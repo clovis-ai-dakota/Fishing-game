@@ -44,8 +44,6 @@ object GameConfig {
     const val LANTERN_PRICE = 600
     const val STARTING_LANTERNS = 1
 
-    const val EVENT_DURATION_MS = 7L * 24 * 60 * 60 * 1000
-
     /** Simulation never advances more than this per frame, and sub-steps at this size. */
     const val MAX_FRAME_DT = 1f / 20f
     const val SUBSTEP_DT = 1f / 120f

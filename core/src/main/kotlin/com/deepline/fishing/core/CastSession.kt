@@ -196,6 +196,14 @@ class CastSession(
         }
     }
 
+    /**
+     * Ends the cast immediately (e.g. when a battle timer runs out). Fish already on the line
+     * are kept and scored.
+     */
+    fun endNow() {
+        if (phase != CastPhase.SURFACED) surface()
+    }
+
     private fun surface() {
         phase = CastPhase.SURFACED
         result = CastResult(
@@ -211,5 +219,9 @@ class CastSession(
     companion object {
         fun create(specs: RopeSpecs, lanternActive: Boolean, random: Random = Random.Default): CastSession =
             CastSession(specs, lanternActive, WorldGenerator.generate(specs.lengthM, random))
+
+        /** A cast on the water generated from [seed]: the same seed always gives the same fish. */
+        fun seeded(specs: RopeSpecs, seed: Long, lanternActive: Boolean = false): CastSession =
+            create(specs, lanternActive, Random(seed))
     }
 }

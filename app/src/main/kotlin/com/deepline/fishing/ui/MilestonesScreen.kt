@@ -36,14 +36,14 @@ fun milestoneRewardText(m: Milestone): String = listOfNotNull(
 @Composable
 fun MilestonesScreen(vm: GameViewModel) {
     val p = vm.progress
-    SubScreen(title = "Event milestones", onBack = { vm.navigate(Screen.HOME) }) {
+    SubScreen(title = "Milestones", onBack = { vm.navigate(Screen.HOME) }) {
         LazyColumn(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             item {
                 Text(
-                    "Earned this event: ${formatPoints(p.pointsEarned)} pts",
+                    "Earned in total: ${formatPoints(p.pointsEarned)} pts",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.Bold,

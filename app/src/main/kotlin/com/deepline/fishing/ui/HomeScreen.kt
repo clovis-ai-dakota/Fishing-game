@@ -13,40 +13,29 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.GameViewModel
 import com.deepline.fishing.Screen
+import com.deepline.fishing.core.DepthZone
 import com.deepline.fishing.core.FishCatalog
 import com.deepline.fishing.core.GameConfig
 import com.deepline.fishing.core.Progression
-import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
 @Composable
 fun HomeScreen(vm: GameViewModel) {
     val p = vm.progress
-    var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
-    LaunchedEffect(Unit) {
-        while (true) {
-            now = System.currentTimeMillis()
-            delay(30_000)
-        }
-    }
-    val eventOver = Progression.isEventOver(p, now)
+    val total = FishCatalog.all.size
 
     Column(
         modifier = Modifier
@@ -59,42 +48,51 @@ fun HomeScreen(vm: GameViewModel) {
         Column {
             Text("Deep Line", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Black)
             Text(
-                "Tide Festival fishing event",
+                "Catch every fish in the deep",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
 
-        Card(Modifier.fillMaxWidth()) {
+        Card(onClick = { vm.navigate(Screen.COLLECTION) }, modifier = Modifier.fillMaxWidth()) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Column(Modifier.weight(1f)) {
-                        Text("Event points", style = MaterialTheme.typography.labelLarge)
-                        Text(
-                            formatPoints(p.pointsBalance),
-                            style = MaterialTheme.typography.headlineMedium,
-                            color = MaterialTheme.colorScheme.secondary,
-                            fontWeight = FontWeight.Bold,
-                        )
-                    }
-                    Column(horizontalAlignment = Alignment.End) {
-                        Text(
-                            if (eventOver) "Event ended" else "Ends in ${formatDuration(Progression.eventEndsAt(p) - now)}",
-                            style = MaterialTheme.typography.labelLarge,
-                        )
-                        Text(
-                            "Earned this event: ${formatPoints(p.pointsEarned)}",
-                            style = MaterialTheme.typography.bodySmall,
-                        )
-                    }
-                }
-                if (eventOver) {
+                    Text("Fish log", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
                     Text(
-                        "Start a new event to keep fishing. Points and milestones reset; " +
-                            "rope upgrades, lanterns and your collection log are kept.",
-                        style = MaterialTheme.typography.bodySmall,
+                        "${p.discoveredCount} / $total",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.secondary,
+                        fontWeight = FontWeight.Bold,
                     )
-                    Button(onClick = vm::startNewEvent, modifier = Modifier.fillMaxWidth()) { Text("Start new event") }
+                }
+                LinearProgressIndicator(
+                    progress = { p.discoveredCount.toFloat() / total },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Text(
+                    DepthZone.entries.joinToString("  ·  ") { zone ->
+                        val species = FishCatalog.all.filter { it.zone == zone }
+                        "${zone.displayName} ${species.count(p::isDiscovered)}/${species.size}"
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+        }
+
+        Card(Modifier.fillMaxWidth()) {
+            Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text("Points", style = MaterialTheme.typography.labelLarge)
+                    Text(
+                        formatPoints(p.pointsBalance),
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.secondary,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+                Column(horizontalAlignment = Alignment.End) {
+                    Text("Earned in total: ${formatPoints(p.pointsEarned)}", style = MaterialTheme.typography.bodySmall)
+                    Text("Casts: ${p.castsMade}", style = MaterialTheme.typography.bodySmall)
                 }
             }
         }
@@ -159,16 +157,20 @@ fun HomeScreen(vm: GameViewModel) {
 
         Button(
             onClick = vm::startCast,
-            enabled = !eventOver,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(64.dp),
         ) {
-            Text(
-                if (eventOver) "Event ended" else "Cast line",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-            )
+            Text("Cast line", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+        }
+
+        FilledTonalButton(
+            onClick = { vm.navigate(Screen.BATTLE_SETUP) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+        ) {
+            Text("1v1 Battle", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         }
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -200,17 +202,5 @@ fun HomeScreen(vm: GameViewModel) {
             }
         }
         Spacer(Modifier.height(8.dp))
-    }
-}
-
-fun formatDuration(ms: Long): String {
-    val totalMinutes = (ms.coerceAtLeast(0) / 60_000)
-    val days = totalMinutes / (60 * 24)
-    val hours = (totalMinutes / 60) % 24
-    val minutes = totalMinutes % 60
-    return when {
-        days > 0 -> "${days}d ${hours}h"
-        hours > 0 -> "${hours}h ${minutes}m"
-        else -> "${minutes}m"
     }
 }

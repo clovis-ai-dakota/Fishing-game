@@ -12,8 +12,8 @@ data class CollectionEntry(
 /**
  * Everything that is saved between sessions.
  *
- * [pointsBalance] is what can be spent on upgrades; [pointsEarned] is the total earned
- * during the current event and drives milestones (spending never lowers it).
+ * [pointsBalance] is what can be spent on upgrades; [pointsEarned] is the lifetime total and
+ * drives milestones (spending never lowers it). There is no time limit: progress is kept forever.
  */
 data class PlayerProgress(
     val pointsBalance: Long = 0,
@@ -22,32 +22,21 @@ data class PlayerProgress(
     val ropeLevels: Map<RopeStat, Int> = emptyMap(),
     val lanterns: Int = GameConfig.STARTING_LANTERNS,
     val collection: Map<String, CollectionEntry> = emptyMap(),
-    val eventStartMillis: Long = 0,
     val castsMade: Int = 0,
+    /** Record against the computer rival. */
+    val battleWins: Int = 0,
+    val battleLosses: Int = 0,
+    val battleDraws: Int = 0,
 ) {
     fun level(stat: RopeStat): Int = ropeLevels[stat] ?: 0
     val specs: RopeSpecs get() = RopeSpecs.fromLevels(ropeLevels)
     val discoveredCount: Int get() = collection.count { it.value.caught > 0 }
+
+    fun isDiscovered(species: FishSpecies): Boolean = (collection[species.id]?.caught ?: 0) > 0
 }
 
 /** Pure functions that turn one [PlayerProgress] into the next. */
 object Progression {
-    fun ensureEventStarted(p: PlayerProgress, nowMillis: Long): PlayerProgress =
-        if (p.eventStartMillis == 0L) p.copy(eventStartMillis = nowMillis) else p
-
-    fun eventEndsAt(p: PlayerProgress): Long = p.eventStartMillis + GameConfig.EVENT_DURATION_MS
-
-    fun isEventOver(p: PlayerProgress, nowMillis: Long): Boolean =
-        p.eventStartMillis != 0L && nowMillis >= eventEndsAt(p)
-
-    /** Starts a fresh event: points and milestones reset; upgrades, lanterns and the log are kept. */
-    fun startNewEvent(p: PlayerProgress, nowMillis: Long): PlayerProgress = p.copy(
-        pointsBalance = 0,
-        pointsEarned = 0,
-        claimedMilestones = emptySet(),
-        eventStartMillis = nowMillis,
-    )
-
     fun applyCast(p: PlayerProgress, result: CastResult): PlayerProgress {
         val collection = p.collection.toMutableMap()
         for (c in result.catches) {
@@ -106,6 +95,13 @@ object Progression {
             lanterns = p.lanterns + m.rewardLanterns,
             claimedMilestones = p.claimedMilestones + m.index,
         )
+    }
+
+    /** Updates the record against the computer rival. [won] is null for a draw. */
+    fun recordBattle(p: PlayerProgress, won: Boolean?): PlayerProgress = when (won) {
+        true -> p.copy(battleWins = p.battleWins + 1)
+        false -> p.copy(battleLosses = p.battleLosses + 1)
+        null -> p.copy(battleDraws = p.battleDraws + 1)
     }
 
     fun nextMilestone(p: PlayerProgress): Milestone? =

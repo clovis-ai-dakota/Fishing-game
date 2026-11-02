@@ -99,19 +99,50 @@ fun CastScreen(vm: GameViewModel) {
             drawCastScene(session, time, textMeasurer)
         }
 
-        CastHud(session = session, time = time, notice = vm.notice, onPause = vm::pause)
+        val turn = vm.battleTurn
+        val battleLabel = turn?.let { t ->
+            val b = vm.battle
+            val name = b?.players?.getOrNull(t.playerIndex)?.name ?: "Player"
+            val perPlayer = b?.mode?.castsPerPlayer
+            when {
+                t.round > 0 -> "$name · Round ${t.round}"
+                perPlayer != null -> "$name · Cast ${t.castNumber}/$perPlayer"
+                else -> "$name · Cast ${t.castNumber}"
+            }
+        }
+        CastHud(
+            session = session,
+            time = time,
+            notice = vm.notice,
+            battleLabel = battleLabel,
+            timeLeft = vm.battleTimeLeft(),
+            onPause = vm::pause,
+        )
 
         if (vm.paused) {
+            val inBattle = turn != null
             AlertDialog(
                 onDismissRequest = vm::resume,
                 title = { Text("Paused") },
-                text = { Text("Quitting ends this cast without scoring any of the fish on the line.") },
+                text = {
+                    Text(
+                        if (inBattle) {
+                            "Quitting forfeits the battle. The battle clock is stopped while paused."
+                        } else {
+                            "Quitting ends this cast without scoring any of the fish on the line."
+                        },
+                    )
+                },
                 confirmButton = { TextButton(onClick = vm::resume) { Text("Resume") } },
-                dismissButton = { TextButton(onClick = vm::abandonCast) { Text("Quit cast") } },
+                dismissButton = {
+                    TextButton(onClick = vm::abandonCast) { Text(if (inBattle) "Forfeit battle" else "Quit cast") }
+                },
             )
         }
 
-        vm.pendingResult?.let { ResultsPanel(it, onCollect = vm::collectResult) }
+        vm.pendingResult?.let {
+            ResultsPanel(it, collectLabel = if (turn != null) "Continue" else "Collect", onCollect = vm::collectResult)
+        }
     }
 }
 
@@ -134,7 +165,14 @@ private fun HudChip(text: String, modifier: Modifier = Modifier) {
  */
 @Suppress("UNUSED_PARAMETER")
 @Composable
-private fun CastHud(session: CastSession, time: Float, notice: Notice?, onPause: () -> Unit) {
+private fun CastHud(
+    session: CastSession,
+    time: Float,
+    notice: Notice?,
+    battleLabel: String?,
+    timeLeft: Float?,
+    onPause: () -> Unit,
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -183,6 +221,25 @@ private fun CastHud(session: CastSession, time: Float, notice: Notice?, onPause:
                 modifier = Modifier.width(70.dp),
             )
         }
+        if (battleLabel != null || timeLeft != null) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                battleLabel?.let { HudChip(it) }
+                timeLeft?.let {
+                    Text(
+                        "⏱ ${formatClock(it)}",
+                        modifier = Modifier
+                            .background(
+                                if (it < 15f) Color(0xCCB71C1C) else Color(0x99001421),
+                                RoundedCornerShape(50),
+                            )
+                            .padding(horizontal = 12.dp, vertical = 6.dp),
+                        color = Color.White,
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            }
+        }
         if (session.lanternActive && session.hookDepth > GameConfig.DARK_DEPTH) {
             HudChip("Lantern lit", Modifier.align(Alignment.Start))
         }
@@ -214,7 +271,7 @@ private fun CastHud(session: CastSession, time: Float, notice: Notice?, onPause:
 }
 
 @Composable
-private fun ResultsPanel(result: CastResult, onCollect: () -> Unit) {
+private fun ResultsPanel(result: CastResult, collectLabel: String, onCollect: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -278,7 +335,7 @@ private fun ResultsPanel(result: CastResult, onCollect: () -> Unit) {
                     color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.Bold,
                 )
-                Button(onClick = onCollect, modifier = Modifier.fillMaxWidth()) { Text("Collect") }
+                Button(onClick = onCollect, modifier = Modifier.fillMaxWidth()) { Text(collectLabel) }
             }
         }
     }

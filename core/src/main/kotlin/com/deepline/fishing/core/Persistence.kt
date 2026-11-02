@@ -24,8 +24,8 @@ object ProgressCodec {
         appendLine("earned=${p.pointsEarned}")
         appendLine("claimed=${p.claimedMilestones.sorted().joinToString(",")}")
         appendLine("lanterns=${p.lanterns}")
-        appendLine("eventStart=${p.eventStartMillis}")
         appendLine("casts=${p.castsMade}")
+        appendLine("battle=${p.battleWins},${p.battleLosses},${p.battleDraws}")
         for ((stat, level) in p.ropeLevels) appendLine("rope.${stat.name}=$level")
         for ((id, e) in p.collection) {
             appendLine("fish.$id=${e.caught},${e.sparklingCaught},${e.deepestM},${e.bestPoints}")
@@ -48,7 +48,12 @@ object ProgressCodec {
                     claimedMilestones = value.split(',').mapNotNull { it.trim().toIntOrNull() }.toSet(),
                 )
                 key == "lanterns" -> value.toIntOrNull()?.let { p = p.copy(lanterns = it) }
-                key == "eventStart" -> value.toLongOrNull()?.let { p = p.copy(eventStartMillis = it) }
+                key == "battle" -> {
+                    val parts = value.split(',').map { it.trim().toIntOrNull() }
+                    if (parts.size == 3 && parts.all { it != null }) {
+                        p = p.copy(battleWins = parts[0]!!, battleLosses = parts[1]!!, battleDraws = parts[2]!!)
+                    }
+                }
                 key == "casts" -> value.toIntOrNull()?.let { p = p.copy(castsMade = it) }
                 key.startsWith("rope.") -> {
                     val stat = RopeStat.entries.firstOrNull { it.name == key.removePrefix("rope.") }

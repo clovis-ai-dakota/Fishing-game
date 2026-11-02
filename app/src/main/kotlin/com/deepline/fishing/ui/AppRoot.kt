@@ -31,6 +31,8 @@ fun AppRoot(vm: GameViewModel) {
             Screen.UPGRADES -> UpgradesScreen(vm)
             Screen.COLLECTION -> CollectionScreen(vm)
             Screen.MILESTONES -> MilestonesScreen(vm)
+            Screen.BATTLE_SETUP -> BattleSetupScreen(vm)
+            Screen.BATTLE -> BattleScreen(vm)
         }
     }
 }

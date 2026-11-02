@@ -79,17 +79,15 @@ class RulesTest {
     }
 
     @Test
-    fun newEventResetsPointsButKeepsGear() {
-        val p = PlayerProgress(
-            pointsBalance = 50, pointsEarned = 5_000, claimedMilestones = setOf(0, 1),
-            ropeLevels = mapOf(RopeStat.LENGTH to 3), lanterns = 4, eventStartMillis = 1,
-        )
-        assertTrue(Progression.isEventOver(p, 1 + GameConfig.EVENT_DURATION_MS))
-        val fresh = Progression.startNewEvent(p, 99)
-        assertEquals(0L, fresh.pointsEarned)
-        assertTrue(fresh.claimedMilestones.isEmpty())
-        assertEquals(3, fresh.level(RopeStat.LENGTH))
-        assertEquals(4, fresh.lanterns)
+    fun battleRecordIsTracked() {
+        var p = PlayerProgress()
+        p = Progression.recordBattle(p, true)
+        p = Progression.recordBattle(p, false)
+        p = Progression.recordBattle(p, null)
+        p = Progression.recordBattle(p, true)
+        assertEquals(2, p.battleWins)
+        assertEquals(1, p.battleLosses)
+        assertEquals(1, p.battleDraws)
     }
 
     @Test
@@ -98,11 +96,13 @@ class RulesTest {
             pointsBalance = 1234, pointsEarned = 5678, claimedMilestones = setOf(0, 2),
             ropeLevels = mapOf(RopeStat.LENGTH to 2, RopeStat.AGILITY to 5), lanterns = 3,
             collection = mapOf("ghost_hake" to CollectionEntry(4, 1, 455.5f, 820)),
-            eventStartMillis = 1_700_000_000_000, castsMade = 9,
+            castsMade = 9, battleWins = 3, battleLosses = 2, battleDraws = 1,
         )
         val repo = ProgressRepository(InMemoryStore())
         repo.save(p)
         assertEquals(p, repo.load())
         assertEquals(PlayerProgress(), ProgressRepository(InMemoryStore()).load())
+        // Saves from the earlier event-based version still load.
+        assertEquals(1234L, ProgressCodec.decode("balance=1234\neventStart=99\n").pointsBalance)
     }
 }

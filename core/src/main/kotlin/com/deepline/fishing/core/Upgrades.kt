@@ -1,6 +1,6 @@
 package com.deepline.fishing.core
 
-/** The rope specs the player can upgrade by spending event points. */
+/** The rope specs the player can upgrade by spending points. */
 enum class RopeStat(
     val displayName: String,
     val description: String,
@@ -35,7 +35,7 @@ data class RopeSpecs(
     }
 }
 
-/** Rewards unlocked by the total number of points earned during the current event. */
+/** Rewards unlocked by the lifetime total of points earned. */
 data class Milestone(
     val index: Int,
     val threshold: Long,
