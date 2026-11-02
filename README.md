@@ -106,7 +106,7 @@ app/    Android app (Jetpack Compose)
 
 ## Building
 
-Requirements: JDK 17+, Android SDK (API 36).
+Requirements: JDK 17+ (JDK 21 for the app UI tests: Robolectric needs it for Android 16), Android SDK (API 36).
 
 ```bash
 ./gradlew :core:test            # game-logic unit tests (no Android SDK needed)
