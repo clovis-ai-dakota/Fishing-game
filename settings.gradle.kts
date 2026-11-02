@@ -28,6 +28,7 @@ dependencyResolutionManagement {
 rootProject.name = "DeepLine"
 
 include(":core")
+include(":server")
 
 // The Android app module needs an Android SDK. It is included whenever one is
 // configured (ANDROID_HOME / ANDROID_SDK_ROOT, or sdk.dir in local.properties),

@@ -1,5 +1,7 @@
 package com.deepline.fishing.core
 
+import kotlinx.serialization.Serializable
+
 /** The ways two players can compete. */
 enum class BattleMode(
     val title: String,
@@ -54,6 +56,7 @@ data class BattleCast(val result: CastResult, val durationSec: Float) {
  * Whose cast comes next. [seed] generates the water for that cast: both players get the same
  * water for the same cast number (or round), so battles are fair.
  */
+@Serializable
 data class BattleTurn(
     val playerIndex: Int,
     /** 1-based cast number for this player. */
@@ -99,33 +102,40 @@ class Battle(
     /** Seed of the water for the [index]-th cast (0-based) of each player / [index]-th round. */
     fun castSeed(index: Int): Long = seed * 1_000_003L + index * 7_919L
 
-    fun nextTurn(): BattleTurn? {
+    /**
+     * The next cast [player] may fish, independently of the other player (used for online
+     * battles, where both fish at the same time). In Best of 5 a player waits for the opponent
+     * to finish the current round before starting the next one; null then means "waiting".
+     */
+    fun nextTurnFor(player: Int): BattleTurn? {
         if (forfeitedBy != null) return null
+        val c = casts[player]
         val limit = mode.timeLimitSec
         val perPlayer = mode.castsPerPlayer
         return when {
             mode == BattleMode.BEST_OF_FIVE -> {
                 if (roundWins(0) >= ROUNDS_TO_WIN || roundWins(1) >= ROUNDS_TO_WIN) return null
                 if (_rounds.size >= MAX_ROUNDS) return null
-                val round = _rounds.size
-                val player = if (casts[0].size <= round) 0 else 1
-                BattleTurn(player, casts[player].size + 1, round + 1, castSeed(round), null)
+                if (c.size > _rounds.size) return null
+                BattleTurn(player, c.size + 1, c.size + 1, castSeed(c.size), null)
             }
-            limit != null -> (0..1).firstNotNullOfOrNull { p ->
-                val left = limit - timeUsed(p)
-                if (left > MIN_TIME_LEFT) BattleTurn(p, casts[p].size + 1, 0, castSeed(casts[p].size), left) else null
+            limit != null -> {
+                val left = limit - timeUsed(player)
+                if (left > MIN_TIME_LEFT) BattleTurn(player, c.size + 1, 0, castSeed(c.size), left) else null
             }
-            perPlayer != null -> (0..1).firstNotNullOfOrNull { p ->
-                if (casts[p].size < perPlayer) BattleTurn(p, casts[p].size + 1, 0, castSeed(casts[p].size), null) else null
-            }
+            perPlayer != null ->
+                if (c.size < perPlayer) BattleTurn(player, c.size + 1, 0, castSeed(c.size), null) else null
             else -> null
         }
     }
 
+    /** The next cast when players take turns on one device: player 1 goes first. */
+    fun nextTurn(): BattleTurn? = nextTurnFor(0) ?: nextTurnFor(1)
+
     val isOver: Boolean get() = nextTurn() == null
 
     fun record(turn: BattleTurn, cast: BattleCast) {
-        check(turn == nextTurn()) { "Out-of-order battle turn: $turn" }
+        check(turn == nextTurnFor(turn.playerIndex)) { "Out-of-order battle turn: $turn" }
         casts[turn.playerIndex] += cast
         if (mode == BattleMode.BEST_OF_FIVE) {
             val round = _rounds.size

@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -39,8 +40,9 @@ fun BattleScreen(vm: GameViewModel) {
     // Battle objects are not observable; reading the version makes this screen recompose.
     @Suppress("UNUSED_VARIABLE")
     val version = vm.battleVersion
-    val outcome = b.outcome()
-    val next = b.nextTurn()
+    val online = vm.onlineMatch?.takeIf { vm.isOnlineBattle }
+    val outcome = if (online != null) online.outcome else b.outcome()
+    val next = vm.battleNextTurn()
     var confirmForfeit by remember { mutableStateOf(false) }
 
     BackHandler {
@@ -60,7 +62,13 @@ fun BattleScreen(vm: GameViewModel) {
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     for (i in 0..1) {
-                        PlayerCard(b, i, highlighted = next?.playerIndex == i, modifier = Modifier.weight(1f))
+                        PlayerCard(
+                            b,
+                            i,
+                            highlighted = next?.playerIndex == i,
+                            isMe = online?.myIndex == i,
+                            modifier = Modifier.weight(1f),
+                        )
                     }
                 }
             }
@@ -103,13 +111,30 @@ fun BattleScreen(vm: GameViewModel) {
                                 textAlign = TextAlign.Center,
                             )
                             if (outcome.byForfeit) {
-                                Text("by forfeit", style = MaterialTheme.typography.bodyMedium)
+                                Text(online?.overReason ?: "by forfeit", style = MaterialTheme.typography.bodyMedium)
                             }
-                            Button(onClick = vm::rematch, modifier = Modifier.fillMaxWidth()) { Text("Rematch") }
+                            Button(onClick = vm::rematch, modifier = Modifier.fillMaxWidth()) {
+                                Text(if (online != null) "New online battle" else "Rematch")
+                            }
                             OutlinedButton(onClick = vm::leaveBattle, modifier = Modifier.fillMaxWidth()) {
                                 Text("Back to menu")
                             }
                         }
+                    }
+                } else if (online != null && next == null) {
+                    Column(
+                        Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        CircularProgressIndicator()
+                        Text(
+                            if (online.awaitingConfirmation != null) "Sending your cast…"
+                            else "Waiting for ${b.players[online.opponentIndex].name}…",
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                        opponentLiveText(vm)?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
+                        TextButton(onClick = { confirmForfeit = true }) { Text("Forfeit") }
                     }
                 } else if (next != null) {
                     val player = b.players[next.playerIndex]
@@ -125,7 +150,9 @@ fun BattleScreen(vm: GameViewModel) {
                             }
                         }
                         Text(what, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        if (!player.isBot && b.players.none { it.isBot }) {
+                        if (online != null) {
+                            opponentLiveText(vm)?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
+                        } else if (!player.isBot && b.players.none { it.isBot }) {
                             Text(
                                 "Hand the phone to ${player.name}.",
                                 style = MaterialTheme.typography.bodySmall,
@@ -138,7 +165,11 @@ fun BattleScreen(vm: GameViewModel) {
                                 .height(56.dp),
                         ) {
                             Text(
-                                if (player.isBot) "Let ${player.name} fish" else "Cast, ${player.name}!",
+                                when {
+                                    player.isBot -> "Let ${player.name} fish"
+                                    online != null -> "Cast!"
+                                    else -> "Cast, ${player.name}!"
+                                },
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                             )
@@ -169,13 +200,13 @@ fun BattleScreen(vm: GameViewModel) {
 }
 
 @Composable
-private fun PlayerCard(b: Battle, index: Int, highlighted: Boolean, modifier: Modifier = Modifier) {
+private fun PlayerCard(b: Battle, index: Int, highlighted: Boolean, isMe: Boolean, modifier: Modifier = Modifier) {
     val player = b.players[index]
     val score = b.score(index)
     Card(modifier) {
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(
-                (if (highlighted) "▶ " else "") + player.name,
+                (if (highlighted) "▶ " else "") + player.name + (if (isMe) " (you)" else ""),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
             )
@@ -199,6 +230,16 @@ private fun castLine(i: Int, c: BattleCast): String {
     val deepest = c.result.catches.maxOfOrNull { it.depth }?.roundToInt()
     return "#${i + 1}: ${formatPoints(c.points)} pts · ${c.result.catches.size} fish · %.1f kg".format(c.result.totalWeightKg) +
         (deepest?.let { " · ${it} m" } ?: "")
+}
+
+/** "Ana is fishing: cast 2 · 230 m ↑ · 3 fish · 450 pts", while the online opponent is mid-cast. */
+fun opponentLiveText(vm: GameViewModel): String? {
+    val match = vm.onlineMatch ?: return null
+    val live = match.opponentLive ?: return null
+    val name = match.battle.players[match.opponentIndex].name
+    val arrow = if (live.ascending) "↑" else "↓"
+    return "$name is fishing: cast ${live.castNumber} · ${live.depth.roundToInt()} m $arrow · " +
+        "${live.fish} fish · ${formatPoints(live.points)} pts"
 }
 
 fun formatClock(seconds: Float): String {

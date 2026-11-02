@@ -116,6 +116,7 @@ fun CastScreen(vm: GameViewModel) {
             notice = vm.notice,
             battleLabel = battleLabel,
             timeLeft = vm.battleTimeLeft(),
+            opponentLive = if (vm.isOnlineBattle) opponentLiveText(vm) else null,
             onPause = vm::pause,
         )
 
@@ -127,7 +128,11 @@ fun CastScreen(vm: GameViewModel) {
                 text = {
                     Text(
                         if (inBattle) {
-                            "Quitting forfeits the battle. The battle clock is stopped while paused."
+                            if (vm.isOnlineBattle) {
+                                "Quitting forfeits the battle. Online, your opponent keeps fishing while you're paused."
+                            } else {
+                                "Quitting forfeits the battle. The battle clock is stopped while paused."
+                            }
                         } else {
                             "Quitting ends this cast without scoring any of the fish on the line."
                         },
@@ -171,6 +176,7 @@ private fun CastHud(
     notice: Notice?,
     battleLabel: String?,
     timeLeft: Float?,
+    opponentLive: String?,
     onPause: () -> Unit,
 ) {
     Column(
@@ -239,6 +245,16 @@ private fun CastHud(
                     )
                 }
             }
+        }
+        opponentLive?.let {
+            Text(
+                it,
+                modifier = Modifier
+                    .background(Color(0x99001421), RoundedCornerShape(12.dp))
+                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                color = Color(0xFFFFCC80),
+                style = MaterialTheme.typography.labelMedium,
+            )
         }
         if (session.lanternActive && session.hookDepth > GameConfig.DARK_DEPTH) {
             HudChip("Lantern lit", Modifier.align(Alignment.Start))

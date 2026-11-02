@@ -121,7 +121,24 @@ class BattleTest {
     @Test
     fun outOfOrderTurnsAreRejected() {
         val b = Battle(BattleMode.HEAVY_HAUL, players(), seed = 8)
-        val wrong = b.nextTurn()!!.copy(playerIndex = 1)
+        val wrong = b.nextTurn()!!.copy(castNumber = 2)
         assertFailsWith<IllegalStateException> { b.record(wrong, cast(1)) }
+    }
+
+    @Test
+    fun onlinePlayersCanFishAtTheSameTimeButBestOfFiveWaitsForTheRound() {
+        val b = Battle(BattleMode.BEST_OF_FIVE, players(), seed = 9)
+        val p1 = b.nextTurnFor(1)!!
+        b.record(p1, cast(10)) // player 2 finishes round 1 first
+        assertNull(b.nextTurnFor(1), "player 2 waits for player 1 to finish round 1")
+        b.record(b.nextTurnFor(0)!!, cast(20))
+        assertEquals(0, b.rounds.single().winner)
+        assertEquals(2, b.nextTurnFor(1)!!.round)
+
+        val haul = Battle(BattleMode.HEAVY_HAUL, players(), seed = 10)
+        haul.record(haul.nextTurnFor(1)!!, cast(1))
+        haul.record(haul.nextTurnFor(1)!!, cast(1))
+        assertEquals(3, haul.nextTurnFor(1)!!.castNumber)
+        assertEquals(1, haul.nextTurnFor(0)!!.castNumber)
     }
 }

@@ -31,12 +31,16 @@ import com.deepline.fishing.Opponent
 import com.deepline.fishing.Screen
 import com.deepline.fishing.core.BattleMode
 import com.deepline.fishing.core.BotDifficulty
+import com.deepline.fishing.core.online.OnlineProtocol
+
+private const val FRIEND = "FRIEND"
+private const val ONLINE = "ONLINE"
 
 @Composable
 fun BattleSetupScreen(vm: GameViewModel) {
     var mode by rememberSaveable { mutableStateOf(BattleMode.BEST_OF_FIVE) }
-    // null = friend on this device, otherwise the computer's difficulty.
-    var difficulty by rememberSaveable { mutableStateOf<BotDifficulty?>(BotDifficulty.NORMAL) }
+    // A BotDifficulty name, FRIEND (pass and play) or ONLINE.
+    var opponentKey by rememberSaveable { mutableStateOf(BotDifficulty.NORMAL.name) }
     val p = vm.progress
 
     SubScreen(title = "1v1 Battle", onBack = { vm.navigate(Screen.HOME) }) {
@@ -79,8 +83,8 @@ fun BattleSetupScreen(vm: GameViewModel) {
                     Text("Computer:", style = MaterialTheme.typography.bodyMedium)
                     for (d in BotDifficulty.entries) {
                         FilterChip(
-                            selected = difficulty == d,
-                            onClick = { difficulty = d },
+                            selected = opponentKey == d.name,
+                            onClick = { opponentKey = d.name },
                             label = { Text(d.displayName) },
                         )
                     }
@@ -88,16 +92,28 @@ fun BattleSetupScreen(vm: GameViewModel) {
             }
             item {
                 FilterChip(
-                    selected = difficulty == null,
-                    onClick = { difficulty = null },
+                    selected = opponentKey == FRIEND,
+                    onClick = { opponentKey = FRIEND },
                     label = { Text("Friend on this device (pass and play)") },
                 )
             }
             item {
+                FilterChip(
+                    selected = opponentKey == ONLINE,
+                    onClick = { opponentKey = ONLINE },
+                    label = { Text("Online (room code or quick match)") },
+                )
+            }
+            item {
                 Text(
-                    "Both players use your current rope and fish the very same water for each cast, " +
-                        "so skill decides. No lanterns in battles. Battle catches don't count for your " +
-                        "points or fish log.",
+                    if (opponentKey == ONLINE) {
+                        "Online, both players fish at the same time on their own phones, on the very same " +
+                            "water, with the same standard tournament rope (level ${OnlineProtocol.TOURNAMENT_ROPE_LEVEL} " +
+                            "in every stat)."
+                    } else {
+                        "Both players use your current rope and fish the very same water for each cast, " +
+                            "so skill decides."
+                    } + " No lanterns in battles. Battle catches don't count for your points or fish log.",
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
@@ -111,14 +127,18 @@ fun BattleSetupScreen(vm: GameViewModel) {
             item {
                 Button(
                     onClick = {
-                        val opponent = difficulty?.let { Opponent.Computer(it) } ?: Opponent.Friend
+                        val opponent = when (opponentKey) {
+                            FRIEND -> Opponent.Friend
+                            ONLINE -> Opponent.Online
+                            else -> Opponent.Computer(BotDifficulty.valueOf(opponentKey))
+                        }
                         vm.startBattle(mode, opponent)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
                 ) {
-                    Text("Start battle", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(if (opponentKey == ONLINE) "Go online" else "Start battle", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 }
             }
         }

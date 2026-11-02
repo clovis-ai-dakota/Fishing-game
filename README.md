@@ -32,9 +32,10 @@ improves and try to fill the fish log.
 
 ### 1v1 battles
 
-Against the computer (Easy / Normal / Hard) or a friend on the same device (pass and play).
-Both players use the device's current rope and fish **the same water** for the same cast
-number (or round), so skill decides. No lanterns in battles, and battle catches don't count
+Against the computer (Easy / Normal / Hard), a friend on the same device (pass and play), or
+**online**. Both players fish **the same water** for the same cast number (or round), so skill
+decides. Offline both use the device's current rope; online both use a standard tournament
+rope (level 5 in every stat). No lanterns in battles, and battle catches don't count
 towards points or the fish log. The record against the computer is saved.
 
 | Mode | Rules |
@@ -44,6 +45,18 @@ towards points or the fish log. The record against the computer is saved.
 | Heavy Haul | 3 casts each; most total kilograms wins. |
 | Species Hunt | 3 casts each; most different species wins, total points break ties. |
 | Deep Dive | 3 casts each; the single deepest catch wins, total points break ties. |
+
+#### Online
+
+- **Room code:** one player creates a room and shares the 5-character code; the other joins.
+- **Quick match:** you are paired with the next player who picks the same mode.
+- Both players fish **at the same time** on their own phones and see the opponent's live depth
+  and score. In Best of 5 the next round starts once both have finished the current one.
+- The server is authoritative: it checks every cast (species exist, live at that depth, fit
+  within the tournament rope's length and weight limit, valid turn) and **recomputes the
+  points itself**. Leaving or losing the connection mid-match forfeits it.
+- Not handled yet: reconnecting to a match after a dropped connection, accounts or rankings,
+  and full anti-cheat (a modified client could still report fish it never actually hooked).
 
 The computer rival plays by exactly the same rules (see `core/.../Bot.kt`): it dodges objects
 on the way down and aims for fish heads on the way up. Its difficulty changes how far ahead it
@@ -62,7 +75,8 @@ These details weren't in the spec, so I picked values. All numbers live in
 | Head zone | The front third of the fish, in the direction it faces. |
 | Depth scoring | `base × (1 + depth / 100 m)`; Sparkling = ×3, spawn chance 6 %. |
 | Lantern | Start with 1; earned from milestones, or 600 pts in the upgrades screen. |
-| Battle opponents | Offline only (computer or pass and play); online play would need a server. |
+| Online rope | Same tournament rope for both players (level 5 in every stat), since each phone has its own upgrades. |
+| Online pause | Pausing stops your own clock only; the opponent keeps fishing. |
 | Battle modes beyond the two requested | Heavy Haul, Species Hunt, Deep Dive. |
 | Bait / cast limit | None (bait was dropped from the spec): casting is unlimited. |
 | Quitting a cast | Pause → *Quit cast* returns to the menu with no points; a lantern used for it is spent. |
@@ -80,8 +94,11 @@ core/   Pure Kotlin game logic (no Android dependency) + unit tests
         Battle.kt          1v1 battle modes, turns, scoring
         Bot.kt             computer rival
         Persistence.kt     save/load (key=value text)
+        online/            battle protocol (JSON messages), cast validation, client-side match mirror
+server/ Ktor WebSocket battle server (room codes, quick match, authoritative battles) + tests
 app/    Android app (Jetpack Compose)
-        GameViewModel.kt   game state, persistence via SharedPreferences
+        GameViewModel.kt   game state, persistence via SharedPreferences, online flow
+        OnlineConnection.kt WebSocket client (Ktor + OkHttp)
         ui/CastScreen.kt   game loop, HUD, pause, results
         ui/CastRenderer.kt underwater scene drawn on a Canvas
         ui/*Screen.kt      home, upgrades, fish log, milestones, battle setup / hub
@@ -96,6 +113,26 @@ Requirements: JDK 17+, Android SDK (API 36).
 ./gradlew :app:assembleDebug    # APK at app/build/outputs/apk/debug/
 ./gradlew :app:installDebug     # install on a connected device / emulator
 ```
+
+### Battle server
+
+```bash
+./gradlew :server:test           # server tests (real WebSocket matches)
+./gradlew :server:run            # runs on http://localhost:8080 (PORT env var to change)
+docker build -t deepline-server . && docker run -p 8080:8080 deepline-server
+```
+
+Any host that runs a Docker container or a JVM works (for example Fly.io, Render, Railway or a
+VPS). Players connect to `ws://<host>:8080/battle`, or `wss://<host>/battle` behind HTTPS.
+
+The app's default server address is `ws://10.0.2.2:8080/battle`, which is the development
+machine as seen from the Android emulator. To ship a build pointing at your deployed server:
+
+```bash
+./gradlew :app:assembleDebug -PdeeplineServerUrl=wss://your-host.example.com/battle
+```
+
+Players can also change the address in the app (Online battle → Server settings).
 
 The `:app` module is only included when an Android SDK is found (`ANDROID_HOME`,
 `ANDROID_SDK_ROOT`, or `sdk.dir` in `local.properties`), so `:core` can be built anywhere.

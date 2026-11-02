@@ -33,6 +33,7 @@ fun AppRoot(vm: GameViewModel) {
             Screen.MILESTONES -> MilestonesScreen(vm)
             Screen.BATTLE_SETUP -> BattleSetupScreen(vm)
             Screen.BATTLE -> BattleScreen(vm)
+            Screen.ONLINE_LOBBY -> OnlineLobbyScreen(vm)
         }
     }
 }

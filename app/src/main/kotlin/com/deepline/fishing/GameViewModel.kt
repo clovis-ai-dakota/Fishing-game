@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.deepline.fishing.core.Battle
 import com.deepline.fishing.core.BattleCast
 import com.deepline.fishing.core.BattleMode
@@ -24,9 +25,15 @@ import com.deepline.fishing.core.Progression
 import com.deepline.fishing.core.ProgressRepository
 import com.deepline.fishing.core.ReverseReason
 import com.deepline.fishing.core.RopeStat
+import com.deepline.fishing.core.online.ClientMessage
+import com.deepline.fishing.core.online.LiveStatus
+import com.deepline.fishing.core.online.OnlineMatch
+import com.deepline.fishing.core.online.OnlineProtocol
+import com.deepline.fishing.core.online.ServerMessage
+import com.deepline.fishing.core.online.toDto
 import kotlin.random.Random
 
-enum class Screen { HOME, CAST, UPGRADES, COLLECTION, MILESTONES, BATTLE_SETUP, BATTLE }
+enum class Screen { HOME, CAST, UPGRADES, COLLECTION, MILESTONES, BATTLE_SETUP, BATTLE, ONLINE_LOBBY }
 
 /** A short message flashed over the game screen. */
 data class Notice(val text: String, val shownAtSeconds: Float)
@@ -35,10 +42,14 @@ data class Notice(val text: String, val shownAtSeconds: Float)
 sealed interface Opponent {
     data class Computer(val difficulty: BotDifficulty) : Opponent
     data object Friend : Opponent
+    data object Online : Opponent
 }
 
+enum class OnlineStatus { DISCONNECTED, CONNECTING, CONNECTED, WAITING_ROOM, WAITING_QUICK, IN_MATCH }
+
 class GameViewModel(app: Application) : AndroidViewModel(app) {
-    private val repository = ProgressRepository(SharedPrefsStore(app))
+    private val store = SharedPrefsStore(app)
+    private val repository = ProgressRepository(store)
 
     var progress by mutableStateOf(repository.load())
         private set
@@ -67,6 +78,27 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         private set
     private var battleOpponent: Opponent? = null
     private var battleRecorded = false
+
+    // --- Online --------------------------------------------------------------------------
+
+    var onlineStatus by mutableStateOf(OnlineStatus.DISCONNECTED)
+        private set
+    var onlineError by mutableStateOf<String?>(null)
+        private set
+    var roomCode by mutableStateOf<String?>(null)
+        private set
+    var onlineMode by mutableStateOf(BattleMode.BEST_OF_FIVE)
+        private set
+    var onlineMatch by mutableStateOf<OnlineMatch?>(null)
+        private set
+    var playerName by mutableStateOf(store.getString(KEY_NAME) ?: "Angler")
+        private set
+    var serverUrl by mutableStateOf(store.getString(KEY_SERVER) ?: BuildConfig.DEFAULT_SERVER_URL)
+        private set
+    private var connection: OnlineConnection? = null
+    private var lastLiveSentAt = -1f
+
+    val isOnlineBattle: Boolean get() = onlineMatch != null && battle === onlineMatch?.battle
 
     private fun update(p: PlayerProgress) {
         progress = p
@@ -131,6 +163,25 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             notice = Notice("Time's up!", s.elapsedSeconds)
         }
         if (s.phase == CastPhase.SURFACED) pendingResult = s.result
+        sendLiveStatus(s)
+    }
+
+    private fun sendLiveStatus(s: CastSession) {
+        val turn = battleTurn ?: return
+        if (!isOnlineBattle) return
+        if (lastLiveSentAt >= 0f && s.elapsedSeconds - lastLiveSentAt < LIVE_INTERVAL_SEC) return
+        lastLiveSentAt = s.elapsedSeconds
+        connection?.send(
+            ClientMessage.Live(
+                LiveStatus(
+                    castNumber = turn.castNumber,
+                    depth = s.hookDepth,
+                    points = s.pointsSoFar,
+                    fish = s.catches.size,
+                    ascending = s.phase == CastPhase.ASCENDING,
+                ),
+            ),
+        )
     }
 
     /** Seconds left on the battle clock during a timed battle cast, otherwise null. */
@@ -160,6 +211,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         pendingResult = null
         battleTurn = null
         if (turn != null) {
+            onlineMatch?.let { if (isOnlineBattle) it.markSent(turn) }
             forfeitBattle(turn.playerIndex)
         } else {
             screen = Screen.HOME
@@ -175,7 +227,15 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         battleTurn = null
         if (turn != null && result != null && s != null) {
             val duration = turn.timeLimitSec?.let { minOf(it, s.elapsedSeconds) } ?: s.elapsedSeconds
-            battle?.record(turn, BattleCast(result, duration))
+            val cast = BattleCast(result, duration)
+            val online = onlineMatch
+            if (isOnlineBattle && online != null) {
+                // Online casts are only recorded once the server confirms them.
+                online.markSent(turn)
+                connection?.send(ClientMessage.CastFinished(turn, cast.toDto()))
+            } else {
+                battle?.record(turn, cast)
+            }
             onBattleChanged()
             screen = Screen.BATTLE
             return
@@ -207,6 +267,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
                 BattlePlayer("Rival (${opponent.difficulty.displayName})", opponent.difficulty),
             )
             Opponent.Friend -> listOf(BattlePlayer("Player 1"), BattlePlayer("Player 2"))
+            Opponent.Online -> return openOnlineLobby(mode)
         }
         battle = Battle(mode, players, Random.nextLong())
         battleOpponent = opponent
@@ -219,7 +280,18 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     fun rematch() {
         val b = battle ?: return
         val opponent = battleOpponent ?: return
-        startBattle(b.mode, opponent)
+        if (opponent == Opponent.Online) {
+            clearBattle()
+            openOnlineLobby(b.mode)
+        } else {
+            startBattle(b.mode, opponent)
+        }
+    }
+
+    /** The next cast to play from this device, or null when waiting or finished. */
+    fun battleNextTurn(): BattleTurn? {
+        val online = onlineMatch
+        return if (isOnlineBattle && online != null) online.myNextTurn() else battle?.nextTurn()
     }
 
     /**
@@ -227,6 +299,13 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
      * (all of the computer's consecutive casts at once).
      */
     fun playNextTurn() {
+        val online = onlineMatch
+        if (isOnlineBattle && online != null) {
+            val turn = online.myNextTurn() ?: return
+            lastLiveSentAt = -1f
+            beginSession(CastSession.seeded(OnlineProtocol.tournamentSpecs, turn.seed), turn)
+            return
+        }
         val b = battle ?: return
         var turn = b.nextTurn() ?: return
         val firstBot = b.players[turn.playerIndex].bot
@@ -244,24 +323,40 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun forfeitBattle(playerIndex: Int = 0) {
-        battle?.forfeit(playerIndex)
-        onBattleChanged()
+        if (isOnlineBattle) {
+            // The server answers with MatchOver.
+            connection?.send(ClientMessage.Forfeit)
+        } else {
+            battle?.forfeit(playerIndex)
+            onBattleChanged()
+        }
         screen = Screen.BATTLE
     }
 
     fun leaveBattle() {
+        val wasOnline = isOnlineBattle
         val b = battle
-        if (b != null && !b.isOver) b.forfeit(0)
-        onBattleChanged()
+        if (wasOnline) {
+            if (onlineMatch?.outcome == null) connection?.send(ClientMessage.Forfeit)
+        } else if (b != null && !b.isOver) {
+            b.forfeit(0)
+            onBattleChanged()
+        }
+        clearBattle()
+        screen = if (wasOnline) Screen.ONLINE_LOBBY else Screen.HOME
+    }
+
+    private fun clearBattle() {
         battle = null
         battleOpponent = null
-        screen = Screen.HOME
+        onlineMatch = null
+        if (onlineStatus == OnlineStatus.IN_MATCH) onlineStatus = OnlineStatus.CONNECTED
     }
 
     private fun onBattleChanged() {
         battleVersion++
         val b = battle ?: return
-        val outcome = b.outcome() ?: return
+        val outcome = (if (isOnlineBattle) onlineMatch?.outcome else b.outcome()) ?: return
         if (!battleRecorded && battleOpponent is Opponent.Computer) {
             battleRecorded = true
             update(Progression.recordBattle(progress, outcome.winner?.let { it == 0 }))
@@ -275,7 +370,133 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             Screen.CAST -> if (pendingResult != null) collectResult() else if (paused) resume() else pause()
             Screen.BATTLE -> if (battle?.isOver != false) leaveBattle() else Unit
             Screen.BATTLE_SETUP -> screen = Screen.HOME
+            Screen.ONLINE_LOBBY -> closeOnlineLobby()
             else -> screen = Screen.HOME
         }
+    }
+
+    // --- Online lobby ---------------------------------------------------------------------
+
+    fun openOnlineLobby(mode: BattleMode) {
+        onlineMode = mode
+        onlineError = null
+        screen = Screen.ONLINE_LOBBY
+    }
+
+    fun closeOnlineLobby() {
+        disconnect()
+        screen = Screen.BATTLE_SETUP
+    }
+
+    fun updatePlayerName(name: String) {
+        playerName = name.take(OnlineProtocol.MAX_NAME_LENGTH)
+        store.putString(KEY_NAME, playerName)
+    }
+
+    fun updateServerUrl(url: String) {
+        serverUrl = url.trim()
+        store.putString(KEY_SERVER, serverUrl)
+        // A different server needs a fresh connection.
+        if (onlineStatus == OnlineStatus.CONNECTED) disconnect()
+    }
+
+    fun createRoom() = sendToServer(ClientMessage.CreateRoom(onlineMode))
+
+    fun joinRoom(code: String) {
+        val normalized = OnlineProtocol.normalizeRoomCode(code)
+        if (normalized.length != OnlineProtocol.ROOM_CODE_LENGTH) {
+            onlineError = "Room codes have ${OnlineProtocol.ROOM_CODE_LENGTH} characters."
+            return
+        }
+        sendToServer(ClientMessage.JoinRoom(normalized))
+    }
+
+    fun quickMatch() = sendToServer(ClientMessage.QuickMatch(onlineMode))
+
+    fun cancelWaiting() {
+        connection?.send(ClientMessage.CancelWaiting)
+    }
+
+    private fun sendToServer(message: ClientMessage) {
+        onlineError = null
+        if (connection == null) {
+            onlineStatus = OnlineStatus.CONNECTING
+            connection = OnlineConnection(viewModelScope, ::onServerMessage, ::onConnectionClosed).also {
+                it.connect(serverUrl, OnlineProtocol.sanitizeName(playerName))
+            }
+        }
+        connection?.send(message)
+    }
+
+    private fun onServerMessage(message: ServerMessage) {
+        when (message) {
+            is ServerMessage.Welcome -> if (onlineStatus == OnlineStatus.CONNECTING) onlineStatus = OnlineStatus.CONNECTED
+            is ServerMessage.RoomCreated -> {
+                roomCode = message.code
+                onlineStatus = OnlineStatus.WAITING_ROOM
+            }
+            is ServerMessage.Waiting -> onlineStatus = OnlineStatus.WAITING_QUICK
+            ServerMessage.WaitingCancelled -> {
+                roomCode = null
+                onlineStatus = OnlineStatus.CONNECTED
+            }
+            is ServerMessage.MatchStarted -> {
+                val match = OnlineMatch(message)
+                roomCode = null
+                onlineMatch = match
+                battle = match.battle
+                battleOpponent = Opponent.Online
+                battleRecorded = false
+                battleTurn = null
+                onlineStatus = OnlineStatus.IN_MATCH
+                onBattleChanged()
+                screen = Screen.BATTLE
+            }
+            is ServerMessage.Error -> {
+                onlineError = message.message
+                if (onlineStatus == OnlineStatus.CONNECTING) onlineStatus = OnlineStatus.CONNECTED
+            }
+            is ServerMessage.CastRecorded, is ServerMessage.OpponentLive, is ServerMessage.MatchOver -> {
+                onlineMatch?.apply(message)
+                onBattleChanged()
+            }
+        }
+    }
+
+    private fun onConnectionClosed(reason: String) {
+        connection = null
+        roomCode = null
+        onlineStatus = OnlineStatus.DISCONNECTED
+        onlineError = reason
+        val match = onlineMatch
+        if (match != null && match.outcome == null) {
+            match.connectionLost(reason)
+            if (screen == Screen.CAST && battleTurn != null) {
+                session = null
+                paused = false
+                pendingResult = null
+                battleTurn = null
+                screen = Screen.BATTLE
+            }
+            onBattleChanged()
+        }
+    }
+
+    private fun disconnect() {
+        connection?.close()
+        connection = null
+        roomCode = null
+        if (onlineMatch == null) onlineStatus = OnlineStatus.DISCONNECTED
+    }
+
+    override fun onCleared() {
+        connection?.close()
+        super.onCleared()
+    }
+
+    private companion object {
+        const val KEY_NAME = "online.name"
+        const val KEY_SERVER = "online.server"
+        const val LIVE_INTERVAL_SEC = 0.5f
     }
 }
