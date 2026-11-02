@@ -153,7 +153,7 @@ fun DrawScope.drawCastScene(session: CastSession, timeSeconds: Float, textMeasur
         drawFish(
             species = f.species,
             center = Offset(sx(f.x), sy(f.depth)),
-            lengthPx = f.species.lengthM * scale,
+            lengthPx = f.species.bodyLengthM * scale,
             direction = f.direction,
             sparkling = f.sparkling,
             timeSeconds = timeSeconds,
@@ -179,7 +179,7 @@ fun DrawScope.drawCastScene(session: CastSession, timeSeconds: Float, textMeasur
     // Catches hanging from the hook, heads up
     val n = session.caughtFish.size
     session.caughtFish.forEachIndexed { i, f ->
-        val len = f.species.lengthM * scale
+        val len = f.species.bodyLengthM * scale
         val ox = (i - (n - 1) / 2f) * 0.35f * scale
         drawFish(
             species = f.species,

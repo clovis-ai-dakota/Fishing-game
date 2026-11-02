@@ -31,6 +31,9 @@ data class FishSpecies(
     val accentColor: Long,
 ) {
     val zone: DepthZone get() = DepthZone.of(minDepth)
+
+    /** In-game body length (catalog length × [GameConfig.FISH_SIZE_SCALE]). */
+    val bodyLengthM: Float get() = lengthM * GameConfig.FISH_SIZE_SCALE
 }
 
 object FishCatalog {

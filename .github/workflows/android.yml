@@ -18,11 +18,18 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      - name: Unit tests, server build and debug APK
-        run: ./gradlew :core:test :server:test :server:installDist :app:assembleDebug --stacktrace
+      - name: Tests (core, server, app UI) and debug APK
+        run: ./gradlew :core:test :server:test :app:testDebugUnitTest :app:assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: deep-line-debug-apk
           path: app/build/outputs/apk/debug/*.apk
+
+      - name: Upload UI screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deep-line-screenshots
+          path: app/build/screenshots/*.png

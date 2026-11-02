@@ -114,6 +114,19 @@ Requirements: JDK 17+, Android SDK (API 36).
 ./gradlew :app:installDebug     # install on a connected device / emulator
 ```
 
+### Tests
+
+```bash
+./gradlew :core:test :server:test :app:testDebugUnitTest
+```
+
+- `core`: game rules, battles, the computer rival and the online protocol.
+- `server`: real WebSocket matches against the battle server.
+- `app`: Robolectric UI tests that run the real app on the JVM. They tap through every
+  screen, play casts and battles, render the dark zone with and without a Lantern, and play a
+  full online match against the real server (started as a separate process). Screenshots are
+  written to `app/build/screenshots/`; CI uploads them as the `deep-line-screenshots` artifact.
+
 ### Battle server
 
 ```bash

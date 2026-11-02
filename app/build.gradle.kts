@@ -39,6 +39,13 @@ android {
         buildConfig = true
     }
 
+    testOptions {
+        unitTests {
+            // Robolectric UI tests render the real app on the JVM.
+            isIncludeAndroidResources = true
+        }
+    }
+
     packaging {
         resources {
             excludes += setOf("/META-INF/{AL2.0,LGPL2.1}", "/META-INF/INDEX.LIST")
@@ -50,6 +57,15 @@ kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_17)
     }
+}
+
+// The online UI test runs the real battle server as a separate process.
+tasks.withType<Test>().configureEach {
+    // Robolectric UI test classes each get a fresh JVM so app state (e.g. the coroutine main
+    // dispatcher) never leaks from one class into the next.
+    forkEvery = 1
+    dependsOn(":server:installDist")
+    systemProperty("deepline.serverBin", rootProject.file("server/build/install/server/bin/server").absolutePath)
 }
 
 dependencies {
@@ -73,4 +89,9 @@ dependencies {
     val ktorVersion = "3.3.3"
     implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
     implementation("io.ktor:ktor-client-websockets:$ktorVersion")
+
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.robolectric:robolectric:4.16.1")
+    testImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
 }

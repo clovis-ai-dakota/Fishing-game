@@ -27,8 +27,8 @@ class FishEntity(
     internal var fleeTimer = 0f
     internal var tooHeavyCooldown = 0f
 
-    val halfLength: Float get() = species.lengthM / 2f
-    val halfHeight: Float get() = species.lengthM * species.heightRatio / 2f
+    val halfLength: Float get() = species.bodyLengthM / 2f
+    val halfHeight: Float get() = species.bodyLengthM * species.heightRatio / 2f
     val isFleeing: Boolean get() = fleeTimer > 0f
 
     internal fun swim(dt: Float) {

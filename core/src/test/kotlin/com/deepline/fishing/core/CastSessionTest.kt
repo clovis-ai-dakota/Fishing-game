@@ -16,7 +16,7 @@ class CastSessionTest {
 
     /** A fish that does not move, placed so that the hook at [center] meets the given part of it. */
     private fun stillFish(id: Int, species: FishSpecies, depth: Float, hookOn: String, direction: Int = 1): FishEntity {
-        val half = species.lengthM / 2f
+        val half = species.bodyLengthM / 2f
         val offset = when (hookOn) {
             "head" -> half * 0.8f
             "tail" -> -half * 0.8f

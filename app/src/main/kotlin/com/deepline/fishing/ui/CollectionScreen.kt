@@ -92,7 +92,7 @@ fun CollectionScreen(vm: GameViewModel) {
                                     )
                                 } else {
                                     Text(
-                                        "Not caught yet. Lives around ${s.minDepth.roundToInt()} m and deeper.",
+                                        "Not caught yet. Found at ${s.minDepth.roundToInt()}–${s.maxDepth.roundToInt()} m.",
                                         style = MaterialTheme.typography.bodySmall,
                                     )
                                 }

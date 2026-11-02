@@ -37,9 +37,10 @@ import kotlin.math.roundToInt
 @Composable
 fun BattleScreen(vm: GameViewModel) {
     val b = vm.battle ?: return
-    // Battle objects are not observable; reading the version makes this screen recompose.
-    @Suppress("UNUSED_VARIABLE")
+    // Battle objects are not observable: reading the version makes this screen recompose, and
+    // everything shown is copied into plain data so the children recompose when it changes.
     val version = vm.battleVersion
+    val view = remember(b, version) { BattleView.of(b) }
     val online = vm.onlineMatch?.takeIf { vm.isOnlineBattle }
     val outcome = if (online != null) online.outcome else b.outcome()
     val next = vm.battleNextTurn()
@@ -63,8 +64,7 @@ fun BattleScreen(vm: GameViewModel) {
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     for (i in 0..1) {
                         PlayerCard(
-                            b,
-                            i,
+                            view.players[i],
                             highlighted = next?.playerIndex == i,
                             isMe = online?.myIndex == i,
                             modifier = Modifier.weight(1f),
@@ -73,15 +73,15 @@ fun BattleScreen(vm: GameViewModel) {
                 }
             }
 
-            if (b.mode == BattleMode.BEST_OF_FIVE && b.rounds.isNotEmpty()) {
+            if (b.mode == BattleMode.BEST_OF_FIVE && view.rounds.isNotEmpty()) {
                 item { Text("Rounds", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold) }
-                items(b.rounds) { r ->
+                items(view.rounds) { r ->
                     Card(Modifier.fillMaxWidth()) {
                         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
                             Text("Round ${r.number}", modifier = Modifier.weight(1f), fontWeight = FontWeight.SemiBold)
                             Text("${formatPoints(r.points[0])}  vs  ${formatPoints(r.points[1])}")
                             Text(
-                                r.winner?.let { "  → ${b.players[it].name}" } ?: "  → tie",
+                                r.winnerName?.let { "  → $it" } ?: "  → tie",
                                 color = MaterialTheme.colorScheme.secondary,
                             )
                         }
@@ -199,10 +199,36 @@ fun BattleScreen(vm: GameViewModel) {
     }
 }
 
+/** Plain snapshot of a battle for display. */
+private data class PlayerView(
+    val name: String,
+    val scoreLabel: String,
+    val totalPoints: Int,
+    val timeLeft: Float?,
+    val castLines: List<String>,
+)
+
+private data class RoundView(val number: Int, val points: List<Int>, val winnerName: String?)
+
+private data class BattleView(val players: List<PlayerView>, val rounds: List<RoundView>) {
+    companion object {
+        fun of(b: Battle) = BattleView(
+            players = (0..1).map { i ->
+                PlayerView(
+                    name = b.players[i].name,
+                    scoreLabel = b.score(i).label,
+                    totalPoints = b.totalPoints(i),
+                    timeLeft = b.mode.timeLimitSec?.let { (it - b.timeUsed(i)).coerceAtLeast(0f) },
+                    castLines = b.castsOf(i).mapIndexed(::castLine),
+                )
+            },
+            rounds = b.rounds.map { r -> RoundView(r.number, r.points, r.winner?.let { b.players[it].name }) },
+        )
+    }
+}
+
 @Composable
-private fun PlayerCard(b: Battle, index: Int, highlighted: Boolean, isMe: Boolean, modifier: Modifier = Modifier) {
-    val player = b.players[index]
-    val score = b.score(index)
+private fun PlayerCard(player: PlayerView, highlighted: Boolean, isMe: Boolean, modifier: Modifier = Modifier) {
     Card(modifier) {
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(
@@ -211,17 +237,16 @@ private fun PlayerCard(b: Battle, index: Int, highlighted: Boolean, isMe: Boolea
                 fontWeight = FontWeight.Bold,
             )
             Text(
-                score.label,
+                player.scoreLabel,
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.secondary,
                 fontWeight = FontWeight.Bold,
             )
-            b.mode.timeLimitSec?.let { limit ->
-                val left = (limit - b.timeUsed(index)).coerceAtLeast(0f)
-                Text("Time left ${formatClock(left)}", style = MaterialTheme.typography.bodySmall)
+            player.timeLeft?.let {
+                Text("Time left ${formatClock(it)}", style = MaterialTheme.typography.bodySmall)
             }
-            Text("Total ${formatPoints(b.totalPoints(index))} pts", style = MaterialTheme.typography.bodySmall)
-            b.castsOf(index).forEachIndexed { i, c -> Text(castLine(i, c), style = MaterialTheme.typography.bodySmall) }
+            Text("Total ${formatPoints(player.totalPoints)} pts", style = MaterialTheme.typography.bodySmall)
+            player.castLines.forEach { Text(it, style = MaterialTheme.typography.bodySmall) }
         }
     }
 }

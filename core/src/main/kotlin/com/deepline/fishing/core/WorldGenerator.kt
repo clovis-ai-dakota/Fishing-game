@@ -13,7 +13,7 @@ object WorldGenerator {
             val candidates = FishCatalog.all.filter { depth >= it.minDepth && depth <= it.maxDepth }
             if (candidates.isNotEmpty()) {
                 val species = weightedPick(candidates, random) { it.rarity }
-                val halfLength = species.lengthM / 2f
+                val halfLength = species.bodyLengthM / 2f
                 fish += FishEntity(
                     id = id++,
                     species = species,

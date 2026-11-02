@@ -5,13 +5,19 @@ package com.deepline.fishing.core
  * Distances are in meters, speeds in meters per second, weights in kilograms.
  */
 object GameConfig {
-    /** Width of the playable water column. */
-    const val WORLD_WIDTH = 30f
+    /** Width of the playable water column (and of the screen). */
+    const val WORLD_WIDTH = 20f
+
+    /**
+     * Fish are drawn and collide at this multiple of their catalog length, so they are big
+     * enough on a phone screen to aim at their heads.
+     */
+    const val FISH_SIZE_SCALE = 2f
 
     /** On the way down, the hook reverses after touching this many objects (fish or obstacles). */
     const val DESCENT_TOUCH_LIMIT = 4
 
-    const val DESCENT_SPEED = 20f
+    const val DESCENT_SPEED = 18f
     const val ASCENT_SPEED = 15f
 
     /** Collision radius of the hook. */
@@ -21,7 +27,7 @@ object GameConfig {
     const val DARK_DEPTH = 300f
     /** Depth range over which darkness fades in after [DARK_DEPTH]. */
     const val DARK_FADE_RANGE = 25f
-    const val VISIBLE_RADIUS_DARK = 5f
+    const val VISIBLE_RADIUS_DARK = 6f
     const val VISIBLE_RADIUS_LANTERN = 14f
 
     /** Chance that a spawned fish is Sparkling, and how much more a Sparkling fish is worth. */
@@ -32,7 +38,7 @@ object GameConfig {
     const val DEPTH_MULTIPLIER_PER_100M = 1f
 
     /** Average vertical spacing between spawned fish / obstacles. */
-    const val FISH_SPACING = 3.5f
+    const val FISH_SPACING = 4.5f
     const val FIRST_FISH_DEPTH = 6f
     const val OBSTACLE_SPACING = 22f
     const val FIRST_OBSTACLE_DEPTH = 25f

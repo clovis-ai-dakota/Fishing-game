@@ -65,7 +65,12 @@ fun CastScreen(vm: GameViewModel) {
     var time by remember(session) { mutableFloatStateOf(0f) }
     val textMeasurer = rememberTextMeasurer()
 
-    LaunchedEffect(session) {
+    // The loop only runs while the cast is live: no frames are spent on the pause dialog or
+    // the results panel. [time] keeps counting from where it stopped.
+    val running = !vm.paused && vm.pendingResult == null
+    LaunchedEffect(session, running) {
+        if (!running) return@LaunchedEffect
+        val resumedAt = time
         var start = 0L
         var last = 0L
         while (true) {
@@ -77,7 +82,7 @@ fun CastScreen(vm: GameViewModel) {
                     vm.onFrame(dt, target)
                 }
                 last = now
-                time = (now - start) / 1_000_000_000f
+                time = resumedAt + (now - start) / 1_000_000_000f
             }
         }
     }
@@ -110,9 +115,12 @@ fun CastScreen(vm: GameViewModel) {
                 else -> "$name · Cast ${t.castNumber}"
             }
         }
+        // Reading [time] subscribes this screen to every frame; the HUD then gets plain values
+        // so it recomposes whenever one of them changes.
+        @Suppress("UNUSED_VARIABLE")
+        val frameTick = time
         CastHud(
-            session = session,
-            time = time,
+            hud = HudState.of(session),
             notice = vm.notice,
             battleLabel = battleLabel,
             timeLeft = vm.battleTimeLeft(),
@@ -164,15 +172,36 @@ private fun HudChip(text: String, modifier: Modifier = Modifier) {
     )
 }
 
-/**
- * [time] changes every frame; taking it as a parameter makes the HUD recompose each frame so
- * it reflects the (non-observable) simulation state of [session].
- */
-@Suppress("UNUSED_PARAMETER")
+/** Plain snapshot of what the HUD shows, taken from the (non-observable) session each frame. */
+private data class HudState(
+    val depthM: Int,
+    val phase: CastPhase,
+    val points: Int,
+    val touchesLeft: Int,
+    val carriedKg: Float,
+    val maxKg: Float,
+    val lanternLit: Boolean,
+    val elapsedSeconds: Float,
+    val nothingCaughtYet: Boolean,
+) {
+    companion object {
+        fun of(s: CastSession) = HudState(
+            depthM = s.hookDepth.roundToInt(),
+            phase = s.phase,
+            points = s.pointsSoFar,
+            touchesLeft = s.touchesLeft,
+            carriedKg = s.carriedWeightKg,
+            maxKg = s.specs.maxWeightKg,
+            lanternLit = s.lanternActive && s.hookDepth > GameConfig.DARK_DEPTH,
+            elapsedSeconds = s.elapsedSeconds,
+            nothingCaughtYet = s.catches.isEmpty(),
+        )
+    }
+}
+
 @Composable
 private fun CastHud(
-    session: CastSession,
-    time: Float,
+    hud: HudState,
     notice: Notice?,
     battleLabel: String?,
     timeLeft: Float?,
@@ -187,16 +216,16 @@ private fun CastHud(
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            HudChip("${session.hookDepth.roundToInt()} m")
+            HudChip("${hud.depthM} m")
             HudChip(
-                when (session.phase) {
+                when (hud.phase) {
                     CastPhase.DESCENDING -> "Sinking"
                     CastPhase.ASCENDING -> "Reeling up"
                     CastPhase.SURFACED -> "Surfaced"
                 },
             )
             Spacer(Modifier.weight(1f))
-            HudChip("${formatPoints(session.pointsSoFar)} pts")
+            HudChip("${formatPoints(hud.points)} pts")
             FilledTonalButton(onClick = onPause) { Text("II", fontWeight = FontWeight.Black) }
         }
         Row(
@@ -212,18 +241,17 @@ private fun CastHud(
                     Modifier
                         .size(12.dp)
                         .clip(CircleShape)
-                        .background(if (i < session.touchesLeft) Color(0xFF80DEEA) else Color(0x33FFFFFF)),
+                        .background(if (i < hud.touchesLeft) Color(0xFF80DEEA) else Color(0x33FFFFFF)),
                 )
             }
             Spacer(Modifier.width(10.dp))
-            val max = session.specs.maxWeightKg
             Text(
-                "Load %.1f / %.0f kg".format(session.carriedWeightKg, max),
+                "Load %.1f / %.0f kg".format(hud.carriedKg, hud.maxKg),
                 color = Color.White,
                 style = MaterialTheme.typography.labelMedium,
             )
             LinearProgressIndicator(
-                progress = { (session.carriedWeightKg / max).coerceIn(0f, 1f) },
+                progress = { (hud.carriedKg / hud.maxKg).coerceIn(0f, 1f) },
                 modifier = Modifier.width(70.dp),
             )
         }
@@ -256,18 +284,18 @@ private fun CastHud(
                 style = MaterialTheme.typography.labelMedium,
             )
         }
-        if (session.lanternActive && session.hookDepth > GameConfig.DARK_DEPTH) {
+        if (hud.lanternLit) {
             HudChip("Lantern lit", Modifier.align(Alignment.Start))
         }
 
         val hint = when {
-            session.elapsedSeconds < 3.5f ->
+            hud.elapsedSeconds < 3.5f ->
                 "Drag to steer. Avoid bumping things on the way down: ${GameConfig.DESCENT_TOUCH_LIMIT} bumps and the line comes up."
-            session.phase == CastPhase.ASCENDING && session.catches.isEmpty() && notice == null ->
+            hud.phase == CastPhase.ASCENDING && hud.nothingCaughtYet && notice == null ->
                 "Nudge fish on the HEAD to hook them. Tails don't count."
             else -> null
         }
-        val activeNotice = notice?.takeIf { session.elapsedSeconds - it.shownAtSeconds < 1.8f }
+        val activeNotice = notice?.takeIf { hud.elapsedSeconds - it.shownAtSeconds < 1.8f }
         val message = activeNotice?.text ?: hint
         if (message != null) {
             Text(
