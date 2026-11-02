@@ -1,0 +1,84 @@
+package com.deepline.fishing.core
+
+/** Minimal storage abstraction so the core stays independent of Android. */
+interface KeyValueStore {
+    fun getString(key: String): String?
+    fun putString(key: String, value: String)
+}
+
+class InMemoryStore : KeyValueStore {
+    private val map = HashMap<String, String>()
+    override fun getString(key: String): String? = map[key]
+    override fun putString(key: String, value: String) {
+        map[key] = value
+    }
+}
+
+/** Encodes [PlayerProgress] as simple `key=value` lines. Unknown or malformed lines are ignored. */
+object ProgressCodec {
+    private const val VERSION = 1
+
+    fun encode(p: PlayerProgress): String = buildString {
+        appendLine("v=$VERSION")
+        appendLine("balance=${p.pointsBalance}")
+        appendLine("earned=${p.pointsEarned}")
+        appendLine("claimed=${p.claimedMilestones.sorted().joinToString(",")}")
+        appendLine("lanterns=${p.lanterns}")
+        appendLine("eventStart=${p.eventStartMillis}")
+        appendLine("casts=${p.castsMade}")
+        for ((stat, level) in p.ropeLevels) appendLine("rope.${stat.name}=$level")
+        for ((id, e) in p.collection) {
+            appendLine("fish.$id=${e.caught},${e.sparklingCaught},${e.deepestM},${e.bestPoints}")
+        }
+    }
+
+    fun decode(text: String): PlayerProgress {
+        var p = PlayerProgress()
+        val ropeLevels = HashMap<RopeStat, Int>()
+        val collection = HashMap<String, CollectionEntry>()
+        for (line in text.lineSequence()) {
+            val eq = line.indexOf('=')
+            if (eq <= 0) continue
+            val key = line.substring(0, eq)
+            val value = line.substring(eq + 1)
+            when {
+                key == "balance" -> value.toLongOrNull()?.let { p = p.copy(pointsBalance = it) }
+                key == "earned" -> value.toLongOrNull()?.let { p = p.copy(pointsEarned = it) }
+                key == "claimed" -> p = p.copy(
+                    claimedMilestones = value.split(',').mapNotNull { it.trim().toIntOrNull() }.toSet(),
+                )
+                key == "lanterns" -> value.toIntOrNull()?.let { p = p.copy(lanterns = it) }
+                key == "eventStart" -> value.toLongOrNull()?.let { p = p.copy(eventStartMillis = it) }
+                key == "casts" -> value.toIntOrNull()?.let { p = p.copy(castsMade = it) }
+                key.startsWith("rope.") -> {
+                    val stat = RopeStat.entries.firstOrNull { it.name == key.removePrefix("rope.") }
+                    val level = value.toIntOrNull()
+                    if (stat != null && level != null) ropeLevels[stat] = level.coerceIn(0, stat.maxLevel)
+                }
+                key.startsWith("fish.") -> {
+                    val parts = value.split(',')
+                    if (parts.size == 4) {
+                        val entry = CollectionEntry(
+                            caught = parts[0].toIntOrNull() ?: continue,
+                            sparklingCaught = parts[1].toIntOrNull() ?: continue,
+                            deepestM = parts[2].toFloatOrNull() ?: continue,
+                            bestPoints = parts[3].toIntOrNull() ?: continue,
+                        )
+                        collection[key.removePrefix("fish.")] = entry
+                    }
+                }
+            }
+        }
+        return p.copy(ropeLevels = ropeLevels, collection = collection)
+    }
+}
+
+class ProgressRepository(private val store: KeyValueStore) {
+    fun load(): PlayerProgress = store.getString(KEY)?.let(ProgressCodec::decode) ?: PlayerProgress()
+
+    fun save(progress: PlayerProgress) = store.putString(KEY, ProgressCodec.encode(progress))
+
+    private companion object {
+        const val KEY = "progress"
+    }
+}
