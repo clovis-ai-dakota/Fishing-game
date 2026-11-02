@@ -27,7 +27,7 @@ class OnlineConnection(
     private val onClosed: (String) -> Unit,
 ) {
     private val client = HttpClient(OkHttp) { install(WebSockets) }
-    private val outgoing = Channel<ClientMessage>(Channel.UNLIMITED)
+    private val outbox = Channel<ClientMessage>(Channel.UNLIMITED)
     private var job: Job? = null
 
     @Volatile
@@ -40,7 +40,7 @@ class OnlineConnection(
                 client.webSocket(urlString = url) {
                     send(Frame.Text(OnlineProtocol.encode(ClientMessage.Hello(playerName))))
                     val writer = launch {
-                        for (m in outgoing) send(Frame.Text(OnlineProtocol.encode(m)))
+                        for (m in outbox) send(Frame.Text(OnlineProtocol.encode(m)))
                     }
                     try {
                         for (frame in incoming) {
@@ -66,13 +66,13 @@ class OnlineConnection(
     }
 
     fun send(message: ClientMessage) {
-        outgoing.trySend(message)
+        outbox.trySend(message)
     }
 
     fun close() {
         closedByUser = true
         job?.cancel()
-        outgoing.close()
+        outbox.close()
         client.close()
     }
 }
