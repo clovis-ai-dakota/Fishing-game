@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.GameViewModel
 import com.deepline.fishing.Screen
+import com.deepline.fishing.ui.secrets.SecretsScreen
 import com.deepline.fishing.ui.tour.LocalTourTargets
 import com.deepline.fishing.ui.tour.TourOverlay
 import com.deepline.fishing.ui.tour.TourTargets
@@ -44,6 +45,7 @@ fun AppRoot(vm: GameViewModel) {
                     Screen.BATTLE_SETUP -> BattleSetupScreen(vm)
                     Screen.BATTLE -> BattleScreen(vm)
                     Screen.ONLINE_LOBBY -> OnlineLobbyScreen(vm)
+                    Screen.SECRETS -> SecretsScreen(vm)
                 }
                 vm.tour?.let { TourOverlay(it, onNext = vm::tourNext, onBack = vm::tourBack, onSkip = vm::skipTour) }
             }

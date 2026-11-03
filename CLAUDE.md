@@ -13,6 +13,12 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
   "What's new" tour of just those steps. Point steps at UI with `Modifier.tourTarget(...)`.
   `TourContentTest` fails when a screen, battle mode or rope upgrade isn't covered; extend it
   when you add new kinds of features.
+- **Fishing secrets are hidden mechanics: never reveal them in the tour** (`TourContentTest`
+  checks for giveaways). To add one: add an id to `Secrets` in `core/.../Progress.kt`, make
+  the game trigger it (see `Secrets.revealedBy` and `GameViewModel.onSecretTriggered`), and
+  describe it in `app/.../ui/secrets/FishingSecrets.kt`. It's explained the first time it
+  happens (with "show again next time?") and then listed in the Fishing secrets screen, whose
+  button only appears once a secret has been found.
 - All tunable numbers live in `core/.../GameConfig.kt` (plus the tables in `FishSpecies.kt` and
   `Upgrades.kt`). The tour and HUD read them, so don't hard-code them in UI text.
 - Run `./gradlew :core:test :server:test :app:testDebugUnitTest` before pushing. App UI tests

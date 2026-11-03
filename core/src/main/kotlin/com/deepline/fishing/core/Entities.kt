@@ -66,6 +66,10 @@ class Obstacle(
     /** The hook passed through this obstacle in the bump-free zone. */
     var passedInBumpFreeZone: Boolean = false
         internal set
+
+    /** Hooked by the last bump: it rides up on the line. */
+    var snagged: Boolean = false
+        internal set
 }
 
 class World(

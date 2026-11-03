@@ -46,6 +46,22 @@ class ProtocolTest {
     }
 
     @Test
+    fun snagsAreValidatedAndRescored() {
+        val specs = OnlineProtocol.tournamentSpecs
+        val turn = BattleTurn(0, 1, 0, 1L, null)
+        val snag = com.deepline.fishing.core.online.SnagDto(ObstacleKind.ROCK, 120f, points = 999_999)
+        val dto = com.deepline.fishing.core.online.CastDto(emptyList(), 120f, GameConfig.DESCENT_TOUCH_LIMIT, ReverseReason.TOUCH_LIMIT, 20f, listOf(snag))
+        assertEquals(dto, OnlineProtocol.decodeClient(OnlineProtocol.encode(ClientMessage.CastFinished(turn, dto)))!!.let { (it as ClientMessage.CastFinished).cast })
+
+        val cast = assertNotNull(CastValidation.toBattleCast(dto, turn, specs))
+        assertEquals(Scoring.snagPoints(ObstacleKind.ROCK, 120f), cast.points)
+
+        assertNull(CastValidation.toBattleCast(dto.copy(touchesUsed = 2), turn, specs), "only the last bump snags")
+        assertNull(CastValidation.toBattleCast(dto.copy(snags = listOf(snag, snag)), turn, specs), "one hook per cast")
+        assertNull(CastValidation.toBattleCast(dto.copy(snags = listOf(snag.copy(depth = 10f))), turn, specs), "bump-free zone")
+    }
+
+    @Test
     fun onlineMirrorWaitsForServerConfirmation() {
         val match = OnlineMatch(ServerMessage.MatchStarted(BattleMode.HEAVY_HAUL, 5L, 1, listOf("A", "B")))
         val turn = assertNotNull(match.myNextTurn())

@@ -26,6 +26,9 @@ object ProgressCodec {
         appendLine("lanterns=${p.lanterns}")
         appendLine("casts=${p.castsMade}")
         appendLine("battle=${p.battleWins},${p.battleLosses},${p.battleDraws}")
+        appendLine("secrets=${p.discoveredSecrets.sorted().joinToString(",")}")
+        appendLine("secretsMuted=${p.mutedSecretPopups.sorted().joinToString(",")}")
+        appendLine("snagged=${p.objectsSnagged}")
         for ((stat, level) in p.ropeLevels) appendLine("rope.${stat.name}=$level")
         for ((id, e) in p.collection) {
             appendLine("fish.$id=${e.caught},${e.sparklingCaught},${e.deepestM},${e.bestPoints}")
@@ -48,6 +51,9 @@ object ProgressCodec {
                     claimedMilestones = value.split(',').mapNotNull { it.trim().toIntOrNull() }.toSet(),
                 )
                 key == "lanterns" -> value.toIntOrNull()?.let { p = p.copy(lanterns = it) }
+                key == "secrets" -> p = p.copy(discoveredSecrets = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet())
+                key == "secretsMuted" -> p = p.copy(mutedSecretPopups = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet())
+                key == "snagged" -> value.toIntOrNull()?.let { p = p.copy(objectsSnagged = it) }
                 key == "battle" -> {
                     val parts = value.split(',').map { it.trim().toIntOrNull() }
                     if (parts.size == 3 && parts.all { it != null }) {

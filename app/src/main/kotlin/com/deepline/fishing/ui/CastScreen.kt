@@ -38,6 +38,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.systemGestureExclusion
+import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.font.FontWeight
@@ -50,12 +52,23 @@ import com.deepline.fishing.core.CastPhase
 import com.deepline.fishing.core.CastResult
 import com.deepline.fishing.core.CastSession
 import com.deepline.fishing.core.GameConfig
+import com.deepline.fishing.ui.secrets.FishingSecrets
+import com.deepline.fishing.ui.secrets.SecretDiscoveredDialog
 import kotlin.math.roundToInt
 
 /** Latest finger position, read by the game loop without causing recomposition. */
 private class SteerInput {
+    /** The finger being followed, so a second finger or a lift-and-retouch can't confuse it. */
+    var pointerId: PointerId? = null
     var pointerX: Float? = null
-    var widthPx: Float = 1f
+    var widthPx: Float = 0f
+
+    /** Where the finger is in world meters, or null when nobody is touching (or before layout). */
+    fun targetX(): Float? {
+        val x = pointerX ?: return null
+        if (widthPx <= 1f) return null
+        return x / widthPx * GameConfig.WORLD_WIDTH
+    }
 }
 
 @Composable
@@ -67,7 +80,7 @@ fun CastScreen(vm: GameViewModel) {
 
     // The loop only runs while the cast is live: no frames are spent on the pause dialog or
     // the results panel. [time] keeps counting from where it stopped.
-    val running = !vm.paused && vm.pendingResult == null
+    val running = !vm.paused && vm.pendingResult == null && vm.secretPopup == null
     LaunchedEffect(session, running) {
         if (!running) return@LaunchedEffect
         val resumedAt = time
@@ -78,8 +91,7 @@ fun CastScreen(vm: GameViewModel) {
                 if (start == 0L) start = now
                 if (last != 0L) {
                     val dt = (now - last) / 1_000_000_000f
-                    val target = steer.pointerX?.let { it / steer.widthPx * GameConfig.WORLD_WIDTH }
-                    vm.onFrame(dt, target)
+                    vm.onFrame(dt, steer.targetX())
                 }
                 last = now
                 time = resumedAt + (now - start) / 1_000_000_000f
@@ -91,17 +103,25 @@ fun CastScreen(vm: GameViewModel) {
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
-                .onSizeChanged { steer.widthPx = it.width.toFloat().coerceAtLeast(1f) }
+                .onSizeChanged { steer.widthPx = it.width.toFloat() }
+                // Let steering drags near the screen edges steer instead of triggering the system
+                // back gesture (Android honors this for part of each edge).
+                .systemGestureExclusion()
                 .pointerInput(session) {
                     awaitPointerEventScope {
                         while (true) {
                             val event = awaitPointerEvent()
-                            steer.pointerX = event.changes.firstOrNull { it.pressed }?.position?.x
+                            // Follow one finger: keep the one we follow while it's down, otherwise
+                            // pick up any finger that is down. When none is, the hook holds still.
+                            val followed = event.changes.firstOrNull { it.id == steer.pointerId && it.pressed }
+                                ?: event.changes.firstOrNull { it.pressed }
+                            steer.pointerId = followed?.id
+                            steer.pointerX = followed?.position?.x
                         }
                     }
                 },
         ) {
-            drawCastScene(session, time, textMeasurer)
+            drawCastScene(session, time, textMeasurer, aimX = steer.targetX())
         }
 
         val turn = vm.battleTurn
@@ -151,6 +171,10 @@ fun CastScreen(vm: GameViewModel) {
                     TextButton(onClick = vm::abandonCast) { Text(if (inBattle) "Forfeit battle" else "Quit cast") }
                 },
             )
+        }
+
+        vm.secretPopup?.let { id ->
+            FishingSecrets.byId(id)?.let { SecretDiscoveredDialog(it, onAnswer = vm::answerSecretPopup) }
         }
 
         vm.pendingResult?.let {
@@ -303,8 +327,8 @@ private fun CastHud(
 
         val hint = when {
             hud.elapsedSeconds < 3.5f ->
-                "Drag to steer. Below ${GameConfig.BUMP_FREE_DEPTH.toInt()} m, avoid bumping things: " +
-                    "${GameConfig.DESCENT_TOUCH_LIMIT} bumps and the line comes up."
+                "Drag to steer: the hook glides to your finger. Below ${GameConfig.BUMP_FREE_DEPTH.toInt()} m, " +
+                    "avoid fish heads and objects: ${GameConfig.DESCENT_TOUCH_LIMIT} bumps and the line comes up."
             hud.phase == CastPhase.ASCENDING && hud.nothingCaughtYet && notice == null ->
                 "Nudge fish on the HEAD to hook them. Tails don't count."
             else -> null
@@ -328,6 +352,10 @@ private fun CastHud(
     }
 }
 
+/** How deep the cast went, counting what was caught (a hooked rock's center can sit below the hook). */
+private fun deepestPoint(result: CastResult): Float =
+    maxOf(result.maxDepth, result.catches.maxOfOrNull { it.depth } ?: 0f, result.snags.maxOfOrNull { it.depth } ?: 0f)
+
 @Composable
 private fun ResultsPanel(result: CastResult, collectLabel: String, onCollect: () -> Unit) {
     Box(
@@ -344,11 +372,12 @@ private fun ResultsPanel(result: CastResult, collectLabel: String, onCollect: ()
             Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text("Cast complete", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                 Text(
-                    "Deepest point ${result.maxDepth.roundToInt()} m · ${result.catches.size} fish · %.1f kg"
+                    "Deepest point ${deepestPoint(result).roundToInt()} m · ${result.catches.size} fish" +
+                        (if (result.snags.isNotEmpty()) " · ${result.snags.size} object" else "") + " · %.1f kg"
                         .format(result.totalWeightKg),
                     style = MaterialTheme.typography.bodyMedium,
                 )
-                if (result.catches.isEmpty()) {
+                if (result.catches.isEmpty() && result.snags.isEmpty()) {
                     Text(
                         "Nothing on the line this time. On the way up, steer into fish so the hook meets their head.",
                         style = MaterialTheme.typography.bodyMedium,
@@ -358,6 +387,22 @@ private fun ResultsPanel(result: CastResult, collectLabel: String, onCollect: ()
                         modifier = Modifier.heightIn(max = 320.dp),
                         verticalArrangement = Arrangement.spacedBy(6.dp),
                     ) {
+                        items(result.snags) { sn ->
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Canvas(Modifier.size(width = 48.dp, height = 28.dp)) {
+                                    drawObstacleIcon(sn.kind, Offset(size.width / 2f, size.height / 2f), size.height * 0.45f)
+                                }
+                                Spacer(Modifier.width(10.dp))
+                                Column(Modifier.weight(1f)) {
+                                    Text(sn.kind.displayName, color = SparkleGold, fontWeight = FontWeight.SemiBold)
+                                    Text(
+                                        "${sn.depth.roundToInt()} m · hooked by the last bump",
+                                        style = MaterialTheme.typography.bodySmall,
+                                    )
+                                }
+                                Text("+${formatPoints(sn.points)}", fontWeight = FontWeight.Bold, color = SparkleGold)
+                            }
+                        }
                         items(result.catches) { c ->
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Canvas(Modifier.size(width = 48.dp, height = 28.dp)) {
@@ -378,7 +423,8 @@ private fun ResultsPanel(result: CastResult, collectLabel: String, onCollect: ()
                                         fontWeight = FontWeight.SemiBold,
                                     )
                                     Text(
-                                        "${c.depth.roundToInt()} m · %.1f kg".format(c.species.weightKg),
+                                        "${c.depth.roundToInt()} m · %.1f kg".format(c.species.weightKg) +
+                                            (if (c.byLastBump) " · hooked by the last bump" else ""),
                                         style = MaterialTheme.typography.bodySmall,
                                     )
                                 }

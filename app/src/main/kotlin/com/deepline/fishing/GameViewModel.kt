@@ -24,7 +24,9 @@ import com.deepline.fishing.core.PlayerProgress
 import com.deepline.fishing.core.Progression
 import com.deepline.fishing.core.ProgressRepository
 import com.deepline.fishing.core.ReverseReason
+import com.deepline.fishing.core.RopeSpecs
 import com.deepline.fishing.core.RopeStat
+import com.deepline.fishing.core.Secrets
 import com.deepline.fishing.core.online.ClientMessage
 import com.deepline.fishing.core.online.LiveStatus
 import com.deepline.fishing.core.online.OnlineMatch
@@ -35,7 +37,7 @@ import com.deepline.fishing.ui.tour.Tour
 import com.deepline.fishing.ui.tour.TourSession
 import kotlin.random.Random
 
-enum class Screen { HOME, CAST, UPGRADES, COLLECTION, MILESTONES, BATTLE_SETUP, BATTLE, ONLINE_LOBBY }
+enum class Screen { HOME, CAST, UPGRADES, COLLECTION, MILESTONES, BATTLE_SETUP, BATTLE, ONLINE_LOBBY, SECRETS }
 
 /** A short message flashed over the game screen. */
 data class Notice(val text: String, val shownAtSeconds: Float)
@@ -179,7 +181,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         val lantern = useLantern && p.lanterns > 0
         if (lantern) p = Progression.consumeLantern(p) ?: p
         update(p)
-        beginSession(CastSession.create(p.specs, lantern), turn = null)
+        beginSession(castFactory(p.specs, lantern), turn = null)
     }
 
     private fun beginSession(s: CastSession, turn: BattleTurn?) {
@@ -191,11 +193,21 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         screen = Screen.CAST
     }
 
+    /** Builds the water for a regular cast. Tests swap it to fish hand-placed water. */
+    internal var castFactory: (RopeSpecs, Boolean) -> CastSession = { specs, lantern -> CastSession.create(specs, lantern) }
+
+    /** The fishing secret being explained right now (the cast is paused while it shows). */
+    var secretPopup by mutableStateOf<String?>(null)
+        private set
+
     fun onFrame(dt: Float, steerTargetX: Float?) {
         val s = session ?: return
-        if (paused || pendingResult != null) return
+        if (paused || pendingResult != null || secretPopup != null) return
         s.update(dt, steerTargetX)
-        for (event in s.drainEvents()) {
+        val events = s.drainEvents()
+        // A last-bump hook comes with the line turning back; its notice is the one worth showing.
+        val hooked = events.any { it is CastEvent.LastBumpHooked }
+        for (event in events) {
             val text = when (event) {
                 is CastEvent.Touched ->
                     if (event.touchesUsed < GameConfig.DESCENT_TOUCH_LIMIT) {
@@ -204,7 +216,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
                         null
                     }
                 is CastEvent.Reversed -> when (event.reason) {
-                    ReverseReason.TOUCH_LIMIT -> "Line pulled up! Aim for heads"
+                    ReverseReason.TOUCH_LIMIT -> if (hooked) null else "Line pulled up! Aim for heads"
                     ReverseReason.ROPE_END -> "End of the rope! Reel in"
                 }
                 is CastEvent.Caught -> buildString {
@@ -213,6 +225,10 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
                     append("  +${event.record.points}")
                 }
                 is CastEvent.TooHeavy -> "Too heavy: ${event.species.name}"
+                is CastEvent.LastBumpHooked -> {
+                    onSecretTriggered(Secrets.LAST_BUMP)
+                    "Last bump hooked: ${event.name}  +${event.points}"
+                }
                 CastEvent.Surfaced -> null
             }
             if (text != null) notice = Notice(text, s.elapsedSeconds)
@@ -249,6 +265,20 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         val limit = battleTurn?.timeLimitSec ?: return null
         val elapsed = session?.elapsedSeconds ?: 0f
         return (limit - elapsed).coerceAtLeast(0f)
+    }
+
+    /** A hidden mechanic just happened: remember it, and explain it unless the player opted out. */
+    private fun onSecretTriggered(id: String) {
+        val explain = Progression.shouldExplainSecret(progress, id)
+        update(Progression.discoverSecret(progress, id))
+        if (explain) secretPopup = id
+    }
+
+    /** Closes the secret explanation; [showAgain] is the answer to "show this again next time?". */
+    fun answerSecretPopup(showAgain: Boolean) {
+        val id = secretPopup ?: return
+        update(Progression.setSecretPopupMuted(progress, id, muted = !showAgain))
+        secretPopup = null
     }
 
     fun pause() {
@@ -431,6 +461,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             Screen.BATTLE -> if (battle?.isOver != false) leaveBattle() else Unit
             Screen.BATTLE_SETUP -> screen = Screen.HOME
             Screen.ONLINE_LOBBY -> closeOnlineLobby()
+            Screen.SECRETS -> screen = Screen.HOME
             else -> screen = Screen.HOME
         }
     }

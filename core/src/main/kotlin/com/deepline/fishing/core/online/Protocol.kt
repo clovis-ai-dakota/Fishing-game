@@ -7,10 +7,13 @@ import com.deepline.fishing.core.CastResult
 import com.deepline.fishing.core.CatchRecord
 import com.deepline.fishing.core.FishCatalog
 import com.deepline.fishing.core.GameConfig
+import com.deepline.fishing.core.ObstacleKind
 import com.deepline.fishing.core.ReverseReason
 import com.deepline.fishing.core.RopeSpecs
 import com.deepline.fishing.core.RopeStat
 import com.deepline.fishing.core.Scoring
+import com.deepline.fishing.core.SnagRecord
+import com.deepline.fishing.core.snagPoints
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -26,7 +29,8 @@ import kotlinx.serialization.json.Json
  * [ServerMessage.MatchOver].
  */
 object OnlineProtocol {
-    const val VERSION = 1
+    /** 2: bumps only on fish heads, and the last bump hooks what it hit (snags). */
+    const val VERSION = 2
 
     /** Online battles use the same standard rope for both players. */
     const val TOURNAMENT_ROPE_LEVEL = 5
@@ -132,7 +136,16 @@ data class LiveStatus(
 )
 
 @Serializable
-data class CatchDto(val speciesId: String, val sparkling: Boolean, val depth: Float, val points: Int = 0)
+data class CatchDto(
+    val speciesId: String,
+    val sparkling: Boolean,
+    val depth: Float,
+    val points: Int = 0,
+    val byLastBump: Boolean = false,
+)
+
+@Serializable
+data class SnagDto(val kind: ObstacleKind, val depth: Float, val points: Int = 0)
 
 @Serializable
 data class CastDto(
@@ -141,14 +154,16 @@ data class CastDto(
     val touchesUsed: Int,
     val reverseReason: ReverseReason? = null,
     val durationSec: Float,
+    val snags: List<SnagDto> = emptyList(),
 )
 
 fun BattleCast.toDto(): CastDto = CastDto(
-    catches = result.catches.map { CatchDto(it.species.id, it.sparkling, it.depth, it.points) },
+    catches = result.catches.map { CatchDto(it.species.id, it.sparkling, it.depth, it.points, it.byLastBump) },
     maxDepth = result.maxDepth,
     touchesUsed = result.touchesUsed,
     reverseReason = result.reverseReason,
     durationSec = durationSec,
+    snags = result.snags.map { SnagDto(it.kind, it.depth, it.points) },
 )
 
 object CastValidation {
@@ -158,8 +173,9 @@ object CastValidation {
 
     /**
      * Rebuilds a cast from what a client reported, or returns null if it is impossible with
-     * [specs] (unknown species, fish outside its habitat or beyond the rope, too much weight).
-     * Points are always recomputed from species, depth and Sparkling, never taken from the client.
+     * [specs]: unknown species, fish outside its habitat or beyond the rope, too much weight, or a
+     * last-bump hook that couldn't have happened (more than one, without using every bump, or in
+     * the bump-free zone). Points are always recomputed, never taken from the client.
      */
     fun toBattleCast(dto: CastDto, turn: BattleTurn, specs: RopeSpecs): BattleCast? {
         val catches = ArrayList<CatchRecord>()
@@ -168,9 +184,26 @@ object CastValidation {
             if (!c.depth.isFinite()) return null
             if (c.depth < species.minDepth - DEPTH_TOLERANCE || c.depth > species.maxDepth + DEPTH_TOLERANCE) return null
             if (c.depth > specs.lengthM + DEPTH_TOLERANCE) return null
-            catches += CatchRecord(species, c.sparkling, c.depth, Scoring.points(species, c.depth, c.sparkling))
+            catches += CatchRecord(species, c.sparkling, c.depth, Scoring.points(species, c.depth, c.sparkling), c.byLastBump)
         }
-        if (catches.sumOf { it.species.weightKg.toDouble() } > specs.maxWeightKg + 1e-3) return null
+        val snags = ArrayList<SnagRecord>()
+        for (sn in dto.snags) {
+            if (!sn.depth.isFinite()) return null
+            if (sn.depth < sn.kind.minDepth - DEPTH_TOLERANCE || sn.depth > sn.kind.maxDepth + DEPTH_TOLERANCE) return null
+            if (sn.depth > specs.lengthM + DEPTH_TOLERANCE) return null
+            snags += SnagRecord(sn.kind, sn.depth, Scoring.snagPoints(sn.kind, sn.depth))
+        }
+        val lastBumpHooks = catches.filter { it.byLastBump }
+        if (lastBumpHooks.size + snags.size > 1) return null
+        if (lastBumpHooks.size + snags.size == 1) {
+            if (dto.touchesUsed != GameConfig.DESCENT_TOUCH_LIMIT) return null
+            val depth = lastBumpHooks.firstOrNull()?.depth ?: snags.first().depth
+            if (depth < GameConfig.BUMP_FREE_DEPTH - DEPTH_TOLERANCE) return null
+        }
+        // The last-bump hook always holds; fish caught on the way up must fit alongside it.
+        val hookedWeight = lastBumpHooks.sumOf { it.species.weightKg.toDouble() } + snags.sumOf { it.kind.weightKg.toDouble() }
+        val ascentWeight = catches.filter { !it.byLastBump }.sumOf { it.species.weightKg.toDouble() }
+        if (ascentWeight > 0.0 && hookedWeight + ascentWeight > specs.maxWeightKg + 1e-3) return null
         val maxDuration = turn.timeLimitSec ?: MAX_DURATION
         val duration = if (dto.durationSec.isFinite()) dto.durationSec else maxDuration
         val result = CastResult(
@@ -179,6 +212,7 @@ object CastValidation {
             touchesUsed = dto.touchesUsed.coerceIn(0, GameConfig.DESCENT_TOUCH_LIMIT),
             reverseReason = dto.reverseReason,
             lanternUsed = false,
+            snags = snags,
         )
         return BattleCast(result, duration.coerceIn(minOf(MIN_DURATION, maxDuration), maxDuration))
     }

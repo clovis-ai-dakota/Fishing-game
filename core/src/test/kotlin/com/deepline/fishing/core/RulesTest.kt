@@ -2,6 +2,7 @@ package com.deepline.fishing.core
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -79,6 +80,35 @@ class RulesTest {
     }
 
     @Test
+    fun snaggedObjectsScoreWithDepthAndRevealTheSecret() {
+        assertTrue(Scoring.snagPoints(ObstacleKind.ROCK, 400f) > Scoring.snagPoints(ObstacleKind.ROCK, 40f))
+        val snag = SnagRecord(ObstacleKind.JELLY, 200f, Scoring.snagPoints(ObstacleKind.JELLY, 200f))
+        val result = CastResult(emptyList(), 200f, 4, ReverseReason.TOUCH_LIMIT, false, snags = listOf(snag))
+        assertEquals(setOf(Secrets.LAST_BUMP), Secrets.revealedBy(result))
+
+        val p = Progression.applyCast(PlayerProgress(), result)
+        assertEquals(snag.points.toLong(), p.pointsEarned)
+        assertEquals(1, p.objectsSnagged)
+        assertTrue(Secrets.LAST_BUMP in p.discoveredSecrets)
+        assertTrue(p.collection.isEmpty(), "objects aren't fish: the fish log is untouched")
+
+        val plain = CastResult(emptyList(), 50f, 0, ReverseReason.ROPE_END, false)
+        assertTrue(Secrets.revealedBy(plain).isEmpty())
+    }
+
+    @Test
+    fun secretExplanationShowsFirstTimeAndUntilMuted() {
+        var p = PlayerProgress()
+        assertTrue(Progression.shouldExplainSecret(p, Secrets.LAST_BUMP), "first time")
+        p = Progression.discoverSecret(p, Secrets.LAST_BUMP)
+        assertTrue(Progression.shouldExplainSecret(p, Secrets.LAST_BUMP), "asked to see it again")
+        p = Progression.setSecretPopupMuted(p, Secrets.LAST_BUMP, muted = true)
+        assertFalse(Progression.shouldExplainSecret(p, Secrets.LAST_BUMP))
+        p = Progression.setSecretPopupMuted(p, Secrets.LAST_BUMP, muted = false)
+        assertTrue(Progression.shouldExplainSecret(p, Secrets.LAST_BUMP))
+    }
+
+    @Test
     fun battleRecordIsTracked() {
         var p = PlayerProgress()
         p = Progression.recordBattle(p, true)
@@ -97,6 +127,7 @@ class RulesTest {
             ropeLevels = mapOf(RopeStat.LENGTH to 2, RopeStat.AGILITY to 5), lanterns = 3,
             collection = mapOf("ghost_hake" to CollectionEntry(4, 1, 455.5f, 820)),
             castsMade = 9, battleWins = 3, battleLosses = 2, battleDraws = 1,
+            discoveredSecrets = setOf(Secrets.LAST_BUMP), mutedSecretPopups = setOf(Secrets.LAST_BUMP), objectsSnagged = 4,
         )
         val repo = ProgressRepository(InMemoryStore())
         repo.save(p)

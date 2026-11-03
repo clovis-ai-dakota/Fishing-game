@@ -65,8 +65,18 @@ object FishCatalog {
     fun byId(id: String): FishSpecies? = byId[id]
 }
 
-enum class ObstacleKind(val displayName: String, val minDepth: Float, val maxDepth: Float) {
-    DRIFTWOOD("Driftwood", 0f, 260f),
-    ROCK("Rock", 20f, Float.MAX_VALUE),
-    JELLY("Jelly cluster", 120f, Float.MAX_VALUE),
+/**
+ * Things in the water that aren't fish. Touching one on the way down costs a bump; the last bump
+ * snags it (the only way to land one), worth [snagPoints] base points (more the deeper it is).
+ */
+enum class ObstacleKind(
+    val displayName: String,
+    val minDepth: Float,
+    val maxDepth: Float,
+    val snagPoints: Int,
+    val weightKg: Float,
+) {
+    DRIFTWOOD("Driftwood", 0f, 260f, snagPoints = 100, weightKg = 2f),
+    ROCK("Rock", 20f, Float.MAX_VALUE, snagPoints = 200, weightKg = 4f),
+    JELLY("Jelly cluster", 120f, Float.MAX_VALUE, snagPoints = 150, weightKg = 1f),
 }

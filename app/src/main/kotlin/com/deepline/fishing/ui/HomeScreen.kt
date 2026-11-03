@@ -189,13 +189,21 @@ fun HomeScreen(vm: GameViewModel) {
             }
         }
 
-        OutlinedButton(
-            onClick = vm::startTour,
-            modifier = Modifier
-                .fillMaxWidth()
-                .tourTarget(TourTarget.HOME_TOUR),
-        ) {
-            Text("Take the tour")
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedButton(
+                onClick = vm::startTour,
+                modifier = Modifier
+                    .weight(1f)
+                    .tourTarget(TourTarget.HOME_TOUR),
+            ) {
+                Text("Take the tour")
+            }
+            // Appears once the player has discovered a hidden mechanic.
+            if (p.discoveredSecrets.isNotEmpty()) {
+                OutlinedButton(onClick = { vm.navigate(Screen.SECRETS) }, modifier = Modifier.weight(1f)) {
+                    Text("Fishing secrets")
+                }
+            }
         }
 
         Card(Modifier.fillMaxWidth()) {
@@ -203,9 +211,9 @@ fun HomeScreen(vm: GameViewModel) {
                 Text("How to fish", style = MaterialTheme.typography.titleMedium)
                 Text(
                     "• Drag left and right to steer the hook.\n" +
-                        "• Going down: the hook sinks until it has bumped ${GameConfig.DESCENT_TOUCH_LIMIT} things " +
-                        "(fish, rocks, driftwood, jellies) or runs out of rope. Bumping fish pulls the line up early. " +
-                        "The first ${GameConfig.BUMP_FREE_DEPTH.toInt()} m are bump-free.\n" +
+                        "• Going down: the hook sinks until it has bumped ${GameConfig.DESCENT_TOUCH_LIMIT} times " +
+                        "or runs out of rope. A bump is touching a fish's head, or a rock, driftwood or jelly; " +
+                        "brushing a fish's body or tail is free. The first ${GameConfig.BUMP_FREE_DEPTH.toInt()} m are bump-free.\n" +
                         "• Coming up: nudge a fish on its head (the pale face by the eye) to hook it. " +
                         "Touching the tail does nothing. The rope can only carry so much weight.\n" +
                         "• Deeper catches are worth more points. Sparkling fish are worth " +

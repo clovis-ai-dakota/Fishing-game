@@ -66,8 +66,11 @@ private val LineColor = Color(0xFFE8F4FA)
 private val BumpRed = Color(0xFFFF5252)
 private val BumpFreeGreen = Color(0xFF9CFFB0)
 
-/** Draws the whole underwater scene for [session], with the camera following the hook. */
-fun DrawScope.drawCastScene(session: CastSession, timeSeconds: Float, textMeasurer: TextMeasurer) {
+/**
+ * Draws the whole underwater scene for [session], with the camera following the hook.
+ * [aimX] is where the player's finger is (world meters), shown as a marker the hook glides to.
+ */
+fun DrawScope.drawCastScene(session: CastSession, timeSeconds: Float, textMeasurer: TextMeasurer, aimX: Float? = null) {
     val scale = size.width / GameConfig.WORLD_WIDTH
     val viewHeight = size.height / scale
     val top = max(session.hookDepth - viewHeight * 0.4f, -viewHeight * 0.2f)
@@ -209,6 +212,7 @@ fun DrawScope.drawCastScene(session: CastSession, timeSeconds: Float, textMeasur
 
     // Obstacles
     for (o in session.world.obstacles) {
+        if (o.snagged) continue // it rides on the hook, drawn below
         if (o.depth < top - 4f || o.depth > bottom + 4f) continue
         drawObstacle(o, Offset(sx(o.x), sy(o.depth)), o.radius * scale, timeSeconds)
     }
@@ -234,9 +238,11 @@ fun DrawScope.drawCastScene(session: CastSession, timeSeconds: Float, textMeasur
     val s = GameConfig.HOOK_RADIUS * scale
     val hookEye = Offset(hook.x, hook.y - 1.4f * s)
     val bumpFlash = (1f - (elapsed - session.lastTouchAtSeconds) / 0.5f).coerceIn(0f, 1f)
+    // The line runs from where it enters the water to the hook, arriving from above the hook and
+    // trailing slightly behind its sideways movement (no idle sway: it only moves with the hook).
     val entry = Offset(rodTip.x + (hookEye.x - rodTip.x) * 0.1f, surfaceY)
-    val sway = sin(timeSeconds * 1.1f) * 0.3f * scale * (if (session.phase == CastPhase.DESCENDING) 1f else 0.35f)
-    val control = Offset(entry.x + (hookEye.x - entry.x) * 0.2f + sway, entry.y + (hookEye.y - entry.y) * 0.55f)
+    val trail = (-session.hookVelocityX * 0.12f).coerceIn(-1.5f, 1.5f) * scale
+    val control = Offset(hookEye.x + trail, entry.y + (hookEye.y - entry.y) * 0.6f)
     val line = Path().apply {
         moveTo(rodTip.x, rodTip.y)
         lineTo(entry.x, entry.y)
@@ -284,7 +290,23 @@ fun DrawScope.drawCastScene(session: CastSession, timeSeconds: Float, textMeasur
         drawCircle(BumpFreeGreen.copy(alpha = 0.55f), radius = 2.0f * s, center = hook, style = Stroke(width = 2f))
     }
 
+    // Where the finger is aiming: the hook glides there (faster with more Rope Agility).
+    if (aimX != null) {
+        val aim = Offset(sx(aimX.coerceIn(0f, GameConfig.WORLD_WIDTH)), hook.y)
+        if (kotlin.math.abs(aim.x - hook.x) > s * 0.5f) {
+            drawLine(Color.White.copy(alpha = 0.25f), hook, aim, strokeWidth = 2f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(8f, 8f)))
+        }
+        drawCircle(Color.White.copy(alpha = 0.55f), radius = s * 0.55f, center = aim, style = Stroke(width = 2.5f))
+        drawCircle(Color.White.copy(alpha = 0.35f), radius = s * 0.15f, center = aim)
+    }
+
     drawHook(hook, s, timeSeconds)
+
+    // An object snagged by the last bump rides up under the hook.
+    session.snaggedObstacle?.let { o ->
+        val r = o.radius * scale
+        drawObstacleIcon(o.kind, Offset(hook.x, hook.y + s * 0.8f + r), r, timeSeconds, o.id)
+    }
 
     // Catches hanging from the hook, heads up and struggling.
     val n = session.caughtFish.size
@@ -455,7 +477,15 @@ private fun DrawScope.drawLabel(textMeasurer: TextMeasurer, text: String, style:
 }
 
 private fun DrawScope.drawObstacle(o: Obstacle, c: Offset, r: Float, timeSeconds: Float) {
-    when (o.kind) {
+    drawObstacleIcon(o.kind, c, r, timeSeconds, o.id)
+    if (o.touched) {
+        drawCircle(Color(0xFFFF5252).copy(alpha = 0.5f), radius = r * 1.1f, center = c, style = Stroke(width = 2f))
+    }
+}
+
+/** Draws a rock, driftwood or jelly of radius [r] at [c] (also used for icons). */
+fun DrawScope.drawObstacleIcon(kind: ObstacleKind, c: Offset, r: Float, timeSeconds: Float = 0f, id: Int = 0) {
+    when (kind) {
         ObstacleKind.ROCK -> {
             drawCircle(
                 Brush.radialGradient(listOf(Color(0xFF78909C), Color(0xFF37474F)), center = c - Offset(r * 0.35f, r * 0.35f), radius = r * 1.5f),
@@ -466,7 +496,7 @@ private fun DrawScope.drawObstacle(o: Obstacle, c: Offset, r: Float, timeSeconds
             drawCircle(Color(0xFF263238).copy(alpha = 0.3f), radius = r * 0.15f, center = c + Offset(-r * 0.25f, r * 0.45f))
         }
         ObstacleKind.DRIFTWOOD -> {
-            rotate(degrees = (o.id * 37 % 40 - 20).toFloat(), pivot = c) {
+            rotate(degrees = (id * 37 % 40 - 20).toFloat(), pivot = c) {
                 drawRoundRect(
                     Brush.verticalGradient(listOf(Color(0xFF8D6E63), Color(0xFF4E342E)), startY = c.y - r * 0.3f, endY = c.y + r * 0.3f),
                     topLeft = c - Offset(r, r * 0.3f),
@@ -480,7 +510,7 @@ private fun DrawScope.drawObstacle(o: Obstacle, c: Offset, r: Float, timeSeconds
             }
         }
         ObstacleKind.JELLY -> {
-            val bob = sin(timeSeconds * 2f + o.id) * r * 0.08f
+            val bob = sin(timeSeconds * 2f + id) * r * 0.08f
             val center = c + Offset(0f, bob)
             for (k in 0 until 4) {
                 val x = center.x - r * 0.6f + k * r * 0.4f
@@ -501,8 +531,5 @@ private fun DrawScope.drawObstacle(o: Obstacle, c: Offset, r: Float, timeSeconds
                 size = Size(r * 2f, r * 2f),
             )
         }
-    }
-    if (o.touched) {
-        drawCircle(Color(0xFFFF5252).copy(alpha = 0.5f), radius = r * 1.1f, center = c, style = Stroke(width = 2f))
     }
 }

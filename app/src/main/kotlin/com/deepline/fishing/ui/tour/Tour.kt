@@ -37,7 +37,8 @@ data class TourStep(
  * screen, battle mode and rope upgrade is covered.
  */
 object Tour {
-    const val VERSION = 1
+    /** 2: head-only bumps, smoother steering with an aim marker, fishing secrets. */
+    const val VERSION = 2
 
     private val bumps = GameConfig.DESCENT_TOUCH_LIMIT
     private val bumpFree = GameConfig.BUMP_FREE_DEPTH.toInt()
@@ -61,18 +62,22 @@ object Tour {
         TourStep(
             id = "steer",
             title = "Steer the hook",
-            body = "During a cast, drag left and right anywhere on the screen. The hook follows your finger.",
+            body = "During a cast, drag left and right anywhere on the screen. A ring shows where your finger " +
+                "is: the hook glides over to it and follows it. Rope Agility makes it faster.",
             screen = Screen.HOME,
             art = TourArt.STEER,
+            sinceVersion = 2,
         ),
         TourStep(
             id = "descent",
             title = "Going down: dodge",
-            body = "The hook sinks until it has bumped $bumps things (fish, rocks, driftwood or jellies) or reaches " +
-                "the end of the rope, then it turns back up. The first $bumpFree m are bump-free, so landing on a " +
-                "fish costs nothing.",
+            body = "The hook sinks until it has bumped $bumps times or reaches the end of the rope, then it turns " +
+                "back up. On a fish, only the head counts as a bump (the same spot you aim for on the way up); " +
+                "brushing a body or tail is free. Rocks, driftwood and jellies count wherever you touch them. " +
+                "The first $bumpFree m are bump-free.",
             screen = Screen.HOME,
             art = TourArt.BUMPS,
+            sinceVersion = 2,
         ),
         TourStep(
             id = "ascent",
@@ -130,6 +135,14 @@ object Tour {
                 "you spend it. Claim them here.",
             screen = Screen.MILESTONES,
             target = TourTarget.MILESTONES_FIRST,
+        ),
+        TourStep(
+            id = "secrets",
+            title = "Fishing secrets",
+            body = "Some tricks are only found by playing. When you discover one, it's explained on the spot, and " +
+                "a Fishing secrets button appears on the home screen so you can read it again.",
+            screen = Screen.HOME,
+            sinceVersion = 2,
         ),
         TourStep(
             id = "battle",

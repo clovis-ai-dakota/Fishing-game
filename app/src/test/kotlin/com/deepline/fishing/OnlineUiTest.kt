@@ -101,6 +101,30 @@ class OnlineUiTest {
         node.performClick()
     }
 
+    /**
+     * Plays the current cast to its end (up to [maxSeconds] of game time). If the last bump hooks
+     * something for the first time, the cast pauses to explain the secret: answer it and go on.
+     */
+    private fun ComposeTestRule.playOutCast(endText: String, maxSeconds: Int = 150) {
+        var elapsed = 0
+        while (elapsed < maxSeconds) {
+            mainClock.autoAdvance = false
+            repeat(2 * 60) { mainClock.advanceTimeBy(16) }
+            elapsed += 2
+            if (onAllNodes(hasText("Fishing secret discovered!")).fetchSemanticsNodes().isNotEmpty()) {
+                // The cast is paused behind the dialog. Answer it, then let the dialog window
+                // close for a few frames so it isn't mistaken for a new one.
+                if (onAllNodes(hasText("No thanks")).fetchSemanticsNodes().isNotEmpty()) {
+                    onNode(hasText("No thanks")).performClick()
+                }
+                repeat(10) { mainClock.advanceTimeByFrame() }
+                continue
+            }
+            if (onAllNodes(hasText(endText)).fetchSemanticsNodes().isNotEmpty()) break
+        }
+        mainClock.autoAdvance = true
+    }
+
     private fun ComposeTestRule.waitFor(matcher: SemanticsMatcher, millis: Long = 15_000) =
         waitUntil(millis) { onAllNodes(matcher).fetchSemanticsNodes().isNotEmpty() }
 
@@ -180,9 +204,7 @@ class OnlineUiTest {
             compose.waitFor(hasText("Cast!"))
             if (i == 0) compose.shot("17_online_battle_hub")
             compose.click("Cast!")
-            compose.mainClock.autoAdvance = false
-            repeat(90 * 60) { compose.mainClock.advanceTimeBy(16) } // the whole cast
-            compose.mainClock.autoAdvance = true
+            compose.playOutCast("Continue")
             compose.click("Continue")
         }
 

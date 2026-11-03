@@ -25,6 +25,13 @@ object GameConfig {
     const val BUMP_FREE_DEPTH = 30f
 
     const val DESCENT_SPEED = 18f
+
+    /**
+     * How eagerly the hook closes the gap to the player's finger: its sideways speed is the gap
+     * times this (per second), capped by the rope's agility. It glides onto the finger and then
+     * tracks it instead of moving at a fixed speed and stopping dead.
+     */
+    const val STEER_RESPONSIVENESS = 12f
     const val ASCENT_SPEED = 15f
 
     /** Collision radius of the hook. */

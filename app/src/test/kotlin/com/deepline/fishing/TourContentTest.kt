@@ -20,8 +20,9 @@ class TourContentTest {
     @Test
     fun everyMenuScreenIsVisited() {
         // CAST, BATTLE and ONLINE_LOBBY need a live cast, battle or connection, so they're
-        // explained from the screens that lead to them.
-        val explainedElsewhere = setOf(Screen.CAST, Screen.BATTLE, Screen.ONLINE_LOBBY)
+        // explained from the screens that lead to them. SECRETS only exists once a secret is
+        // discovered; the "secrets" step explains it from the home screen.
+        val explainedElsewhere = setOf(Screen.CAST, Screen.BATTLE, Screen.ONLINE_LOBBY, Screen.SECRETS)
         val visited = Tour.steps.map { it.screen }.toSet()
         for (screen in Screen.entries - explainedElsewhere) {
             assertTrue("The tour never shows the $screen screen", screen in visited)
@@ -32,11 +33,25 @@ class TourContentTest {
     fun everyBattleModeRopeUpgradeAndCoreRuleIsExplained() {
         for (mode in BattleMode.entries) assertTrue("Tour doesn't mention ${mode.title}", mode.title in text)
         for (stat in RopeStat.entries) assertTrue("Tour doesn't mention ${stat.displayName}", stat.displayName in text)
-        for (topic in listOf("Lantern", "Sparkling", "head", "Load", "Fish log", "Milestone", "online", "Quick match")) {
+        for (topic in listOf("Lantern", "Sparkling", "head", "Load", "Fish log", "Milestone", "online", "Quick match", "Fishing secrets")) {
             assertTrue("Tour doesn't mention $topic", text.contains(topic, ignoreCase = true))
         }
         assertTrue("${GameConfig.BUMP_FREE_DEPTH.toInt()} m" in text)
         assertTrue("${GameConfig.DESCENT_TOUCH_LIMIT}" in text)
+    }
+
+    @Test
+    fun theTourNeverGivesAwayASecret() {
+        // Secrets are discovered by playing and explained then (see FishingSecrets), not in the tour.
+        for (giveaway in listOf("last bump", "snag", "hooks what", "hooks whatever")) {
+            assertTrue("The tour reveals a secret: '$giveaway'", !text.contains(giveaway, ignoreCase = true))
+        }
+    }
+
+    @Test
+    fun everySecretHasAnExplanation() {
+        val ids = listOf(com.deepline.fishing.core.Secrets.LAST_BUMP)
+        for (id in ids) assertTrue("No explanation for secret $id", com.deepline.fishing.ui.secrets.FishingSecrets.byId(id) != null)
     }
 
     @Test

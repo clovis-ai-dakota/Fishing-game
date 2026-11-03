@@ -14,6 +14,9 @@ object Scoring {
     }
 }
 
+/** Points for an object snagged by the last bump. */
+fun Scoring.snagPoints(kind: ObstacleKind, depth: Float): Int = (kind.snagPoints * depthMultiplier(depth)).roundToInt()
+
 object Lighting {
     /** 0 = fully lit, 1 = fully dark. Darkness only starts below [GameConfig.DARK_DEPTH]. */
     fun darkness(depth: Float): Float =

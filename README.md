@@ -5,9 +5,11 @@ All art is drawn in code (no image assets).
 
 ## How it plays
 
-- **Descent.** The hook sinks from the boat. Drag left/right to steer it. Each object the hook
-  touches (a fish, rock, driftwood or jelly cluster) uses up one of **4 bumps**. The first
-  **30 m are bump-free**, so a cast that lands on a fish costs nothing. After the 4th
+- **Steering.** Drag anywhere: a ring marks your finger and the hook glides onto it and follows
+  it (speed proportional to the gap, capped by Rope Agility). Lifting the finger holds the hook.
+- **Descent.** The hook sinks from the boat. Each bump uses up one of **4 bumps**: touching a
+  fish's **head** (brushing its body or tail is free) or touching a rock, driftwood or jelly
+  cluster anywhere. The first **30 m are bump-free**, so a cast that lands on a fish costs nothing. After the 4th
   bump, or at the end of the rope, the hook reverses direction. Bumping fish on the way down
   therefore pulls the line up early.
 - **Ascent.** On the way up, nudge a fish's **head** with the hook to catch it. Touching its
@@ -16,6 +18,18 @@ All art is drawn in code (no image assets).
   100 m). **Sparkling** fish (gold outline and glints) are worth 3× more.
 - **Lantern.** Below 300 m the water goes dark and you only see a small circle around the hook.
   A Lantern (toggle it on before casting; one is used per cast) widens the lit circle.
+
+### Fishing secrets (spoilers)
+
+Hidden mechanics, explained in game the first time they happen (with a "show this again next
+time?" question) and then listed under **Fishing secrets** on the home screen. The tour hints that
+secrets exist but never reveals them.
+
+- **The last bump hooks what it hits.** The 4th bump doesn't just send the line up: it hooks the
+  fish whose head it hit (even over the weight limit), or snags the object, which is the only way
+  to land rocks, driftwood and jellies. Objects are worth big points (base 200 / 100 / 150,
+  times the depth multiplier). Online, the server checks it: at most one per cast, only with all
+  4 bumps used, never in the bump-free zone.
 
 ### Guided tour
 

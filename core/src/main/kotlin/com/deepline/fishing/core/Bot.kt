@@ -13,8 +13,8 @@ enum class BotDifficulty(
     /** How often the bot re-thinks its target, in seconds. */
     val replanSeconds: Float,
 ) {
-    EASY("Easy", 8f, 0.8f, 0.4f),
-    NORMAL("Normal", 10f, 0.5f, 0.25f),
+    EASY("Easy", 6f, 1.3f, 0.5f),
+    NORMAL("Normal", 8f, 0.9f, 0.3f),
     HARD("Hard", 16f, 0.15f, 0.1f),
 }
 
@@ -38,8 +38,10 @@ class BotBrain(private val difficulty: BotDifficulty, private val random: Random
 
     private class Hazard(val x: Float, val halfWidth: Float, val eta: Float)
 
-    /** Going down: pick the x that avoids the most upcoming objects. */
+    /** Going down: pick the x that avoids the most upcoming fish heads and objects. */
     private fun planDodge(s: CastSession): Float? {
+        // With one bump left, a Hard rival aims it at something worth hooking instead.
+        if (difficulty == BotDifficulty.HARD && s.touchesLeft == 1) planLastBump(s)?.let { return it }
         val r = GameConfig.HOOK_RADIUS
         val margin = 0.3f
         val hazards = ArrayList<Hazard>()
@@ -49,7 +51,11 @@ class BotBrain(private val difficulty: BotDifficulty, private val random: Random
             val dy = f.depth - s.hookDepth
             if (dy < -f.halfHeight || dy > difficulty.lookaheadM) continue
             val eta = dy.coerceAtLeast(0f) / GameConfig.DESCENT_SPEED
-            hazards += Hazard(predictX(f, eta), f.halfLength + r + margin, eta)
+            // Only the head counts as a bump: it spans from a third of the way forward to the nose.
+            val fishX = predictX(f, eta)
+            val back = f.halfLength / 3f
+            val front = f.halfLength + r
+            hazards += Hazard(fishX + f.direction * (back + front) / 2f, (front - back) / 2f + margin, eta)
         }
         for (o in s.world.obstacles) {
             if (o.touched || o.passedInBumpFreeZone) continue
@@ -77,6 +83,25 @@ class BotBrain(private val difficulty: BotDifficulty, private val random: Random
             x += 0.5f
         }
         return bestX
+    }
+
+    /** The x of the most valuable object or fish head ahead that the hook can still reach. */
+    private fun planLastBump(s: CastSession): Float? {
+        var best: Float? = null
+        var bestValue = 0f
+        for (o in s.world.obstacles) {
+            if (o.touched || o.passedInBumpFreeZone || o.depth < GameConfig.BUMP_FREE_DEPTH) continue
+            val dy = o.depth - s.hookDepth
+            if (dy < 0.5f || dy > difficulty.lookaheadM) continue
+            val eta = dy / GameConfig.DESCENT_SPEED
+            if (abs(o.x - s.hookX) > s.specs.steerSpeed * eta) continue
+            val value = Scoring.snagPoints(o.kind, o.depth).toFloat()
+            if (value > bestValue) {
+                bestValue = value
+                best = o.x
+            }
+        }
+        return best
     }
 
     /** Coming up: aim for the head of the most valuable reachable fish that still fits on the line. */

@@ -70,6 +70,30 @@ class AppUiTest {
         File(dir, "$name.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
     }
 
+    /**
+     * Plays the current cast to its end (up to [maxSeconds] of game time). If the last bump hooks
+     * something for the first time, the cast pauses to explain the secret: answer it and go on.
+     */
+    private fun ComposeTestRule.playOutCast(endText: String, maxSeconds: Int = 150) {
+        var elapsed = 0
+        while (elapsed < maxSeconds) {
+            mainClock.autoAdvance = false
+            repeat(2 * 60) { mainClock.advanceTimeBy(16) }
+            elapsed += 2
+            if (onAllNodes(hasText("Fishing secret discovered!")).fetchSemanticsNodes().isNotEmpty()) {
+                // The cast is paused behind the dialog. Answer it, then let the dialog window
+                // close for a few frames so it isn't mistaken for a new one.
+                if (onAllNodes(hasText("No thanks")).fetchSemanticsNodes().isNotEmpty()) {
+                    onNode(hasText("No thanks")).performClick()
+                }
+                repeat(10) { mainClock.advanceTimeByFrame() }
+                continue
+            }
+            if (onAllNodes(hasText(endText)).fetchSemanticsNodes().isNotEmpty()) break
+        }
+        mainClock.autoAdvance = true
+    }
+
     private fun ComposeTestRule.advanceSeconds(seconds: Float) {
         val steps = (seconds * 60).toInt()
         repeat(steps) { mainClock.advanceTimeBy(16) }
@@ -96,8 +120,7 @@ class AppUiTest {
         compose.mainClock.autoAdvance = false
         compose.advanceSeconds(1.5f)
         compose.shot("02_cast_start")
-        compose.advanceSeconds(60f) // long enough for any cast with the starting rope to finish
-        compose.mainClock.autoAdvance = true
+        compose.playOutCast("Cast complete")
         compose.onNodeWithText("Cast complete").assertExists()
         compose.onNodeWithText("Surfaced").assertExists()
         compose.shot("03_cast_results")
@@ -153,8 +176,7 @@ class AppUiTest {
         compose.mainClock.autoAdvance = false
         compose.advanceSeconds(2f)
         compose.shot("11_battle_cast")
-        compose.advanceSeconds(60f)
-        compose.mainClock.autoAdvance = true
+        compose.playOutCast("Continue")
         compose.click("Continue")
 
         compose.click("Let Rival", substring = true)
