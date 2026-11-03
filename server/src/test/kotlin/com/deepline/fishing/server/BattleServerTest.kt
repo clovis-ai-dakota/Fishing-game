@@ -140,12 +140,12 @@ class BattleServerTest {
         val turn = OnlineMatch(start).myNextTurn()!!
 
         // A deep-sea fish caught in the shallows is impossible.
-        val impossible = CastDto(listOf(CatchDto("pale_leviathan", false, 20f, 99_999)), 30f, 1, null, 20f)
+        val impossible = CastDto(listOf(CatchDto("pale_leviathan", false, 20f, 99_999)), 30f, 0, null, 20f)
         host.send(ClientMessage.CastFinished(turn, impossible))
         assertTrue(host.expect<ServerMessage.Error>().message.contains("not possible"))
 
         // A real catch with inflated points is accepted, with the points recomputed.
-        val inflated = CastDto(listOf(CatchDto("silver_sprat", false, 20f, 99_999)), 30f, 1, null, 20f)
+        val inflated = CastDto(listOf(CatchDto("silver_sprat", false, 20f, 99_999)), 30f, 0, null, 20f)
         host.send(ClientMessage.CastFinished(turn, inflated))
         val recorded = host.expect<ServerMessage.CastRecorded>()
         assertEquals(6, recorded.cast.catches.single().points) // 5 base × 1.2 depth multiplier

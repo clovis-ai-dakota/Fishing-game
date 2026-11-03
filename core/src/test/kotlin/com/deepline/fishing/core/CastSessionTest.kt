@@ -116,6 +116,27 @@ class CastSessionTest {
     }
 
     @Test
+    fun aCastRecordsWhatEachBumpHitAndReCaughtFish() {
+        // Bump a grouper's head at 130 m, then a rock, driftwood and a jelly; on the way up the
+        // hook meets the same grouper's head again.
+        val grouper = stillFish(0, FishCatalog.byId("reef_grouper")!!, 130f, "head")
+        val obstacles = listOf(
+            Obstacle(1, ObstacleKind.ROCK, center, 140f, 1f),
+            Obstacle(2, ObstacleKind.DRIFTWOOD, center, 150f, 1f),
+            Obstacle(3, ObstacleKind.JELLY, center, 160f, 1f),
+        )
+        val session = CastSession(specs(length = 200f, weight = 20f), false, World(listOf(grouper), obstacles))
+        runToEnd(session)
+
+        val r = session.result!!
+        assertEquals(listOf(BumpKind.FISH_HEAD, BumpKind.ROCK, BumpKind.DRIFTWOOD, BumpKind.JELLY), r.bumps)
+        assertEquals(ObstacleKind.JELLY, r.snags.single().kind)
+        assertTrue(r.catches.single().bumpedOnDescent)
+        assertEquals(setOf(Secrets.LAST_BUMP, Secrets.GRAND_TOUR, Secrets.SECOND_ENCOUNTER), Secrets.revealedBy(r))
+        assertEquals(20f, r.lineStrengthKg)
+    }
+
+    @Test
     fun theHookGlidesOntoTheFingerWithoutOvershooting() {
         val session = CastSession(specs(), false, World(emptyList(), emptyList()))
         val target = center + 1f

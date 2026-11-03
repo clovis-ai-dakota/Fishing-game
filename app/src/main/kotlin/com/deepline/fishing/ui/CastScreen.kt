@@ -77,6 +77,7 @@ fun CastScreen(vm: GameViewModel) {
     val steer = remember(session) { SteerInput() }
     var time by remember(session) { mutableFloatStateOf(0f) }
     val textMeasurer = rememberTextMeasurer()
+    val skins = Skins.of(vm.progress.equippedSkins)
 
     // The loop only runs while the cast is live: no frames are spent on the pause dialog or
     // the results panel. [time] keeps counting from where it stopped.
@@ -121,7 +122,7 @@ fun CastScreen(vm: GameViewModel) {
                     }
                 },
         ) {
-            drawCastScene(session, time, textMeasurer, aimX = steer.targetX())
+            drawCastScene(session, time, textMeasurer, aimX = steer.targetX(), skins = skins)
         }
 
         val turn = vm.battleTurn
@@ -431,6 +432,17 @@ private fun ResultsPanel(result: CastResult, collectLabel: String, onCollect: ()
                                 Text("+${formatPoints(c.points)}", fontWeight = FontWeight.Bold)
                             }
                         }
+                    }
+                }
+                for (b in result.secretBonuses) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            "✦ Secret: " + (FishingSecrets.byId(b.secretId)?.title ?: b.secretId),
+                            color = SparkleGold,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.weight(1f),
+                        )
+                        Text("+${formatPoints(b.points)}", fontWeight = FontWeight.Bold, color = SparkleGold)
                     }
                 }
                 Text(

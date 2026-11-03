@@ -37,8 +37,11 @@ data class TourStep(
  * screen, battle mode and rope upgrade is covered.
  */
 object Tour {
-    /** 2: head-only bumps, smoother steering with an aim marker, fishing secrets. */
-    const val VERSION = 2
+    /**
+     * 2: head-only bumps, smoother steering with an aim marker, fishing secrets.
+     * 3: more secrets with bonuses that also count in battles, and skins.
+     */
+    const val VERSION = 3
 
     private val bumps = GameConfig.DESCENT_TOUCH_LIMIT
     private val bumpFree = GameConfig.BUMP_FREE_DEPTH.toInt()
@@ -139,10 +142,12 @@ object Tour {
         TourStep(
             id = "secrets",
             title = "Fishing secrets",
-            body = "Some tricks are only found by playing. When you discover one, it's explained on the spot, and " +
-                "a Fishing secrets button appears on the home screen so you can read it again.",
+            body = "Some tricks are only found by playing, and they pay off: every time you pull one off it adds " +
+                "a bonus to the cast, in battles too. The first time, it's explained on the spot and earns a " +
+                "discovery reward, and a Secrets button appears on the home screen. The rarest secrets also " +
+                "unlock Skins for your hook, line and boat (looks only, no advantage).",
             screen = Screen.HOME,
-            sinceVersion = 2,
+            sinceVersion = 3,
         ),
         TourStep(
             id = "battle",

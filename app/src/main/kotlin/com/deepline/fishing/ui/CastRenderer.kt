@@ -18,6 +18,9 @@ import androidx.compose.ui.text.drawText
 import androidx.compose.ui.unit.sp
 import com.deepline.fishing.core.CastPhase
 import com.deepline.fishing.core.CastSession
+import com.deepline.fishing.core.Cosmetic
+import com.deepline.fishing.core.CosmeticSlot
+import com.deepline.fishing.core.FishCatalog
 import com.deepline.fishing.core.GameConfig
 import com.deepline.fishing.core.Lighting
 import com.deepline.fishing.core.Obstacle
@@ -70,7 +73,13 @@ private val BumpFreeGreen = Color(0xFF9CFFB0)
  * Draws the whole underwater scene for [session], with the camera following the hook.
  * [aimX] is where the player's finger is (world meters), shown as a marker the hook glides to.
  */
-fun DrawScope.drawCastScene(session: CastSession, timeSeconds: Float, textMeasurer: TextMeasurer, aimX: Float? = null) {
+fun DrawScope.drawCastScene(
+    session: CastSession,
+    timeSeconds: Float,
+    textMeasurer: TextMeasurer,
+    aimX: Float? = null,
+    skins: Skins = Skins.CLASSIC,
+) {
     val scale = size.width / GameConfig.WORLD_WIDTH
     val viewHeight = size.height / scale
     val top = max(session.hookDepth - viewHeight * 0.4f, -viewHeight * 0.2f)
@@ -208,7 +217,7 @@ fun DrawScope.drawCastScene(session: CastSession, timeSeconds: Float, textMeasur
     val bend = if (session.phase == CastPhase.ASCENDING) 0.25f + 0.6f * load else 0.1f
     val rodBase = Offset(cx + 0.9f * scale, surfaceY - 1.0f * scale)
     val rodTip = Offset(cx + (1.9f + bend * 0.6f) * scale, surfaceY - (2.9f - bend) * scale)
-    if (surfaceY > -6f * scale) drawBoatAndRod(cx, surfaceY, scale, rodBase, rodTip)
+    if (surfaceY > -6f * scale) drawBoatAndRod(cx, surfaceY, scale, rodBase, rodTip, skins, timeSeconds)
 
     // Obstacles
     for (o in session.world.obstacles) {
@@ -249,7 +258,17 @@ fun DrawScope.drawCastScene(session: CastSession, timeSeconds: Float, textMeasur
         quadraticTo(control.x, control.y, hookEye.x, hookEye.y)
     }
     drawPath(line, Color.Black.copy(alpha = 0.22f), style = Stroke(width = 3.5f, cap = StrokeCap.Round))
-    drawPath(line, lerp(LineColor, BumpRed, bumpFlash).copy(alpha = 0.9f), style = Stroke(width = 1.7f, cap = StrokeCap.Round))
+    if (skins.line == Cosmetic.GIANTS_BRAID_LINE) {
+        // Pale braid: a light core with a darker twisted strand along it.
+        drawPath(line, lerp(BraidLight, BumpRed, bumpFlash), style = Stroke(width = 2.4f, cap = StrokeCap.Round))
+        drawPath(
+            line,
+            lerp(BraidDark, BumpRed, bumpFlash),
+            style = Stroke(width = 2.4f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(5f, 7f))),
+        )
+    } else {
+        drawPath(line, lerp(LineColor, BumpRed, bumpFlash).copy(alpha = 0.9f), style = Stroke(width = 1.7f, cap = StrokeCap.Round))
+    }
     if (surfaceY > -10f && surfaceY < size.height + 10f) {
         for (k in 0 until 2) {
             val p = (timeSeconds * 0.8f + k * 0.5f) % 1f
@@ -300,7 +319,7 @@ fun DrawScope.drawCastScene(session: CastSession, timeSeconds: Float, textMeasur
         drawCircle(Color.White.copy(alpha = 0.35f), radius = s * 0.15f, center = aim)
     }
 
-    drawHook(hook, s, timeSeconds)
+    drawHook(hook, s, timeSeconds, bone = skins.hook == Cosmetic.LEVIATHAN_BONE_HOOK)
 
     // An object snagged by the last bump rides up under the hook.
     session.snaggedObstacle?.let { o ->
@@ -379,7 +398,16 @@ fun DrawScope.drawCastScene(session: CastSession, timeSeconds: Float, textMeasur
     }
 }
 
-private fun DrawScope.drawBoatAndRod(cx: Float, surfaceY: Float, scale: Float, rodBase: Offset, rodTip: Offset) {
+private fun DrawScope.drawBoatAndRod(
+    cx: Float,
+    surfaceY: Float,
+    scale: Float,
+    rodBase: Offset,
+    rodTip: Offset,
+    skins: Skins,
+    timeSeconds: Float,
+) {
+    if (skins.boat == Cosmetic.GIANT_SLAYER_PENNANT) drawPennant(cx, surfaceY, scale, timeSeconds)
     val hull = Path().apply {
         moveTo(cx - 2.5f * scale, surfaceY - 1.0f * scale)
         lineTo(cx + 2.5f * scale, surfaceY - 1.0f * scale)
@@ -426,10 +454,10 @@ private fun DrawScope.drawBoatAndRod(cx: Float, surfaceY: Float, scale: Float, r
  * A barbed J-hook with a wriggling worm. [bend] is the bottom of the hook (where it catches
  * fish) and [s] its size in pixels; the line ties on at the eye, 1.4 s above the bend.
  */
-fun DrawScope.drawHook(bend: Offset, s: Float, timeSeconds: Float, withBait: Boolean = true) {
+fun DrawScope.drawHook(bend: Offset, s: Float, timeSeconds: Float, withBait: Boolean = true, bone: Boolean = false) {
     val w = max(2.2f, s * 0.16f)
     val metal = Brush.linearGradient(
-        listOf(Color(0xFFF5F7F8), Color(0xFF90A4AE), Color(0xFFECEFF1)),
+        if (bone) BoneColors else listOf(Color(0xFFF5F7F8), Color(0xFF90A4AE), Color(0xFFECEFF1)),
         start = Offset(bend.x - s, bend.y - s),
         end = Offset(bend.x + s, bend.y + s),
     )
@@ -460,7 +488,55 @@ fun DrawScope.drawHook(bend: Offset, s: Float, timeSeconds: Float, withBait: Boo
     drawCircle(metal, radius = s * 0.17f, center = Offset(bend.x, bend.y - 1.4f * s), style = Stroke(width = w * 0.8f))
     drawPath(shankAndBend, metal, style = Stroke(width = w, cap = StrokeCap.Round))
     drawLine(metal, pointTip, Offset(bend.x + 0.62f * s, bend.y + 0.20f * s), strokeWidth = w * 0.8f, cap = StrokeCap.Round)
+    if (bone) {
+        // Carved rings on the shank (same shape and size as the classic hook: purely visual).
+        for (k in 0 until 3) {
+            val y = bend.y + (-1.05f + k * 0.32f) * s
+            drawLine(Color(0xFF8D6E63), Offset(bend.x - w * 0.6f, y), Offset(bend.x + w * 0.6f, y), strokeWidth = max(1.2f, w * 0.3f))
+        }
+    }
 }
+
+/** The Giant-slayer pennant: a mast on the cabin with a waving flag showing a leviathan. */
+private fun DrawScope.drawPennant(cx: Float, surfaceY: Float, scale: Float, timeSeconds: Float) {
+    val mastBase = Offset(cx - 0.4f * scale, surfaceY - 2.3f * scale)
+    val mastTop = Offset(mastBase.x, surfaceY - 4.1f * scale)
+    drawLine(Color(0xFF5D4037), mastBase, mastTop, strokeWidth = max(2f, 0.07f * scale), cap = StrokeCap.Round)
+    val wave = sin(timeSeconds * 3f) * 0.12f * scale
+    val flag = Path().apply {
+        moveTo(mastTop.x, mastTop.y)
+        quadraticTo(mastTop.x + 0.8f * scale, mastTop.y + 0.2f * scale + wave, mastTop.x + 1.6f * scale, mastTop.y + 0.45f * scale + wave)
+        quadraticTo(mastTop.x + 0.8f * scale, mastTop.y + 0.7f * scale + wave, mastTop.x, mastTop.y + 0.9f * scale)
+        close()
+    }
+    drawPath(flag, Color(0xFF263238))
+    drawPath(flag, Color(0xFF80DEEA), style = Stroke(width = 1.5f))
+    drawFish(
+        FishCatalog.byId("pale_leviathan")!!,
+        Offset(mastTop.x + 0.6f * scale, mastTop.y + 0.45f * scale + wave * 0.6f),
+        0.8f * scale,
+        1,
+        sparkling = false,
+        timeSeconds = timeSeconds,
+    )
+}
+
+/** Which cosmetic is worn in each slot (null = classic). Cosmetics never change gameplay. */
+data class Skins(val hook: Cosmetic? = null, val line: Cosmetic? = null, val boat: Cosmetic? = null) {
+    companion object {
+        val CLASSIC = Skins()
+
+        fun of(equipped: Map<CosmeticSlot, Cosmetic>) = Skins(
+            hook = equipped[CosmeticSlot.HOOK],
+            line = equipped[CosmeticSlot.LINE],
+            boat = equipped[CosmeticSlot.BOAT],
+        )
+    }
+}
+
+private val BoneColors = listOf(Color(0xFFFFF8E1), Color(0xFFD7CCC8), Color(0xFFFFFDE7))
+private val BraidLight = Color(0xFFE0F7FA)
+private val BraidDark = Color(0xFF4DD0E1)
 
 /**
  * Draws a one-line label at ([x], [y]); a null [x] right-aligns it. The text is measured without

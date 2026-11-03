@@ -14,13 +14,20 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
   `TourContentTest` fails when a screen, battle mode or rope upgrade isn't covered; extend it
   when you add new kinds of features.
 - **Fishing secrets are hidden mechanics: never reveal them in the tour** (`TourContentTest`
-  checks for giveaways). To add one: add an id to `Secrets` in `core/.../Progress.kt`, make
-  the game trigger it (see `Secrets.revealedBy` and `GameViewModel.onSecretTriggered`), and
-  describe it in `app/.../ui/secrets/FishingSecrets.kt`. It's explained the first time it
-  happens (with "show again next time?") and then listed in the Fishing secrets screen, whose
-  button only appears once a secret has been found.
-- All tunable numbers live in `core/.../GameConfig.kt` (plus the tables in `FishSpecies.kt` and
-  `Upgrades.kt`). The tour and HUD read them, so don't hard-code them in UI text.
+  checks for giveaways, including every secret's title). To add one: in `core/.../Secrets.kt`
+  add its id to `Secrets` (and `Secrets.all`), its trigger and bonus to `SecretRules.bonuses`,
+  and its discovery reward to `SecretRewards`; then describe it in
+  `app/.../ui/secrets/FishingSecrets.kt`. Bonuses are part of `CastResult.totalPoints`, so they
+  count in battles too and the online server recomputes them: if a secret needs a new fact about
+  the cast, add it to `CastResult` and `CastDto`, and validate it in `CastValidation`. A secret
+  is explained the first time it happens (with "show again next time?") and listed under the
+  Secrets button, which only appears once one has been found.
+- **Cosmetics (skins) must never give a gameplay advantage**: same hook size and hitbox, nothing
+  that lights up dark water or changes what the player can see. They're unlocked by legendary
+  secrets (`Cosmetic.unlockedBy`), drawn in `CastRenderer.kt` (`Skins`), and chosen in the Skins
+  screen, whose button only appears once one is unlocked.
+- All tunable numbers live in `core/.../GameConfig.kt` (plus the tables in `FishSpecies.kt`,
+  `Upgrades.kt` and `Secrets.kt`). The tour and HUD read them, so don't hard-code them in UI text.
 - Run `./gradlew :core:test :server:test :app:testDebugUnitTest` before pushing. App UI tests
   need JDK 21 (Robolectric emulating Android 16).
 

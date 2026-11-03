@@ -29,6 +29,7 @@ object ProgressCodec {
         appendLine("secrets=${p.discoveredSecrets.sorted().joinToString(",")}")
         appendLine("secretsMuted=${p.mutedSecretPopups.sorted().joinToString(",")}")
         appendLine("snagged=${p.objectsSnagged}")
+        appendLine("skins=${p.equippedSkins.entries.joinToString(",") { "${it.key.name}:${it.value.name}" }}")
         for ((stat, level) in p.ropeLevels) appendLine("rope.${stat.name}=$level")
         for ((id, e) in p.collection) {
             appendLine("fish.$id=${e.caught},${e.sparklingCaught},${e.deepestM},${e.bestPoints}")
@@ -54,6 +55,14 @@ object ProgressCodec {
                 key == "secrets" -> p = p.copy(discoveredSecrets = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet())
                 key == "secretsMuted" -> p = p.copy(mutedSecretPopups = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet())
                 key == "snagged" -> value.toIntOrNull()?.let { p = p.copy(objectsSnagged = it) }
+                key == "skins" -> p = p.copy(
+                    equippedSkins = value.split(',').mapNotNull { entry ->
+                        val (slot, cosmetic) = entry.split(':').takeIf { it.size == 2 } ?: return@mapNotNull null
+                        val s = CosmeticSlot.entries.firstOrNull { it.name == slot }
+                        val c = Cosmetic.entries.firstOrNull { it.name == cosmetic }
+                        if (s != null && c != null && c.slot == s) s to c else null
+                    }.toMap(),
+                )
                 key == "battle" -> {
                     val parts = value.split(',').map { it.trim().toIntOrNull() }
                     if (parts.size == 3 && parts.all { it != null }) {

@@ -46,6 +46,7 @@ fun AppRoot(vm: GameViewModel) {
                     Screen.BATTLE -> BattleScreen(vm)
                     Screen.ONLINE_LOBBY -> OnlineLobbyScreen(vm)
                     Screen.SECRETS -> SecretsScreen(vm)
+                    Screen.SKINS -> SkinsScreen(vm)
                 }
                 vm.tour?.let { TourOverlay(it, onNext = vm::tourNext, onBack = vm::tourBack, onSkip = vm::skipTour) }
             }

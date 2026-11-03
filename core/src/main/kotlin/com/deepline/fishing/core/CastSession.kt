@@ -15,6 +15,8 @@ data class CatchRecord(
     val points: Int,
     /** Hooked by the last bump on the way down rather than on the way up. */
     val byLastBump: Boolean = false,
+    /** Caught on the way up after being bumped on the way down. */
+    val bumpedOnDescent: Boolean = false,
 )
 
 /** An object (not a fish) hooked by the last bump. */
@@ -31,8 +33,18 @@ data class CastResult(
     val reverseReason: ReverseReason?,
     val lanternUsed: Boolean,
     val snags: List<SnagRecord> = emptyList(),
+    /** What each bump on the way down hit, in order. */
+    val bumps: List<BumpKind> = emptyList(),
+    /** The rope's weight limit for this cast. */
+    val lineStrengthKg: Float = Float.POSITIVE_INFINITY,
 ) {
-    val totalPoints: Int get() = catches.sumOf { it.points } + snags.sumOf { it.points }
+    /** Points from catches and snags, before fishing-secret bonuses. */
+    val basePoints: Int get() = catches.sumOf { it.points } + snags.sumOf { it.points }
+
+    /** Bonuses from fishing secrets pulled off in this cast. */
+    val secretBonuses: List<SecretBonus> = SecretRules.bonuses(this)
+
+    val totalPoints: Int get() = basePoints + secretBonuses.sumOf { it.points }
     val totalWeightKg: Float
         get() = (catches.sumOf { it.species.weightKg.toDouble() } + snags.sumOf { it.kind.weightKg.toDouble() }).toFloat()
 
@@ -96,6 +108,7 @@ class CastSession(
     var hookVelocityX: Float = 0f
         private set
 
+    private val _bumps = ArrayList<BumpKind>()
     private val _snags = ArrayList<SnagRecord>()
     val snags: List<SnagRecord> get() = _snags
     /** The object hooked by the last bump, if any, riding up on the line. */
@@ -191,6 +204,7 @@ class CastSession(
                 continue
             }
             fish.touchedOnDescent = true
+            _bumps += BumpKind.FISH_HEAD
             if (isLastBump()) {
                 hookFishWithLastBump(fish)
                 registerTouch()
@@ -208,6 +222,7 @@ class CastSession(
                     continue
                 }
                 obstacle.touched = true
+                _bumps += BumpKind.of(obstacle.kind)
                 if (isLastBump()) {
                     snagWithLastBump(obstacle)
                     registerTouch()
@@ -282,6 +297,7 @@ class CastSession(
                     sparkling = fish.sparkling,
                     depth = fish.depth,
                     points = Scoring.points(fish.species, fish.depth, fish.sparkling),
+                    bumpedOnDescent = fish.touchedOnDescent,
                 )
                 _catches += record
                 _caughtFish += fish
@@ -311,6 +327,8 @@ class CastSession(
             reverseReason = reverseReason,
             lanternUsed = lanternActive,
             snags = _snags.toList(),
+            bumps = _bumps.toList(),
+            lineStrengthKg = specs.maxWeightKg,
         )
         pendingEvents += CastEvent.Surfaced
     }

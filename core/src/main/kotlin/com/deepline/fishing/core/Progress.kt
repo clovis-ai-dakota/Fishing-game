@@ -32,25 +32,17 @@ data class PlayerProgress(
     /** Secrets whose explanation the player doesn't want to see pop up again. */
     val mutedSecretPopups: Set<String> = emptySet(),
     val objectsSnagged: Int = 0,
+    /** The cosmetic worn in each slot (absent = classic look). */
+    val equippedSkins: Map<CosmeticSlot, Cosmetic> = emptyMap(),
 ) {
     fun level(stat: RopeStat): Int = ropeLevels[stat] ?: 0
     val specs: RopeSpecs get() = RopeSpecs.fromLevels(ropeLevels)
     val discoveredCount: Int get() = collection.count { it.value.caught > 0 }
 
     fun isDiscovered(species: FishSpecies): Boolean = (collection[species.id]?.caught ?: 0) > 0
-}
 
-/**
- * Ids of hidden mechanics ("fishing secrets"). They are deliberately not explained in the tour;
- * the app explains each one the first time the player triggers it.
- */
-object Secrets {
-    /** The last bump hooks whatever it hit, which is the only way to land objects. */
-    const val LAST_BUMP = "last_bump"
-
-    /** Which secrets this cast revealed. */
-    fun revealedBy(result: CastResult): Set<String> =
-        if (result.lastBumpHooked) setOf(LAST_BUMP) else emptySet()
+    /** Cosmetics unlocked by the secrets discovered so far. */
+    val unlockedCosmetics: List<Cosmetic> get() = Cosmetic.entries.filter { it.unlockedBy in discoveredSecrets }
 }
 
 /** Pure functions that turn one [PlayerProgress] into the next. */
@@ -72,13 +64,30 @@ object Progression {
             pointsEarned = p.pointsEarned + gained,
             collection = collection,
             castsMade = p.castsMade + 1,
+            // Discovery rewards are granted when a secret is first explained (discoverSecret).
             discoveredSecrets = p.discoveredSecrets + Secrets.revealedBy(result),
             objectsSnagged = p.objectsSnagged + result.snags.size,
         )
     }
 
-    fun discoverSecret(p: PlayerProgress, id: String): PlayerProgress =
-        if (id in p.discoveredSecrets) p else p.copy(discoveredSecrets = p.discoveredSecrets + id)
+    /** Records a newly found secret and grants its one-time reward (nothing if already found). */
+    fun discoverSecret(p: PlayerProgress, id: String): PlayerProgress {
+        if (id in p.discoveredSecrets) return p
+        val reward = SecretRewards.of(id)
+        return p.copy(
+            discoveredSecrets = p.discoveredSecrets + id,
+            pointsBalance = p.pointsBalance + reward.points,
+            pointsEarned = p.pointsEarned + reward.points,
+            lanterns = p.lanterns + reward.lanterns,
+        )
+    }
+
+    /** Wears [cosmetic] in its slot, or the classic look when null. Locked cosmetics are refused. */
+    fun equipSkin(p: PlayerProgress, slot: CosmeticSlot, cosmetic: Cosmetic?): PlayerProgress = when {
+        cosmetic == null -> p.copy(equippedSkins = p.equippedSkins - slot)
+        cosmetic.slot != slot || cosmetic !in p.unlockedCosmetics -> p
+        else -> p.copy(equippedSkins = p.equippedSkins + (slot to cosmetic))
+    }
 
     /** Whether to pop up the explanation of [id] now that it has just happened. */
     fun shouldExplainSecret(p: PlayerProgress, id: String): Boolean =

@@ -18,6 +18,8 @@ import com.deepline.fishing.core.CastEvent
 import com.deepline.fishing.core.CastPhase
 import com.deepline.fishing.core.CastResult
 import com.deepline.fishing.core.CastSession
+import com.deepline.fishing.core.Cosmetic
+import com.deepline.fishing.core.CosmeticSlot
 import com.deepline.fishing.core.GameConfig
 import com.deepline.fishing.core.Milestone
 import com.deepline.fishing.core.PlayerProgress
@@ -37,7 +39,7 @@ import com.deepline.fishing.ui.tour.Tour
 import com.deepline.fishing.ui.tour.TourSession
 import kotlin.random.Random
 
-enum class Screen { HOME, CAST, UPGRADES, COLLECTION, MILESTONES, BATTLE_SETUP, BATTLE, ONLINE_LOBBY, SECRETS }
+enum class Screen { HOME, CAST, UPGRADES, COLLECTION, MILESTONES, BATTLE_SETUP, BATTLE, ONLINE_LOBBY, SECRETS, SKINS }
 
 /** A short message flashed over the game screen. */
 data class Notice(val text: String, val shownAtSeconds: Float)
@@ -185,6 +187,8 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun beginSession(s: CastSession, turn: BattleTurn?) {
+        explainedThisCast.clear()
+        secretQueue = emptyList()
         session = s
         battleTurn = turn
         pendingResult = null
@@ -196,9 +200,14 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     /** Builds the water for a regular cast. Tests swap it to fish hand-placed water. */
     internal var castFactory: (RopeSpecs, Boolean) -> CastSession = { specs, lantern -> CastSession.create(specs, lantern) }
 
-    /** The fishing secret being explained right now (the cast is paused while it shows). */
-    var secretPopup by mutableStateOf<String?>(null)
-        private set
+    /** Fishing secrets waiting to be explained; the first one is showing (the cast is paused). */
+    private var secretQueue by mutableStateOf<List<String>>(emptyList())
+
+    /** The fishing secret being explained right now. */
+    val secretPopup: String? get() = secretQueue.firstOrNull()
+
+    /** Secrets already explained during the current cast (so they don't pop up twice). */
+    private val explainedThisCast = HashSet<String>()
 
     fun onFrame(dt: Float, steerTargetX: Float?) {
         val s = session ?: return
@@ -238,7 +247,12 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             s.endNow()
             notice = Notice("Time's up!", s.elapsedSeconds)
         }
-        if (s.phase == CastPhase.SURFACED) pendingResult = s.result
+        if (s.phase == CastPhase.SURFACED) {
+            val result = s.result
+            pendingResult = result
+            // Secrets pulled off in this cast are revealed with the results.
+            result?.let { r -> Secrets.revealedBy(r).forEach(::onSecretTriggered) }
+        }
         sendLiveStatus(s)
     }
 
@@ -269,16 +283,18 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
 
     /** A hidden mechanic just happened: remember it, and explain it unless the player opted out. */
     private fun onSecretTriggered(id: String) {
+        if (!explainedThisCast.add(id)) return
         val explain = Progression.shouldExplainSecret(progress, id)
+        // The first time also grants the secret's one-time reward (points, Lanterns, skins).
         update(Progression.discoverSecret(progress, id))
-        if (explain) secretPopup = id
+        if (explain) secretQueue = secretQueue + id
     }
 
     /** Closes the secret explanation; [showAgain] is the answer to "show this again next time?". */
     fun answerSecretPopup(showAgain: Boolean) {
         val id = secretPopup ?: return
         update(Progression.setSecretPopupMuted(progress, id, muted = !showAgain))
-        secretPopup = null
+        secretQueue = secretQueue.drop(1)
     }
 
     fun pause() {
@@ -334,6 +350,10 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         result?.let { update(Progression.applyCast(progress, it)) }
         useLantern = useLantern && progress.lanterns > 0
         screen = Screen.HOME
+    }
+
+    fun equipSkin(slot: CosmeticSlot, cosmetic: Cosmetic?) {
+        update(Progression.equipSkin(progress, slot, cosmetic))
     }
 
     fun buyUpgrade(stat: RopeStat) {
@@ -461,7 +481,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             Screen.BATTLE -> if (battle?.isOver != false) leaveBattle() else Unit
             Screen.BATTLE_SETUP -> screen = Screen.HOME
             Screen.ONLINE_LOBBY -> closeOnlineLobby()
-            Screen.SECRETS -> screen = Screen.HOME
+            Screen.SECRETS, Screen.SKINS -> screen = Screen.HOME
             else -> screen = Screen.HOME
         }
     }

@@ -43,6 +43,14 @@ class SecretUiTest {
 
     private var scenario: ActivityScenario<MainActivity>? = null
 
+    /** Saved settings can outlive a test in the same class: every test starts from a clean slate. */
+    @org.junit.Before
+    fun clearSavedState() {
+        ApplicationProvider.getApplicationContext<android.content.Context>()
+            .getSharedPreferences("deepline", android.content.Context.MODE_PRIVATE)
+            .edit().clear().commit()
+    }
+
     @After
     fun tearDown() {
         scenario?.close()
@@ -108,7 +116,7 @@ class SecretUiTest {
         scenario!!.onActivity { vm = ViewModelProvider(it)[GameViewModel::class.java] }
         vm.castFactory = ::snagWater
 
-        assertTrue("no secrets button before any discovery", !isShowing("Fishing secrets"))
+        assertTrue("no secrets button before any discovery", !isShowing("Secrets"))
 
         // First snag: the cast pauses and the secret is explained.
         compose.click("Cast line")
@@ -127,7 +135,7 @@ class SecretUiTest {
         assertEquals(1, vm.progress.objectsSnagged)
 
         // The secret is now listed on its own screen.
-        compose.click("Fishing secrets")
+        compose.click("Secrets")
         compose.onNodeWithText("The last bump hooks what it hits").assertExists()
         compose.shot("29_fishing_secrets")
         compose.click("‹ Back")

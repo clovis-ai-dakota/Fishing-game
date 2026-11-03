@@ -25,11 +25,31 @@ Hidden mechanics, explained in game the first time they happen (with a "show thi
 time?" question) and then listed under **Fishing secrets** on the home screen. The tour hints that
 secrets exist but never reveals them.
 
-- **The last bump hooks what it hits.** The 4th bump doesn't just send the line up: it hooks the
-  fish whose head it hit (even over the weight limit), or snags the object, which is the only way
-  to land rocks, driftwood and jellies. Objects are worth big points (base 200 / 100 / 150,
-  times the depth multiplier). Online, the server checks it: at most one per cast, only with all
-  4 bumps used, never in the bump-free zone.
+Every secret adds a **bonus to the cast every time** it's pulled off (solo and in battles, for
+the computer rival too; online, the server recomputes it from the cast) and gives a **one-time
+discovery reward**. Cast-wide multipliers add up rather than compound. Numbers live in
+`core/.../Secrets.kt`.
+
+| Secret | Trigger | Each time | Discovery reward |
+| --- | --- | --- | --- |
+| The last bump hooks what it hits | The 4th bump hooks the fish whose head it hit (even over the weight limit) or snags the object: the only way to land rocks (200), driftwood (100) and jellies (150 base, × depth) | the hooked catch | — |
+| Schooling | 3+ fish of one species in a cast | +100 | 300 |
+| Second encounter | On the way up, catch a fish you bumped on the way down | that fish ×2 | 750 + 1 Lantern |
+| Clean drop | Reach the end of a rope of 300 m+ with no bumps | cast ×1.5 | 1,000 + 1 Lantern |
+| Grand tour | The 4 bumps hit a fish head, a rock, driftwood and a jelly | last bump's catch ×2 | 2,500 + 2 Lanterns |
+| Ladder | 4+ fish caught on the way up in strictly increasing weight | cast ×1.5 | 2,000 + 2 Lanterns |
+| Zone sweep | A fish from each of the 4 depth zones in one cast | cast ×2 | 8,000 + 5 Lanterns |
+| David and Goliath | The last bump hooks the Pale Leviathan (24 kg) on a rope weaker than it | leviathan ×3 | 15,000 + 6 Lanterns + Giant-slayer skins |
+
+Online, the server checks every fact a bonus relies on: what each bump hit must match the bumps
+used and the last-bump hook, "bumped then caught" fish need fish-head bumps, and catches must come
+up deepest first (so a Ladder can't be faked by reordering).
+
+### Skins
+
+Legendary secrets unlock cosmetics, chosen per slot (hook, line, boat) in the **Skins** screen:
+the Leviathan bone hook, the Giant's braid line and the Giant-slayer pennant. They are purely
+visual: same hook size and hitbox, and nothing that lights up dark water.
 
 ### Guided tour
 

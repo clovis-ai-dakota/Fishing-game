@@ -41,6 +41,14 @@ class AppUiTest {
 
     private var scenario: ActivityScenario<MainActivity>? = null
 
+    /** Saved settings can outlive a test in the same class: every test starts from a clean slate. */
+    @org.junit.Before
+    fun clearSavedState() {
+        ApplicationProvider.getApplicationContext<android.content.Context>()
+            .getSharedPreferences("deepline", android.content.Context.MODE_PRIVATE)
+            .edit().clear().commit()
+    }
+
     @After
     fun tearDown() {
         scenario?.close()

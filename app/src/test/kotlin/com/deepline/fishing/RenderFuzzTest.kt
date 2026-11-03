@@ -41,6 +41,7 @@ class RenderFuzzTest {
         widthPx: Int,
         heightPx: Int,
         density: Float,
+        skins: com.deepline.fishing.ui.Skins = com.deepline.fishing.ui.Skins.CLASSIC,
     ) {
         val d = Density(density)
         val measurer = TextMeasurer(createFontFamilyResolver(context), d, LayoutDirection.Ltr)
@@ -57,7 +58,7 @@ class RenderFuzzTest {
             t += dt
             try {
                 drawScope.draw(d, LayoutDirection.Ltr, canvas, Size(widthPx.toFloat(), heightPx.toFloat())) {
-                    drawCastScene(session, t, measurer)
+                    drawCastScene(session, t, measurer, aimX = session.hookX + 1f, skins = skins)
                 }
             } catch (e: Throwable) {
                 throw AssertionError(
@@ -76,6 +77,13 @@ class RenderFuzzTest {
     @Test
     fun startingRopeOnAPhoneScreen() {
         playAndRenderEveryFrame(rope(0), seed = 1, lantern = false, widthPx = 1080, heightPx = 2400, density = 2.625f)
+        // And with every skin on.
+        val allSkins = com.deepline.fishing.ui.Skins(
+            hook = com.deepline.fishing.core.Cosmetic.LEVIATHAN_BONE_HOOK,
+            line = com.deepline.fishing.core.Cosmetic.GIANTS_BRAID_LINE,
+            boat = com.deepline.fishing.core.Cosmetic.GIANT_SLAYER_PENNANT,
+        )
+        playAndRenderEveryFrame(rope(0), seed = 1, lantern = false, widthPx = 1080, heightPx = 2400, density = 2.625f, skins = allSkins)
     }
 
     /**

@@ -50,15 +50,38 @@ class ProtocolTest {
         val specs = OnlineProtocol.tournamentSpecs
         val turn = BattleTurn(0, 1, 0, 1L, null)
         val snag = com.deepline.fishing.core.online.SnagDto(ObstacleKind.ROCK, 120f, points = 999_999)
-        val dto = com.deepline.fishing.core.online.CastDto(emptyList(), 120f, GameConfig.DESCENT_TOUCH_LIMIT, ReverseReason.TOUCH_LIMIT, 20f, listOf(snag))
+        val bumps = listOf(BumpKind.DRIFTWOOD, BumpKind.DRIFTWOOD, BumpKind.ROCK, BumpKind.ROCK)
+        val dto = com.deepline.fishing.core.online.CastDto(emptyList(), 120f, GameConfig.DESCENT_TOUCH_LIMIT, ReverseReason.TOUCH_LIMIT, 20f, listOf(snag), bumps)
         assertEquals(dto, OnlineProtocol.decodeClient(OnlineProtocol.encode(ClientMessage.CastFinished(turn, dto)))!!.let { (it as ClientMessage.CastFinished).cast })
 
         val cast = assertNotNull(CastValidation.toBattleCast(dto, turn, specs))
         assertEquals(Scoring.snagPoints(ObstacleKind.ROCK, 120f), cast.points)
 
-        assertNull(CastValidation.toBattleCast(dto.copy(touchesUsed = 2), turn, specs), "only the last bump snags")
+        assertNull(CastValidation.toBattleCast(dto.copy(touchesUsed = 2, bumps = bumps.take(2)), turn, specs), "only the last bump snags")
+        assertNull(CastValidation.toBattleCast(dto.copy(bumps = bumps.take(3) + BumpKind.JELLY), turn, specs), "last bump didn't hit a rock")
         assertNull(CastValidation.toBattleCast(dto.copy(snags = listOf(snag, snag)), turn, specs), "one hook per cast")
         assertNull(CastValidation.toBattleCast(dto.copy(snags = listOf(snag.copy(depth = 10f))), turn, specs), "bump-free zone")
+    }
+
+    @Test
+    fun secretBonusesAreRecomputedAndFakedFactsRejected() {
+        val specs = OnlineProtocol.tournamentSpecs
+        val turn = BattleTurn(0, 1, 0, 1L, null)
+        fun c(id: String, depth: Float, bumped: Boolean = false) = com.deepline.fishing.core.online.CatchDto(id, false, depth, 0, false, bumped)
+        // A genuine ladder: caught on the way up (deepest first), lightest first.
+        val ladder = listOf(c("silver_sprat", 80f), c("coral_darter", 60f), c("reed_perch", 40f), c("sun_bream", 35f))
+        val dto = com.deepline.fishing.core.online.CastDto(ladder, 370f, 0, ReverseReason.ROPE_END, 40f)
+        val cast = assertNotNull(CastValidation.toBattleCast(dto, turn, specs))
+        assertEquals(setOf(Secrets.LADDER, Secrets.CLEAN_DROP), cast.result.secretBonuses.map { it.secretId }.toSet())
+        assertTrue(cast.points > cast.result.basePoints)
+
+        // Reordering catches against the ascent to fake a ladder is rejected.
+        val faked = listOf(c("silver_sprat", 30f), c("coral_darter", 50f), c("reed_perch", 80f), c("sun_bream", 120f))
+        assertNull(CastValidation.toBattleCast(dto.copy(catches = faked), turn, specs))
+        // A "bumped then caught" fish needs a fish-head bump.
+        assertNull(CastValidation.toBattleCast(dto.copy(catches = listOf(c("silver_sprat", 50f, bumped = true))), turn, specs))
+        // Bump facts must match the bumps used.
+        assertNull(CastValidation.toBattleCast(dto.copy(touchesUsed = 1), turn, specs))
     }
 
     @Test

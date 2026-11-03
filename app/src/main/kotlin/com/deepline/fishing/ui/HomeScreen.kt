@@ -196,12 +196,18 @@ fun HomeScreen(vm: GameViewModel) {
                     .weight(1f)
                     .tourTarget(TourTarget.HOME_TOUR),
             ) {
-                Text("Take the tour")
+                Text("Take the tour", maxLines = 1)
             }
             // Appears once the player has discovered a hidden mechanic.
             if (p.discoveredSecrets.isNotEmpty()) {
                 OutlinedButton(onClick = { vm.navigate(Screen.SECRETS) }, modifier = Modifier.weight(1f)) {
-                    Text("Fishing secrets")
+                    Text("Secrets", maxLines = 1)
+                }
+            }
+            // Appears once a legendary secret has unlocked a cosmetic.
+            if (p.unlockedCosmetics.isNotEmpty()) {
+                OutlinedButton(onClick = { vm.navigate(Screen.SKINS) }, modifier = Modifier.weight(1f)) {
+                    Text("Skins", maxLines = 1)
                 }
             }
         }
