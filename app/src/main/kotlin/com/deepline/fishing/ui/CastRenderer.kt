@@ -93,7 +93,7 @@ fun DrawScope.drawCastScene(session: CastSession, timeSeconds: Float, textMeasur
     while (marker < bottom) {
         val y = sy(marker)
         drawLine(Color.White.copy(alpha = 0.10f), Offset(0f, y), Offset(size.width, y), strokeWidth = 1f)
-        drawText(textMeasurer, "${marker.toInt()} m", topLeft = Offset(8f, y + 4f), style = labelStyle)
+        drawLabel(textMeasurer, "${marker.toInt()} m", labelStyle, x = 8f, y = y + 4f)
         marker += 50f
     }
 
@@ -108,11 +108,12 @@ fun DrawScope.drawCastScene(session: CastSession, timeSeconds: Float, textMeasur
             strokeWidth = 2f,
             pathEffect = PathEffect.dashPathEffect(floatArrayOf(18f, 12f)),
         )
-        drawText(
+        drawLabel(
             textMeasurer,
             "Rope limit",
-            topLeft = Offset(size.width - 90f, y + 4f),
-            style = TextStyle(color = Color(0xFFFFB74D), fontSize = 11.sp),
+            TextStyle(color = Color(0xFFFFB74D), fontSize = 11.sp),
+            x = null, // right-aligned
+            y = y + 4f,
         )
     }
 
@@ -217,6 +218,20 @@ fun DrawScope.drawCastScene(session: CastSession, timeSeconds: Float, textMeasur
             )
         }
     }
+}
+
+/**
+ * Draws a one-line label at ([x], [y]); a null [x] right-aligns it. The text is measured without
+ * size limits and then drawn, so a label partly or fully off-screen is simply clipped.
+ * (`drawText(textMeasurer, text, topLeft)` sizes the text to the space between [y] and the bottom
+ * edge, and throws when [y] is below the edge: that crashed the game whenever a depth or
+ * "Rope limit" label scrolled in at the bottom of the screen.)
+ */
+private fun DrawScope.drawLabel(textMeasurer: TextMeasurer, text: String, style: TextStyle, x: Float?, y: Float) {
+    if (y > size.height || y < -200f) return
+    val layout = textMeasurer.measure(text, style, softWrap = false, maxLines = 1)
+    val left = x ?: (size.width - layout.size.width - 8f)
+    drawText(layout, topLeft = Offset(left, y))
 }
 
 private fun DrawScope.drawObstacle(o: Obstacle, c: Offset, r: Float, timeSeconds: Float) {
