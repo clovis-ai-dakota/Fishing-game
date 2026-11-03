@@ -24,6 +24,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.GameViewModel
 import com.deepline.fishing.Screen
+import com.deepline.fishing.ui.secrets.FishingSecrets
+import com.deepline.fishing.ui.secrets.SecretDiscoveredDialog
 import com.deepline.fishing.ui.secrets.SecretsScreen
 import com.deepline.fishing.ui.tour.LocalTourTargets
 import com.deepline.fishing.ui.tour.TourOverlay
@@ -50,6 +52,10 @@ fun AppRoot(vm: GameViewModel) {
                 }
                 vm.tour?.let { TourOverlay(it, onNext = vm::tourNext, onBack = vm::tourBack, onSkip = vm::skipTour) }
             }
+        }
+        // Fishing secrets are explained wherever they happen: in a cast, after a battle, at home.
+        vm.secretPopup?.let { id ->
+            FishingSecrets.byId(id)?.let { SecretDiscoveredDialog(it, onAnswer = vm::answerSecretPopup) }
         }
         if (vm.askTourAgain) {
             AlertDialog(

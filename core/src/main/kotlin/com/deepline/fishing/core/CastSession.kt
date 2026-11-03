@@ -17,6 +17,12 @@ data class CatchRecord(
     val byLastBump: Boolean = false,
     /** Caught on the way up after being bumped on the way down. */
     val bumpedOnDescent: Boolean = false,
+    /** When it was caught (cast seconds); NaN when unknown. */
+    val caughtAt: Float = Float.NaN,
+    /** It was still darting away from a bump when caught. */
+    val whileFleeing: Boolean = false,
+    /** It had just turned around at the edge of the water when caught. */
+    val afterWallTurn: Boolean = false,
 )
 
 /** An object (not a fish) hooked by the last bump. */
@@ -37,6 +43,16 @@ data class CastResult(
     val bumps: List<BumpKind> = emptyList(),
     /** The rope's weight limit for this cast. */
     val lineStrengthKg: Float = Float.POSITIVE_INFINITY,
+    /** The rope's length for this cast. */
+    val ropeLengthM: Float = Float.POSITIVE_INFINITY,
+    /** When each bump happened (cast seconds), matching [bumps]. */
+    val bumpTimes: List<Float> = emptyList(),
+    /** Fish heads the hook passed through in the bump-free zone. */
+    val freePasses: Int = 0,
+    /** Whether the player steered at all during the cast. */
+    val steered: Boolean = true,
+    /** Battle clock left when the cast started (timed battles), else null. */
+    val timeLeftAtStart: Float? = null,
 ) {
     /** Points from catches and snags, before fishing-secret bonuses. */
     val basePoints: Int get() = catches.sumOf { it.points } + snags.sumOf { it.points }
@@ -82,6 +98,8 @@ class CastSession(
     val lanternActive: Boolean,
     val world: World,
     startX: Float = GameConfig.WORLD_WIDTH / 2f,
+    /** Battle clock left when this cast starts (timed battles). */
+    val timeLeftAtStart: Float? = null,
 ) {
     var phase: CastPhase = CastPhase.DESCENDING
         private set
@@ -109,6 +127,9 @@ class CastSession(
         private set
 
     private val _bumps = ArrayList<BumpKind>()
+    private val _bumpTimes = ArrayList<Float>()
+    private var freePasses = 0
+    private var steered = false
     private val _snags = ArrayList<SnagRecord>()
     val snags: List<SnagRecord> get() = _snags
     /** The object hooked by the last bump, if any, riding up on the line. */
@@ -173,6 +194,7 @@ class CastSession(
     private fun steer(dt: Float, targetX: Float?) {
         val before = hookX
         if (targetX != null) {
+            steered = true
             val target = targetX.coerceIn(GameConfig.HOOK_RADIUS, GameConfig.WORLD_WIDTH - GameConfig.HOOK_RADIUS)
             val delta = target - hookX
             val speed = (abs(delta) * GameConfig.STEER_RESPONSIVENESS).coerceAtMost(specs.steerSpeed)
@@ -201,6 +223,7 @@ class CastSession(
             if (!Collision.touchesHead(fish, hookX, hookDepth, r)) continue
             if (bumpFree) {
                 fish.passedInBumpFreeZone = true
+                freePasses++
                 continue
             }
             fish.touchedOnDescent = true
@@ -244,6 +267,7 @@ class CastSession(
             depth = fish.depth,
             points = Scoring.points(fish.species, fish.depth, fish.sparkling),
             byLastBump = true,
+            caughtAt = elapsedSeconds,
         )
         _catches += record
         _caughtFish += fish
@@ -264,6 +288,7 @@ class CastSession(
     private fun registerTouch(): Boolean {
         touches++
         lastTouchAtSeconds = elapsedSeconds
+        _bumpTimes += elapsedSeconds
         pendingEvents += CastEvent.Touched(touches)
         if (touches >= GameConfig.DESCENT_TOUCH_LIMIT) {
             reverse(ReverseReason.TOUCH_LIMIT)
@@ -287,7 +312,7 @@ class CastSession(
         }
         val r = GameConfig.HOOK_RADIUS
         for (fish in world.fish) {
-            if (fish.caught) continue
+            if (fish.caught || fish.species.lastBumpOnly) continue
             if (abs(fish.depth - hookDepth) > fish.halfLength + r) continue
             if (!Collision.touchesHead(fish, hookX, hookDepth, r)) continue
             if (carriedWeightKg + fish.species.weightKg <= specs.maxWeightKg + 1e-4f) {
@@ -298,6 +323,9 @@ class CastSession(
                     depth = fish.depth,
                     points = Scoring.points(fish.species, fish.depth, fish.sparkling),
                     bumpedOnDescent = fish.touchedOnDescent,
+                    caughtAt = elapsedSeconds,
+                    whileFleeing = fish.isFleeing,
+                    afterWallTurn = fish.secondsSinceTurn <= GameConfig.WALL_TURN_WINDOW,
                 )
                 _catches += record
                 _caughtFish += fish
@@ -329,6 +357,11 @@ class CastSession(
             snags = _snags.toList(),
             bumps = _bumps.toList(),
             lineStrengthKg = specs.maxWeightKg,
+            ropeLengthM = specs.lengthM,
+            bumpTimes = _bumpTimes.toList(),
+            freePasses = freePasses,
+            steered = steered,
+            timeLeftAtStart = timeLeftAtStart,
         )
         pendingEvents += CastEvent.Surfaced
     }
@@ -338,7 +371,7 @@ class CastSession(
             CastSession(specs, lanternActive, WorldGenerator.generate(specs.lengthM, random))
 
         /** A cast on the water generated from [seed]: the same seed always gives the same fish. */
-        fun seeded(specs: RopeSpecs, seed: Long, lanternActive: Boolean = false): CastSession =
-            create(specs, lanternActive, Random(seed))
+        fun seeded(specs: RopeSpecs, seed: Long, lanternActive: Boolean = false, timeLeftAtStart: Float? = null): CastSession =
+            CastSession(specs, lanternActive, WorldGenerator.generate(specs.lengthM, Random(seed)), timeLeftAtStart = timeLeftAtStart)
     }
 }

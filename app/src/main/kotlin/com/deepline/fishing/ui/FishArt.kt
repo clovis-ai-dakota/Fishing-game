@@ -43,10 +43,41 @@ object FishStyles {
         "star_drifter" to FishStyle(FishShape.DEEP_BODY, FishPattern.SPOTS),
         "abyss_wyrm" to FishStyle(FishShape.EEL, FishPattern.STRIPES),
         "pale_leviathan" to FishStyle(FishShape.STANDARD, FishPattern.LATERAL_BAND),
+        "deep_sovereign" to FishStyle(FishShape.ANGLER, FishPattern.STRIPES),
     )
 
-    fun of(species: FishSpecies): FishStyle =
-        styles[species.id] ?: FishStyle(if (species.heightRatio < 0.2f) FishShape.EEL else FishShape.STANDARD, FishPattern.PLAIN)
+    /** Body plans for generated species, by the kind of fish their name ends with. */
+    private val shapeByKind = listOf(
+        "Cuttle" to FishShape.CUTTLE,
+        "Grouper" to FishShape.DEEP_BODY,
+        "Batfish" to FishShape.DEEP_BODY,
+        "Angelfish" to FishShape.DEEP_BODY,
+        "Gulper" to FishShape.DEEP_BODY,
+        "Ray" to FishShape.DEEP_BODY,
+    )
+
+    /** Markings that match a name ("Banded", "Speckled"...); otherwise one picked from the id. */
+    private val patternByWord = mapOf(
+        "Banded" to FishPattern.STRIPES,
+        "Tidal" to FishPattern.STRIPES,
+        "Speckled" to FishPattern.SPOTS,
+        "Pebble" to FishPattern.SPOTS,
+        "Starlit" to FishPattern.SPOTS,
+        "Nebula" to FishPattern.SPOTS,
+    )
+
+    fun of(species: FishSpecies): FishStyle {
+        styles[species.id]?.let { return it }
+        // Glowing fish carry a lure, which is what shines in dark water.
+        val shape = when {
+            species.glowing -> FishShape.ANGLER
+            species.heightRatio < 0.2f -> FishShape.EEL
+            else -> shapeByKind.firstOrNull { species.name.endsWith(it.first) }?.second ?: FishShape.STANDARD
+        }
+        val pattern = patternByWord[species.name.substringBefore(' ')]
+            ?: FishPattern.entries[(species.id.hashCode() and 0x7FFFFFFF) % FishPattern.entries.size]
+        return FishStyle(shape, pattern)
+    }
 }
 
 /**

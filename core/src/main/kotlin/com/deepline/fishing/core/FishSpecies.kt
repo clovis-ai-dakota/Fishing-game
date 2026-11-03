@@ -29,6 +29,10 @@ data class FishSpecies(
     val rarity: Int,
     val bodyColor: Long,
     val accentColor: Long,
+    /** Has a glowing lure or lights (anglers, sea devils, dragonfish...). Visual and for secrets. */
+    val glowing: Boolean = false,
+    /** Can only be landed by the last bump on the way down (never on the way up). */
+    val lastBumpOnly: Boolean = false,
 ) {
     val zone: DepthZone get() = DepthZone.of(minDepth)
 
@@ -37,7 +41,8 @@ data class FishSpecies(
 }
 
 object FishCatalog {
-    val all: List<FishSpecies> = listOf(
+    /** The original hand-made species (their ids must never change: saves refer to them). */
+    private val handmade: List<FishSpecies> = listOf(
         // Sunlit Shallows
         FishSpecies("silver_sprat", "Silver Sprat", 0.2f, 5, 0f, 90f, 0.7f, 0.38f, 2.0f, 30, 0xFFC9D6DF, 0xFF7E929F),
         FishSpecies("coral_darter", "Coral Darter", 0.4f, 8, 0f, 110f, 0.8f, 0.42f, 2.6f, 25, 0xFFFF8A65, 0xFFFFD54F),
@@ -54,11 +59,28 @@ object FishCatalog {
         FishSpecies("ink_cuttle", "Ink Cuttle", 2.6f, 92, 330f, 520f, 1.2f, 0.5f, 0.8f, 10, 0xFF8D6E63, 0xFF3E2723),
         FishSpecies("iron_sturgeon", "Iron Sturgeon", 12f, 120, 360f, 540f, 3.0f, 0.3f, 0.7f, 6, 0xFF78909C, 0xFF37474F),
         // Abyssal Floor
-        FishSpecies("glowfin_angler", "Glowfin Angler", 5f, 150, 480f, 800f, 1.4f, 0.6f, 0.6f, 14, 0xFF5C6BC0, 0xFFB2FF59),
+        FishSpecies("glowfin_angler", "Glowfin Angler", 5f, 150, 480f, 800f, 1.4f, 0.6f, 0.6f, 14, 0xFF5C6BC0, 0xFFB2FF59, glowing = true),
         FishSpecies("star_drifter", "Star Drifter", 1.2f, 180, 500f, 800f, 1.0f, 0.6f, 0.9f, 10, 0xFFF48FB1, 0xFFFFF59D),
         FishSpecies("abyss_wyrm", "Abyss Wyrm", 10f, 220, 520f, 800f, 3.4f, 0.18f, 1.3f, 6, 0xFF6A1B9A, 0xFFEA80FC),
         FishSpecies("pale_leviathan", "Pale Leviathan", 24f, 450, 560f, 800f, 4.5f, 0.32f, 0.5f, 2, 0xFFECEFF1, 0xFF80DEEA),
     )
+
+    /**
+     * The legendary 200th fish: it only lives in the last meters of a fully upgraded rope, shows
+     * up in [GameConfig.SOVEREIGN_SPAWN_CHANCE] of the casts that reach there, and can only be
+     * landed by the last bump.
+     */
+    val sovereign = FishSpecies(
+        "deep_sovereign", "Deep Sovereign", 60f, 2_500,
+        GameConfig.SOVEREIGN_MIN_DEPTH, GameConfig.SOVEREIGN_MAX_DEPTH, 5.5f, 0.36f, 0.35f,
+        rarity = 0, bodyColor = 0xFF4A148C, accentColor = 0xFFFFD54F, glowing = true, lastBumpOnly = true,
+    )
+
+    /** Every species: 199 regular ones (the hand-made plus generated) and the legendary 200th. */
+    val all: List<FishSpecies> = handmade + SpeciesGenerator.generate(handmade.map { it.name }.toSet()) + sovereign
+
+    /** Species that spawn normally (everything but the legendary). */
+    val regular: List<FishSpecies> = all.filter { !it.lastBumpOnly }
 
     private val byId = all.associateBy { it.id }
 

@@ -108,8 +108,9 @@ class LegendarySecretUiTest {
         val c = GameConfig.WORLD_WIDTH / 2f
         val leviathan = com.deepline.fishing.core.FishCatalog.byId("pale_leviathan")!!
         val head = leviathan.bodyLengthM / 2f * 0.8f
-        val fish = com.deepline.fishing.core.FishEntity(0, leviathan, false, c - head, 75f, 1, 0f)
-        val rocks = listOf(40f, 50f, 60f).mapIndexed { i, d -> Obstacle(i, ObstacleKind.ROCK, c, d, 1f) }
+        // Spaced out so the bumps take longer than "Pinball" allows: only the legendary secret here.
+        val fish = com.deepline.fishing.core.FishEntity(0, leviathan, false, c - head, 80f, 1, 0f)
+        val rocks = listOf(35f, 50f, 65f).mapIndexed { i, d -> Obstacle(i, ObstacleKind.ROCK, c, d, 1f) }
         return CastSession(specs, lantern, World(listOf(fish), rocks))
     }
 
@@ -127,7 +128,7 @@ class LegendarySecretUiTest {
         val lanternsBefore = vm.progress.lanterns
 
         compose.click("Cast line")
-        compose.advanceSeconds(5f)
+        compose.advanceSeconds(6f)
         // The last bump hooked the leviathan: that secret first, mid-cast.
         compose.onNodeWithText("The last bump hooks what it hits").assertExists()
         compose.click("No thanks")
@@ -146,15 +147,18 @@ class LegendarySecretUiTest {
         assertEquals(lanternsBefore + reward.lanterns, vm.progress.lanterns)
         assertTrue(vm.progress.unlockedCosmetics.isNotEmpty())
 
-        // Skins: wear all three, then fish with them.
+        // Skins: wear the whole set (hook, line, boat, trail and title), then fish with them.
         compose.click("Skins")
-        compose.click("Leviathan bone hook")
-        compose.click("Giant's braid")
-        compose.click("Giant-slayer pennant")
+        val set = com.deepline.fishing.core.Cosmetic.entries.filter { it.unlockedBy == Secrets.DAVID_AND_GOLIATH }
+        assertEquals(com.deepline.fishing.core.CosmeticSlot.entries.size, set.size)
+        for (c in set) compose.click(c.displayName)
         compose.onAllNodes(hasScrollAction()).onFirst().performScrollToIndex(0)
         compose.shot("32_skins")
-        assertEquals(3, vm.progress.equippedSkins.size)
+        assertEquals(set.size, vm.progress.equippedSkins.size)
+        assertEquals("Giant-slayer", vm.title)
         compose.click("‹ Back")
+        // The title is shown off on the home screen.
+        compose.onNodeWithText("★ Giant-slayer").assertExists()
 
         compose.click("Cast line")
         compose.mainClock.autoAdvance = false

@@ -1,6 +1,12 @@
 package com.deepline.fishing.ui
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,10 +23,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -48,6 +57,7 @@ fun SkinsScreen(vm: GameViewModel) {
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             item { SkinPreview(skins) }
+            vm.title?.let { t -> item { Row(verticalAlignment = Alignment.CenterVertically) { Text("Your title: "); TitleBadge(t) } } }
             item {
                 Text(
                     "Skins only change how your gear looks: they never change how the game plays.",
@@ -101,21 +111,45 @@ private fun SkinOption(name: String, description: String, selected: Boolean, onS
     }
 }
 
+/** A title won with a legendary secret, shown under the player's name. */
+@Composable
+fun TitleBadge(title: String, modifier: Modifier = Modifier) {
+    Text(
+        "★ $title",
+        modifier = modifier
+            .clip(RoundedCornerShape(50))
+            .background(Brush.horizontalGradient(listOf(Color(0xFFFFA000), Color(0xFFFFE082), Color(0xFFFFA000))))
+            .padding(horizontal = 10.dp, vertical = 2.dp),
+        color = Color(0xFF3E2723),
+        style = MaterialTheme.typography.labelLarge,
+        fontWeight = FontWeight.Bold,
+        maxLines = 1,
+    )
+}
+
 /** The boat, rod, line and hook near the surface, wearing [skins]. */
 @Composable
 private fun SkinPreview(skins: Skins) {
     val measurer = rememberTextMeasurer()
     val session = remember {
         CastSession(RopeSpecs(120f, 10f, 9f), false, World(emptyList(), emptyList())).also {
-            while (it.hookDepth < 3f) it.update(1f / 60f, null)
+            while (it.hookDepth < 5f) it.update(1f / 60f, null)
         }
     }
+    // Skins are animated: the preview plays them (tests run with animations paused).
+    val time by rememberInfiniteTransition(label = "skins").animateFloat(
+        initialValue = 0f,
+        targetValue = 60f,
+        animationSpec = infiniteRepeatable(tween(60_000, easing = LinearEasing)),
+        label = "time",
+    )
     Canvas(
         Modifier
             .fillMaxWidth()
             .height(360.dp)
             .clip(RoundedCornerShape(12.dp)),
     ) {
-        drawCastScene(session, 0.8f, measurer, skins = skins)
+        // Framed on the boat, the line and the hook, with room for the masts.
+        drawCastScene(session, 0.8f + time, measurer, skins = skins, cameraTop = -6.5f)
     }
 }

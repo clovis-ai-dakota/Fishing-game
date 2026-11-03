@@ -82,6 +82,15 @@ class ProtocolTest {
         assertNull(CastValidation.toBattleCast(dto.copy(catches = listOf(c("silver_sprat", 50f, bumped = true))), turn, specs))
         // Bump facts must match the bumps used.
         assertNull(CastValidation.toBattleCast(dto.copy(touchesUsed = 1), turn, specs))
+        // The legendary fish can't come up any way but the last bump.
+        assertNull(CastValidation.toBattleCast(dto.copy(catches = listOf(c("deep_sovereign", 610f))), turn, specs))
+        // Out-of-order bump times, or a "fleeing" fish that was never bumped.
+        assertNull(CastValidation.toBattleCast(dto.copy(touchesUsed = 2, bumps = listOf(BumpKind.ROCK, BumpKind.ROCK), bumpTimes = listOf(5f, 4f)), turn, specs))
+        val fled = com.deepline.fishing.core.online.CatchDto("silver_sprat", false, 50f, whileFleeing = true)
+        assertNull(CastValidation.toBattleCast(dto.copy(catches = listOf(fled)), turn, specs))
+        // The battle clock is the server's, not the client's.
+        val timed = BattleTurn(0, 1, 0, 1L, 10f)
+        assertEquals(10f, CastValidation.toBattleCast(dto.copy(durationSec = 9f), timed, specs)!!.result.timeLeftAtStart)
     }
 
     @Test

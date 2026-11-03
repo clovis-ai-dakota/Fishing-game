@@ -10,7 +10,7 @@ object WorldGenerator {
         var depth = GameConfig.FIRST_FISH_DEPTH
         var id = 0
         while (depth < limit) {
-            val candidates = FishCatalog.all.filter { depth >= it.minDepth && depth <= it.maxDepth }
+            val candidates = FishCatalog.regular.filter { depth >= it.minDepth && depth <= it.maxDepth }
             if (candidates.isNotEmpty()) {
                 val species = weightedPick(candidates, random) { it.rarity }
                 val halfLength = species.bodyLengthM / 2f
@@ -42,6 +42,22 @@ object WorldGenerator {
                 radius = radius,
             )
             depth += GameConfig.OBSTACLE_SPACING * (0.6f + random.nextFloat() * 0.8f)
+        }
+        // The legendary fish, at the very bottom, in a few of the casts that can reach it.
+        // (Drawn last so it doesn't change the rest of the water for a given seed.)
+        val bottom = minOf(maxDepth, GameConfig.SOVEREIGN_MAX_DEPTH) - 1f
+        if (bottom >= GameConfig.SOVEREIGN_MIN_DEPTH && random.nextFloat() < GameConfig.SOVEREIGN_SPAWN_CHANCE) {
+            val s = FishCatalog.sovereign
+            val half = s.bodyLengthM / 2f
+            fish += FishEntity(
+                id = fish.size + 10_000,
+                species = s,
+                sparkling = false,
+                x = half + random.nextFloat() * (GameConfig.WORLD_WIDTH - 2 * half),
+                depth = GameConfig.SOVEREIGN_MIN_DEPTH + random.nextFloat() * (bottom - GameConfig.SOVEREIGN_MIN_DEPTH),
+                direction = if (random.nextBoolean()) 1 else -1,
+                baseSpeed = s.speed,
+            )
         }
         return World(fish, obstacles)
     }

@@ -28,6 +28,7 @@ import com.deepline.fishing.core.ProgressRepository
 import com.deepline.fishing.core.ReverseReason
 import com.deepline.fishing.core.RopeSpecs
 import com.deepline.fishing.core.RopeStat
+import com.deepline.fishing.core.SecretRules
 import com.deepline.fishing.core.Secrets
 import com.deepline.fishing.core.online.ClientMessage
 import com.deepline.fishing.core.online.LiveStatus
@@ -348,6 +349,8 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         }
         // Battle casts never reach here: only regular casts count for points and the fish log.
         result?.let { update(Progression.applyCast(progress, it)) }
+        // Master angler: the fish log has just been completed (it can only happen once).
+        (Secrets.revealedByProgress(progress) - progress.discoveredSecrets).forEach(::onSecretTriggered)
         useLantern = useLantern && progress.lanterns > 0
         screen = Screen.HOME
     }
@@ -355,6 +358,14 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     fun equipSkin(slot: CosmeticSlot, cosmetic: Cosmetic?) {
         update(Progression.equipSkin(progress, slot, cosmetic))
     }
+
+    /** Steps a rope stat down one level and refunds what it cost. */
+    fun downgrade(stat: RopeStat) {
+        Progression.downgrade(progress, stat)?.let(::update)
+    }
+
+    /** The title the player wears (shown at home and in battles), or null. */
+    val title: String? get() = progress.equippedSkins[CosmeticSlot.TITLE]?.displayName
 
     fun buyUpgrade(stat: RopeStat) {
         Progression.upgrade(progress, stat)?.let(::update)
@@ -413,7 +424,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         if (isOnlineBattle && online != null) {
             val turn = online.myNextTurn() ?: return
             lastLiveSentAt = -1f
-            beginSession(CastSession.seeded(OnlineProtocol.tournamentSpecs, turn.seed), turn)
+            beginSession(CastSession.seeded(OnlineProtocol.tournamentSpecs, turn.seed, timeLeftAtStart = turn.timeLimitSec), turn)
             return
         }
         val b = battle ?: return
@@ -421,7 +432,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         val firstBot = b.players[turn.playerIndex].bot
         if (firstBot == null) {
             // Both players use the same rope and the same water; no lanterns in battles.
-            beginSession(CastSession.seeded(progress.specs, turn.seed), turn)
+            beginSession(CastSession.seeded(progress.specs, turn.seed, timeLeftAtStart = turn.timeLimitSec), turn)
             return
         }
         while (true) {
@@ -470,6 +481,14 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         if (!battleRecorded && battleOpponent is Opponent.Computer) {
             battleRecorded = true
             update(Progression.recordBattle(progress, outcome.winner?.let { it == 0 }))
+            // Shutout: a battle-result secret, paid into the player's points.
+            val rival = (battleOpponent as Opponent.Computer).difficulty
+            for (id in Secrets.revealedByBattle(b, outcome, playerIndex = 0, rival = rival)) {
+                if (id in progress.discoveredSecrets) {
+                    update(progress.copy(pointsBalance = progress.pointsBalance + SecretRules.SHUTOUT_BONUS))
+                }
+                onSecretTriggered(id)
+            }
         }
     }
 
@@ -533,7 +552,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         if (connection == null) {
             onlineStatus = OnlineStatus.CONNECTING
             connection = OnlineConnection(viewModelScope, ::onServerMessage, ::onConnectionClosed).also {
-                it.connect(serverUrl, OnlineProtocol.sanitizeName(playerName))
+                it.connect(serverUrl, OnlineProtocol.sanitizeName(playerName), title)
             }
         }
         connection?.send(message)

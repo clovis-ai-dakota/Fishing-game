@@ -61,6 +61,17 @@ object GameConfig {
     const val FLEE_SPEED_MULTIPLIER = 3f
     const val FLEE_DURATION = 1.2f
 
+    /**
+     * The legendary 200th fish lives only at the very bottom: the last meters of a fully upgraded
+     * rope. It appears in this share of the casts that can reach it.
+     */
+    const val SOVEREIGN_MIN_DEPTH = 600f
+    const val SOVEREIGN_MAX_DEPTH = 620f
+    const val SOVEREIGN_SPAWN_CHANCE = 0.05f
+
+    /** A fish counts as "just turned" at the edge for this long (Corner pocket). */
+    const val WALL_TURN_WINDOW = 0.3f
+
     const val LANTERN_PRICE = 600
     const val STARTING_LANTERNS = 1
 

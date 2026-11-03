@@ -1,6 +1,9 @@
 package com.deepline.fishing.ui.tour
 
 import com.deepline.fishing.Screen
+import com.deepline.fishing.core.CosmeticSlot
+import com.deepline.fishing.core.DepthZone
+import com.deepline.fishing.core.FishCatalog
 import com.deepline.fishing.core.GameConfig
 import com.deepline.fishing.core.online.OnlineProtocol
 
@@ -40,12 +43,15 @@ object Tour {
     /**
      * 2: head-only bumps, smoother steering with an aim marker, fishing secrets.
      * 3: more secrets with bonuses that also count in battles, and skins.
+     * 4: rope downgrades with a full refund, many more species, bolder skins and titles.
      */
-    const val VERSION = 3
+    const val VERSION = 4
 
     private val bumps = GameConfig.DESCENT_TOUCH_LIMIT
     private val bumpFree = GameConfig.BUMP_FREE_DEPTH.toInt()
     private val dark = GameConfig.DARK_DEPTH.toInt()
+    private val skinSlots = (CosmeticSlot.entries - CosmeticSlot.TITLE).map { it.displayName.lowercase() }
+        .let { it.dropLast(1).joinToString(", ") + " and " + it.last() }
 
     val steps: List<TourStep> = listOf(
         TourStep(
@@ -110,9 +116,11 @@ object Tour {
             id = "upgrades",
             title = "Upgrade your rope",
             body = "Spend points here. Rope Length lets you reach deeper zones and new fish, Rope Strength " +
-                "carries more weight, and Rope Agility steers faster.",
+                "carries more weight, and Rope Agility steers faster. Changed your mind? Downgrade a level and " +
+                "get back every point it cost.",
             screen = Screen.UPGRADES,
             target = TourTarget.UPGRADES_ROPE,
+            sinceVersion = 4,
         ),
         TourStep(
             id = "lantern",
@@ -126,10 +134,12 @@ object Tour {
         TourStep(
             id = "log",
             title = "Fill your Fish log",
-            body = "16 species live in 4 depth zones. Every catch is recorded here. Fish you haven't caught yet " +
-                "show as silhouettes, with the depths where they live.",
+            body = "${FishCatalog.all.size} species live in ${DepthZone.entries.size} depth zones, some of them rare. " +
+                "Every catch is recorded here. Fish you haven't caught yet show as silhouettes, with the depths " +
+                "where they live.",
             screen = Screen.COLLECTION,
             target = TourTarget.COLLECTION_HEADER,
+            sinceVersion = 4,
         ),
         TourStep(
             id = "milestones",
@@ -145,9 +155,10 @@ object Tour {
             body = "Some tricks are only found by playing, and they pay off: every time you pull one off it adds " +
                 "a bonus to the cast, in battles too. The first time, it's explained on the spot and earns a " +
                 "discovery reward, and a Secrets button appears on the home screen. The rarest secrets also " +
-                "unlock Skins for your hook, line and boat (looks only, no advantage).",
+                "unlock Skins for your $skinSlots, plus a title shown under your name, in online battles " +
+                "too. They're made to show off: looks only, never an advantage.",
             screen = Screen.HOME,
-            sinceVersion = 3,
+            sinceVersion = 4,
         ),
         TourStep(
             id = "battle",

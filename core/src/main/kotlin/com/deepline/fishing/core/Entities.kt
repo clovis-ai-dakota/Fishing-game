@@ -31,6 +31,10 @@ class FishEntity(
     internal var fleeTimer = 0f
     internal var tooHeavyCooldown = 0f
 
+    /** Seconds since this fish last turned around at the edge of the water. */
+    var secondsSinceTurn: Float = Float.POSITIVE_INFINITY
+        internal set
+
     val halfLength: Float get() = species.bodyLengthM / 2f
     val halfHeight: Float get() = species.bodyLengthM * species.heightRatio / 2f
     val isFleeing: Boolean get() = fleeTimer > 0f
@@ -39,6 +43,7 @@ class FishEntity(
         if (caught) return
         if (fleeTimer > 0f) fleeTimer -= dt
         if (tooHeavyCooldown > 0f) tooHeavyCooldown -= dt
+        secondsSinceTurn += dt
         val speed = if (fleeTimer > 0f) baseSpeed * GameConfig.FLEE_SPEED_MULTIPLIER else baseSpeed
         x += direction * speed * dt
         val minX = halfLength
@@ -46,9 +51,11 @@ class FishEntity(
         if (x < minX) {
             x = minX
             direction = 1
+            secondsSinceTurn = 0f
         } else if (x > maxX) {
             x = maxX
             direction = -1
+            secondsSinceTurn = 0f
         }
     }
 }

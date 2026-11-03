@@ -54,6 +54,7 @@ fun HomeScreen(vm: GameViewModel) {
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+            vm.title?.let { TitleBadge(it, Modifier.padding(top = 6.dp)) }
         }
 
         Card(onClick = { vm.navigate(Screen.COLLECTION) }, modifier = Modifier.fillMaxWidth()) {

@@ -90,7 +90,7 @@ class CastSessionTest {
         val snag = result.snags.single()
         assertEquals(ObstacleKind.ROCK, snag.kind)
         assertEquals(Scoring.snagPoints(ObstacleKind.ROCK, 70f), snag.points)
-        assertEquals(snag.points, result.totalPoints)
+        assertEquals(snag.points, result.basePoints)
         assertTrue(snag.points > Scoring.points(FishCatalog.byId("dusk_snapper")!!, 70f, false), "objects are worth big points")
         assertEquals(ObstacleKind.ROCK.weightKg, result.totalWeightKg)
         assertTrue(result.lastBumpHooked)
@@ -132,8 +132,39 @@ class CastSessionTest {
         assertEquals(listOf(BumpKind.FISH_HEAD, BumpKind.ROCK, BumpKind.DRIFTWOOD, BumpKind.JELLY), r.bumps)
         assertEquals(ObstacleKind.JELLY, r.snags.single().kind)
         assertTrue(r.catches.single().bumpedOnDescent)
-        assertEquals(setOf(Secrets.LAST_BUMP, Secrets.GRAND_TOUR, Secrets.SECOND_ENCOUNTER), Secrets.revealedBy(r))
+        // The 4 bumps came within 2 seconds of each other, so it's also a Pinball.
+        assertEquals(setOf(Secrets.LAST_BUMP, Secrets.GRAND_TOUR, Secrets.SECOND_ENCOUNTER, Secrets.PINBALL), Secrets.revealedBy(r))
+        assertEquals(4, r.bumpTimes.size)
+        assertFalse(r.steered)
         assertEquals(20f, r.lineStrengthKg)
+    }
+
+    @Test
+    fun theLegendaryFishCanOnlyBeLandedByTheLastBump() {
+        val sovereign = FishCatalog.sovereign
+        // On the way up, nudging its head does nothing.
+        val passing = stillFish(0, sovereign, 30f, "head")
+        val up = CastSession(specs(length = 50f, weight = 100f), false, World(listOf(passing), emptyList()))
+        runToEnd(up)
+        assertTrue(up.result!!.catches.isEmpty())
+
+        // As the 4th bump, it's hooked.
+        val rocks = listOf(40f, 50f, 60f).mapIndexed { i, d -> Obstacle(i, ObstacleKind.ROCK, center, d, 1f) }
+        val down = CastSession(specs(length = 120f), false, World(listOf(stillFish(1, sovereign, 75f, "head")), rocks))
+        runToEnd(down)
+        assertEquals(sovereign, down.result!!.catches.single { it.byLastBump }.species)
+    }
+
+    @Test
+    fun theLegendaryFishOnlySpawnsAtTheVeryBottomInAboutOneCastInTwenty() {
+        fun count(rope: Float) = (1L..4000L).count { seed ->
+            WorldGenerator.generate(rope, Random(seed)).fish.any { it.species == FishCatalog.sovereign }
+        }
+        assertEquals(0, count(570f), "never with a rope that can't reach the bottom")
+        val rate = count(620f) / 4000.0
+        assertTrue(rate in 0.035..0.065, "rate $rate")
+        val placed = (1L..4000L).flatMap { WorldGenerator.generate(620f, Random(it)).fish }.filter { it.species == FishCatalog.sovereign }
+        assertTrue(placed.all { it.depth >= GameConfig.SOVEREIGN_MIN_DEPTH && it.depth <= GameConfig.SOVEREIGN_MAX_DEPTH })
     }
 
     @Test

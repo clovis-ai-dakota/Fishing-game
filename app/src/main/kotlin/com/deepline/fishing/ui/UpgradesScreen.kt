@@ -13,6 +13,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,6 +65,12 @@ fun UpgradesScreen(vm: GameViewModel) {
                             modifier = Modifier.fillMaxWidth(),
                         )
                         val current = formatStat(stat, stat.valueAt(level))
+                        Progression.downgradeRefund(p, stat)?.let { refund ->
+                            // Stepping down refunds exactly what the level cost.
+                            TextButton(onClick = { vm.downgrade(stat) }) {
+                                Text("Downgrade to ${formatStat(stat, stat.valueAt(level - 1))} · refund ${formatPoints(refund)} pts")
+                            }
+                        }
                         if (cost == null) {
                             Text("$current · maxed out", fontWeight = FontWeight.SemiBold)
                         } else {

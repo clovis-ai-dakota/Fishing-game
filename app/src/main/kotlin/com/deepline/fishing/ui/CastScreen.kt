@@ -174,10 +174,6 @@ fun CastScreen(vm: GameViewModel) {
             )
         }
 
-        vm.secretPopup?.let { id ->
-            FishingSecrets.byId(id)?.let { SecretDiscoveredDialog(it, onAnswer = vm::answerSecretPopup) }
-        }
-
         vm.pendingResult?.let {
             ResultsPanel(it, collectLabel = if (turn != null) "Continue" else "Collect", onCollect = vm::collectResult)
         }

@@ -40,8 +40,10 @@ fun BattleScreen(vm: GameViewModel) {
     // Battle objects are not observable: reading the version makes this screen recompose, and
     // everything shown is copied into plain data so the children recompose when it changes.
     val version = vm.battleVersion
-    val view = remember(b, version) { BattleView.of(b) }
     val online = vm.onlineMatch?.takeIf { vm.isOnlineBattle }
+    // Titles (a legendary cosmetic): online players send theirs; locally, yours is on player 1.
+    val titles = online?.titles ?: listOf(vm.title, null)
+    val view = remember(b, version, titles) { BattleView.of(b, titles) }
     val outcome = if (online != null) online.outcome else b.outcome()
     val next = vm.battleNextTurn()
     var confirmForfeit by remember { mutableStateOf(false) }
@@ -202,6 +204,7 @@ fun BattleScreen(vm: GameViewModel) {
 /** Plain snapshot of a battle for display. */
 private data class PlayerView(
     val name: String,
+    val title: String?,
     val scoreLabel: String,
     val totalPoints: Int,
     val timeLeft: Float?,
@@ -212,10 +215,11 @@ private data class RoundView(val number: Int, val points: List<Int>, val winnerN
 
 private data class BattleView(val players: List<PlayerView>, val rounds: List<RoundView>) {
     companion object {
-        fun of(b: Battle) = BattleView(
+        fun of(b: Battle, titles: List<String?>) = BattleView(
             players = (0..1).map { i ->
                 PlayerView(
                     name = b.players[i].name,
+                    title = titles.getOrNull(i),
                     scoreLabel = b.score(i).label,
                     totalPoints = b.totalPoints(i),
                     timeLeft = b.mode.timeLimitSec?.let { (it - b.timeUsed(i)).coerceAtLeast(0f) },
@@ -236,6 +240,7 @@ private fun PlayerCard(player: PlayerView, highlighted: Boolean, isMe: Boolean, 
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
             )
+            player.title?.let { TitleBadge(it) }
             Text(
                 player.scoreLabel,
                 style = MaterialTheme.typography.titleMedium,

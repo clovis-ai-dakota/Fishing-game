@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.GameViewModel
 import com.deepline.fishing.Screen
+import com.deepline.fishing.core.DepthZone
 import com.deepline.fishing.core.FishCatalog
 import com.deepline.fishing.core.GameConfig
 import com.deepline.fishing.core.ObstacleKind
@@ -41,6 +42,7 @@ import com.deepline.fishing.core.Secrets
 import com.deepline.fishing.ui.SparkleGold
 import com.deepline.fishing.ui.SubScreen
 import com.deepline.fishing.ui.drawFish
+import com.deepline.fishing.ui.drawFishGlow
 import com.deepline.fishing.ui.drawHook
 import com.deepline.fishing.ui.drawObstacleIcon
 import com.deepline.fishing.ui.formatPoints
@@ -72,6 +74,8 @@ object FishingSecrets {
     private val snagList = ObstacleKind.entries.joinToString(", ") { "${it.displayName} ${it.snagPoints}" }
     private val bumps = GameConfig.DESCENT_TOUCH_LIMIT
 
+    private val R = SecretRules
+
     val all: List<FishingSecret> = listOf(
         FishingSecret(
             id = Secrets.LAST_BUMP,
@@ -83,61 +87,134 @@ object FishingSecrets {
             bonus = "The hooked object or fish is yours.",
             art = { drawLastBumpArt() },
         ),
+        // Tier 1
         FishingSecret(
-            id = Secrets.SCHOOLING,
-            title = "Schooling",
-            body = "Fish swim in schools. Land ${SecretRules.SCHOOLING_COUNT} or more of the same species in a " +
-                "single cast for a bonus.",
-            bonus = "+${SecretRules.SCHOOLING_BONUS} points per cast.",
-            art = { drawSchoolingArt() },
+            Secrets.FREE_PASS, "Free pass",
+            "Pass through ${R.FREE_PASS_COUNT} fish heads in the bump-free first ${GameConfig.BUMP_FREE_DEPTH.roundToInt()} m of one cast. They don't cost bumps up there.",
+            "+${R.FREE_PASS_BONUS} points.", art = { drawFishRow(listOf("silver_sprat", "coral_darter", "silver_sprat"), hook = true) },
         ),
         FishingSecret(
-            id = Secrets.SECOND_ENCOUNTER,
-            title = "Second encounter",
-            body = "A fish you bumped on the way down hasn't gone far. Catch it by the head on the way up and it's " +
-                "worth double.",
-            bonus = "That fish ${times(SecretRules.SECOND_ENCOUNTER_MULTIPLIER)}.",
-            art = { drawSecondEncounterArt() },
+            Secrets.SCHOOLING, "Schooling",
+            "Fish swim in schools. Land ${R.SCHOOLING_COUNT} or more of the same species in a single cast.",
+            "+${R.SCHOOLING_BONUS} points.", art = { drawSchoolingArt() },
         ),
         FishingSecret(
-            id = Secrets.CLEAN_DROP,
-            title = "Clean drop",
-            body = "Reach the end of a rope of at least ${SecretRules.CLEAN_DROP_MIN_ROPE_M.roundToInt()} m without " +
-                "a single bump. Dodging every head and object all the way down boosts the whole cast.",
-            bonus = "Whole cast ${times(SecretRules.CLEAN_DROP_MULTIPLIER)}.",
-            art = { drawCleanDropArt() },
+            Secrets.SURFACE_SKIM, "Surface skim",
+            "Catch a fish shallower than ${R.SURFACE_SKIM_DEPTH.roundToInt()} m on the way up, right before you land.",
+            "+${R.SURFACE_SKIM_BONUS} points.", art = { drawFishRow(listOf("coral_darter"), hook = true, top = true) },
         ),
         FishingSecret(
-            id = Secrets.GRAND_TOUR,
-            title = "Grand tour",
-            body = "Make your $bumps bumps hit four different things: a fish's head, a rock, driftwood and a jelly. " +
-                "They only share the water between about 120 and 260 m. Whatever the last bump hooks is worth double.",
-            bonus = "The last bump's catch ${times(SecretRules.GRAND_TOUR_MULTIPLIER)}.",
-            art = { drawGrandTourArt() },
+            Secrets.ZEN_CAST, "Zen cast",
+            "Don't touch the screen for a whole cast, and still land ${R.ZEN_CAST_COUNT} or more fish.",
+            "+${R.ZEN_CAST_BONUS} points.", art = { drawFishRow(listOf("reed_perch", "sun_bream", "silver_sprat")) },
+        ),
+        // Tier 2
+        FishingSecret(
+            Secrets.PINBALL, "Pinball",
+            "Use all $bumps bumps within ${R.PINBALL_SECONDS.roundToInt()} seconds by steering into a cluster.",
+            "+${R.PINBALL_BONUS} points.", art = { drawObstacleRow() },
         ),
         FishingSecret(
-            id = Secrets.LADDER,
-            title = "Ladder",
-            body = "On the way up, catch ${SecretRules.LADDER_COUNT} or more fish in strictly increasing weight: " +
-                "each one heavier than the one before. Deep fish tend to be heavy, so you have to pick your catches.",
-            bonus = "Whole cast ${times(SecretRules.LADDER_MULTIPLIER)}.",
-            art = { drawLadderArt() },
+            Secrets.SECOND_ENCOUNTER, "Second encounter",
+            "A fish you bumped on the way down hasn't gone far. Catch it by the head on the way up and it's worth double.",
+            "That fish ${times(R.SECOND_ENCOUNTER_MULTIPLIER)}.", art = { drawSecondEncounterArt() },
         ),
         FishingSecret(
-            id = Secrets.ZONE_SWEEP,
-            title = "Zone sweep",
-            body = "Land a fish from every depth zone (Sunlit Shallows, Twilight Reef, Midnight Trench and Abyssal " +
-                "Floor) in a single cast. You'll need a long rope and room on the line.",
-            bonus = "Whole cast ${times(SecretRules.ZONE_SWEEP_MULTIPLIER)}.",
-            art = { drawZoneSweepArt() },
+            Secrets.CLEAN_DROP, "Clean drop",
+            "Reach the end of a rope of at least ${R.CLEAN_DROP_MIN_ROPE_M.roundToInt()} m without a single bump.",
+            "Whole cast ${times(R.CLEAN_DROP_MULTIPLIER)}.", art = { drawCleanDropArt() },
         ),
         FishingSecret(
-            id = Secrets.DAVID_AND_GOLIATH,
-            title = "David and Goliath",
-            body = "Hook the Pale Leviathan with your last bump while your rope is too weak to carry it. A legendary " +
-                "catch: it unlocks the Giant-slayer skins.",
-            bonus = "The leviathan ${times(SecretRules.DAVID_AND_GOLIATH_MULTIPLIER)}.",
-            art = { drawGoliathArt() },
+            Secrets.ROCK_BOTTOM, "Rock bottom",
+            "Make your last bump snag an object within ${R.ROCK_BOTTOM_WITHIN_M.roundToInt()} m of the end of your rope.",
+            "The snag ${times(R.ROCK_BOTTOM_MULTIPLIER)}.", art = { drawCleanDropArt(withRock = true) },
+        ),
+        FishingSecret(
+            Secrets.BUZZER_BEATER, "Buzzer beater",
+            "In a timed battle, start a cast with under ${R.BUZZER_BEATER_SECONDS.roundToInt()} seconds on the clock and still land a fish.",
+            "+${R.BUZZER_BEATER_BONUS} points.", art = { drawFishRow(listOf("dusk_snapper"), hook = true) },
+        ),
+        // Tier 3
+        FishingSecret(
+            Secrets.CORNER_POCKET, "Corner pocket",
+            "On the way up, hook a fish by the head right as it turns around at the edge of the water (within ${(GameConfig.WALL_TURN_WINDOW * 10).roundToInt() / 10.0} s).",
+            "+${R.CORNER_POCKET_BONUS} points.", art = { drawCornerArt() },
+        ),
+        FishingSecret(
+            Secrets.GRAND_TOUR, "Grand tour",
+            "Make your $bumps bumps hit four different things: a fish's head, a rock, driftwood and a jelly. They only share " +
+                "the water between about ${ObstacleKind.JELLY.minDepth.roundToInt()} and ${ObstacleKind.DRIFTWOOD.maxDepth.roundToInt()} m.",
+            "The last bump's catch ${times(R.GRAND_TOUR_MULTIPLIER)}.", art = { drawGrandTourArt() },
+        ),
+        FishingSecret(
+            Secrets.SPARKLE_SNAG, "Sparkle snag",
+            "Make your last bump hook a Sparkling fish by the head, on the way down.",
+            "That fish ${times(R.SPARKLE_SNAG_MULTIPLIER)} on top of Sparkling (${times(R.SPARKLE_SNAG_MULTIPLIER * GameConfig.SPARKLING_MULTIPLIER)} in all).", art = { drawFishRow(listOf("dusk_snapper"), hook = true, sparkling = true) },
+        ),
+        FishingSecret(
+            Secrets.LADDER, "Ladder",
+            "On the way up, catch ${R.LADDER_COUNT} or more fish in strictly increasing weight. Deep fish tend to be heavy, so pick your catches.",
+            "Whole cast ${times(R.LADDER_MULTIPLIER)}.", art = { drawLadderArt() },
+        ),
+        FishingSecret(
+            Secrets.PERFECT_LOAD, "Perfect load",
+            "Surface with your line exactly at its weight limit, with at least ${R.PERFECT_LOAD_MIN_CATCHES} catches, and the fish that " +
+                "fills it weighing ${R.PERFECT_LOAD_FINAL_CATCH_KG} kg or more. Leave just the right room!",
+            "Whole cast ${times(R.PERFECT_LOAD_MULTIPLIER)}.", art = { drawFishRow(listOf("sun_bream", "reed_perch", "coral_darter"), hook = true) },
+        ),
+        FishingSecret(
+            Secrets.MOONLIT_ANGLER, "Moonlit angler",
+            "Below ${GameConfig.DARK_DEPTH.roundToInt()} m and without a Lantern, catch a fish that glows on the way up, aiming only by its light.",
+            "That fish ${times(R.MOONLIT_ANGLER_MULTIPLIER)}.", art = { drawMoonlitArt() },
+        ),
+        FishingSecret(
+            Secrets.SHUTOUT, "Shutout",
+            "Win Best of 5 against the Hard rival without dropping a round (3-0).",
+            "+${formatPoints(R.SHUTOUT_BONUS)} points.", art = { drawFishRow(listOf("reef_grouper", "reef_grouper", "reef_grouper")) },
+        ),
+        // Tier 4
+        FishingSecret(
+            Secrets.WHILE_IT_FLEES, "While it flees",
+            "Bump a fish on the way down (it darts away for a moment), then hook it by the head on the way up while it is still fleeing. Tip: make that your last bump, so the hook turns back right away.",
+            "That fish ${times(R.WHILE_IT_FLEES_MULTIPLIER)}.", art = { drawSecondEncounterArt() },
+        ),
+        FishingSecret(
+            Secrets.BLIND_DROP, "Blind drop",
+            "Without a Lantern, drop to at least ${R.BLIND_DROP_MIN_DEPTH_M.roundToInt()} m and reach the end of your rope without a single bump.",
+            "Whole cast ${times(R.BLIND_DROP_MULTIPLIER)}.", art = { drawMoonlitArt(dark = true) },
+        ),
+        FishingSecret(
+            Secrets.ZONE_SWEEP, "Zone sweep",
+            "Land a fish from every depth zone (${DepthZone.entries.joinToString { it.displayName }}) in a single cast.",
+            "Whole cast ${times(R.ZONE_SWEEP_MULTIPLIER)}.", art = { drawZoneSweepArt() },
+        ),
+        FishingSecret(
+            Secrets.GRAND_SLAM, "Grand slam",
+            "In one cast, snag an object with your last bump and catch ${R.GRAND_SLAM_COUNT} or more fish on the way up.",
+            "Whole cast ${times(R.GRAND_SLAM_MULTIPLIER)}.", art = { drawLastBumpArt() },
+        ),
+        FishingSecret(
+            Secrets.DOUBLE_HEADER, "Double header",
+            "On the way up, hook two fish by the head at the very same instant.",
+            "Both fish ${times(R.DOUBLE_HEADER_MULTIPLIER)}.", art = { drawFishRow(listOf("dusk_snapper", "dusk_snapper"), hook = true) },
+        ),
+        // Tier 5
+        FishingSecret(
+            Secrets.DAVID_AND_GOLIATH, "David and Goliath",
+            "Hook the Pale Leviathan with your last bump while your rope is too weak to carry it. A legendary catch.",
+            "The leviathan ${times(R.DAVID_AND_GOLIATH_MULTIPLIER)}.", art = { drawGoliathArt() },
+        ),
+        FishingSecret(
+            Secrets.PERFECT_CAST, "Perfect cast",
+            "Everything in one cast: your last bump snags an object within ${R.ROCK_BOTTOM_WITHIN_M.roundToInt()} m of the end of your " +
+                "rope, you catch a Sparkling fish on the way up, and you surface with a perfect load.",
+            "Whole cast ${times(R.PERFECT_CAST_MULTIPLIER)}.", art = { drawFishRow(listOf("star_drifter"), hook = true, sparkling = true) },
+        ),
+        FishingSecret(
+            Secrets.MASTER_ANGLER, "Master angler",
+            "Fill the whole fish log: all ${FishCatalog.all.size} species, including the one that lives at the very bottom and only " +
+                "the last bump can land.",
+            "A legend, forever.", art = { drawSovereignArt() },
         ),
     )
 
@@ -176,6 +253,61 @@ private fun DrawScope.drawLastBumpArt() {
     burst(Offset(hook.x, hook.y + s), s * 2.6f, s * 3.4f)
 }
 
+private fun DrawScope.drawFishRow(ids: List<String>, hook: Boolean = false, top: Boolean = false, sparkling: Boolean = false) {
+    drawRect(if (top) Brush.verticalGradient(listOf(Color(0xFFB3E5FC), Color(0xFF0288D1))) else ArtWater)
+    val n = ids.size
+    ids.forEachIndexed { i, id ->
+        val sp = FishCatalog.byId(id) ?: return@forEachIndexed
+        val c = Offset(size.width * (i + 1f) / (n + 1f), size.height * (if (top) 0.35f else 0.55f))
+        drawFish(sp, c, size.width / (n + 2.2f), if (i % 2 == 0) 1 else -1, sparkling, i * 0.6f, phase = i.toFloat())
+    }
+    if (hook) {
+        val h = Offset(size.width * 0.5f, size.height * 0.2f)
+        drawLine(Color.White.copy(alpha = 0.8f), Offset(h.x, 0f), Offset(h.x, h.y - 10.dp.toPx()), strokeWidth = 2f)
+        drawHook(h, 8.dp.toPx(), 0.2f, withBait = false)
+    }
+}
+
+private fun DrawScope.drawObstacleRow() {
+    drawRect(ArtWater)
+    val r = 15.dp.toPx()
+    listOf(ObstacleKind.ROCK, ObstacleKind.DRIFTWOOD, ObstacleKind.JELLY, ObstacleKind.ROCK).forEachIndexed { i, k ->
+        drawObstacleIcon(k, Offset(size.width * (0.2f + i * 0.2f), size.height * (0.3f + (i % 2) * 0.35f)), r)
+    }
+    burst(Offset(size.width * 0.5f, size.height * 0.5f), 20.dp.toPx(), 28.dp.toPx())
+}
+
+private fun DrawScope.drawCornerArt() {
+    drawRect(ArtWater)
+    drawLine(Color.White.copy(alpha = 0.6f), Offset(size.width - 6.dp.toPx(), 0f), Offset(size.width - 6.dp.toPx(), size.height), strokeWidth = 3f)
+    val sp = FishCatalog.byId("dusk_snapper")!!
+    drawFish(sp, Offset(size.width * 0.78f, size.height * 0.55f), size.width * 0.25f, -1, false, 0.2f)
+    val h = Offset(size.width * 0.62f, size.height * 0.5f)
+    drawHook(h, 9.dp.toPx(), 0f, withBait = false)
+    burst(h, 14.dp.toPx(), 20.dp.toPx())
+}
+
+private fun DrawScope.drawMoonlitArt(dark: Boolean = false) {
+    drawRect(Color(0xFF02060F))
+    val sp = FishCatalog.byId("glowfin_angler")!!
+    val c = Offset(size.width * 0.5f, size.height * 0.55f)
+    if (!dark) {
+        drawFish(sp, c, size.width * 0.3f, 1, false, 0.4f, silhouette = true)
+        drawFishGlow(sp, c, size.width * 0.3f, 1, 1f)
+    }
+    drawLine(Color.White.copy(alpha = 0.5f), Offset(size.width * 0.3f, 0f), Offset(size.width * 0.3f, size.height * 0.8f), strokeWidth = 1.5f)
+    drawHook(Offset(size.width * 0.3f, size.height * 0.85f), 8.dp.toPx(), 0f, withBait = false)
+}
+
+private fun DrawScope.drawSovereignArt() {
+    drawRect(Brush.verticalGradient(listOf(Color(0xFF1A0033), Color(0xFF02060F))))
+    val sp = FishCatalog.sovereign
+    val c = Offset(size.width * 0.5f, size.height * 0.55f)
+    drawFish(sp, c, size.width * 0.7f, 1, sparkling = true, timeSeconds = 0.4f)
+    drawFishGlow(sp, c, size.width * 0.7f, 1, 1f)
+    burst(Offset(size.width * 0.86f, size.height * 0.25f), 8.dp.toPx(), 14.dp.toPx())
+}
+
 private fun DrawScope.drawSchoolingArt() {
     drawRect(ArtWater)
     val sprat = FishCatalog.byId("silver_sprat")!!
@@ -197,7 +329,7 @@ private fun DrawScope.drawSecondEncounterArt() {
     burst(Offset(x, c.y), 18.dp.toPx(), 26.dp.toPx())
 }
 
-private fun DrawScope.drawCleanDropArt() {
+private fun DrawScope.drawCleanDropArt(withRock: Boolean = false) {
     drawRect(ArtWater)
     val x = size.width / 2f
     val end = size.height * 0.78f
@@ -205,6 +337,10 @@ private fun DrawScope.drawCleanDropArt() {
     drawLine(Color(0xFFFFB74D), Offset(0f, end + 14.dp.toPx()), Offset(size.width, end + 14.dp.toPx()), strokeWidth = 3f,
         pathEffect = PathEffect.dashPathEffect(floatArrayOf(18f, 12f)))
     drawHook(Offset(x, end), 11.dp.toPx(), 0.2f)
+    if (withRock) {
+        drawObstacleIcon(ObstacleKind.ROCK, Offset(x, end + 4.dp.toPx()), 14.dp.toPx())
+        burst(Offset(x, end), 22.dp.toPx(), 30.dp.toPx())
+    }
     drawObstacleIcon(ObstacleKind.ROCK, Offset(x - size.width * 0.25f, size.height * 0.35f), 16.dp.toPx())
     drawFish(FishCatalog.byId("ghost_hake")!!, Offset(x + size.width * 0.22f, size.height * 0.5f), size.width * 0.22f, -1, false, 0.5f)
 }

@@ -20,6 +20,7 @@ import com.deepline.fishing.core.World
 import com.deepline.fishing.ui.DeepLineTheme
 import com.deepline.fishing.ui.drawCastScene
 import com.deepline.fishing.ui.drawFish
+import com.deepline.fishing.ui.drawFishGlow
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -56,11 +57,19 @@ class SceneRenderTest {
         return session
     }
 
-    private fun render(name: String, session: CastSession) {
+    private fun render(
+        name: String,
+        session: CastSession,
+        skins: com.deepline.fishing.ui.Skins = com.deepline.fishing.ui.Skins.CLASSIC,
+        cameraTop: Float? = null,
+        time: Float = 1f,
+    ) {
         compose.setContent {
             DeepLineTheme {
                 val measurer = rememberTextMeasurer()
-                androidx.compose.foundation.Canvas(Modifier.size(400.dp, 860.dp)) { drawCastScene(session, 1f, measurer) }
+                androidx.compose.foundation.Canvas(Modifier.size(400.dp, 860.dp)) {
+                    drawCastScene(session, time, measurer, skins = skins, cameraTop = cameraTop)
+                }
             }
         }
         compose.waitForIdle()
@@ -85,12 +94,12 @@ class SceneRenderTest {
         File(dir, "$name.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
     }
 
-    /** Every species, large, to review the fish art. */
+    /** The hand-made species, large, to review the fish art. */
     @Test
     fun fishGallery() {
         renderCanvas("19_fish_gallery") {
             drawRect(androidx.compose.ui.graphics.Color(0xFF0B4F7A))
-            val all = FishCatalog.all
+            val all = FishCatalog.all.take(16)
             val rowH = size.height / 8f
             all.forEachIndexed { i, sp ->
                 val col = i % 2
@@ -100,6 +109,47 @@ class SceneRenderTest {
                 drawFish(sp, c, len, if (col == 0) 1 else -1, sparkling = i == 4, timeSeconds = 0.4f, phase = i.toFloat())
             }
         }
+    }
+
+    /** A sample of the generated species (every 4th), then the legendary one at the very bottom. */
+    @Test
+    fun generatedFishGallery() {
+        renderCanvas("19b_generated_fish") {
+            drawRect(androidx.compose.ui.graphics.Color(0xFF0B3C5D))
+            val sample = FishCatalog.all.drop(16).filterIndexed { i, _ -> i % 4 == 0 }.take(44) + FishCatalog.sovereign
+            val cols = 4
+            val rowH = size.height / ((sample.size + cols - 1) / cols)
+            sample.forEachIndexed { i, sp ->
+                val c = androidx.compose.ui.geometry.Offset(size.width * (i % cols + 0.5f) / cols, rowH * (i / cols + 0.5f))
+                drawFish(sp, c, size.width * 0.2f, 1, sparkling = false, timeSeconds = 0.4f, phase = i.toFloat())
+                drawFishGlow(sp, c, size.width * 0.2f, 1, 1f)
+            }
+        }
+    }
+
+    private fun surfaceSession(): CastSession {
+        val session = CastSession(RopeSpecs(120f, 10f, 9f), false, World(emptyList(), emptyList()))
+        while (session.hookDepth < 7f) session.update(1f / 60f, 2f)
+        return session
+    }
+
+    /** Each legendary skin set, worn at the surface: boat, line, hook and trail. */
+    private fun renderSet(i: Int, set: String) =
+        render("4${i}_skins_${set.lowercase()}", surfaceSession(), com.deepline.fishing.ui.Skins.ofSet(set), cameraTop = -7f, time = 1.3f)
+
+    @Test
+    fun giantSlayerSkins() = renderSet(0, "Giant-slayer")
+
+    @Test
+    fun prismaticSkins() = renderSet(1, "Prismatic")
+
+    @Test
+    fun sovereignSkins() = renderSet(2, "Sovereign")
+
+    /** Skins in dark water: they never light it up (the lit circle is the same as classic). */
+    @Test
+    fun skinsInDarkWater() {
+        render("43_skins_dark", deepSession(lantern = false), com.deepline.fishing.ui.Skins.ofSet("Sovereign"))
     }
 
     /** Near the surface: boat, rod, line, bump-free shield and the 30 m marker. */

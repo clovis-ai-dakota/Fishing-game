@@ -113,6 +113,25 @@ object Progression {
         )
     }
 
+    /** Points refunded when stepping [stat] down one level: exactly what that level cost. */
+    fun downgradeRefund(p: PlayerProgress, stat: RopeStat): Int? {
+        val level = p.level(stat)
+        return if (level <= 0) null else stat.costToUpgradeFrom(level - 1)
+    }
+
+    /**
+     * Steps [stat] down one level and refunds what it cost (spendable points only: lifetime
+     * earnings, and so milestones, are unchanged). Null at level 0.
+     */
+    fun downgrade(p: PlayerProgress, stat: RopeStat): PlayerProgress? {
+        val refund = downgradeRefund(p, stat) ?: return null
+        val level = p.level(stat) - 1
+        return p.copy(
+            pointsBalance = p.pointsBalance + refund,
+            ropeLevels = if (level == 0) p.ropeLevels - stat else p.ropeLevels + (stat to level),
+        )
+    }
+
     fun buyLantern(p: PlayerProgress): PlayerProgress? {
         if (p.pointsBalance < GameConfig.LANTERN_PRICE) return null
         return p.copy(pointsBalance = p.pointsBalance - GameConfig.LANTERN_PRICE, lanterns = p.lanterns + 1)

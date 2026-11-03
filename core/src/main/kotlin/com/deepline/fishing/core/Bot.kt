@@ -144,7 +144,7 @@ object BotPlayer {
         timeLimitSec: Float? = null,
         random: Random = Random(seed xor 0x5DEECE66DL),
     ): BattleCast {
-        val session = CastSession.seeded(specs, seed)
+        val session = CastSession.seeded(specs, seed, timeLeftAtStart = timeLimitSec)
         val brain = BotBrain(difficulty, random)
         while (session.phase != CastPhase.SURFACED) {
             if (timeLimitSec != null && session.elapsedSeconds >= timeLimitSec) break

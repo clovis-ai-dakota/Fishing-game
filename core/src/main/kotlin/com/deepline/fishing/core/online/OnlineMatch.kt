@@ -15,6 +15,9 @@ class OnlineMatch(start: ServerMessage.MatchStarted) {
     val opponentIndex = 1 - start.yourIndex
     val battle = Battle(start.mode, start.playerNames.map { BattlePlayer(it) }, start.seed)
 
+    /** Each player's title (a cosmetic), or null. */
+    val titles: List<String?> = List(start.playerNames.size) { start.playerTitles.getOrNull(it) }
+
     var opponentLive: LiveStatus? = null
         private set
     var outcome: BattleOutcome? = null

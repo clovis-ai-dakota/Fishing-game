@@ -3,6 +3,8 @@ package com.deepline.fishing.server
 import com.deepline.fishing.core.Battle
 import com.deepline.fishing.core.BattleMode
 import com.deepline.fishing.core.BattlePlayer
+import com.deepline.fishing.core.Cosmetic
+import com.deepline.fishing.core.CosmeticSlot
 import com.deepline.fishing.core.online.CastValidation
 import com.deepline.fishing.core.online.ClientMessage
 import com.deepline.fishing.core.online.OnlineProtocol
@@ -20,6 +22,7 @@ import kotlin.random.Random
 /** One connected player. */
 class Connection(private val session: WebSocketSession, val id: Long) {
     var name: String = "Angler"
+    var title: String? = null
     var match: Match? = null
     var playerIndex: Int = -1
     var waitingRoom: String? = null
@@ -52,8 +55,9 @@ class Match(val mode: BattleMode, val players: List<Connection>, seed: Long) {
             c.playerIndex = i
         }
         val names = players.map { it.name }
+        val titles = players.map { it.title }
         players.forEachIndexed { i, c ->
-            c.send(ServerMessage.MatchStarted(mode, battle.seed, i, names))
+            c.send(ServerMessage.MatchStarted(mode, battle.seed, i, names, titles))
         }
     }
 
@@ -124,6 +128,8 @@ class Lobby(private val random: Random = Random.Default) {
                     c.send(ServerMessage.Error("Please update the app to play online."))
                 }
                 c.name = OnlineProtocol.sanitizeName(message.name)
+                // Only titles that exist as cosmetics are passed on.
+                c.title = message.title?.takeIf { t -> Cosmetic.entries.any { it.slot == CosmeticSlot.TITLE && it.displayName == t } }
             }
             is ClientMessage.CreateRoom -> createRoom(c, message.mode)
             is ClientMessage.JoinRoom -> joinRoom(c, OnlineProtocol.normalizeRoomCode(message.code))

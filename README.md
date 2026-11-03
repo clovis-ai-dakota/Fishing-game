@@ -30,26 +30,60 @@ the computer rival too; online, the server recomputes it from the cast) and give
 discovery reward**. Cast-wide multipliers add up rather than compound. Numbers live in
 `core/.../Secrets.kt`.
 
-| Secret | Trigger | Each time | Discovery reward |
-| --- | --- | --- | --- |
-| The last bump hooks what it hits | The 4th bump hooks the fish whose head it hit (even over the weight limit) or snags the object: the only way to land rocks (200), driftwood (100) and jellies (150 base, × depth) | the hooked catch | — |
-| Schooling | 3+ fish of one species in a cast | +100 | 300 |
-| Second encounter | On the way up, catch a fish you bumped on the way down | that fish ×2 | 750 + 1 Lantern |
-| Clean drop | Reach the end of a rope of 300 m+ with no bumps | cast ×1.5 | 1,000 + 1 Lantern |
-| Grand tour | The 4 bumps hit a fish head, a rock, driftwood and a jelly | last bump's catch ×2 | 2,500 + 2 Lanterns |
-| Ladder | 4+ fish caught on the way up in strictly increasing weight | cast ×1.5 | 2,000 + 2 Lanterns |
-| Zone sweep | A fish from each of the 4 depth zones in one cast | cast ×2 | 8,000 + 5 Lanterns |
-| David and Goliath | The last bump hooks the Pale Leviathan (24 kg) on a rope weaker than it | leviathan ×3 | 15,000 + 6 Lanterns + Giant-slayer skins |
+| Tier | Secret | Trigger | Each time | Discovery reward |
+| --- | --- | --- | --- | --- |
+| — | The last bump hooks what it hits | The 4th bump hooks the fish whose head it hit (even over the weight limit) or snags the object: the only way to land rocks (200), driftwood (100) and jellies (150 base, × depth) | the hooked catch | — |
+| 1 | Free pass | 3 fish heads passed through in the bump-free first 30 m | +50 | 250 |
+| 1 | Schooling | 3+ fish of one species in a cast | +100 | 300 |
+| 1 | Surface skim | A fish caught on the way up shallower than 10 m | +50 | 300 |
+| 1 | Zen cast | No steering at all, and 3+ catches | +150 | 400 |
+| 2 | Pinball | All 4 bumps within 2 seconds | +200 | 750 + 1 Lantern |
+| 2 | Second encounter | On the way up, catch a fish you bumped on the way down | that fish ×2 | 750 + 1 Lantern |
+| 2 | Clean drop | Reach the end of a rope of 300 m+ with no bumps | cast ×1.5 | 1,000 + 1 Lantern |
+| 2 | Rock bottom | The last bump snags an object within 2 m of the rope's end | the snag ×2 | 1,000 + 1 Lantern |
+| 2 | Buzzer beater | Timed battle: start a cast with under 15 s on the clock and land something | +300 | 800 + 1 Lantern |
+| 3 | Corner pocket | On the way up, hook a fish within 0.3 s of it turning at the edge | +300 | 2,000 + 2 Lanterns |
+| 3 | Grand tour | The 4 bumps hit a fish head, a rock, driftwood and a jelly | last bump's catch ×2 | 2,500 + 2 Lanterns |
+| 3 | Sparkle snag | The last bump hooks a Sparkling fish | that fish ×2 (×6 with Sparkling) | 2,500 + 2 Lanterns |
+| 3 | Ladder | 4+ fish caught on the way up in strictly increasing weight | cast ×1.5 | 2,000 + 2 Lanterns |
+| 3 | Perfect load | Surface exactly at the weight limit (±0.05 kg), 5+ catches, the last one 1.5 kg+ | cast ×1.5 | 2,500 + 2 Lanterns |
+| 3 | Moonlit angler | Without a Lantern, catch a glowing fish below 300 m on the way up | that fish ×3 | 3,000 + 3 Lanterns |
+| 3 | Shutout | Win Best of 5 against the Hard rival 3-0 | +1,000 (profile points, each time) | 3,000 + 3 Lanterns |
+| 4 | While it flees | On the way up, catch a fish you bumped while it is still fleeing | that fish ×4 | 6,000 + 4 Lanterns |
+| 4 | Blind drop | Without a Lantern, reach the end of a 500 m+ rope with no bumps | cast ×2 | 7,500 + 4 Lanterns |
+| 4 | Zone sweep | A fish from each of the 4 depth zones in one cast | cast ×2 | 8,000 + 5 Lanterns |
+| 4 | Grand slam | Snag an object with the last bump and catch 8+ fish on the way up | cast ×1.5 | 6,000 + 4 Lanterns |
+| 4 | Double header | Two fish hooked at the very same instant | both ×3 | 7,000 + 4 Lanterns |
+| 5 | David and Goliath | The last bump hooks the Pale Leviathan (24 kg) on a rope weaker than it | leviathan ×3 | 15,000 + 6 Lanterns + Giant-slayer set |
+| 5 | Perfect cast | Rock bottom + Perfect load + a Sparkling catch on the way up, in one cast | cast ×3 | 20,000 + 8 Lanterns + Prismatic set |
+| 5 | Master angler | Every species in the fish log, including the Deep Sovereign | — | 25,000 + 10 Lanterns + Sovereign set |
 
-Online, the server checks every fact a bonus relies on: what each bump hit must match the bumps
-used and the last-bump hook, "bumped then caught" fish need fish-head bumps, and catches must come
-up deepest first (so a Ladder can't be faked by reordering).
+**The Deep Sovereign** (species #200) lives only at 600 to 620 m, appears in 5% of casts that
+reach that deep, and can only be landed by the last bump (a normal head nudge on the way up does
+nothing). It is worth 2,500 base points (× depth) and glows in the dark.
+
+Online, the server recomputes every bonus from the reported cast and checks the facts they rely
+on: what each bump hit must match the bumps used and the last-bump hook, "bumped then caught"
+fish need fish-head bumps, catches come up deepest first and in time order (so a Ladder or a
+Double header can't be faked by reordering), bump times and free passes must be consistent, the
+Deep Sovereign must come from the last bump, and the rope and battle clock come from the server's
+own records. Steering ("Zen cast") and "turned at the edge" can't be proven without replaying the
+cast, so they are bounded but trusted.
 
 ### Skins
 
-Legendary secrets unlock cosmetics, chosen per slot (hook, line, boat) in the **Skins** screen:
-the Leviathan bone hook, the Giant's braid line and the Giant-slayer pennant. They are purely
-visual: same hook size and hitbox, and nothing that lights up dark water.
+Legendary (tier 5) secrets each unlock a full set of five cosmetics, chosen per slot in the
+**Skins** screen (with an animated preview). The button appears once something is unlocked.
+
+| Set (secret) | Hook | Line | Boat | Bubble trail | Title |
+| --- | --- | --- | --- | --- | --- |
+| Giant-slayer (David and Goliath) | Leviathan bone, pulsing cyan runes | Giant's braid with a running shimmer | Leviathan pennant, dark hull, cyan trim | Tide trail | Giant-slayer |
+| Prismatic (Perfect cast) | Prism hook cycling colours | Rainbow line | Prism sail, rainbow trim | Prism trail | Perfectionist |
+| Sovereign (Master angler) | Crown hook in gold | Golden line with glints | Royal boat: purple crowned sail, gold trim | Golden trail | Master angler |
+
+The title shows under your name on the home screen and in battles (online opponents see it too).
+Skins are purely visual: same hook size and hitbox, and all the effects are drawn under the
+darkness layer and only around your own gear, so they never light up dark water or reveal fish.
 
 ### Guided tour
 
@@ -65,14 +99,17 @@ steps, returning players get a short "What's new" tour of just those steps
 There is no time limit: it is an ongoing collection game. Explore deeper zones as your rope
 improves and try to fill the fish log.
 
-- **Fish log.** 16 species across 4 depth zones (Sunlit Shallows, Twilight Reef, Midnight
-  Trench, Abyssal Floor). It records count, Sparkling count, deepest catch and best score per
+- **Fish log.** 200 species across 4 depth zones (Sunlit Shallows, Twilight Reef, Midnight
+  Trench, Abyssal Floor): 16 hand-made ones, 183 generated from a fixed seed
+  (`core/.../SpeciesGenerator.kt`) and the legendary Deep Sovereign. It records count, Sparkling count, deepest catch and best score per
   species. Undiscovered fish show as silhouettes.
 - **Points and milestones.** Every catch earns points. Milestones are based on the lifetime
   total earned, so spending points never loses milestone progress. Milestones reward bonus
   points and Lanterns.
 - **Rope upgrades** (paid with points): Length (max depth, which unlocks deeper zones),
-  Strength (max weight) and Agility (steering speed), 10 levels each.
+  Strength (max weight) and Agility (steering speed), 10 levels each. Any level can be
+  **downgraded** for a full refund of what it cost (lifetime points earned, and so milestones,
+  are unaffected). The Deep Sovereign's water needs the maximum rope (620 m).
 
 ### 1v1 battles
 

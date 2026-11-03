@@ -89,12 +89,145 @@ class SecretsTest {
         assertNull(bonus(strong, Secrets.DAVID_AND_GOLIATH), "a strong rope is no feat")
     }
 
+    private fun fish(id: String, depth: Float, at: Float = Float.NaN, sparkling: Boolean = false, fleeing: Boolean = false, wall: Boolean = false, bumped: Boolean = fleeing, lastBump: Boolean = false) =
+        CatchRecord(sp(id), sparkling, depth, Scoring.points(sp(id), depth, sparkling), lastBump, bumped, at, fleeing, wall)
+
+    @Test
+    fun tierOneSecrets() {
+        assertEquals(SecretRules.FREE_PASS_BONUS, bonus(result().copy(freePasses = 3), Secrets.FREE_PASS))
+        assertNull(bonus(result().copy(freePasses = 2), Secrets.FREE_PASS))
+        assertEquals(SecretRules.SURFACE_SKIM_BONUS, bonus(result(listOf(catch("silver_sprat", 8f))), Secrets.SURFACE_SKIM))
+        assertNull(bonus(result(listOf(catch("silver_sprat", 12f))), Secrets.SURFACE_SKIM))
+        val three = List(3) { catch("coral_darter", 30f + it) }
+        assertEquals(SecretRules.ZEN_CAST_BONUS, bonus(result(three).copy(steered = false), Secrets.ZEN_CAST))
+        assertNull(bonus(result(three), Secrets.ZEN_CAST), "steered")
+    }
+
+    @Test
+    fun tierTwoSecrets() {
+        val fourBumps = List(4) { BumpKind.ROCK }
+        assertEquals(SecretRules.PINBALL_BONUS, bonus(result(bumps = fourBumps).copy(bumpTimes = listOf(3f, 3.5f, 4.2f, 4.9f)), Secrets.PINBALL))
+        assertNull(bonus(result(bumps = fourBumps).copy(bumpTimes = listOf(3f, 3.5f, 4.2f, 5.5f)), Secrets.PINBALL))
+
+        val snag = SnagRecord(ObstacleKind.ROCK, 120f, Scoring.snagPoints(ObstacleKind.ROCK, 120f))
+        val bottom = result(maxDepth = 118.5f, bumps = fourBumps, snags = listOf(snag)).copy(ropeLengthM = 120f)
+        assertEquals(snag.points, bonus(bottom, Secrets.ROCK_BOTTOM))
+        assertNull(bonus(bottom.copy(maxDepth = 110f), Secrets.ROCK_BOTTOM))
+
+        val late = result(listOf(catch("silver_sprat", 40f))).copy(timeLeftAtStart = 12f)
+        assertEquals(SecretRules.BUZZER_BEATER_BONUS, bonus(late, Secrets.BUZZER_BEATER))
+        assertNull(bonus(late.copy(timeLeftAtStart = 20f), Secrets.BUZZER_BEATER))
+        assertNull(bonus(late.copy(timeLeftAtStart = null), Secrets.BUZZER_BEATER), "not a timed battle")
+    }
+
+    @Test
+    fun tierThreeSecrets() {
+        assertEquals(SecretRules.CORNER_POCKET_BONUS, bonus(result(listOf(fish("dusk_snapper", 150f, wall = true))), Secrets.CORNER_POCKET))
+        val shiny = fish("dusk_snapper", 150f, sparkling = true, lastBump = true)
+        assertEquals(shiny.points, bonus(result(listOf(shiny), bumps = List(4) { BumpKind.FISH_HEAD }), Secrets.SPARKLE_SNAG))
+
+        // 0.2 + 0.4 + 0.9 + 0.2 + 1.6 = 3.3 kg on a 3.3 kg line, filled by a 1.6 kg fish.
+        val load = listOf(catch("silver_sprat", 80f), catch("coral_darter", 60f), catch("reed_perch", 40f), catch("silver_sprat", 38f), catch("sun_bream", 35f))
+        val exact = result(load, strength = 3.3f)
+        assertEquals(Math.round(exact.basePoints * 0.5).toInt(), bonus(exact, Secrets.PERFECT_LOAD))
+        assertNull(bonus(result(load, strength = 3.4f), Secrets.PERFECT_LOAD), "0.1 kg short")
+        assertNull(bonus(result(load.take(4) + catch("sun_bream", 35f), strength = 3.1f).copy(catches = load.take(4)), Secrets.PERFECT_LOAD), "too few catches")
+        val toppedOff = listOf(catch("sun_bream", 80f)) + load.take(4)
+        assertNull(bonus(result(toppedOff, strength = 3.3f), Secrets.PERFECT_LOAD), "filled by a tiny fish")
+
+        val angler = catch("glowfin_angler", 490f)
+        assertEquals(angler.points * 2, bonus(result(listOf(angler)), Secrets.MOONLIT_ANGLER))
+        assertNull(bonus(result(listOf(angler)).copy(lanternUsed = true), Secrets.MOONLIT_ANGLER), "with a Lantern")
+    }
+
+    @Test
+    fun tierFourSecrets() {
+        val fleeing = fish("dusk_snapper", 150f, fleeing = true)
+        assertEquals(fleeing.points * 3, bonus(result(listOf(fleeing), bumps = listOf(BumpKind.FISH_HEAD)), Secrets.WHILE_IT_FLEES))
+
+        val deep = listOf(catch("ghost_hake", 400f))
+        val blind = result(deep, maxDepth = 520f)
+        assertEquals(blind.basePoints, bonus(blind, Secrets.BLIND_DROP))
+        assertNull(bonus(blind.copy(lanternUsed = true), Secrets.BLIND_DROP))
+        assertNull(bonus(result(deep, maxDepth = 450f), Secrets.BLIND_DROP))
+
+        val snag = SnagRecord(ObstacleKind.JELLY, 200f, Scoring.snagPoints(ObstacleKind.JELLY, 200f))
+        val slam = result(List(8) { catch("silver_sprat", 50f - it) }, bumps = List(4) { BumpKind.JELLY }, snags = listOf(snag))
+        assertTrue(bonus(slam, Secrets.GRAND_SLAM) != null)
+        assertNull(bonus(slam.copy(catches = slam.catches.take(7)), Secrets.GRAND_SLAM))
+
+        val pair = listOf(fish("silver_sprat", 30f, at = 10f), fish("coral_darter", 30f, at = 10f), fish("reed_perch", 20f, at = 11f))
+        assertEquals((pair[0].points + pair[1].points) * 2, bonus(result(pair), Secrets.DOUBLE_HEADER))
+    }
+
+    @Test
+    fun perfectCastCombinesRockBottomPerfectLoadAndASparklingCatch() {
+        val snag = SnagRecord(ObstacleKind.ROCK, 120f, Scoring.snagPoints(ObstacleKind.ROCK, 120f)) // 4 kg
+        val shiny = fish("silver_sprat", 60f, sparkling = true) // 0.2 kg
+        val others = List(3) { catch("silver_sprat", 50f - it) } + catch("sun_bream", 30f) // 0.6 + 1.6 kg, filled by the bream
+        val r = result(listOf(shiny) + others, maxDepth = 119f, bumps = List(4) { BumpKind.ROCK }, snags = listOf(snag), strength = 6.4f)
+            .copy(ropeLengthM = 120f)
+        assertEquals(r.basePoints * 2, bonus(r, Secrets.PERFECT_CAST))
+        assertNull(bonus(r.copy(lineStrengthKg = 6f), Secrets.PERFECT_CAST), "load not exact")
+    }
+
+    @Test
+    fun shutoutAndMasterAngler() {
+        val players = listOf(BattlePlayer("You"), BattlePlayer("Rival", BotDifficulty.HARD))
+        val b = Battle(BattleMode.BEST_OF_FIVE, players, 1L)
+        fun cast(points: Int) = BattleCast(CastResult(listOf(CatchRecord(sp("silver_sprat"), false, 10f, points)), 10f, 0, null, false), 10f)
+        repeat(3) { b.record(b.nextTurn()!!, cast(100)); b.record(b.nextTurn()!!, cast(10)) }
+        assertEquals(setOf(Secrets.SHUTOUT), Secrets.revealedByBattle(b, b.outcome()!!, 0, BotDifficulty.HARD))
+        assertTrue(Secrets.revealedByBattle(b, b.outcome()!!, 0, BotDifficulty.NORMAL).isEmpty(), "only against Hard")
+
+        val almost = PlayerProgress(collection = FishCatalog.all.drop(1).associate { it.id to CollectionEntry(caught = 1) })
+        assertTrue(Secrets.revealedByProgress(almost).isEmpty())
+        val all = almost.copy(collection = almost.collection + (FishCatalog.all.first().id to CollectionEntry(caught = 1)))
+        assertEquals(setOf(Secrets.MASTER_ANGLER), Secrets.revealedByProgress(all))
+    }
+
+    @Test
+    fun theCatalogHas200SpeciesAndOneLegendary() {
+        assertEquals(200, FishCatalog.all.size)
+        assertEquals(200, FishCatalog.all.map { it.id }.toSet().size)
+        assertEquals(listOf(FishCatalog.sovereign), FishCatalog.all.filter { it.lastBumpOnly })
+        assertEquals(FishCatalog.sovereign, FishCatalog.all.last(), "the 200th")
+        assertTrue(FishCatalog.all.all { it.minDepth <= RopeStat.LENGTH.valueAt(RopeStat.LENGTH.maxLevel) }, "every fish is reachable")
+        for (id in listOf("silver_sprat", "pale_leviathan", "glowfin_angler")) assertTrue(FishCatalog.byId(id) != null, "hand-made ids kept")
+    }
+
+    @Test
+    fun ropeDowngradeRefundsWhatTheLevelCost() {
+        var p = PlayerProgress(pointsBalance = 5_000, pointsEarned = 9_000)
+        p = Progression.upgrade(p, RopeStat.STRENGTH)!!
+        p = Progression.upgrade(p, RopeStat.STRENGTH)!!
+        val afterUpgrades = p.pointsBalance
+        val refund = Progression.downgradeRefund(p, RopeStat.STRENGTH)!!
+        assertEquals(RopeStat.STRENGTH.costToUpgradeFrom(1), refund)
+        p = Progression.downgrade(p, RopeStat.STRENGTH)!!
+        assertEquals(1, p.level(RopeStat.STRENGTH))
+        assertEquals(afterUpgrades + refund, p.pointsBalance)
+        assertEquals(9_000L, p.pointsEarned, "milestone progress unchanged")
+        p = Progression.downgrade(p, RopeStat.STRENGTH)!!
+        assertEquals(5_000L, p.pointsBalance, "every point back")
+        assertNull(Progression.downgrade(p, RopeStat.STRENGTH), "nothing below level 0")
+    }
+
+    @Test
+    fun everyLegendaryUnlocksAFullSetIncludingATitle() {
+        for (id in listOf(Secrets.DAVID_AND_GOLIATH, Secrets.PERFECT_CAST, Secrets.MASTER_ANGLER)) {
+            val slots = SecretRewards.of(id).cosmetics.map { it.slot }.toSet()
+            assertEquals(CosmeticSlot.entries.toSet(), slots, id)
+        }
+    }
+
     @Test
     fun bonusesAddUpAndCountInTheCastScore() {
         val sweep = listOf(catch("star_drifter", 510f), catch("ghost_hake", 400f), catch("dusk_snapper", 200f), catch("silver_sprat", 50f))
         val r = result(sweep, maxDepth = 520f)
         assertEquals(r.basePoints + r.secretBonuses.sumOf { it.points }, r.totalPoints)
-        assertEquals(setOf(Secrets.ZONE_SWEEP, Secrets.CLEAN_DROP), Secrets.revealedBy(r), "it also reached a 520 m rope end with no bumps")
+        // It also reached a 520 m rope end with no bumps and no Lantern: Clean drop and Blind drop.
+        assertEquals(setOf(Secrets.ZONE_SWEEP, Secrets.CLEAN_DROP, Secrets.BLIND_DROP), Secrets.revealedBy(r))
         // Battles score casts by totalPoints, so secret bonuses count there too.
         assertEquals(r.totalPoints, BattleCast(r, 30f).points)
     }
@@ -112,7 +245,7 @@ class SecretsTest {
         assertTrue(p.unlockedCosmetics.isEmpty())
         assertEquals(p, Progression.equipSkin(p, CosmeticSlot.HOOK, Cosmetic.LEVIATHAN_BONE_HOOK), "locked")
         p = Progression.discoverSecret(p, Secrets.DAVID_AND_GOLIATH)
-        assertEquals(Cosmetic.entries.toSet(), p.unlockedCosmetics.toSet())
+        assertEquals(SecretRewards.of(Secrets.DAVID_AND_GOLIATH).cosmetics.toSet(), p.unlockedCosmetics.toSet())
         assertTrue(p.equippedSkins.isEmpty(), "unlocking doesn't force a skin on")
         p = Progression.equipSkin(p, CosmeticSlot.HOOK, Cosmetic.LEVIATHAN_BONE_HOOK)
         assertEquals(Cosmetic.LEVIATHAN_BONE_HOOK, p.equippedSkins[CosmeticSlot.HOOK])

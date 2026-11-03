@@ -38,13 +38,23 @@ class TourContentTest {
         }
         assertTrue("${GameConfig.BUMP_FREE_DEPTH.toInt()} m" in text)
         assertTrue("${GameConfig.DESCENT_TOUCH_LIMIT}" in text)
+        // Version 4: downgrades, the species count, titles and every drawn skin slot.
+        assertTrue("downgrade" in text.lowercase())
+        assertTrue("${com.deepline.fishing.core.FishCatalog.all.size} species" in text)
+        assertTrue("title" in text.lowercase())
+        for (slot in com.deepline.fishing.core.CosmeticSlot.entries) {
+            assertTrue("Tour doesn't mention the ${slot.displayName} skin slot", slot.displayName.lowercase() in text.lowercase())
+        }
     }
 
     @Test
     fun theTourNeverGivesAwayASecret() {
         // Secrets are discovered by playing and explained then (see FishingSecrets), not in the tour.
         val secretNames = com.deepline.fishing.ui.secrets.FishingSecrets.all.map { it.title }
-        for (giveaway in listOf("last bump", "snag", "hooks what", "hooks whatever", "leviathan") + secretNames) {
+        // Cosmetics are named after the secret that unlocks them, and the legendary fish is a surprise.
+        val rewards = com.deepline.fishing.core.Cosmetic.entries.flatMap { listOf(it.displayName, it.setName) }
+        val legendary = listOf(com.deepline.fishing.core.FishCatalog.sovereign.name, "sovereign", "only be caught")
+        for (giveaway in listOf("last bump", "snag", "hooks what", "hooks whatever", "leviathan") + secretNames + rewards + legendary) {
             assertTrue("The tour reveals a secret: '$giveaway'", !text.contains(giveaway, ignoreCase = true))
         }
     }

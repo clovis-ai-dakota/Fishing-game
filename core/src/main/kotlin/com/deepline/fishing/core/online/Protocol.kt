@@ -33,8 +33,9 @@ object OnlineProtocol {
     /**
      * 2: bumps only on fish heads, and the last bump hooks what it hit (snags).
      * 3: fishing-secret bonuses (casts report what each bump hit and which fish were re-caught).
+     * 4: all 24 secrets (more cast facts), the 200th fish, and player titles.
      */
-    const val VERSION = 3
+    const val VERSION = 4
 
     /** Online battles use the same standard rope for both players. */
     const val TOURNAMENT_ROPE_LEVEL = 5
@@ -68,7 +69,12 @@ object OnlineProtocol {
 @Serializable
 sealed interface ClientMessage {
     @Serializable @SerialName("hello")
-    data class Hello(val name: String, val protocolVersion: Int = OnlineProtocol.VERSION) : ClientMessage
+    data class Hello(
+        val name: String,
+        val protocolVersion: Int = OnlineProtocol.VERSION,
+        /** The title the player wears (a cosmetic), shown to the opponent. */
+        val title: String? = null,
+    ) : ClientMessage
 
     @Serializable @SerialName("create_room")
     data class CreateRoom(val mode: BattleMode) : ClientMessage
@@ -113,6 +119,7 @@ sealed interface ServerMessage {
         val seed: Long,
         val yourIndex: Int,
         val playerNames: List<String>,
+        val playerTitles: List<String?> = emptyList(),
     ) : ServerMessage
 
     @Serializable @SerialName("opponent_live")
@@ -147,6 +154,9 @@ data class CatchDto(
     val points: Int = 0,
     val byLastBump: Boolean = false,
     val bumpedOnDescent: Boolean = false,
+    val caughtAt: Float? = null,
+    val whileFleeing: Boolean = false,
+    val afterWallTurn: Boolean = false,
 )
 
 @Serializable
@@ -161,22 +171,35 @@ data class CastDto(
     val durationSec: Float,
     val snags: List<SnagDto> = emptyList(),
     val bumps: List<BumpKind> = emptyList(),
+    val bumpTimes: List<Float> = emptyList(),
+    val freePasses: Int = 0,
+    val steered: Boolean = true,
 )
 
 fun BattleCast.toDto(): CastDto = CastDto(
-    catches = result.catches.map { CatchDto(it.species.id, it.sparkling, it.depth, it.points, it.byLastBump, it.bumpedOnDescent) },
+    catches = result.catches.map {
+        CatchDto(
+            it.species.id, it.sparkling, it.depth, it.points, it.byLastBump, it.bumpedOnDescent,
+            caughtAt = it.caughtAt.takeIf { t -> t.isFinite() }, whileFleeing = it.whileFleeing, afterWallTurn = it.afterWallTurn,
+        )
+    },
     maxDepth = result.maxDepth,
     touchesUsed = result.touchesUsed,
     reverseReason = result.reverseReason,
     durationSec = durationSec,
     snags = result.snags.map { SnagDto(it.kind, it.depth, it.points) },
     bumps = result.bumps,
+    bumpTimes = result.bumpTimes,
+    freePasses = result.freePasses,
+    steered = result.steered,
 )
 
 object CastValidation {
     private const val DEPTH_TOLERANCE = 1f
     /** Fish come up deepest first; a big fish's head can reach the hook a few meters early. */
     private const val ASCENT_ORDER_TOLERANCE = 6f
+    /** Fish heads passed in the bump-free zone can't plausibly exceed this. */
+    private const val MAX_FREE_PASSES = 30
     private const val MIN_DURATION = 1f
     private const val MAX_DURATION = 600f
 
@@ -194,8 +217,13 @@ object CastValidation {
             if (!c.depth.isFinite()) return null
             if (c.depth < species.minDepth - DEPTH_TOLERANCE || c.depth > species.maxDepth + DEPTH_TOLERANCE) return null
             if (c.depth > specs.lengthM + DEPTH_TOLERANCE) return null
+            if (species.lastBumpOnly && !c.byLastBump) return null
+            if (c.whileFleeing && !c.bumpedOnDescent) return null
+            val at = c.caughtAt
+            if (at != null && (!at.isFinite() || at < 0f || at > dto.durationSec + 1f)) return null
             catches += CatchRecord(
                 species, c.sparkling, c.depth, Scoring.points(species, c.depth, c.sparkling), c.byLastBump, c.bumpedOnDescent,
+                caughtAt = at ?: Float.NaN, whileFleeing = c.whileFleeing, afterWallTurn = c.afterWallTurn,
             )
         }
         val snags = ArrayList<SnagRecord>()
@@ -221,6 +249,13 @@ object CastValidation {
         if (lastBumpHooks.any { it.bumpedOnDescent }) return null
         val ascent = catches.filter { !it.byLastBump }
         if (ascent.zipWithNext().any { (a, b) -> b.depth > a.depth + ASCENT_ORDER_TOLERANCE }) return null
+        if (ascent.zipWithNext().any { (a, b) -> a.caughtAt.isFinite() && b.caughtAt.isFinite() && b.caughtAt < a.caughtAt }) return null
+        if (dto.bumpTimes.isNotEmpty()) {
+            if (dto.bumpTimes.size != dto.bumps.size) return null
+            if (dto.bumpTimes.any { !it.isFinite() || it < 0f || it > dto.durationSec + 1f }) return null
+            if (dto.bumpTimes.zipWithNext().any { (a, b) -> b < a }) return null
+        }
+        if (dto.freePasses !in 0..MAX_FREE_PASSES) return null
 
         // The last-bump hook always holds; fish caught on the way up must fit alongside it.
         val hookedWeight = lastBumpHooks.sumOf { it.species.weightKg.toDouble() } + snags.sumOf { it.kind.weightKg.toDouble() }
@@ -237,6 +272,12 @@ object CastValidation {
             snags = snags,
             bumps = dto.bumps,
             lineStrengthKg = specs.maxWeightKg,
+            ropeLengthM = specs.lengthM,
+            bumpTimes = dto.bumpTimes,
+            freePasses = dto.freePasses,
+            steered = dto.steered,
+            // The battle clock comes from the server's own turn, never from the client.
+            timeLeftAtStart = turn.timeLimitSec,
         )
         return BattleCast(result, duration.coerceIn(minOf(MIN_DURATION, maxDuration), maxDuration))
     }
