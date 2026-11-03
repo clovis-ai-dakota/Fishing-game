@@ -50,6 +50,9 @@ class AppUiTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val store = SharedPrefsStore(context)
         progress?.let { ProgressRepository(store).save(it) }
+        // These tests are about the game itself: start with the tour already taken.
+        store.putString("tour.showAgain", "false")
+        store.putString("tour.seenVersion", com.deepline.fishing.ui.tour.Tour.VERSION.toString())
         scenario = ActivityScenario.launch(MainActivity::class.java)
     }
 

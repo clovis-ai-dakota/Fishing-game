@@ -21,6 +21,10 @@ class FishEntity(
     /** True once the hook bumped into this fish on the way down. */
     var touchedOnDescent: Boolean = false
         internal set
+
+    /** The hook passed through this fish in the bump-free zone: it can't cost a bump on this descent. */
+    var passedInBumpFreeZone: Boolean = false
+        internal set
     var caught: Boolean = false
         internal set
 
@@ -57,6 +61,10 @@ class Obstacle(
     val radius: Float,
 ) {
     var touched: Boolean = false
+        internal set
+
+    /** The hook passed through this obstacle in the bump-free zone. */
+    var passedInBumpFreeZone: Boolean = false
         internal set
 }
 

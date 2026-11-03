@@ -38,7 +38,7 @@ class CastSessionTest {
 
     @Test
     fun hookReversesAfterFourTouches() {
-        val obstacles = listOf(10f, 20f, 30f, 40f, 50f).mapIndexed { i, d ->
+        val obstacles = listOf(40f, 50f, 60f, 70f, 80f).mapIndexed { i, d ->
             Obstacle(i, ObstacleKind.ROCK, center, d, 1f)
         }
         val session = CastSession(specs(length = 120f), false, World(emptyList(), obstacles))
@@ -47,19 +47,55 @@ class CastSessionTest {
         assertEquals(CastPhase.ASCENDING, session.phase)
         assertEquals(ReverseReason.TOUCH_LIMIT, session.reverseReason)
         assertEquals(4, session.touches)
-        assertTrue(session.maxDepthReached in 38f..41f, "reversed at ${session.maxDepthReached}")
+        assertTrue(session.maxDepthReached in 68f..71f, "reversed at ${session.maxDepthReached}")
         assertFalse(obstacles[4].touched)
     }
 
     @Test
     fun hittingFishOnTheWayDownCountsAsTouches() {
-        val fish = listOf(10f, 20f, 30f, 40f).mapIndexed { i, d -> stillFish(i, sprat, d, "body") }
+        val fish = listOf(40f, 50f, 60f, 70f).mapIndexed { i, d -> stillFish(i, sprat, d, "body") }
         val session = CastSession(specs(length = 120f), false, World(fish, emptyList()))
         runWhileDescending(session)
 
         assertEquals(ReverseReason.TOUCH_LIMIT, session.reverseReason)
-        assertTrue(session.maxDepthReached < 41f)
+        assertTrue(session.maxDepthReached < 71f)
         assertTrue(fish.all { it.touchedOnDescent })
+    }
+
+    @Test
+    fun touchesInTheFirst30mDontCostBumps() {
+        // A fish right where the line lands, plus a rock and more fish in the first 30 m.
+        val fish = listOf(1f, 12f, 25f).mapIndexed { i, d -> stillFish(i, sprat, d, "body") }
+        val rock = Obstacle(0, ObstacleKind.ROCK, center, 18f, 1.5f)
+        val session = CastSession(specs(length = 60f), false, World(fish, listOf(rock)))
+        runWhileDescending(session)
+
+        assertEquals(0, session.touches)
+        assertEquals(ReverseReason.ROPE_END, session.reverseReason)
+        assertTrue(fish.none { it.touchedOnDescent || it.isFleeing })
+        assertFalse(rock.touched)
+    }
+
+    @Test
+    fun somethingStillTouchingTheHookWhenItLeavesTheBumpFreeZoneIsLetThrough() {
+        // A big rock spanning the 30 m line: touched from 27.9 m on, still overlapping at 30 m.
+        val rock = Obstacle(0, ObstacleKind.ROCK, center, 30f, 1.5f)
+        val below = Obstacle(1, ObstacleKind.ROCK, center, 45f, 1f)
+        val session = CastSession(specs(length = 60f), false, World(emptyList(), listOf(rock, below)))
+        runWhileDescending(session)
+
+        assertFalse(rock.touched)
+        assertTrue(below.touched, "bumps count again below 30 m")
+        assertEquals(1, session.touches)
+    }
+
+    @Test
+    fun fishPassedInTheBumpFreeZoneCanStillBeCaughtOnTheWayUp() {
+        val fish = stillFish(0, sprat, 15f, "head")
+        val session = CastSession(specs(length = 50f), false, World(listOf(fish), emptyList()))
+        runToEnd(session)
+        assertEquals(0, session.result!!.touchesUsed)
+        assertEquals(1, session.result!!.catches.size)
     }
 
     @Test

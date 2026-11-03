@@ -23,6 +23,8 @@ import com.deepline.fishing.Screen
 import com.deepline.fishing.core.GameConfig
 import com.deepline.fishing.core.Progression
 import com.deepline.fishing.core.RopeStat
+import com.deepline.fishing.ui.tour.TourTarget
+import com.deepline.fishing.ui.tour.tourTarget
 
 fun formatStat(stat: RopeStat, value: Float): String = when (stat) {
     RopeStat.LENGTH -> "%.0f m".format(value)
@@ -49,7 +51,8 @@ fun UpgradesScreen(vm: GameViewModel) {
             items(RopeStat.entries) { stat ->
                 val level = p.level(stat)
                 val cost = Progression.upgradeCost(p, stat)
-                Card(Modifier.fillMaxWidth()) {
+                val tagged = if (stat == RopeStat.entries.first()) Modifier.tourTarget(TourTarget.UPGRADES_ROPE) else Modifier
+                Card(Modifier.fillMaxWidth().then(tagged)) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(stat.displayName, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))

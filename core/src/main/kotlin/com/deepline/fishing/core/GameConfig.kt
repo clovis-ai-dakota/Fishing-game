@@ -17,6 +17,13 @@ object GameConfig {
     /** On the way down, the hook reverses after touching this many objects (fish or obstacles). */
     const val DESCENT_TOUCH_LIMIT = 4
 
+    /**
+     * Touches in the first meters of the descent don't count, so a cast that lands right on a
+     * fish doesn't cost a bump. Anything the hook overlaps in this zone is let through for the
+     * rest of the descent, even if the hook is still touching it when it leaves the zone.
+     */
+    const val BUMP_FREE_DEPTH = 30f
+
     const val DESCENT_SPEED = 18f
     const val ASCENT_SPEED = 15f
 

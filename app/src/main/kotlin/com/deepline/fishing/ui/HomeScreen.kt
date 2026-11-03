@@ -30,6 +30,8 @@ import com.deepline.fishing.core.DepthZone
 import com.deepline.fishing.core.FishCatalog
 import com.deepline.fishing.core.GameConfig
 import com.deepline.fishing.core.Progression
+import com.deepline.fishing.ui.tour.TourTarget
+import com.deepline.fishing.ui.tour.tourTarget
 import kotlin.math.roundToInt
 
 @Composable
@@ -79,7 +81,7 @@ fun HomeScreen(vm: GameViewModel) {
             }
         }
 
-        Card(Modifier.fillMaxWidth()) {
+        Card(Modifier.fillMaxWidth().tourTarget(TourTarget.HOME_POINTS)) {
             Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text("Points", style = MaterialTheme.typography.labelLarge)
@@ -138,7 +140,7 @@ fun HomeScreen(vm: GameViewModel) {
             }
         }
 
-        Card(Modifier.fillMaxWidth()) {
+        Card(Modifier.fillMaxWidth().tourTarget(TourTarget.HOME_LANTERN)) {
             Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text("Lanterns: ${p.lanterns}", style = MaterialTheme.typography.titleMedium)
@@ -159,7 +161,8 @@ fun HomeScreen(vm: GameViewModel) {
             onClick = vm::startCast,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(64.dp),
+                .height(64.dp)
+                .tourTarget(TourTarget.HOME_CAST),
         ) {
             Text("Cast line", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
         }
@@ -168,7 +171,8 @@ fun HomeScreen(vm: GameViewModel) {
             onClick = { vm.navigate(Screen.BATTLE_SETUP) },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
+                .height(56.dp)
+                .tourTarget(TourTarget.HOME_BATTLE),
         ) {
             Text("1v1 Battle", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         }
@@ -185,13 +189,23 @@ fun HomeScreen(vm: GameViewModel) {
             }
         }
 
+        OutlinedButton(
+            onClick = vm::startTour,
+            modifier = Modifier
+                .fillMaxWidth()
+                .tourTarget(TourTarget.HOME_TOUR),
+        ) {
+            Text("Take the tour")
+        }
+
         Card(Modifier.fillMaxWidth()) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text("How to fish", style = MaterialTheme.typography.titleMedium)
                 Text(
                     "• Drag left and right to steer the hook.\n" +
                         "• Going down: the hook sinks until it has bumped ${GameConfig.DESCENT_TOUCH_LIMIT} things " +
-                        "(fish, rocks, driftwood, jellies) or runs out of rope. Bumping fish pulls the line up early.\n" +
+                        "(fish, rocks, driftwood, jellies) or runs out of rope. Bumping fish pulls the line up early. " +
+                        "The first ${GameConfig.BUMP_FREE_DEPTH.toInt()} m are bump-free.\n" +
                         "• Coming up: nudge a fish on its head (the pale face by the eye) to hook it. " +
                         "Touching the tail does nothing. The rope can only carry so much weight.\n" +
                         "• Deeper catches are worth more points. Sparkling fish are worth " +

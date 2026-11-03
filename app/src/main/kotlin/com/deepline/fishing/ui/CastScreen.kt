@@ -183,6 +183,7 @@ private data class HudState(
     val lanternLit: Boolean,
     val elapsedSeconds: Float,
     val nothingCaughtYet: Boolean,
+    val bumpFree: Boolean,
 ) {
     companion object {
         fun of(s: CastSession) = HudState(
@@ -195,6 +196,7 @@ private data class HudState(
             lanternLit = s.lanternActive && s.hookDepth > GameConfig.DARK_DEPTH,
             elapsedSeconds = s.elapsedSeconds,
             nothingCaughtYet = s.catches.isEmpty(),
+            bumpFree = s.isBumpFree,
         )
     }
 }
@@ -284,13 +286,25 @@ private fun CastHud(
                 style = MaterialTheme.typography.labelMedium,
             )
         }
+        if (hud.bumpFree) {
+            Text(
+                "Bump-free zone · bumps count below ${GameConfig.BUMP_FREE_DEPTH.toInt()} m",
+                modifier = Modifier
+                    .background(Color(0x99003D1F), RoundedCornerShape(50))
+                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                color = Color(0xFF9CFFB0),
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+            )
+        }
         if (hud.lanternLit) {
             HudChip("Lantern lit", Modifier.align(Alignment.Start))
         }
 
         val hint = when {
             hud.elapsedSeconds < 3.5f ->
-                "Drag to steer. Avoid bumping things on the way down: ${GameConfig.DESCENT_TOUCH_LIMIT} bumps and the line comes up."
+                "Drag to steer. Below ${GameConfig.BUMP_FREE_DEPTH.toInt()} m, avoid bumping things: " +
+                    "${GameConfig.DESCENT_TOUCH_LIMIT} bumps and the line comes up."
             hud.phase == CastPhase.ASCENDING && hud.nothingCaughtYet && notice == null ->
                 "Nudge fish on the HEAD to hook them. Tails don't count."
             else -> null

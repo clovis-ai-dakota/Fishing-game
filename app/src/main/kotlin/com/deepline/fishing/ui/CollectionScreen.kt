@@ -25,6 +25,8 @@ import com.deepline.fishing.GameViewModel
 import com.deepline.fishing.Screen
 import com.deepline.fishing.core.DepthZone
 import com.deepline.fishing.core.FishCatalog
+import com.deepline.fishing.ui.tour.TourTarget
+import com.deepline.fishing.ui.tour.tourTarget
 import kotlin.math.roundToInt
 
 private fun zoneRange(zone: DepthZone): String =
@@ -45,6 +47,7 @@ fun CollectionScreen(vm: GameViewModel) {
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.Bold,
+                    modifier = Modifier.tourTarget(TourTarget.COLLECTION_HEADER),
                 )
             }
             for (zone in DepthZone.entries) {

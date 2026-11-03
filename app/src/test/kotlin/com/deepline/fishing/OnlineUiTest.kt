@@ -156,6 +156,8 @@ class OnlineUiTest {
         SharedPrefsStore(context).apply {
             putString("online.server", "ws://127.0.0.1:$port/battle")
             putString("online.name", "Tester")
+            putString("tour.showAgain", "false")
+            putString("tour.seenVersion", com.deepline.fishing.ui.tour.Tour.VERSION.toString())
         }
         scenario = ActivityScenario.launch(MainActivity::class.java)
 

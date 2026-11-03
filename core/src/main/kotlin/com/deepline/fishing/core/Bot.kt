@@ -44,14 +44,16 @@ class BotBrain(private val difficulty: BotDifficulty, private val random: Random
         val margin = 0.3f
         val hazards = ArrayList<Hazard>()
         for (f in s.world.fish) {
-            if (f.touchedOnDescent || f.caught) continue
+            if (f.touchedOnDescent || f.passedInBumpFreeZone || f.caught) continue
+            if (f.depth < GameConfig.BUMP_FREE_DEPTH) continue
             val dy = f.depth - s.hookDepth
             if (dy < -f.halfHeight || dy > difficulty.lookaheadM) continue
             val eta = dy.coerceAtLeast(0f) / GameConfig.DESCENT_SPEED
             hazards += Hazard(predictX(f, eta), f.halfLength + r + margin, eta)
         }
         for (o in s.world.obstacles) {
-            if (o.touched) continue
+            if (o.touched || o.passedInBumpFreeZone) continue
+            if (o.depth < GameConfig.BUMP_FREE_DEPTH) continue
             val dy = o.depth - s.hookDepth
             if (dy < -o.radius || dy > difficulty.lookaheadM) continue
             hazards += Hazard(o.x, o.radius + r + margin, dy.coerceAtLeast(0f) / GameConfig.DESCENT_SPEED)

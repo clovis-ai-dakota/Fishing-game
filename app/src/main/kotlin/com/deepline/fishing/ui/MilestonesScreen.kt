@@ -23,6 +23,8 @@ import com.deepline.fishing.Screen
 import com.deepline.fishing.core.Milestone
 import com.deepline.fishing.core.Milestones
 import com.deepline.fishing.core.Progression
+import com.deepline.fishing.ui.tour.TourTarget
+import com.deepline.fishing.ui.tour.tourTarget
 
 fun milestoneRewardText(m: Milestone): String = listOfNotNull(
     if (m.rewardPoints > 0) "+${formatPoints(m.rewardPoints)} pts" else null,
@@ -56,7 +58,8 @@ fun MilestonesScreen(vm: GameViewModel) {
             items(Milestones.all, key = { it.index }) { m ->
                 val claimed = m.index in p.claimedMilestones
                 val reached = Progression.isMilestoneReached(p, m)
-                Card(Modifier.fillMaxWidth()) {
+                val tagged = if (m.index == 0) Modifier.tourTarget(TourTarget.MILESTONES_FIRST) else Modifier
+                Card(Modifier.fillMaxWidth().then(tagged)) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Column(Modifier.weight(1f)) {

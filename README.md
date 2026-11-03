@@ -6,7 +6,8 @@ All art is drawn in code (no image assets).
 ## How it plays
 
 - **Descent.** The hook sinks from the boat. Drag left/right to steer it. Each object the hook
-  touches (a fish, rock, driftwood or jelly cluster) uses up one of **4 bumps**. After the 4th
+  touches (a fish, rock, driftwood or jelly cluster) uses up one of **4 bumps**. The first
+  **30 m are bump-free**, so a cast that lands on a fish costs nothing. After the 4th
   bump, or at the end of the rope, the hook reverses direction. Bumping fish on the way down
   therefore pulls the line up early.
 - **Ascent.** On the way up, nudge a fish's **head** with the hook to catch it. Touching its
@@ -15,6 +16,15 @@ All art is drawn in code (no image assets).
   100 m). **Sparkling** fish (gold outline and glints) are worth 3× more.
 - **Lantern.** Below 300 m the water goes dark and you only see a small circle around the hook.
   A Lantern (toggle it on before casting; one is used per cast) widens the lit circle.
+
+### Guided tour
+
+On first launch a guided tour walks through the game: it highlights each part of the app and
+explains casting, steering, bumps, heads, weight, points, upgrades, Lanterns, the fish log,
+milestones and battles. It can be skipped at any time; when it closes, it asks whether to show
+it again next time. **Take the tour** on the home screen replays it. When new features add tour
+steps, returning players get a short "What's new" tour of just those steps
+(`app/.../ui/tour/Tour.kt`).
 
 ### Around the casts
 

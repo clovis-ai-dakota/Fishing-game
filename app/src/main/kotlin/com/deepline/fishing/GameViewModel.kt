@@ -31,6 +31,8 @@ import com.deepline.fishing.core.online.OnlineMatch
 import com.deepline.fishing.core.online.OnlineProtocol
 import com.deepline.fishing.core.online.ServerMessage
 import com.deepline.fishing.core.online.toDto
+import com.deepline.fishing.ui.tour.Tour
+import com.deepline.fishing.ui.tour.TourSession
 import kotlin.random.Random
 
 enum class Screen { HOME, CAST, UPGRADES, COLLECTION, MILESTONES, BATTLE_SETUP, BATTLE, ONLINE_LOBBY }
@@ -99,6 +101,64 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     private var lastLiveSentAt = -1f
 
     val isOnlineBattle: Boolean get() = onlineMatch != null && battle === onlineMatch?.battle
+
+    // --- Tour ----------------------------------------------------------------------------
+
+    /** The guided tour, while it is showing. */
+    var tour by mutableStateOf<TourSession?>(null)
+        private set
+    /** True right after the tour closes: ask whether to show it again next launch. */
+    var askTourAgain by mutableStateOf(false)
+        private set
+
+    init {
+        // A first launch (no answer stored yet) shows the full tour; afterwards it only opens
+        // again if the player asked for it, or to show steps added since the version they saw.
+        val showAgain = store.getString(KEY_TOUR_AGAIN)?.toBooleanStrictOrNull() ?: true
+        val seen = store.getString(KEY_TOUR_SEEN)?.toIntOrNull() ?: 0
+        Tour.planAtLaunch(showAgain, seen)?.let { beginTour(TourSession(it.steps, whatsNew = it.whatsNew)) }
+    }
+
+    /** Starts the full tour from the menu. */
+    fun startTour() = beginTour(TourSession(Tour.steps))
+
+    private fun beginTour(session: TourSession) {
+        if (this.session != null) return
+        askTourAgain = false
+        tour = session
+        screen = session.current.screen
+    }
+
+    fun tourNext() {
+        val t = tour ?: return
+        if (t.isLast) return endTour()
+        val next = t.copy(index = t.index + 1)
+        tour = next
+        screen = next.current.screen
+    }
+
+    fun tourBack() {
+        val t = tour ?: return
+        if (t.isFirst) return
+        val previous = t.copy(index = t.index - 1)
+        tour = previous
+        screen = previous.current.screen
+    }
+
+    /** Skipping and finishing both close the tour and ask about next time. */
+    fun skipTour() = endTour()
+
+    private fun endTour() {
+        tour = null
+        screen = Screen.HOME
+        store.putString(KEY_TOUR_SEEN, Tour.VERSION.toString())
+        askTourAgain = true
+    }
+
+    fun answerTourAgain(showNextTime: Boolean) {
+        store.putString(KEY_TOUR_AGAIN, showNextTime.toString())
+        askTourAgain = false
+    }
 
     private fun update(p: PlayerProgress) {
         progress = p
@@ -497,6 +557,8 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     private companion object {
         const val KEY_NAME = "online.name"
         const val KEY_SERVER = "online.server"
+        const val KEY_TOUR_AGAIN = "tour.showAgain"
+        const val KEY_TOUR_SEEN = "tour.seenVersion"
         const val LIVE_INTERVAL_SEC = 0.5f
     }
 }

@@ -65,6 +65,15 @@ class CastSession(
     var elapsedSeconds: Float = 0f
         private set
 
+    /** When the last bump / catch happened ([elapsedSeconds]), for visual feedback. */
+    var lastTouchAtSeconds: Float = Float.NEGATIVE_INFINITY
+        private set
+    var lastCatchAtSeconds: Float = Float.NEGATIVE_INFINITY
+        private set
+
+    /** True while the hook is still in the bump-free zone on the way down. */
+    val isBumpFree: Boolean get() = phase == CastPhase.DESCENDING && hookDepth < GameConfig.BUMP_FREE_DEPTH
+
     private val _catches = ArrayList<CatchRecord>()
     val catches: List<CatchRecord> get() = _catches
     private val _caughtFish = ArrayList<FishEntity>()
@@ -130,19 +139,28 @@ class CastSession(
         }
         maxDepthReached = hookDepth
         val r = GameConfig.HOOK_RADIUS
+        val bumpFree = hookDepth < GameConfig.BUMP_FREE_DEPTH
         for (fish in world.fish) {
-            if (fish.touchedOnDescent || fish.caught) continue
+            if (fish.touchedOnDescent || fish.passedInBumpFreeZone || fish.caught) continue
             if (abs(fish.depth - hookDepth) > fish.halfLength + r) continue
             if (Collision.overlapsBody(fish, hookX, hookDepth, r)) {
+                if (bumpFree) {
+                    fish.passedInBumpFreeZone = true
+                    continue
+                }
                 fish.touchedOnDescent = true
                 fish.fleeTimer = GameConfig.FLEE_DURATION
                 if (registerTouch()) return
             }
         }
         for (obstacle in world.obstacles) {
-            if (obstacle.touched) continue
+            if (obstacle.touched || obstacle.passedInBumpFreeZone) continue
             if (abs(obstacle.depth - hookDepth) > obstacle.radius + r) continue
             if (Collision.overlapsObstacle(obstacle, hookX, hookDepth, r)) {
+                if (bumpFree) {
+                    obstacle.passedInBumpFreeZone = true
+                    continue
+                }
                 obstacle.touched = true
                 if (registerTouch()) return
             }
@@ -152,6 +170,7 @@ class CastSession(
     /** Returns true when this touch made the line reverse. */
     private fun registerTouch(): Boolean {
         touches++
+        lastTouchAtSeconds = elapsedSeconds
         pendingEvents += CastEvent.Touched(touches)
         if (touches >= GameConfig.DESCENT_TOUCH_LIMIT) {
             reverse(ReverseReason.TOUCH_LIMIT)
@@ -188,6 +207,7 @@ class CastSession(
                 )
                 _catches += record
                 _caughtFish += fish
+                lastCatchAtSeconds = elapsedSeconds
                 pendingEvents += CastEvent.Caught(record)
             } else if (fish.tooHeavyCooldown <= 0f) {
                 fish.tooHeavyCooldown = 1f
