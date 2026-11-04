@@ -29,8 +29,8 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
   checks it.
 - **Cosmetics (skins) must never give a gameplay advantage**: same hook size and hitbox, nothing
   that lights up dark water or changes what the player can see. They're unlocked by legendary
-  secrets (`Cosmetic.unlockedBy`, a full set of 5 slots each), drawn in `SkinArt.kt` (`Skins`)
-  before the darkness layer and only around the player's own gear, and chosen in the Dex's Skins
+  secrets (`Cosmetic.unlockedBy`, a full set of 5 slots each), drawn in 3D by `SceneBuilder`
+  (and in 2D by `SkinArt.kt`) before the darkness layer and only around the player's own gear, and chosen in the Dex's Skins
   section, which only appears once one is unlocked. Titles (`CosmeticSlot.TITLE`) are text
   shown under the player's name; the server only relays titles that match a cosmetic.
 - **Navigation**: four bottom tabs (`MainTab`: Fish = `Screen.HOME`, Dex, Upgrades, Battle =
@@ -43,6 +43,26 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
   `GameConfig.SEEN_DISTANCE_M`) and is a log feature only: never scored or sent online. Locked
   secret cards show only number, tier (`Secrets.tierOf`) and reward, and locked skins only their
   slot: never names that hint at a secret.
+- **3D renderer** (`ui/render3d/`): pure-Kotlin meshes (`FishModels`, `PropModels`) and a
+  `SceneBuilder` that turns a `CastSession` into a `Frame` (a list of draw items) on the main
+  thread; `gl/GlBackend` only executes frames, on the GL thread (`Scene3d` for casts, `OffscreenGl`
+  for Dex portraits and the skins preview). Shaders are GLSL ES 3.00 in `app/src/main/assets/shaders`
+  (`#include` is resolved by `ShaderSource`). Rules:
+  - The camera maps the play plane (z = 0) exactly like the 2D view (`Camera3d`, tested): never
+    move gameplay objects off it, and keep fish meshes in the 2D art's unit space so the drawn
+    head matches the hitbox (`Render3dTest`).
+  - Darkness is a screen-space overlay with the same falloff as 2D, drawn after the scene and
+    skins; only lures (and the Lantern glow) are drawn after it. Decor stays far behind the play
+    plane and fogged so it never looks like an obstacle.
+  - The 2D renderer is the fallback (no GLES 3, Robolectric, or any GL failure sets
+    `Render3d.failed`), and the 2D overlay (`drawCastOverlay`: labels, aim, flashes) is drawn on top
+    of the 3D view. Keep both working: the UI tests only see the 2D one.
+  - There's no emulator here: check rendering with the WebGL preview. Run
+    `./gradlew :app:testDebugUnitTest --tests '*Render3dExportTest'` then
+    `node tools/render3d-preview/render.cjs` (PNGs in `app/build/render3d/`). It mirrors
+    `GlBackend`'s draw rules: change both together.
+  - GL keeps uniforms per program: per-item uniforms must be in `GlBackend.DEFAULTS` (and the
+    preview's `defaults`) so one item's values never leak into the next.
 - All tunable numbers live in `core/.../GameConfig.kt` (plus the tables in `FishSpecies.kt`,
   `Upgrades.kt` and `Secrets.kt`). The tour and HUD read them, so don't hard-code them in UI text.
 - Run `./gradlew :core:test :server:test :app:testDebugUnitTest` before pushing. App UI tests

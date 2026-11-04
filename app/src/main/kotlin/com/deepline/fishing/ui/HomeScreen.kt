@@ -100,6 +100,8 @@ fun HomeScreen(vm: GameViewModel) {
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            // Your boat at the surface, wearing your skins (live 3D where available).
+            SkinPreview(Skins.of(vm.progress.equippedSkins), height = 190.dp)
             DepthCard(vm)
             DexProgressCard(vm)
             MilestoneStrip(vm)

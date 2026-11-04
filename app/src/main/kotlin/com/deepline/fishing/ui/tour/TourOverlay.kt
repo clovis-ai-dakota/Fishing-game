@@ -126,7 +126,11 @@ fun TourOverlay(session: TourSession, onNext: () -> Unit, onBack: () -> Unit, on
             } else {
                 val pad = 8.dp.toPx()
                 val radius = CornerRadius(16.dp.toPx())
-                val hole = rect.inflate(pad)
+                // Kept inside the screen (the bottom bar's target reaches the very edge).
+                val edge = 2.dp.toPx()
+                val hole = rect.inflate(pad).let {
+                    Rect(maxOf(it.left, edge), maxOf(it.top, edge), minOf(it.right, size.width - edge), minOf(it.bottom, size.height - edge))
+                }
                 val path = Path().apply {
                     fillType = PathFillType.EvenOdd
                     addRect(Rect(Offset.Zero, size))

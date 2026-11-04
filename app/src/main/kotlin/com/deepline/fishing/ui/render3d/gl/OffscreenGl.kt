@@ -22,6 +22,10 @@ import kotlin.coroutines.resume
  * the skins preview. Pictures can then sit in scrolling lists and rounded cards like any image.
  */
 object OffscreenGl {
+    /** Set when offscreen rendering failed: pictures then use the 2D art (casts keep their own 3D view). */
+    @Volatile
+    var failed = false
+        private set
     private val thread by lazy { HandlerThread("DeepLine3D-offscreen").apply { start() } }
     private val handler by lazy { Handler(thread.looper) }
 
@@ -48,7 +52,7 @@ object OffscreenGl {
                     renderNow(appContext.applicationContext, frame, opaque, into)
                 } catch (e: Exception) {
                     Log.e("DeepLine3D", "Offscreen render failed", e)
-                    Render3d.failed = true
+                    failed = true
                     null
                 }
                 if (cont.isActive) cont.resume(result)
@@ -56,7 +60,11 @@ object OffscreenGl {
         }
 
     private fun renderNow(appContext: Context, frame: Frame, opaque: Boolean, into: Bitmap?): Bitmap? {
-        if (!ensureContext(appContext)) return null
+        if (failed) return null
+        if (!ensureContext(appContext)) {
+            failed = true
+            return null
+        }
         val b = backend ?: return null
         val w = frame.widthPx
         val h = frame.heightPx
@@ -106,7 +114,7 @@ object OffscreenGl {
         if (context == EGL14.EGL_NO_CONTEXT) return false
         surface = EGL14.eglCreatePbufferSurface(display, config, intArrayOf(EGL14.EGL_WIDTH, 16, EGL14.EGL_HEIGHT, 16, EGL14.EGL_NONE), 0)
         if (!EGL14.eglMakeCurrent(display, surface, surface, context)) return false
-        backend = GlBackend(appContext.assets, onError = { Render3d.failed = true }).also { it.onSurfaceCreated(null, null) }
+        backend = GlBackend(appContext.assets, onError = { failed = true }).also { it.onSurfaceCreated(null, null) }
         return backend?.hasFailed == false
     }
 

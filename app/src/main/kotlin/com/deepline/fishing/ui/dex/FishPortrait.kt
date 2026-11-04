@@ -31,6 +31,19 @@ import com.deepline.fishing.ui.drawFishGlow
  */
 @Composable
 fun FishPortrait(species: FishSpecies, state: DexState, modifier: Modifier = Modifier, large: Boolean = false) {
+    // A 3D render where the phone supports it; the 2D art while it renders, and otherwise.
+    val look = when (state) {
+        DexState.UNKNOWN -> com.deepline.fishing.ui.render3d.PortraitLook.UNKNOWN
+        DexState.SEEN -> com.deepline.fishing.ui.render3d.PortraitLook.SEEN
+        DexState.CAUGHT -> com.deepline.fishing.ui.render3d.PortraitLook.CAUGHT
+    }
+    com.deepline.fishing.ui.render3d.gl.FishPortrait3d(species, look, modifier, large = large) {
+        FishPortrait2d(species, state, androidx.compose.ui.Modifier.matchParentSize(), large)
+    }
+}
+
+@Composable
+private fun androidx.compose.foundation.layout.BoxScope.FishPortrait2d(species: FishSpecies, state: DexState, modifier: Modifier, large: Boolean) {
     val time = if (large) {
         val t by rememberInfiniteTransition(label = "portrait").animateFloat(
             initialValue = 0f,

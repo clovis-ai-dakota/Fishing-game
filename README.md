@@ -1,7 +1,8 @@
 # Deep Line — a fishing collection game for Android
 
 An original fishing mini-game for Android, written in Kotlin with Jetpack Compose.
-All art is drawn in code (no image assets).
+All art is made in code (no image or model assets): the game draws in real-time 3D with OpenGL
+ES 3.0, in a cel-shaded anime style, with a 2D renderer as the fallback.
 
 ## How it plays
 
@@ -213,7 +214,8 @@ app/    Android app (Jetpack Compose)
         GameViewModel.kt   game state, persistence via SharedPreferences, online flow
         OnlineConnection.kt WebSocket client (Ktor + OkHttp)
         ui/CastScreen.kt   game loop, HUD, pause, results
-        ui/CastRenderer.kt underwater scene drawn on a Canvas
+        ui/render3d/       3D renderer: procedural meshes, scene builder, GL backend (gl/)
+        ui/CastRenderer.kt 2D scene (fallback) and the 2D overlay drawn over the 3D view
         ui/MainScaffold.kt the four tabs (bottom navigation bar)
         ui/dex/            the Dex: species grid and pages, secrets, skins library, FishPortrait
         ui/GameIcons.kt    icons drawn in code
@@ -238,6 +240,10 @@ Requirements: JDK 17+ (JDK 21 for the app UI tests: Robolectric needs it for And
 
 - `core`: game rules, battles, the computer rival and the online protocol.
 - `server`: real WebSocket matches against the battle server.
+- `app` 3D: `Render3dTest` checks the camera mapping, every mesh's winding, that fish bodies
+  match their hitboxes and that hook skins keep the hook's size. `Render3dExportTest` exports
+  frames that `node tools/render3d-preview/render.cjs` draws with WebGL2 (headless Chromium) and
+  the app's own shaders, into `app/build/render3d/*.png`.
 - `app`: Robolectric UI tests that run the real app on the JVM. They tap through every
   screen, play casts and battles, render the dark zone with and without a Lantern, and play a
   full online match against the real server (started as a separate process). Screenshots are

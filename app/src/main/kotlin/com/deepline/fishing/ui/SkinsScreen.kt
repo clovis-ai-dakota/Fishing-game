@@ -74,13 +74,15 @@ fun SkinPreview(skins: Skins, height: androidx.compose.ui.unit.Dp = 360.dp) {
         animationSpec = infiniteRepeatable(tween(60_000, easing = LinearEasing)),
         label = "time",
     )
-    Canvas(
-        Modifier
-            .fillMaxWidth()
-            .height(height)
-            .clip(RoundedCornerShape(12.dp)),
-    ) {
-        // Framed on the boat, the line and the hook, with room for the masts.
-        drawCastScene(session, 0.8f + time, measurer, skins = skins, cameraTop = -6.5f)
+    val box = Modifier
+        .fillMaxWidth()
+        .height(height)
+        .clip(RoundedCornerShape(12.dp))
+    // 3D where the phone supports it, otherwise (and in tests) the 2D scene.
+    com.deepline.fishing.ui.render3d.gl.SkinPreview3d(skins, box) {
+        Canvas(Modifier.matchParentSize()) {
+            // Framed on the boat, the line and the hook, with room for the masts.
+            drawCastScene(session, 0.8f + time, measurer, skins = skins, cameraTop = -6.5f)
+        }
     }
 }

@@ -54,10 +54,10 @@ fun FishPortrait3d(
     modifier: Modifier = Modifier,
     large: Boolean = false,
     sparkling: Boolean = false,
-    fallback: @Composable () -> Unit,
+    fallback: @Composable androidx.compose.foundation.layout.BoxScope.() -> Unit,
 ) {
     val context = LocalContext.current
-    val supported = remember { Render3d.isSupported(context) } && !Render3d.failed
+    val supported = remember { Render3d.isSupported(context) } && !OffscreenGl.failed
     if (!supported) {
         Box(modifier) { fallback() }
         return
@@ -84,7 +84,7 @@ fun FishPortrait3d(
 }
 
 @Composable
-private fun FishTurntable(species: FishSpecies, look: PortraitLook, sparkling: Boolean, modifier: Modifier, fallback: @Composable () -> Unit) {
+private fun FishTurntable(species: FishSpecies, look: PortraitLook, sparkling: Boolean, modifier: Modifier, fallback: @Composable androidx.compose.foundation.layout.BoxScope.() -> Unit) {
     val context = LocalContext.current
     var turn by remember(species) { mutableFloatStateOf(0f) }
     var shown by remember(species, look) { mutableStateOf<ImageBitmap?>(null) }
@@ -116,9 +116,9 @@ private fun FishTurntable(species: FishSpecies, look: PortraitLook, sparkling: B
  * [fallback] where 3D isn't available.
  */
 @Composable
-fun SkinPreview3d(skins: Skins, modifier: Modifier = Modifier, fallback: @Composable () -> Unit) {
+fun SkinPreview3d(skins: Skins, modifier: Modifier = Modifier, fallback: @Composable androidx.compose.foundation.layout.BoxScope.() -> Unit) {
     val context = LocalContext.current
-    val supported = remember { Render3d.isSupported(context) } && !Render3d.failed
+    val supported = remember { Render3d.isSupported(context) } && !OffscreenGl.failed
     if (!supported) {
         Box(modifier) { fallback() }
         return
