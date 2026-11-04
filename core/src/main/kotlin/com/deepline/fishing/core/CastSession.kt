@@ -55,6 +55,10 @@ data class CastResult(
     val timeLeftAtStart: Float? = null,
     /** Species that came into view during the cast (for the Dex; not scored, not sent online). */
     val seenSpeciesIds: Set<String> = emptySet(),
+    /** Different fish the hook brushed on the way up while the line could take no more. */
+    val fullLineTouches: Int = 0,
+    /** When the fast reel started (cast seconds), or null if it wasn't used. */
+    val fastReelAt: Float? = null,
 ) {
     /** Points from catches and snags, before fishing-secret bonuses. */
     val basePoints: Int get() = catches.sumOf { it.points } + snags.sumOf { it.points }
@@ -81,6 +85,8 @@ sealed interface CastEvent {
         val points: Int get() = fish?.points ?: snag!!.points
     }
     data object Surfaced : CastEvent
+    /** The fast reel started. */
+    data object FastReel : CastEvent
 }
 
 /**
@@ -133,6 +139,40 @@ class CastSession(
     private var freePasses = 0
     private var steered = false
     private val _seenSpecies = HashSet<String>()
+    private val _fullLineTouched = HashSet<Int>()
+    private var fastReelStart = Float.NaN
+    private var fastReelSpeed = 0f
+
+    /** True while the fast reel is hauling the hook up. */
+    val isFastReeling: Boolean get() = !fastReelStart.isNaN() && phase == CastPhase.ASCENDING
+
+    /**
+     * True once nothing more can be caught on this cast: the room left on the line is smaller
+     * than the lightest species that lives above the hook. Only the catalogue is used (not the
+     * fish actually in the water), so it reveals nothing about what's up there.
+     */
+    val lineIsFull: Boolean
+        get() {
+            if (phase != CastPhase.ASCENDING) return false
+            val room = specs.maxWeightKg - carriedWeightKg + 1e-4f
+            return FishCatalog.lightestAbove(hookDepth) > room
+        }
+
+    /** The fast reel can be used: on the way up, with a full line, not already reeling. */
+    val canFastReel: Boolean get() = lineIsFull && fastReelStart.isNaN()
+
+    /**
+     * Hauls the hook up fast: it accelerates from the reeling speed and reaches the boat in at
+     * most [GameConfig.FAST_REEL_MAX_SECONDS]. Returns false when it can't be used now.
+     */
+    fun startFastReel(): Boolean {
+        if (!canFastReel) return false
+        fastReelStart = elapsedSeconds
+        val travel = GameConfig.FAST_REEL_MAX_SECONDS - GameConfig.FAST_REEL_RAMP_SECONDS / 2f
+        fastReelSpeed = maxOf(GameConfig.ASCENT_SPEED, hookDepth / travel)
+        pendingEvents += CastEvent.FastReel
+        return true
+    }
     /** Species that have come into view so far (see [GameConfig.SEEN_DISTANCE_M]). */
     val seenSpeciesIds: Set<String> get() = _seenSpecies
     private val _snags = ArrayList<SnagRecord>()
@@ -323,16 +363,26 @@ class CastSession(
     }
 
     private fun ascend(dt: Float) {
-        hookDepth -= GameConfig.ASCENT_SPEED * dt
+        val speed = if (isFastReeling) {
+            val k = ((elapsedSeconds - fastReelStart) / GameConfig.FAST_REEL_RAMP_SECONDS).coerceIn(0f, 1f)
+            GameConfig.ASCENT_SPEED + (fastReelSpeed - GameConfig.ASCENT_SPEED) * k
+        } else {
+            GameConfig.ASCENT_SPEED
+        }
+        hookDepth -= speed * dt
         if (hookDepth <= 0f) {
             hookDepth = 0f
             surface()
             return
         }
+        // Hauled up fast: the line is full, so nothing more is caught or counted.
+        if (isFastReeling) return
         val r = GameConfig.HOOK_RADIUS
+        val full = lineIsFull
         for (fish in world.fish) {
             if (fish.caught || fish.species.lastBumpOnly) continue
             if (abs(fish.depth - hookDepth) > fish.halfLength + r) continue
+            if (full && Collision.overlapsBody(fish, hookX, hookDepth, r)) _fullLineTouched += fish.id
             if (!Collision.touchesHead(fish, hookX, hookDepth, r)) continue
             if (carriedWeightKg + fish.species.weightKg <= specs.maxWeightKg + 1e-4f) {
                 fish.caught = true
@@ -382,6 +432,8 @@ class CastSession(
             steered = steered,
             timeLeftAtStart = timeLeftAtStart,
             seenSpeciesIds = _seenSpecies.toSet() + _catches.map { it.species.id },
+            fullLineTouches = _fullLineTouched.size,
+            fastReelAt = fastReelStart.takeUnless { it.isNaN() },
         )
         pendingEvents += CastEvent.Surfaced
     }

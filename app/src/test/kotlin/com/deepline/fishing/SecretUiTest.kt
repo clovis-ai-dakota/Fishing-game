@@ -105,8 +105,9 @@ class SecretUiTest {
      */
     private fun snagWater(specs: com.deepline.fishing.core.RopeSpecs, lantern: Boolean): CastSession {
         val c = GameConfig.WORLD_WIDTH / 2f
-        val obstacles = listOf(40f, 55f, 70f).mapIndexed { i, d -> Obstacle(i, ObstacleKind.DRIFTWOOD, c, d, 1f) } +
-            Obstacle(3, ObstacleKind.ROCK, c, 85f, 1.2f)
+        // Below the bump-free zone.
+        val obstacles = listOf(60f, 75f, 90f).mapIndexed { i, d -> Obstacle(i, ObstacleKind.DRIFTWOOD, c, d, 1f) } +
+            Obstacle(3, ObstacleKind.ROCK, c, 105f, 1.2f)
         return CastSession(specs, lantern, World(emptyList(), obstacles))
     }
 
@@ -126,7 +127,7 @@ class SecretUiTest {
 
         // First snag: the cast pauses and the secret is explained.
         compose.click("Cast line")
-        compose.advanceSeconds(6f)
+        compose.advanceSeconds(7f)
         compose.onNodeWithText("Fishing secret discovered!").assertExists()
         compose.shot("27_secret_discovered")
         compose.click("No thanks")
@@ -149,7 +150,7 @@ class SecretUiTest {
 
         // Second snag: the player said "No thanks", so no popup this time.
         compose.click("Cast line")
-        compose.advanceSeconds(6f)
+        compose.advanceSeconds(7f)
         assertTrue(!isShowing("Fishing secret discovered!"))
         compose.advanceSeconds(12f)
         compose.onNodeWithText("Cast complete").assertExists()

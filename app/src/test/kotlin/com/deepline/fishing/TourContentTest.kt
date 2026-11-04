@@ -40,6 +40,9 @@ class TourContentTest {
         }
         assertTrue("${GameConfig.BUMP_FREE_DEPTH.toInt()} m" in text)
         assertTrue("${GameConfig.DESCENT_TOUCH_LIMIT}" in text)
+        // Version 7: the fast reel and the Lantern's reach.
+        assertTrue("reel in fast" in text.lowercase())
+        assertTrue("${GameConfig.VISIBLE_RADIUS_LANTERN.toInt()} m" in text)
         // Version 4: downgrades, the species count, titles and every drawn skin slot.
         assertTrue("downgrade" in text.lowercase())
         assertTrue("${com.deepline.fishing.core.FishCatalog.all.size} species" in text)
@@ -72,9 +75,12 @@ class TourContentTest {
         val v5 = Tour.steps.filter { it.sinceVersion == 5 }.map { it.id }
         assertTrue(v5.containsAll(listOf("tabs", "cast", "upgrades", "dex", "dex_filters", "milestones", "secrets", "replay")))
         // Version 6: customising the boat, the shop and the atmosphere.
-        val v6 = Tour.steps.filter { it.sinceVersion == Tour.VERSION }.map { it.id }
-        assertEquals(6, Tour.VERSION)
+        val v6 = Tour.steps.filter { it.sinceVersion == 6 }.map { it.id }
         assertTrue(v6.containsAll(listOf("boat", "shop", "atmosphere")))
+        // Version 7: the fast reel, the deeper bump-free zone and the brighter Lantern.
+        assertEquals(7, Tour.VERSION)
+        val v7 = Tour.steps.filter { it.sinceVersion == 7 }.map { it.id }
+        assertTrue(v7.containsAll(listOf("fast_reel", "descent", "lantern")))
         for (t in listOf(TourTarget.HOME_BOAT, TourTarget.SHOP_ITEMS, TourTarget.SKINS_ATMOSPHERE)) {
             assertTrue("No step points at $t", t in targets)
         }

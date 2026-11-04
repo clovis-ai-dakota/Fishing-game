@@ -38,7 +38,7 @@ class CastSessionTest {
 
     @Test
     fun hookReversesAfterFourTouches() {
-        val obstacles = listOf(40f, 50f, 60f, 70f, 80f).mapIndexed { i, d ->
+        val obstacles = listOf(60f, 70f, 80f, 90f, 100f).mapIndexed { i, d ->
             Obstacle(i, ObstacleKind.ROCK, center, d, 1f)
         }
         val session = CastSession(specs(length = 120f), false, World(emptyList(), obstacles))
@@ -47,19 +47,19 @@ class CastSessionTest {
         assertEquals(CastPhase.ASCENDING, session.phase)
         assertEquals(ReverseReason.TOUCH_LIMIT, session.reverseReason)
         assertEquals(4, session.touches)
-        assertTrue(session.maxDepthReached in 68f..71f, "reversed at ${session.maxDepthReached}")
+        assertTrue(session.maxDepthReached in 88f..91f, "reversed at ${session.maxDepthReached}")
         assertFalse(obstacles[4].touched)
         assertTrue(obstacles[3].snagged, "the last bump snags what it hit")
     }
 
     @Test
     fun hittingFishHeadsOnTheWayDownCountsAsBumps() {
-        val fish = listOf(40f, 50f, 60f, 70f).mapIndexed { i, d -> stillFish(i, sprat, d, "head") }
+        val fish = listOf(60f, 70f, 80f, 90f).mapIndexed { i, d -> stillFish(i, sprat, d, "head") }
         val session = CastSession(specs(length = 120f), false, World(fish, emptyList()))
         runWhileDescending(session)
 
         assertEquals(ReverseReason.TOUCH_LIMIT, session.reverseReason)
-        assertTrue(session.maxDepthReached < 71f)
+        assertTrue(session.maxDepthReached < 91f)
         assertTrue(fish.all { it.touchedOnDescent })
     }
 
@@ -76,8 +76,8 @@ class CastSessionTest {
 
     @Test
     fun theLastBumpSnagsTheObjectItHitForBigPoints() {
-        val obstacles = listOf(40f, 50f, 60f).mapIndexed { i, d -> Obstacle(i, ObstacleKind.DRIFTWOOD, center, d, 1f) } +
-            Obstacle(3, ObstacleKind.ROCK, center, 70f, 1f)
+        val obstacles = listOf(60f, 70f, 80f).mapIndexed { i, d -> Obstacle(i, ObstacleKind.DRIFTWOOD, center, d, 1f) } +
+            Obstacle(3, ObstacleKind.ROCK, center, 90f, 1f)
         val session = CastSession(specs(length = 120f), false, World(emptyList(), obstacles))
         val events = ArrayList<CastEvent>()
         var guard = 0
@@ -89,9 +89,9 @@ class CastSessionTest {
         val result = session.result!!
         val snag = result.snags.single()
         assertEquals(ObstacleKind.ROCK, snag.kind)
-        assertEquals(Scoring.snagPoints(ObstacleKind.ROCK, 70f), snag.points)
+        assertEquals(Scoring.snagPoints(ObstacleKind.ROCK, 90f), snag.points)
         assertEquals(snag.points, result.basePoints)
-        assertTrue(snag.points > Scoring.points(FishCatalog.byId("dusk_snapper")!!, 70f, false), "objects are worth big points")
+        assertTrue(snag.points > Scoring.points(FishCatalog.byId("dusk_snapper")!!, 90f, false), "objects are worth big points")
         assertEquals(ObstacleKind.ROCK.weightKg, result.totalWeightKg)
         assertTrue(result.lastBumpHooked)
         assertTrue(obstacles.take(3).none { it.snagged }, "only the last bump snags")
@@ -101,8 +101,8 @@ class CastSessionTest {
     @Test
     fun theLastBumpHooksTheFishItHitEvenIfItIsHeavy() {
         val leviathan = FishCatalog.byId("pale_leviathan")!! // 24 kg on a 6 kg line
-        val obstacles = listOf(40f, 50f, 60f).mapIndexed { i, d -> Obstacle(i, ObstacleKind.ROCK, center, d, 1f) }
-        val big = stillFish(10, leviathan, 75f, "head")
+        val obstacles = listOf(60f, 70f, 80f).mapIndexed { i, d -> Obstacle(i, ObstacleKind.ROCK, center, d, 1f) }
+        val big = stillFish(10, leviathan, 95f, "head")
         val onTheWayUp = stillFish(11, sprat, 20f, "head")
         val session = CastSession(specs(length = 120f, weight = 6f), false, World(listOf(big, onTheWayUp), obstacles))
         runToEnd(session)
@@ -149,8 +149,8 @@ class CastSessionTest {
         assertTrue(up.result!!.catches.isEmpty())
 
         // As the 4th bump, it's hooked.
-        val rocks = listOf(40f, 50f, 60f).mapIndexed { i, d -> Obstacle(i, ObstacleKind.ROCK, center, d, 1f) }
-        val down = CastSession(specs(length = 120f), false, World(listOf(stillFish(1, sovereign, 75f, "head")), rocks))
+        val rocks = listOf(60f, 70f, 80f).mapIndexed { i, d -> Obstacle(i, ObstacleKind.ROCK, center, d, 1f) }
+        val down = CastSession(specs(length = 120f), false, World(listOf(stillFish(1, sovereign, 95f, "head")), rocks))
         runToEnd(down)
         assertEquals(sovereign, down.result!!.catches.single { it.byLastBump }.species)
     }
@@ -204,14 +204,15 @@ class CastSessionTest {
 
     @Test
     fun somethingStillTouchingTheHookWhenItLeavesTheBumpFreeZoneIsLetThrough() {
-        // A big rock spanning the 30 m line: touched from 27.9 m on, still overlapping at 30 m.
-        val rock = Obstacle(0, ObstacleKind.ROCK, center, 30f, 1.5f)
-        val below = Obstacle(1, ObstacleKind.ROCK, center, 45f, 1f)
-        val session = CastSession(specs(length = 60f), false, World(emptyList(), listOf(rock, below)))
+        // A big rock spanning the bump-free line: touched before it, still overlapping after it.
+        val edge = GameConfig.BUMP_FREE_DEPTH
+        val rock = Obstacle(0, ObstacleKind.ROCK, center, edge, 1.5f)
+        val below = Obstacle(1, ObstacleKind.ROCK, center, edge + 15f, 1f)
+        val session = CastSession(specs(length = edge + 30f), false, World(emptyList(), listOf(rock, below)))
         runWhileDescending(session)
 
         assertFalse(rock.touched)
-        assertTrue(below.touched, "bumps count again below 30 m")
+        assertTrue(below.touched, "bumps count again below the bump-free zone")
         assertEquals(1, session.touches)
     }
 

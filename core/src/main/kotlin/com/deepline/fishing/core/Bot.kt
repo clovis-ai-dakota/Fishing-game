@@ -150,6 +150,8 @@ object BotPlayer {
             if (timeLimitSec != null && session.elapsedSeconds >= timeLimitSec) break
             if (session.elapsedSeconds >= MAX_SIM_SECONDS) break
             session.update(DT, brain.steer(session, DT))
+            // Normal and Hard rivals haul a full line straight up (it saves clock in timed modes).
+            if (difficulty != BotDifficulty.EASY && session.canFastReel) session.startFastReel()
         }
         session.endNow()
         val duration = timeLimitSec?.let { minOf(it, session.elapsedSeconds) } ?: session.elapsedSeconds

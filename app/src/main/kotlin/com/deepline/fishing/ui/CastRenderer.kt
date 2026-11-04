@@ -549,6 +549,15 @@ fun DrawScope.drawCastOverlay(
 
     val hook = Offset(sx(session.hookX), sy(session.hookDepth))
     val s = GameConfig.HOOK_RADIUS * scale
+    if (session.isFastReeling) {
+        // Speed streaks rushing past while the full line is hauled up.
+        for (k in 0 until 14) {
+            val x = size.width * hash01(k, 3, 9)
+            val len = size.height * (0.08f + 0.12f * hash01(k, 4, 9))
+            val y = ((timeSeconds * 2.2f + hash01(k, 5, 9)) % 1f) * (size.height + len) - len
+            drawLine(Color.White.copy(alpha = 0.25f + 0.25f * hash01(k, 6, 9)), Offset(x, y), Offset(x, y + len), strokeWidth = 2f + 2f * hash01(k, 7, 9), cap = StrokeCap.Round)
+        }
+    }
     if (session.isBumpFree) {
         val pulse = 0.5f + 0.5f * sin(timeSeconds * 4f)
         drawCircle(BumpFreeGreen.copy(alpha = 0.10f + 0.06f * pulse), radius = 2.0f * s, center = hook)

@@ -345,6 +345,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
                     "Last bump hooked: ${event.name}  +${event.points}"
                 }
                 CastEvent.Surfaced -> null
+                CastEvent.FastReel -> null
             }
             if (text != null) notice = Notice(text, s.elapsedSeconds)
         }
@@ -401,6 +402,13 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         val id = secretPopup ?: return
         update(Progression.setSecretPopupMuted(progress, id, muted = !showAgain))
         secretQueue = secretQueue.drop(1)
+    }
+
+    /** Hauls a full line straight up (see [CastSession.startFastReel]). */
+    fun fastReel() {
+        val s = session ?: return
+        if (paused || pendingResult != null) return
+        s.startFastReel()
     }
 
     fun pause() {

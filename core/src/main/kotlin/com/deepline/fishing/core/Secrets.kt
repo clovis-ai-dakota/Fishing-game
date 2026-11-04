@@ -44,6 +44,7 @@ object Secrets {
     const val ZONE_SWEEP = "zone_sweep"
     const val GRAND_SLAM = "grand_slam"
     const val DOUBLE_HEADER = "double_header"
+    const val CROWD_SURFER = "crowd_surfer"
 
     // Tier 5: legendary (each unlocks a set of cosmetics)
     const val DAVID_AND_GOLIATH = "david_and_goliath"
@@ -56,7 +57,7 @@ object Secrets {
         FREE_PASS, SCHOOLING, SURFACE_SKIM, ZEN_CAST,
         PINBALL, SECOND_ENCOUNTER, CLEAN_DROP, ROCK_BOTTOM, BUZZER_BEATER,
         CORNER_POCKET, GRAND_TOUR, SPARKLE_SNAG, LADDER, PERFECT_LOAD, MOONLIT_ANGLER, SHUTOUT,
-        WHILE_IT_FLEES, BLIND_DROP, ZONE_SWEEP, GRAND_SLAM, DOUBLE_HEADER,
+        WHILE_IT_FLEES, BLIND_DROP, ZONE_SWEEP, GRAND_SLAM, DOUBLE_HEADER, CROWD_SURFER,
         DAVID_AND_GOLIATH, PERFECT_CAST, MASTER_ANGLER,
     )
 
@@ -65,7 +66,7 @@ object Secrets {
         LAST_BUMP to 1, FREE_PASS to 1, SCHOOLING to 1, SURFACE_SKIM to 1, ZEN_CAST to 1,
         PINBALL to 2, SECOND_ENCOUNTER to 2, CLEAN_DROP to 2, ROCK_BOTTOM to 2, BUZZER_BEATER to 2,
         CORNER_POCKET to 3, GRAND_TOUR to 3, SPARKLE_SNAG to 3, LADDER to 3, PERFECT_LOAD to 3, MOONLIT_ANGLER to 3, SHUTOUT to 3,
-        WHILE_IT_FLEES to 4, BLIND_DROP to 4, ZONE_SWEEP to 4, GRAND_SLAM to 4, DOUBLE_HEADER to 4,
+        WHILE_IT_FLEES to 4, BLIND_DROP to 4, ZONE_SWEEP to 4, GRAND_SLAM to 4, DOUBLE_HEADER to 4, CROWD_SURFER to 4,
         DAVID_AND_GOLIATH to 5, PERFECT_CAST to 5, MASTER_ANGLER to 5,
     )
 
@@ -152,6 +153,13 @@ object SecretRules {
     const val GRAND_SLAM_COUNT = 8
     const val GRAND_SLAM_MULTIPLIER = 1.5
     const val DOUBLE_HEADER_MULTIPLIER = 3.0
+    /**
+     * Crowd surfer: with a full line (nothing more can fit), brush this many different fish on
+     * the way up. Even a bot that knows where every fish is only manages it in about a quarter
+     * of max-rope casts, and players can barely see in the deep: tier 4.
+     */
+    const val CROWD_SURFER_COUNT = 50
+    const val CROWD_SURFER_MULTIPLIER = 2.0
 
     const val GOLIATH_SPECIES_ID = "pale_leviathan"
     const val DAVID_AND_GOLIATH_MULTIPLIER = 3.0
@@ -237,6 +245,7 @@ object SecretRules {
         if (r.snags.isNotEmpty() && ascent.size >= GRAND_SLAM_COUNT) add(Secrets.GRAND_SLAM, base * (GRAND_SLAM_MULTIPLIER - 1.0))
         val together = ascent.filter { it.caughtAt.isFinite() }.groupBy { it.caughtAt }.values.filter { it.size >= 2 }.flatten()
         if (together.isNotEmpty()) add(Secrets.DOUBLE_HEADER, together.sumOf { it.points * (DOUBLE_HEADER_MULTIPLIER - 1.0) })
+        if (r.fullLineTouches >= CROWD_SURFER_COUNT) add(Secrets.CROWD_SURFER, base * (CROWD_SURFER_MULTIPLIER - 1.0))
 
         // Tier 5
         if (lastBumpFish != null && lastBumpFish.species.id == GOLIATH_SPECIES_ID && lastBumpFish.species.weightKg > r.lineStrengthKg) {
@@ -278,6 +287,7 @@ object SecretRewards {
         Secrets.ZONE_SWEEP to SecretReward(8_000, 5),
         Secrets.GRAND_SLAM to SecretReward(6_000, 4),
         Secrets.DOUBLE_HEADER to SecretReward(7_000, 4),
+        Secrets.CROWD_SURFER to SecretReward(7_500, 5),
         Secrets.DAVID_AND_GOLIATH to SecretReward(15_000, 6, set(Secrets.DAVID_AND_GOLIATH)),
         Secrets.PERFECT_CAST to SecretReward(20_000, 8, set(Secrets.PERFECT_CAST)),
         Secrets.MASTER_ANGLER to SecretReward(25_000, 10, set(Secrets.MASTER_ANGLER)),

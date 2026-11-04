@@ -80,6 +80,21 @@ object FishCatalog {
     val all: List<FishSpecies> = handmade + SpeciesGenerator.generate(handmade.map { it.name }.toSet()) + sovereign
 
     /** Species that spawn normally (everything but the legendary). */
+    /**
+     * The lightest species living anywhere above [depth] (that can be caught on the way up), or
+     * infinity when none does. Used to know when nothing more can fit on the line.
+     */
+    fun lightestAbove(depth: Float): Float {
+        val i = lightestByDepth.binarySearchBy(depth) { it.first }.let { if (it >= 0) it else -it - 2 }
+        return if (i < 0) Float.POSITIVE_INFINITY else lightestByDepth[i].second
+    }
+
+    /** (min depth, lightest weight among species living from there up), by increasing depth. */
+    private val lightestByDepth: List<Pair<Float, Float>> by lazy {
+        var best = Float.POSITIVE_INFINITY
+        regular.sortedBy { it.minDepth }.map { s -> best = minOf(best, s.weightKg); s.minDepth to best }
+    }
+
     val regular: List<FishSpecies> = all.filter { !it.lastBumpOnly }
 
     private val byId = all.associateBy { it.id }

@@ -110,8 +110,8 @@ class LegendarySecretUiTest {
         val leviathan = com.deepline.fishing.core.FishCatalog.byId("pale_leviathan")!!
         val head = leviathan.bodyLengthM / 2f * 0.8f
         // Spaced out so the bumps take longer than "Pinball" allows: only the legendary secret here.
-        val fish = com.deepline.fishing.core.FishEntity(0, leviathan, false, c - head, 80f, 1, 0f)
-        val rocks = listOf(35f, 50f, 65f).mapIndexed { i, d -> Obstacle(i, ObstacleKind.ROCK, c, d, 1f) }
+        val fish = com.deepline.fishing.core.FishEntity(0, leviathan, false, c - head, 105f, 1, 0f)
+        val rocks = listOf(60f, 75f, 90f).mapIndexed { i, d -> Obstacle(i, ObstacleKind.ROCK, c, d, 1f) }
         return CastSession(specs, lantern, World(listOf(fish), rocks))
     }
 
@@ -130,7 +130,7 @@ class LegendarySecretUiTest {
         val lanternsBefore = vm.progress.lanterns
 
         compose.click("Cast line")
-        compose.advanceSeconds(6f)
+        compose.advanceSeconds(7f)
         // The last bump hooked the leviathan: that secret first, mid-cast.
         compose.onNodeWithText("The last bump hooks what it hits").assertExists()
         compose.click("No thanks")

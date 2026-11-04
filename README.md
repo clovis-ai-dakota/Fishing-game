@@ -10,7 +10,7 @@ ES 3.0, in a cel-shaded anime style, with a 2D renderer as the fallback.
   it (speed proportional to the gap, capped by Rope Agility). Lifting the finger holds the hook.
 - **Descent.** The hook sinks from the boat. Each bump uses up one of **4 bumps**: touching a
   fish's **head** (brushing its body or tail is free) or touching a rock, driftwood or jelly
-  cluster anywhere. The first **30 m are bump-free**, so a cast that lands on a fish costs nothing. After the 4th
+  cluster anywhere. The first **50 m are bump-free**, so a cast that lands on a fish costs nothing. After the 4th
   bump, or at the end of the rope, the hook reverses direction. Bumping fish on the way down
   therefore pulls the line up early.
 - **Ascent.** On the way up, nudge a fish's **head** with the hook to catch it. Touching its
@@ -18,7 +18,13 @@ ES 3.0, in a cel-shaded anime style, with a 2D renderer as the fallback.
 - **Scoring.** Points = species base points × depth multiplier (1× at the surface, +1× per
   100 m). **Sparkling** fish (gold outline and glints) are worth 3× more.
 - **Lantern.** Below 300 m the water goes dark and you only see a small circle around the hook.
-  A Lantern (toggle it on before casting; one is used per cast) widens the lit circle.
+  A Lantern (toggle it on before casting; one is used per cast) widens the lit circle from
+  6 m to 18.2 m around the hook.
+- **Fast reel.** On the way up, once nothing more can fit on the line (the room left is
+  smaller than the lightest species living above the hook, from the catalogue, so it reveals
+  nothing about the water), a **Reel in fast** button hauls the hook to the boat in at most
+  1.5 s wherever it is (less when shallow). Nothing more is caught or counted after that.
+  Normal and Hard rivals use it too.
 
 ### Navigation
 
@@ -66,7 +72,7 @@ discovery reward**. Cast-wide multipliers add up rather than compound. Numbers l
 | Tier | Secret | Trigger | Each time | Discovery reward |
 | --- | --- | --- | --- | --- |
 | 1 | The last bump hooks what it hits | The 4th bump hooks the fish whose head it hit (even over the weight limit) or snags the object: the only way to land rocks (200), driftwood (100) and jellies (150 base, × depth) | the hooked catch | — |
-| 1 | Free pass | 3 fish heads passed through in the bump-free first 30 m | +50 | 250 |
+| 1 | Free pass | 3 fish heads passed through in the bump-free first 50 m | +50 | 250 |
 | 1 | Schooling | 3+ fish of one species in a cast | +100 | 300 |
 | 1 | Surface skim | A fish caught on the way up shallower than 10 m | +50 | 300 |
 | 1 | Zen cast | No steering at all, and 3+ catches | +150 | 400 |
@@ -87,6 +93,7 @@ discovery reward**. Cast-wide multipliers add up rather than compound. Numbers l
 | 4 | Zone sweep | A fish from each of the 4 depth zones in one cast | cast ×2 | 8,000 + 5 Lanterns |
 | 4 | Grand slam | Snag an object with the last bump and catch 8+ fish on the way up | cast ×1.5 | 6,000 + 4 Lanterns |
 | 4 | Double header | Two fish hooked at the very same instant | both ×3 | 7,000 + 4 Lanterns |
+| 4 | Crowd surfer | With a full line (instead of the fast reel), brush 50 different fish on the way up | cast ×2 | 7,500 + 5 Lanterns |
 | 5 | David and Goliath | The last bump hooks the Pale Leviathan (24 kg) on a rope weaker than it | leviathan ×3 | 15,000 + 6 Lanterns + Giant-slayer set |
 | 5 | Perfect cast | Rock bottom + Perfect load + a Sparkling catch on the way up, in one cast | cast ×3 | 20,000 + 8 Lanterns + Prismatic set |
 | 5 | Master angler | Every species in the fish log, including the Deep Sovereign | — | 25,000 + 10 Lanterns + Sovereign set |

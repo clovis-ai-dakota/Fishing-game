@@ -1,5 +1,7 @@
 package com.deepline.fishing.ui.tour
 
+import kotlin.math.roundToInt
+
 import com.deepline.fishing.Screen
 import com.deepline.fishing.core.Atmosphere
 import com.deepline.fishing.core.CosmeticSlot
@@ -51,8 +53,9 @@ object Tour {
      * 4: rope downgrades with a full refund, many more species, bolder skins and titles.
      * 5: bottom tabs (Fish, Dex, Upgrades, Battle) and the Dex with seen and caught fish.
      * 6: boat customisation, the premium skins shop (coming soon) and the Atmosphere option.
+     * 7: the fast reel for a full line, a deeper bump-free zone and a brighter Lantern.
      */
-    const val VERSION = 6
+    const val VERSION = 7
 
     private val bumps = GameConfig.DESCENT_TOUCH_LIMIT
     private val bumpFree = GameConfig.BUMP_FREE_DEPTH.toInt()
@@ -103,7 +106,7 @@ object Tour {
                 "The first $bumpFree m are bump-free.",
             screen = Screen.HOME,
             art = TourArt.BUMPS,
-            sinceVersion = 2,
+            sinceVersion = 7,
         ),
         TourStep(
             id = "ascent",
@@ -119,6 +122,16 @@ object Tour {
             body = "Your rope can only carry so much. Watch the Load bar: once it's full, heavier fish slip away.",
             screen = Screen.HOME,
             art = TourArt.WEIGHT,
+        ),
+        TourStep(
+            id = "fast_reel",
+            title = "Line full? Reel in fast",
+            body = "When nothing more can fit on your line, a Reel in fast button appears on the way up: it " +
+                "hauls the hook to the boat in ${GameConfig.FAST_REEL_MAX_SECONDS} seconds at most, wherever you are. " +
+                "Handy against the clock in timed battles.",
+            screen = Screen.HOME,
+            art = TourArt.WEIGHT,
+            sinceVersion = 7,
         ),
         TourStep(
             id = "points",
@@ -144,10 +157,13 @@ object Tour {
             id = "lantern",
             title = "Lanterns light the deep",
             body = "Below $dark m the water is dark. Switch this on before a cast to light up much more water " +
-                "around the hook. One Lantern is used per cast; earn more from milestones or buy them in Upgrades.",
+                "around the hook (${GameConfig.VISIBLE_RADIUS_LANTERN.roundToInt()} m instead of " +
+                "${GameConfig.VISIBLE_RADIUS_DARK.roundToInt()} m). One Lantern is used per cast; earn more from " +
+                "milestones or buy them in Upgrades.",
             screen = Screen.HOME,
             target = TourTarget.HOME_LANTERN,
             art = TourArt.DARKNESS,
+            sinceVersion = 7,
         ),
         TourStep(
             id = "dex",

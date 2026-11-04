@@ -35,7 +35,7 @@ object OnlineProtocol {
      * 3: fishing-secret bonuses (casts report what each bump hit and which fish were re-caught).
      * 4: all 24 secrets (more cast facts), the 200th fish, and player titles.
      */
-    const val VERSION = 4
+    const val VERSION = 5
 
     /** Online battles use the same standard rope for both players. */
     const val TOURNAMENT_ROPE_LEVEL = 5
@@ -174,6 +174,8 @@ data class CastDto(
     val bumpTimes: List<Float> = emptyList(),
     val freePasses: Int = 0,
     val steered: Boolean = true,
+    /** Different fish brushed on the way up with a full line (the Crowd surfer secret). */
+    val fullLineTouches: Int = 0,
 )
 
 fun BattleCast.toDto(): CastDto = CastDto(
@@ -192,6 +194,7 @@ fun BattleCast.toDto(): CastDto = CastDto(
     bumpTimes = result.bumpTimes,
     freePasses = result.freePasses,
     steered = result.steered,
+    fullLineTouches = result.fullLineTouches,
 )
 
 object CastValidation {
@@ -256,6 +259,16 @@ object CastValidation {
             if (dto.bumpTimes.zipWithNext().any { (a, b) -> b < a }) return null
         }
         if (dto.freePasses !in 0..MAX_FREE_PASSES) return null
+        // Full-line touches: at most one per fish row the hook rose through, and only with a
+        // line that really was full near the surface (nothing living up there could still fit).
+        if (dto.fullLineTouches < 0) return null
+        if (dto.fullLineTouches > 0) {
+            val rows = (dto.maxDepth.coerceAtLeast(0f) / (GameConfig.FISH_SPACING * 0.5f)).toInt() + 2
+            if (dto.fullLineTouches > rows) return null
+            val carried = catches.sumOf { it.species.weightKg.toDouble() } + snags.sumOf { it.kind.weightKg.toDouble() }
+            val room = specs.maxWeightKg - carried + 1e-3
+            if (FishCatalog.lightestAbove(GameConfig.FIRST_FISH_DEPTH + 1f) <= room) return null
+        }
 
         // The last-bump hook always holds; fish caught on the way up must fit alongside it.
         val hookedWeight = lastBumpHooks.sumOf { it.species.weightKg.toDouble() } + snags.sumOf { it.kind.weightKg.toDouble() }
@@ -276,6 +289,7 @@ object CastValidation {
             bumpTimes = dto.bumpTimes,
             freePasses = dto.freePasses,
             steered = dto.steered,
+            fullLineTouches = dto.fullLineTouches,
             // The battle clock comes from the server's own turn, never from the client.
             timeLeftAtStart = turn.timeLimitSec,
         )

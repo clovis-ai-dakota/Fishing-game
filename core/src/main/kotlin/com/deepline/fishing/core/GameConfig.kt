@@ -22,7 +22,7 @@ object GameConfig {
      * fish doesn't cost a bump. Anything the hook overlaps in this zone is let through for the
      * rest of the descent, even if the hook is still touching it when it leaves the zone.
      */
-    const val BUMP_FREE_DEPTH = 30f
+    const val BUMP_FREE_DEPTH = 50f
 
     const val DESCENT_SPEED = 18f
 
@@ -34,6 +34,15 @@ object GameConfig {
     const val STEER_RESPONSIVENESS = 12f
     const val ASCENT_SPEED = 15f
 
+    /**
+     * Fast reel: once nothing more can fit on the line, the player may haul the hook up so it
+     * reaches the boat in at most this long, wherever it is (shallow hooks take less).
+     */
+    const val FAST_REEL_MAX_SECONDS = 1.5f
+
+    /** How long the fast reel takes to reach full speed (it accelerates from the reeling speed). */
+    const val FAST_REEL_RAMP_SECONDS = 0.25f
+
     /** Collision radius of the hook. */
     const val HOOK_RADIUS = 0.6f
 
@@ -42,7 +51,8 @@ object GameConfig {
     /** Depth range over which darkness fades in after [DARK_DEPTH]. */
     const val DARK_FADE_RANGE = 25f
     const val VISIBLE_RADIUS_DARK = 6f
-    const val VISIBLE_RADIUS_LANTERN = 14f
+    /** 30% further than the first Lantern (14 m): with 200 species the deep needs it. */
+    const val VISIBLE_RADIUS_LANTERN = 18.2f
 
     /** Chance that a spawned fish is Sparkling, and how much more a Sparkling fish is worth. */
     const val SPARKLING_CHANCE = 0.06f

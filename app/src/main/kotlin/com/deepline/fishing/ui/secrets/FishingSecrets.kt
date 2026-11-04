@@ -198,6 +198,11 @@ object FishingSecrets {
             "On the way up, hook two fish by the head at the very same instant.",
             "Both fish ${times(R.DOUBLE_HEADER_MULTIPLIER)}.", art = { drawFishRow(listOf("dusk_snapper", "dusk_snapper"), hook = true) },
         ),
+        FishingSecret(
+            Secrets.CROWD_SURFER, "Crowd surfer",
+            "Once your line can't take another fish, don't reel in fast: brush past ${R.CROWD_SURFER_COUNT} different fish on the way up. Any part of a fish counts.",
+            "Whole cast ${times(R.CROWD_SURFER_MULTIPLIER)}.", art = { drawFishRow(listOf("silver_sprat", "coral_darter", "reed_perch", "silver_sprat"), hook = true) },
+        ),
         // Tier 5
         FishingSecret(
             Secrets.DAVID_AND_GOLIATH, "David and Goliath",

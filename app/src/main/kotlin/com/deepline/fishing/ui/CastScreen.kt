@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -164,14 +165,29 @@ fun CastScreen(vm: GameViewModel) {
         // so it recomposes whenever one of them changes.
         @Suppress("UNUSED_VARIABLE")
         val frameTick = time
+        val hud = HudState.of(session)
         CastHud(
-            hud = HudState.of(session),
+            hud = hud,
             notice = vm.notice,
             battleLabel = battleLabel,
             timeLeft = vm.battleTimeLeft(),
             opponentLive = if (vm.isOnlineBattle) opponentLiveText(vm) else null,
             onPause = vm::pause,
         )
+        // The line is full: offer to haul it straight up (thumb zone, bottom centre).
+        if (hud.canFastReel && !vm.paused && vm.pendingResult == null) {
+            Button(
+                onClick = vm::fastReel,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .systemBarsPadding()
+                    .padding(bottom = 28.dp)
+                    .height(56.dp),
+                shape = RoundedCornerShape(28.dp),
+            ) {
+                Text("Line full · Reel in fast", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            }
+        }
 
         if (vm.paused) {
             val inBattle = turn != null
@@ -229,6 +245,8 @@ private data class HudState(
     val elapsedSeconds: Float,
     val nothingCaughtYet: Boolean,
     val bumpFree: Boolean,
+    /** The line can take no more fish: the fast reel button shows. */
+    val canFastReel: Boolean,
 ) {
     companion object {
         fun of(s: CastSession) = HudState(
@@ -242,6 +260,7 @@ private data class HudState(
             elapsedSeconds = s.elapsedSeconds,
             nothingCaughtYet = s.catches.isEmpty(),
             bumpFree = s.isBumpFree,
+            canFastReel = s.canFastReel,
         )
     }
 }
