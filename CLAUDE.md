@@ -31,8 +31,25 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
   that lights up dark water or changes what the player can see. They're unlocked by legendary
   secrets (`Cosmetic.unlockedBy`, a full set of 5 slots each), drawn in 3D by `SceneBuilder`
   (and in 2D by `SkinArt.kt`) before the darkness layer and only around the player's own gear, and chosen in the Dex's Skins
-  section, which only appears once one is unlocked. Titles (`CosmeticSlot.TITLE`) are text
-  shown under the player's name; the server only relays titles that match a cosmetic.
+  section. Titles (`CosmeticSlot.TITLE`) are text shown under the player's name; the server only
+  relays titles that match a cosmetic.
+- **Skins section** (always visible: everyone can customise a boat). Tapping the boat on the Fish
+  tab opens it. It holds:
+  - **Your boat**: a hand-made `BoatDesign` (`core/.../BoatDesign.kt`), edited in
+    `ui/boat/BoatEditorScreen`. Options unlock per `BoatParts` (free, bought once with points from
+    the balance, or by progress: species caught, a fish from a zone, milestones claimed); all its
+    numbers are in that table and the default design must stay fully free. `Progression`
+    enforces it (`setBoatDesign` refuses locked options). Wearing the custom boat and a boat
+    cosmetic are mutually exclusive (`equipCustomBoat` / `equipSkin`). Build `Skins` with
+    `vm.skins`, never `Skins.of(equippedSkins)` alone.
+  - **Premium skins** (`ui/boat/ShopScreen`, `PremiumSkins`): premade boats with PLACEHOLDER
+    prices, "coming soon". They can't be bought or worn until payments are wired, and only
+    they may use premium-only options (`PartRequirement.PremiumOnly`: hidden from the editor).
+  - **Atmosphere**: `Atmosphere.NIGHTMARE` unlocks when a cast reaches
+    `DepthZone.ABYSS.minDepth` (`Progression.applyCast`). It only changes the mood: the player
+    must see exactly as much as in FAMILY.
+  - The 2D boat (classic, skins and designs) is drawn by `drawBoat` in `BoatArt.kt`; every
+    `HullPattern`, `SailStyle`, `FlagStyle` and `Emblem` must also be drawn in 3D.
 - **Navigation**: four bottom tabs (`MainTab`: Fish = `Screen.HOME`, Dex, Upgrades, Battle =
   `Screen.BATTLE_SETUP`) in `MainScaffold`; everything else is a full screen pushed on top (no
   bar). Tab screens use `TabScreen` (title + actions), pushed ones `SubScreen` (back button). Back

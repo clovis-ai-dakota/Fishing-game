@@ -37,6 +37,10 @@ enum class HullPattern(val displayName: String) {
     WAVES("Waves"),
     DOTS("Polka dots"),
     CHECKER("Checkers"),
+
+    // Premium only (premade shop skins): see BoatParts.
+    FLAMES("Flames"),
+    STARRY("Starry night"),
 }
 
 enum class SailStyle(val displayName: String) {
@@ -61,6 +65,11 @@ enum class Emblem(val displayName: String) {
     HEART("Heart"),
     MOON("Moon"),
     WAVE("Wave"),
+
+    // Premium only (premade shop skins): see BoatParts.
+    CROWN("Crown"),
+    SKULL("Skull"),
+    LIGHTNING("Lightning"),
 }
 
 /**

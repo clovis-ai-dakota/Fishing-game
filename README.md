@@ -105,8 +105,22 @@ cast, so they are bounded but trusted.
 
 ### Skins
 
-Legendary (tier 5) secrets each unlock a full set of five cosmetics, chosen per slot in the
-Dex's **Skins** section (with an animated preview), which appears once something is unlocked.
+The Dex's **Skins** section is always there; tapping the boat at the top of the Fish tab opens it.
+It has an animated preview of what you wear, then:
+
+- **Your boat**: design your own in **Customise boat**: hull and bottom colours, a hull pattern,
+  trim, cabin, sails (triangle, square, twin), a flag (pennant, swallowtail, banner) and an
+  emblem, from a palette of 24 colours. The editor is free, but most options unlock by playing:
+  some are bought once with points (from your balance: milestones keep counting), others come
+  with progress (species caught, a fish from a deeper zone, milestones claimed). The default
+  boat is entirely free. The unlock table is `core/.../BoatParts.kt`. Save, and your boat is worn.
+- **Premium skins**: a shop of premade boats with prices (placeholders), some using shop-only
+  patterns and emblems (flames, a starry night, crown, skull, lightning). **Coming soon**:
+  payments aren't wired, so they can't be bought or worn yet.
+- **Atmosphere**: Family (the default) is harmless near the surface and gets spookier with
+  depth. Reaching the Abyssal Floor unlocks **Nightmare**, a frightening look for the deep that
+  shows exactly as much as before.
+- **Legendary skins**: tier 5 secrets each unlock a full set of five cosmetics, chosen per slot.
 
 | Set (secret) | Hook | Line | Boat | Bubble trail | Title |
 | --- | --- | --- | --- | --- | --- |
@@ -218,6 +232,7 @@ app/    Android app (Jetpack Compose)
         ui/CastRenderer.kt 2D scene (fallback) and the 2D overlay drawn over the 3D view
         ui/MainScaffold.kt the four tabs (bottom navigation bar)
         ui/dex/            the Dex: species grid and pages, secrets, skins library, FishPortrait
+        ui/boat/           boat editor and the premium skins shop; ui/BoatArt.kt draws boats in 2D
         ui/GameIcons.kt    icons drawn in code
         ui/*Screen.kt      Fish tab (HomeScreen), upgrades, milestones, battle setup / hub
 ```

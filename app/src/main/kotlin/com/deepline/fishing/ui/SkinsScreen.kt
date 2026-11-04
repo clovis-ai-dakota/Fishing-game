@@ -7,6 +7,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -31,6 +32,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
@@ -60,7 +63,14 @@ fun TitleBadge(title: String, modifier: Modifier = Modifier) {
 
 /** The boat, rod, line and hook near the surface, wearing [skins] (the Dex's Skins section). */
 @Composable
-fun SkinPreview(skins: Skins, height: androidx.compose.ui.unit.Dp = 360.dp) {
+fun SkinPreview(
+    skins: Skins,
+    height: androidx.compose.ui.unit.Dp = 360.dp,
+    modifier: Modifier = Modifier,
+    /** When set, the preview is a button (the Fish tab's boat opens the Skins section). */
+    onClick: (() -> Unit)? = null,
+    clickLabel: String? = null,
+) {
     val measurer = rememberTextMeasurer()
     val session = remember {
         CastSession(RopeSpecs(120f, 10f, 9f), false, World(emptyList(), emptyList())).also {
@@ -74,10 +84,15 @@ fun SkinPreview(skins: Skins, height: androidx.compose.ui.unit.Dp = 360.dp) {
         animationSpec = infiniteRepeatable(tween(60_000, easing = LinearEasing)),
         label = "time",
     )
-    val box = Modifier
+    val box = modifier
         .fillMaxWidth()
         .height(height)
         .clip(RoundedCornerShape(12.dp))
+        .let { m ->
+            if (onClick == null) m
+            else m.clickable(onClickLabel = clickLabel, role = Role.Button, onClick = onClick)
+                .semantics { contentDescription = clickLabel ?: "Boat" }
+        }
     // 3D where the phone supports it, otherwise (and in tests) the 2D scene.
     com.deepline.fishing.ui.render3d.gl.SkinPreview3d(skins, box) {
         Canvas(Modifier.matchParentSize()) {

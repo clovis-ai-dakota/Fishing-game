@@ -124,7 +124,8 @@ class LegendarySecretUiTest {
         lateinit var vm: GameViewModel
         scenario!!.onActivity { vm = ViewModelProvider(it)[GameViewModel::class.java] }
         vm.castFactory = ::goliathWater
-        assertTrue(!isShowing("Skins"))
+        // The Skins section is always there (boat customising), but no legendary skin yet.
+        assertTrue(vm.progress.unlockedCosmetics.isEmpty())
         val pointsBefore = vm.progress.pointsBalance
         val lanternsBefore = vm.progress.lanterns
 
@@ -148,8 +149,7 @@ class LegendarySecretUiTest {
         assertEquals(lanternsBefore + reward.lanterns, vm.progress.lanterns)
         assertTrue(vm.progress.unlockedCosmetics.isNotEmpty())
 
-        // Skins: the Dex now has a Skins section. Wear the whole set (hook, line, boat, trail and
-        // title), then fish with them.
+        // Skins: wear the whole set (hook, line, boat, trail and title), then fish with them.
         compose.onNodeWithTag("tab_dex").performClick()
         compose.click("Skins")
         val set = com.deepline.fishing.core.Cosmetic.entries.filter { it.unlockedBy == Secrets.DAVID_AND_GOLIATH }

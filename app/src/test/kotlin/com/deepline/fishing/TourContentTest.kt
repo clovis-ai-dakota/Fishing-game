@@ -22,8 +22,9 @@ class TourContentTest {
     fun everyMenuScreenIsVisited() {
         // CAST, BATTLE and ONLINE_LOBBY need a live cast, battle or connection, so they're
         // explained from the screens that lead to them. A species' page (FISH_DETAIL) is
-        // explained from the Dex, which opens it.
-        val explainedElsewhere = setOf(Screen.CAST, Screen.BATTLE, Screen.ONLINE_LOBBY, Screen.FISH_DETAIL)
+        // explained from the Dex, which opens it. The boat editor is explained from the Fish tab's
+        // boat, which leads to it.
+        val explainedElsewhere = setOf(Screen.CAST, Screen.BATTLE, Screen.ONLINE_LOBBY, Screen.FISH_DETAIL, Screen.BOAT_EDITOR)
         val visited = Tour.steps.map { it.screen }.toSet()
         for (screen in Screen.entries - explainedElsewhere) {
             assertTrue("The tour never shows the $screen screen", screen in visited)
@@ -43,6 +44,12 @@ class TourContentTest {
         assertTrue("downgrade" in text.lowercase())
         assertTrue("${com.deepline.fishing.core.FishCatalog.all.size} species" in text)
         assertTrue("title" in text.lowercase())
+        // Version 6: boat customisation, the shop (coming soon) and the atmosphere.
+        for (topic in listOf("Customise", "Premium", "Coming soon", "Atmosphere", com.deepline.fishing.core.Atmosphere.NIGHTMARE.displayName)) {
+            assertTrue("Tour doesn't mention $topic", text.contains(topic, ignoreCase = true))
+        }
+        val boatStep = Tour.steps.first { it.id == "boat" }
+        assertTrue("The boat step points at the Fish tab's boat", boatStep.screen == Screen.HOME && boatStep.target == com.deepline.fishing.ui.tour.TourTarget.HOME_BOAT)
         for (slot in com.deepline.fishing.core.CosmeticSlot.entries) {
             assertTrue("Tour doesn't mention the ${slot.displayName} skin slot", slot.displayName.lowercase() in text.lowercase())
         }
@@ -61,9 +68,16 @@ class TourContentTest {
         for (t in listOf(TourTarget.HOME_CAST, TourTarget.HOME_POINTS, TourTarget.HOME_TOUR, TourTarget.DEX_HEADER, TourTarget.DEX_FILTERS)) {
             assertTrue("No step points at $t", t in targets)
         }
-        // Changed in version 5, so returning players see them in "What's new".
-        val whatsNew = Tour.steps.filter { it.sinceVersion == Tour.VERSION }.map { it.id }
-        assertTrue(whatsNew.containsAll(listOf("tabs", "cast", "upgrades", "dex", "dex_filters", "milestones", "secrets", "replay")))
+        // Changed in version 5, so returning players saw them in "What's new".
+        val v5 = Tour.steps.filter { it.sinceVersion == 5 }.map { it.id }
+        assertTrue(v5.containsAll(listOf("tabs", "cast", "upgrades", "dex", "dex_filters", "milestones", "secrets", "replay")))
+        // Version 6: customising the boat, the shop and the atmosphere.
+        val v6 = Tour.steps.filter { it.sinceVersion == Tour.VERSION }.map { it.id }
+        assertEquals(6, Tour.VERSION)
+        assertTrue(v6.containsAll(listOf("boat", "shop", "atmosphere")))
+        for (t in listOf(TourTarget.HOME_BOAT, TourTarget.SHOP_ITEMS, TourTarget.SKINS_ATMOSPHERE)) {
+            assertTrue("No step points at $t", t in targets)
+        }
     }
 
     @Test

@@ -47,6 +47,8 @@ fun AppRoot(vm: GameViewModel) {
                     Screen.MILESTONES -> MilestonesScreen(vm)
                     Screen.BATTLE -> BattleScreen(vm)
                     Screen.ONLINE_LOBBY -> OnlineLobbyScreen(vm)
+                    Screen.BOAT_EDITOR -> com.deepline.fishing.ui.boat.BoatEditorScreen(vm)
+                    Screen.SHOP -> com.deepline.fishing.ui.boat.ShopScreen(vm)
                 }
                 vm.tour?.let { TourOverlay(it, onNext = vm::tourNext, onBack = vm::tourBack, onSkip = vm::skipTour) }
             }

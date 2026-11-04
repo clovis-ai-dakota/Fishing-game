@@ -36,6 +36,14 @@ data class PlayerProgress(
     val equippedSkins: Map<CosmeticSlot, Cosmetic> = emptyMap(),
     /** Species that have come into view during a cast (caught ones count as seen too). */
     val seenSpecies: Set<String> = emptySet(),
+    /** The boat the player designed (Dex > Skins > Customise), worn when [customBoatEquipped]. */
+    val boatDesign: BoatDesign = BoatDesign.DEFAULT,
+    val customBoatEquipped: Boolean = false,
+    /** Boat options bought with points ([BoatPart.key]); other options unlock by progress. */
+    val unlockedBoatParts: Set<String> = emptySet(),
+    /** The Nightmare atmosphere unlocks the first time a cast reaches the Abyssal Floor. */
+    val atmosphereUnlocked: Boolean = false,
+    val atmosphere: Atmosphere = Atmosphere.FAMILY,
 ) {
     fun level(stat: RopeStat): Int = ropeLevels[stat] ?: 0
     val specs: RopeSpecs get() = RopeSpecs.fromLevels(ropeLevels)
@@ -89,7 +97,38 @@ object Progression {
             // Discovery rewards are granted when a secret is first explained (discoverSecret).
             discoveredSecrets = p.discoveredSecrets + Secrets.revealedBy(result),
             objectsSnagged = p.objectsSnagged + result.snags.size,
+            atmosphereUnlocked = p.atmosphereUnlocked || result.maxDepth >= DepthZone.ABYSS.minDepth,
         )
+    }
+
+    // --- Boat customisation and atmosphere ----------------------------------------------------
+
+    fun isBoatPartAvailable(p: PlayerProgress, part: BoatPart): Boolean = BoatParts.isAvailable(p, part)
+
+    /**
+     * Buys [part] with points (spendable balance only: lifetime earnings, and so milestones, don't
+     * change). Null if it isn't sold for points, is already owned, or is too expensive.
+     */
+    fun unlockBoatPart(p: PlayerProgress, part: BoatPart): PlayerProgress? {
+        val cost = (BoatParts.requirement(part) as? PartRequirement.Points)?.cost ?: return null
+        if (part.key in p.unlockedBoatParts || p.pointsBalance < cost) return null
+        return p.copy(pointsBalance = p.pointsBalance - cost, unlockedBoatParts = p.unlockedBoatParts + part.key)
+    }
+
+    /** Saves [design] as the player's boat. Null if it uses an option they can't use yet. */
+    fun setBoatDesign(p: PlayerProgress, design: BoatDesign): PlayerProgress? {
+        if (BoatParts.partsOf(design).any { !BoatParts.isAvailable(p, it) }) return null
+        return p.copy(boatDesign = design)
+    }
+
+    /** Wears the hand-made boat (taking off any boat cosmetic), or the classic boat when false. */
+    fun equipCustomBoat(p: PlayerProgress, on: Boolean): PlayerProgress =
+        if (on) p.copy(customBoatEquipped = true, equippedSkins = p.equippedSkins - CosmeticSlot.BOAT) else p.copy(customBoatEquipped = false)
+
+    /** Nightmare needs to be unlocked first; Family is always allowed. */
+    fun setAtmosphere(p: PlayerProgress, atmosphere: Atmosphere): PlayerProgress? = when {
+        atmosphere == Atmosphere.NIGHTMARE && !p.atmosphereUnlocked -> null
+        else -> p.copy(atmosphere = atmosphere)
     }
 
     /** Records a newly found secret and grants its one-time reward (nothing if already found). */
@@ -108,6 +147,8 @@ object Progression {
     fun equipSkin(p: PlayerProgress, slot: CosmeticSlot, cosmetic: Cosmetic?): PlayerProgress = when {
         cosmetic == null -> p.copy(equippedSkins = p.equippedSkins - slot)
         cosmetic.slot != slot || cosmetic !in p.unlockedCosmetics -> p
+        // A boat cosmetic replaces the hand-made boat.
+        slot == CosmeticSlot.BOAT -> p.copy(equippedSkins = p.equippedSkins + (slot to cosmetic), customBoatEquipped = false)
         else -> p.copy(equippedSkins = p.equippedSkins + (slot to cosmetic))
     }
 

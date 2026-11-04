@@ -279,15 +279,18 @@ fun DrawScope.drawHookTrail(hookX: Float, eyeY: Float, scale: Float, timeSeconds
     }
 }
 
-/** The hull's colour and the trim stripe along it, by boat skin. */
-internal fun hullBrush(skin: Cosmetic?, top: Float, bottom: Float, timeSeconds: Float): Brush = when (skin) {
+/** The hull's colour and the trim stripe along it, by boat skin (or hand-made [design]). */
+internal fun hullBrush(skin: Cosmetic?, top: Float, bottom: Float, timeSeconds: Float, design: com.deepline.fishing.core.BoatDesign? = null): Brush =
+    if (skin == null && design != null) customHullBrush(design, top, bottom) else when (skin) {
     Cosmetic.GIANT_SLAYER_PENNANT -> Brush.verticalGradient(listOf(Color(0xFF37474F), Color(0xFF102027)), startY = top, endY = bottom)
     Cosmetic.PRISM_SAIL -> Brush.verticalGradient(listOf(Color(0xFFFAFAFA), Color(0xFFB0BEC5)), startY = top, endY = bottom)
     Cosmetic.ROYAL_BOAT -> Brush.verticalGradient(listOf(Color(0xFF7B1FA2), Color(0xFF38006B)), startY = top, endY = bottom)
     else -> Brush.verticalGradient(listOf(Color(0xFFA1662F), Color(0xFF5D3A1A)), startY = top, endY = bottom)
 }
 
-internal fun trimBrush(skin: Cosmetic?, left: Float, right: Float, timeSeconds: Float): Brush = when (skin) {
+internal fun trimBrush(skin: Cosmetic?, left: Float, right: Float, timeSeconds: Float, design: com.deepline.fishing.core.BoatDesign? = null): Brush =
+    if (skin == null && design != null) Brush.horizontalGradient(listOf(Color(design.trimColor()), lerp(Color(design.trimColor()), Color.White, 0.35f), Color(design.trimColor())), startX = left, endX = right)
+    else when (skin) {
     Cosmetic.GIANT_SLAYER_PENNANT -> Brush.horizontalGradient(listOf(Cyan, CyanPale, Cyan), startX = left, endX = right)
     Cosmetic.PRISM_SAIL -> Brush.horizontalGradient(prismColors(timeSeconds), startX = left, endX = right)
     Cosmetic.ROYAL_BOAT -> Brush.horizontalGradient(listOf(GoldDeep, GoldPale, Gold, GoldDeep), startX = left, endX = right)
@@ -295,7 +298,8 @@ internal fun trimBrush(skin: Cosmetic?, left: Float, right: Float, timeSeconds: 
 }
 
 /** Masts, sails and flags behind the cabin. */
-internal fun DrawScope.drawBoatRig(cx: Float, surfaceY: Float, scale: Float, timeSeconds: Float, skin: Cosmetic?) {
+internal fun DrawScope.drawBoatRig(cx: Float, surfaceY: Float, scale: Float, timeSeconds: Float, skin: Cosmetic?, design: com.deepline.fishing.core.BoatDesign? = null) {
+    if (skin == null && design != null) return drawCustomRig(design, cx, surfaceY, scale, timeSeconds)
     when (skin) {
         Cosmetic.GIANT_SLAYER_PENNANT -> drawPennant(cx, surfaceY, scale, timeSeconds)
         Cosmetic.PRISM_SAIL -> {
@@ -384,9 +388,13 @@ private fun DrawScope.drawPennant(cx: Float, surfaceY: Float, scale: Float, time
 }
 
 /** A small badge drawn for a set, used on the Skins screen and the secret details. */
-internal fun DrawScope.drawCabin(cx: Float, surfaceY: Float, scale: Float, skin: Cosmetic?) {
+internal fun DrawScope.drawCabin(cx: Float, surfaceY: Float, scale: Float, skin: Cosmetic?, design: com.deepline.fishing.core.BoatDesign? = null) {
     drawRoundRect(
-        if (skin == Cosmetic.ROYAL_BOAT) GoldPale else Color(0xFFF5E6CC),
+        when {
+            skin == null && design != null -> Color(design.cabinColor())
+            skin == Cosmetic.ROYAL_BOAT -> GoldPale
+            else -> Color(0xFFF5E6CC)
+        },
         topLeft = Offset(cx - 1.3f * scale, surfaceY - 2.3f * scale),
         size = Size(1.7f * scale, 1.3f * scale),
         cornerRadius = CornerRadius(0.15f * scale),

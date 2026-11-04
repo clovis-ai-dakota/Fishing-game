@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.GameViewModel
+import com.deepline.fishing.DexSection
 import com.deepline.fishing.MainTab
 import com.deepline.fishing.Screen
 import com.deepline.fishing.core.DepthZone
@@ -100,8 +101,15 @@ fun HomeScreen(vm: GameViewModel) {
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            // Your boat at the surface, wearing your skins (live 3D where available).
-            SkinPreview(Skins.of(vm.progress.equippedSkins), height = 190.dp)
+            // Your boat at the surface, wearing your skins (live 3D where available). Tap it to
+            // customise it in the Dex's Skins section.
+            SkinPreview(
+                vm.skins,
+                height = 190.dp,
+                modifier = Modifier.tourTarget(TourTarget.HOME_BOAT),
+                onClick = { vm.openDex(DexSection.SKINS) },
+                clickLabel = "Customise your boat",
+            )
             DepthCard(vm)
             DexProgressCard(vm)
             MilestoneStrip(vm)
