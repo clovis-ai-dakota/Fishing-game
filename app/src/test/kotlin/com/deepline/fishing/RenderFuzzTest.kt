@@ -16,6 +16,7 @@ import com.deepline.fishing.core.CastPhase
 import com.deepline.fishing.core.CastSession
 import com.deepline.fishing.core.RopeSpecs
 import com.deepline.fishing.core.RopeStat
+import com.deepline.fishing.ui.drawCastOverlay
 import com.deepline.fishing.ui.drawCastScene
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -59,6 +60,8 @@ class RenderFuzzTest {
             try {
                 drawScope.draw(d, LayoutDirection.Ltr, canvas, Size(widthPx.toFloat(), heightPx.toFloat())) {
                     drawCastScene(session, t, measurer, aimX = session.hookX + 1f, skins = skins)
+                    // The 2D layer drawn over the 3D renderer.
+                    drawCastOverlay(session, t, measurer, aimX = session.hookX + 1f)
                 }
             } catch (e: Throwable) {
                 throw AssertionError(
@@ -78,12 +81,9 @@ class RenderFuzzTest {
     fun startingRopeOnAPhoneScreen() {
         playAndRenderEveryFrame(rope(0), seed = 1, lantern = false, widthPx = 1080, heightPx = 2400, density = 2.625f)
         // And with every skin on.
-        val allSkins = com.deepline.fishing.ui.Skins(
-            hook = com.deepline.fishing.core.Cosmetic.LEVIATHAN_BONE_HOOK,
-            line = com.deepline.fishing.core.Cosmetic.GIANTS_BRAID_LINE,
-            boat = com.deepline.fishing.core.Cosmetic.GIANT_SLAYER_PENNANT,
-        )
-        playAndRenderEveryFrame(rope(0), seed = 1, lantern = false, widthPx = 1080, heightPx = 2400, density = 2.625f, skins = allSkins)
+        for (set in listOf("Giant-slayer", "Prismatic", "Sovereign")) {
+            playAndRenderEveryFrame(rope(0), seed = 1, lantern = false, widthPx = 540, heightPx = 1200, density = 1.3f, skins = com.deepline.fishing.ui.Skins.ofSet(set))
+        }
     }
 
     /**

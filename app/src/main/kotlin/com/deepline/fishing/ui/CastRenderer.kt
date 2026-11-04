@@ -542,3 +542,74 @@ fun DrawScope.drawObstacleIcon(kind: ObstacleKind, c: Offset, r: Float, timeSeco
         }
     }
 }
+
+/**
+ * What the 3D renderer leaves to 2D, drawn over it: depth markers and labels, the bump-free and
+ * rope-limit lines, the aim marker, the bump-free shield and the bump and catch flashes. The 3D
+ * camera maps the play plane exactly like [drawCastScene], so these line up with the scene.
+ */
+fun DrawScope.drawCastOverlay(
+    session: CastSession,
+    timeSeconds: Float,
+    textMeasurer: TextMeasurer,
+    aimX: Float? = null,
+    cameraTop: Float? = null,
+) {
+    val scale = size.width / GameConfig.WORLD_WIDTH
+    val viewHeight = size.height / scale
+    val top = cameraTop ?: max(session.hookDepth - viewHeight * 0.4f, -viewHeight * 0.2f)
+    val bottom = top + viewHeight
+    fun sx(x: Float) = x * scale
+    fun sy(depth: Float) = (depth - top) * scale
+    val elapsed = session.elapsedSeconds
+
+    val labelStyle = TextStyle(color = Color.White.copy(alpha = 0.6f), fontSize = 11.sp)
+    var marker = ceil(max(top, 1f) / 50f) * 50f
+    while (marker < bottom) {
+        val y = sy(marker)
+        drawLine(Color.White.copy(alpha = 0.10f), Offset(0f, y), Offset(size.width, y), strokeWidth = 1f)
+        drawLabel(textMeasurer, "${marker.toInt()} m", labelStyle, x = 8f, y = y + 4f)
+        marker += 50f
+    }
+    val bumpFreeEnd = GameConfig.BUMP_FREE_DEPTH
+    if (bumpFreeEnd in top..bottom) {
+        val y = sy(bumpFreeEnd)
+        drawLine(BumpFreeGreen.copy(alpha = 0.45f), Offset(0f, y), Offset(size.width, y), strokeWidth = 2f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f)))
+        drawLabel(textMeasurer, "Bump-free above ${bumpFreeEnd.toInt()} m", TextStyle(color = BumpFreeGreen.copy(alpha = 0.8f), fontSize = 11.sp), x = null, y = y - 20f)
+    }
+    val ropeEnd = session.specs.lengthM
+    if (ropeEnd in top..bottom) {
+        val y = sy(ropeEnd + GameConfig.HOOK_RADIUS)
+        drawLine(Color(0xFFFFB74D).copy(alpha = 0.7f), Offset(0f, y), Offset(size.width, y), strokeWidth = 2f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(18f, 12f)))
+        drawLabel(textMeasurer, "Rope limit", TextStyle(color = Color(0xFFFFB74D), fontSize = 11.sp), x = null, y = y + 4f)
+    }
+
+    val hook = Offset(sx(session.hookX), sy(session.hookDepth))
+    val s = GameConfig.HOOK_RADIUS * scale
+    if (session.isBumpFree) {
+        val pulse = 0.5f + 0.5f * sin(timeSeconds * 4f)
+        drawCircle(BumpFreeGreen.copy(alpha = 0.10f + 0.06f * pulse), radius = 2.0f * s, center = hook)
+        drawCircle(BumpFreeGreen.copy(alpha = 0.55f), radius = 2.0f * s, center = hook, style = Stroke(width = 2f))
+    }
+    if (aimX != null) {
+        val aim = Offset(sx(aimX.coerceIn(0f, GameConfig.WORLD_WIDTH)), hook.y)
+        if (kotlin.math.abs(aim.x - hook.x) > s * 0.5f) {
+            drawLine(Color.White.copy(alpha = 0.25f), hook, aim, strokeWidth = 2f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(8f, 8f)))
+        }
+        drawCircle(Color.White.copy(alpha = 0.55f), radius = s * 0.55f, center = aim, style = Stroke(width = 2.5f))
+        drawCircle(Color.White.copy(alpha = 0.35f), radius = s * 0.15f, center = aim)
+    }
+    val bumpFlash = (1f - (elapsed - session.lastTouchAtSeconds) / 0.5f).coerceIn(0f, 1f)
+    if (bumpFlash > 0f) {
+        drawCircle(BumpRed.copy(alpha = 0.8f * bumpFlash), radius = s * (1.4f + 2.6f * (1f - bumpFlash)), center = hook, style = Stroke(width = 3f))
+    }
+    val catchFlash = (1f - (elapsed - session.lastCatchAtSeconds) / 0.6f).coerceIn(0f, 1f)
+    if (catchFlash > 0f) {
+        val inner = s * (1.2f + 2f * (1f - catchFlash))
+        for (k in 0 until 8) {
+            val a = (k / 8f) * 2f * PI.toFloat()
+            val dir = Offset(cos(a), sin(a))
+            drawLine(SparkleGold.copy(alpha = catchFlash), hook + dir * inner, hook + dir * (inner + s * 0.9f), strokeWidth = 3f, cap = StrokeCap.Round)
+        }
+    }
+}

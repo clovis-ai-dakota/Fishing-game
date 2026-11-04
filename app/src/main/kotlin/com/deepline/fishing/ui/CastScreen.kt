@@ -78,6 +78,20 @@ fun CastScreen(vm: GameViewModel) {
     var time by remember(session) { mutableFloatStateOf(0f) }
     val textMeasurer = rememberTextMeasurer()
     val skins = Skins.of(vm.progress.equippedSkins)
+    // The 3D renderer where the phone supports it (and it hasn't failed), otherwise 2D.
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val use3d = remember { com.deepline.fishing.ui.render3d.gl.Render3d.isSupported(context) } &&
+        !com.deepline.fishing.ui.render3d.gl.Render3d.failed
+    val scene3d = remember(session) { com.deepline.fishing.ui.render3d.gl.Scene3dHandle() }
+    val sceneBuilder = remember(session) { com.deepline.fishing.ui.render3d.SceneBuilder() }
+    if (use3d) {
+        // Build this cast's fish meshes ahead of time, off the main thread.
+        LaunchedEffect(session) {
+            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
+                session.world.fish.map { it.species }.distinct().forEach { com.deepline.fishing.ui.render3d.FishModels.mesh(it) }
+            }
+        }
+    }
 
     // The loop only runs while the cast is live: no frames are spent on the pause dialog or
     // the results panel. [time] keeps counting from where it stopped.
@@ -96,11 +110,19 @@ fun CastScreen(vm: GameViewModel) {
                 }
                 last = now
                 time = resumedAt + (now - start) / 1_000_000_000f
+                if (use3d) scene3d.render { w, h -> sceneBuilder.build(session, time, w, h, skins) }
             }
         }
     }
 
     Box(Modifier.fillMaxSize()) {
+        if (use3d) {
+            com.deepline.fishing.ui.render3d.gl.Scene3d(scene3d, Modifier.fillMaxSize())
+            // Show the paused scene too (the loop above only runs during play).
+            LaunchedEffect(session, running) {
+                if (!running) scene3d.render { w, h -> sceneBuilder.build(session, time, w, h, skins) }
+            }
+        }
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
@@ -122,7 +144,8 @@ fun CastScreen(vm: GameViewModel) {
                     }
                 },
         ) {
-            drawCastScene(session, time, textMeasurer, aimX = steer.targetX(), skins = skins)
+            if (use3d) drawCastOverlay(session, time, textMeasurer, aimX = steer.targetX())
+            else drawCastScene(session, time, textMeasurer, aimX = steer.targetX(), skins = skins)
         }
 
         val turn = vm.battleTurn
