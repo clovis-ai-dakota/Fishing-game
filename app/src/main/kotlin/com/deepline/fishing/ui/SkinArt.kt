@@ -32,15 +32,24 @@ data class Skins(
     val line: Cosmetic? = null,
     val boat: Cosmetic? = null,
     val trail: Cosmetic? = null,
+    /** A hand-made boat, worn when no boat cosmetic is ([boat] wins when both are set). */
+    val customBoat: com.deepline.fishing.core.BoatDesign? = null,
+    val atmosphere: com.deepline.fishing.core.Atmosphere = com.deepline.fishing.core.Atmosphere.FAMILY,
 ) {
     companion object {
         val CLASSIC = Skins()
 
-        fun of(equipped: Map<CosmeticSlot, Cosmetic>) = Skins(
+        fun of(
+            equipped: Map<CosmeticSlot, Cosmetic>,
+            customBoat: com.deepline.fishing.core.BoatDesign? = null,
+            atmosphere: com.deepline.fishing.core.Atmosphere = com.deepline.fishing.core.Atmosphere.FAMILY,
+        ) = Skins(
             hook = equipped[CosmeticSlot.HOOK],
             line = equipped[CosmeticSlot.LINE],
             boat = equipped[CosmeticSlot.BOAT],
             trail = equipped[CosmeticSlot.TRAIL],
+            customBoat = customBoat,
+            atmosphere = atmosphere,
         )
 
         /** One full set, as unlocked by a legendary secret. */
