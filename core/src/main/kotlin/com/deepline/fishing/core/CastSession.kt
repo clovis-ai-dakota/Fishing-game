@@ -53,6 +53,8 @@ data class CastResult(
     val steered: Boolean = true,
     /** Battle clock left when the cast started (timed battles), else null. */
     val timeLeftAtStart: Float? = null,
+    /** Species that came into view during the cast (for the Dex; not scored, not sent online). */
+    val seenSpeciesIds: Set<String> = emptySet(),
 ) {
     /** Points from catches and snags, before fishing-secret bonuses. */
     val basePoints: Int get() = catches.sumOf { it.points } + snags.sumOf { it.points }
@@ -130,6 +132,9 @@ class CastSession(
     private val _bumpTimes = ArrayList<Float>()
     private var freePasses = 0
     private var steered = false
+    private val _seenSpecies = HashSet<String>()
+    /** Species that have come into view so far (see [GameConfig.SEEN_DISTANCE_M]). */
+    val seenSpeciesIds: Set<String> get() = _seenSpecies
     private val _snags = ArrayList<SnagRecord>()
     val snags: List<SnagRecord> get() = _snags
     /** The object hooked by the last bump, if any, riding up on the line. */
@@ -184,6 +189,20 @@ class CastSession(
             CastPhase.DESCENDING -> descend(dt)
             CastPhase.ASCENDING -> ascend(dt)
             CastPhase.SURFACED -> Unit
+        }
+        markSeen()
+    }
+
+    /** Records the species close enough to the hook to be seen (inside the lit circle when dark). */
+    private fun markSeen() {
+        val dark = Lighting.darkness(hookDepth) > 0.5f
+        val radius = if (dark) min(GameConfig.SEEN_DISTANCE_M, Lighting.visibleRadius(lanternActive)) else GameConfig.SEEN_DISTANCE_M
+        for (fish in world.fish) {
+            if (fish.species.id in _seenSpecies) continue
+            val dy = fish.depth - hookDepth
+            if (abs(dy) > radius) continue
+            val dx = fish.x - hookX
+            if (dx * dx + dy * dy <= radius * radius) _seenSpecies += fish.species.id
         }
     }
 
@@ -362,6 +381,7 @@ class CastSession(
             freePasses = freePasses,
             steered = steered,
             timeLeftAtStart = timeLeftAtStart,
+            seenSpeciesIds = _seenSpecies.toSet() + _catches.map { it.species.id },
         )
         pendingEvents += CastEvent.Surfaced
     }

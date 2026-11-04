@@ -28,7 +28,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.GameViewModel
 import com.deepline.fishing.Opponent
-import com.deepline.fishing.Screen
 import com.deepline.fishing.core.BattleMode
 import com.deepline.fishing.core.BotDifficulty
 import com.deepline.fishing.core.online.OnlineProtocol
@@ -45,7 +44,7 @@ fun BattleSetupScreen(vm: GameViewModel) {
     var opponentKey by rememberSaveable { mutableStateOf(BotDifficulty.NORMAL.name) }
     val p = vm.progress
 
-    SubScreen(title = "1v1 Battle", onBack = { vm.navigate(Screen.HOME) }) {
+    TabScreen(title = "1v1 Battle") {
         // A plain scrolling column (not a lazy list) so every section exists for the tour to scroll to.
         Column(
             modifier = Modifier

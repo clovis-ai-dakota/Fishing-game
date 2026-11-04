@@ -9,8 +9,9 @@ import com.deepline.fishing.core.online.OnlineProtocol
 
 /** A UI element a tour step can point at (see `Modifier.tourTarget`). */
 enum class TourTarget {
-    HOME_CAST, HOME_POINTS, HOME_LANTERN, HOME_BATTLE, HOME_TOUR,
-    UPGRADES_ROPE, COLLECTION_HEADER, MILESTONES_FIRST, BATTLE_MODES, BATTLE_OPPONENT,
+    HOME_CAST, HOME_POINTS, HOME_LANTERN, HOME_MILESTONES, HOME_TOUR,
+    NAV_BAR, TAB_DEX, TAB_UPGRADES, TAB_BATTLE,
+    UPGRADES_ROPE, DEX_HEADER, DEX_FILTERS, MILESTONES_FIRST, BATTLE_MODES, BATTLE_OPPONENT,
 }
 
 /** A small illustration shown in a tour card. */
@@ -44,8 +45,9 @@ object Tour {
      * 2: head-only bumps, smoother steering with an aim marker, fishing secrets.
      * 3: more secrets with bonuses that also count in battles, and skins.
      * 4: rope downgrades with a full refund, many more species, bolder skins and titles.
+     * 5: bottom tabs (Fish, Dex, Upgrades, Battle) and the Dex with seen and caught fish.
      */
-    const val VERSION = 4
+    const val VERSION = 5
 
     private val bumps = GameConfig.DESCENT_TOUCH_LIMIT
     private val bumpFree = GameConfig.BUMP_FREE_DEPTH.toInt()
@@ -62,11 +64,21 @@ object Tour {
             screen = Screen.HOME,
         ),
         TourStep(
+            id = "tabs",
+            title = "Four tabs",
+            body = "The bar at the bottom takes you everywhere: Fish is where you cast, the Dex collects every " +
+                "species you meet, Upgrades improves your rope, and Battle is for 1v1 matches.",
+            screen = Screen.HOME,
+            target = TourTarget.NAV_BAR,
+            sinceVersion = 5,
+        ),
+        TourStep(
             id = "cast",
             title = "Cast your line",
-            body = "Tap Cast line to drop your hook from the boat.",
+            body = "The big Cast line button at the bottom of the Fish tab drops your hook from the boat.",
             screen = Screen.HOME,
             target = TourTarget.HOME_CAST,
+            sinceVersion = 5,
         ),
         TourStep(
             id = "steer",
@@ -106,21 +118,22 @@ object Tour {
         TourStep(
             id = "points",
             title = "Score points",
-            body = "Deeper catches are worth more points. Sparkling fish (gold outline and glints) are worth " +
-                "${GameConfig.SPARKLING_MULTIPLIER}× more.",
+            body = "Deeper catches are worth more points, shown here at the top. Sparkling fish (gold outline " +
+                "and glints) are worth ${GameConfig.SPARKLING_MULTIPLIER}× more.",
             screen = Screen.HOME,
             target = TourTarget.HOME_POINTS,
             art = TourArt.SPARKLING,
+            sinceVersion = 5,
         ),
         TourStep(
             id = "upgrades",
             title = "Upgrade your rope",
-            body = "Spend points here. Rope Length lets you reach deeper zones and new fish, Rope Strength " +
-                "carries more weight, and Rope Agility steers faster. Changed your mind? Downgrade a level and " +
-                "get back every point it cost.",
+            body = "Spend points in the Upgrades tab. Rope Length lets you reach deeper zones and new fish, Rope " +
+                "Strength carries more weight, and Rope Agility steers faster. Changed your mind? Downgrade a " +
+                "level and get back every point it cost.",
             screen = Screen.UPGRADES,
             target = TourTarget.UPGRADES_ROPE,
-            sinceVersion = 4,
+            sinceVersion = 5,
         ),
         TourStep(
             id = "lantern",
@@ -132,33 +145,45 @@ object Tour {
             art = TourArt.DARKNESS,
         ),
         TourStep(
-            id = "log",
-            title = "Fill your Fish log",
-            body = "${FishCatalog.all.size} species live in ${DepthZone.entries.size} depth zones, some of them rare. " +
-                "Every catch is recorded here. Fish you haven't caught yet show as silhouettes, with the depths " +
-                "where they live.",
-            screen = Screen.COLLECTION,
-            target = TourTarget.COLLECTION_HEADER,
-            sinceVersion = 4,
+            id = "dex",
+            title = "Fill your Dex",
+            body = "${FishCatalog.all.size} species live in ${DepthZone.entries.size} depth zones, some of them " +
+                "rare, and each has a numbered card. A fish that swims close to your hook is marked as Seen: you " +
+                "learn its name and depths. Catch it to fill its card with its weight, points and your records.",
+            screen = Screen.DEX,
+            target = TourTarget.DEX_HEADER,
+            sinceVersion = 5,
+        ),
+        TourStep(
+            id = "dex_filters",
+            title = "Browse by zone",
+            body = "Filter the cards by depth zone, or show only the fish you've caught. Tap a card to open its " +
+                "page, then swipe to flip through the Dex.",
+            screen = Screen.DEX,
+            target = TourTarget.DEX_FILTERS,
+            sinceVersion = 5,
         ),
         TourStep(
             id = "milestones",
             title = "Milestone rewards",
             body = "Every point you earn counts towards milestone rewards (bonus points and Lanterns), even after " +
-                "you spend it. Claim them here.",
+                "you spend it. The trophy at the top of the Fish tab opens them, with a badge when one is ready " +
+                "to claim.",
             screen = Screen.MILESTONES,
             target = TourTarget.MILESTONES_FIRST,
+            sinceVersion = 5,
         ),
         TourStep(
             id = "secrets",
             title = "Fishing secrets",
             body = "Some tricks are only found by playing, and they pay off: every time you pull one off it adds " +
                 "a bonus to the cast, in battles too. The first time, it's explained on the spot and earns a " +
-                "discovery reward, and a Secrets button appears on the home screen. The rarest secrets also " +
-                "unlock Skins for your $skinSlots, plus a title shown under your name, in online battles " +
-                "too. They're made to show off: looks only, never an advantage.",
-            screen = Screen.HOME,
-            sinceVersion = 4,
+                "discovery reward, and a Secrets section appears in the Dex. The rarest secrets also unlock " +
+                "Skins for your $skinSlots, plus a title shown under your name, in online battles too. They're " +
+                "made to show off: looks only, never an advantage.",
+            screen = Screen.DEX,
+            target = TourTarget.TAB_DEX,
+            sinceVersion = 5,
         ),
         TourStep(
             id = "battle",
@@ -180,9 +205,10 @@ object Tour {
         TourStep(
             id = "replay",
             title = "That's it, good fishing!",
-            body = "You can replay this tour any time with this button.",
+            body = "You can replay this tour any time with the ? button at the top of the Fish tab.",
             screen = Screen.HOME,
             target = TourTarget.HOME_TOUR,
+            sinceVersion = 5,
         ),
     )
 

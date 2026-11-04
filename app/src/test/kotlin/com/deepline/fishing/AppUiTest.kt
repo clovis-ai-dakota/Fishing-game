@@ -8,6 +8,7 @@ import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onFirst
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performClick
@@ -118,6 +119,9 @@ class AppUiTest {
         node.performClick()
     }
 
+    /** Taps a tab of the bottom navigation bar. */
+    private fun ComposeTestRule.tab(name: String) = onNodeWithTag("tab_$name").performClick()
+
     @Test
     fun freshPlayerCastsAndCollects() {
         launch()
@@ -138,44 +142,9 @@ class AppUiTest {
     }
 
     @Test
-    fun deepCastWithLanternAndFullerLog() {
-        val caught = FishCatalog.all.take(9).associate { it.id to CollectionEntry(3, 1, it.minDepth + 10f, it.basePoints * 3) }
-        launch(
-            PlayerProgress(
-                pointsBalance = 12_345,
-                pointsEarned = 30_000,
-                ropeLevels = mapOf(RopeStat.LENGTH to 10, RopeStat.STRENGTH to 8, RopeStat.AGILITY to 6),
-                lanterns = 3,
-                collection = caught,
-                castsMade = 42,
-            ),
-        )
-        compose.shot("04_home_progressed")
-
-        compose.click("Log ", substring = true)
-        compose.shot("05_fish_log")
-        compose.click("‹ Back")
-
-        compose.click("Upgrades")
-        compose.shot("06_upgrades")
-        compose.click("‹ Back")
-
-        compose.click("Rewards")
-        compose.shot("07_milestones")
-        compose.click("‹ Back")
-
-        compose.click("Cast line")
-        compose.mainClock.autoAdvance = false
-        // Sink towards the dark zone (it may turn back early after 4 bumps).
-        compose.advanceSeconds(16f)
-        compose.shot("08_cast_deep")
-        compose.mainClock.autoAdvance = true
-    }
-
-    @Test
     fun battleAgainstTheComputer() {
         launch()
-        compose.click("1v1 Battle")
+        compose.tab("battle")
         compose.shot("09_battle_setup")
         compose.click("Start battle")
         compose.shot("10_battle_hub")
@@ -195,7 +164,7 @@ class AppUiTest {
     @Test
     fun onlineLobby() {
         launch()
-        compose.click("1v1 Battle")
+        compose.tab("battle")
         compose.click("Online (room code or quick match)")
         compose.click("Go online")
         compose.onNodeWithText("Create room").assertExists()

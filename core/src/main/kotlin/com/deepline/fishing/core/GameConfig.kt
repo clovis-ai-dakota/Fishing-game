@@ -72,6 +72,15 @@ object GameConfig {
     /** A fish counts as "just turned" at the edge for this long (Corner pocket). */
     const val WALL_TURN_WINDOW = 0.3f
 
+    /**
+     * Dex: a fish is "seen" (name and depths shown in the Dex) when it comes this close to the
+     * hook. In dark water it must also be inside the lit circle around the hook.
+     */
+    const val SEEN_DISTANCE_M = 10f
+
+    /** Dex rarity stars: a species gets one extra star per value its spawn weight is at or below. */
+    val RARITY_STAR_WEIGHTS = listOf(17, 9, 4, 0)
+
     const val LANTERN_PRICE = 600
     const val STARTING_LANTERNS = 1
 

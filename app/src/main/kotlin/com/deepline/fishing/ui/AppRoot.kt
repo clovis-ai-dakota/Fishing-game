@@ -24,9 +24,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.GameViewModel
 import com.deepline.fishing.Screen
+import com.deepline.fishing.ui.dex.FishDetailScreen
 import com.deepline.fishing.ui.secrets.FishingSecrets
 import com.deepline.fishing.ui.secrets.SecretDiscoveredDialog
-import com.deepline.fishing.ui.secrets.SecretsScreen
 import com.deepline.fishing.ui.tour.LocalTourTargets
 import com.deepline.fishing.ui.tour.TourOverlay
 import com.deepline.fishing.ui.tour.TourTargets
@@ -39,16 +39,14 @@ fun AppRoot(vm: GameViewModel) {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             Box(Modifier.fillMaxSize()) {
                 when (vm.screen) {
-                    Screen.HOME -> HomeScreen(vm)
+                    // The four tabs share the bottom navigation bar.
+                    Screen.HOME, Screen.DEX, Screen.UPGRADES, Screen.BATTLE_SETUP -> MainScaffold(vm)
+                    // Full screens, without the bar.
                     Screen.CAST -> CastScreen(vm)
-                    Screen.UPGRADES -> UpgradesScreen(vm)
-                    Screen.COLLECTION -> CollectionScreen(vm)
+                    Screen.FISH_DETAIL -> FishDetailScreen(vm)
                     Screen.MILESTONES -> MilestonesScreen(vm)
-                    Screen.BATTLE_SETUP -> BattleSetupScreen(vm)
                     Screen.BATTLE -> BattleScreen(vm)
                     Screen.ONLINE_LOBBY -> OnlineLobbyScreen(vm)
-                    Screen.SECRETS -> SecretsScreen(vm)
-                    Screen.SKINS -> SkinsScreen(vm)
                 }
                 vm.tour?.let { TourOverlay(it, onNext = vm::tourNext, onBack = vm::tourBack, onSkip = vm::skipTour) }
             }
@@ -64,7 +62,7 @@ fun AppRoot(vm: GameViewModel) {
                 text = {
                     Text(
                         "Should the tour open again the next time you start Deep Line? You can also take it " +
-                            "any time with the Take the tour button on the home screen.",
+                            "any time with the ? button at the top of the Fish tab.",
                     )
                 },
                 confirmButton = { TextButton(onClick = { vm.answerTourAgain(true) }) { Text("Yes, next time") } },

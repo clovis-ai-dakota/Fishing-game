@@ -10,6 +10,7 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onFirst
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
@@ -193,7 +194,7 @@ class OnlineUiTest {
         }
         scenario = ActivityScenario.launch(MainActivity::class.java)
 
-        compose.click("1v1 Battle")
+        compose.onNodeWithTag("tab_battle").performClick()
         compose.click("Heavy Haul")
         compose.click("Online (room code or quick match)")
         compose.click("Go online")

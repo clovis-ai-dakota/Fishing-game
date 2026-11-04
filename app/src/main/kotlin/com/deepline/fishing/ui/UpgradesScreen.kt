@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.GameViewModel
-import com.deepline.fishing.Screen
 import com.deepline.fishing.core.GameConfig
 import com.deepline.fishing.core.Progression
 import com.deepline.fishing.core.RopeStat
@@ -36,7 +35,7 @@ fun formatStat(stat: RopeStat, value: Float): String = when (stat) {
 @Composable
 fun UpgradesScreen(vm: GameViewModel) {
     val p = vm.progress
-    SubScreen(title = "Rope upgrades", onBack = { vm.navigate(Screen.HOME) }) {
+    TabScreen(title = "Rope upgrades") {
         LazyColumn(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),

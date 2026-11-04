@@ -19,11 +19,43 @@ All art is drawn in code (no image assets).
 - **Lantern.** Below 300 m the water goes dark and you only see a small circle around the hook.
   A Lantern (toggle it on before casting; one is used per cast) widens the lit circle.
 
+### Navigation
+
+Four tabs in a bottom navigation bar (Material 3: 3 to 5 top-level destinations, always
+labelled, in the thumb zone), so every main area is one tap away:
+
+- **Fish**: the hub. One dominant **Cast line** button at the bottom with the Lantern switch next
+  to it, your rope's reach drawn over the depth zones, Dex and milestone progress. The top bar
+  holds your points, a trophy (with a badge when a milestone can be claimed) that opens
+  Milestones, and **?** to replay the tour.
+- **Dex**: the collection (see below).
+- **Upgrades**: rope upgrades and downgrades, and the Lantern shop.
+- **Battle**: battle setup and the way online.
+
+Casts, battles, the online lobby, Milestones and Dex pages are full screens without the bar.
+System back goes from any tab to Fish, then leaves the app.
+
+### Dex
+
+A numbered card for every species (#001 to #200), in a dense grid with zone-coloured frames,
+filters by zone (and "caught only"), and a completion ring. A species is **Seen** once it swims
+within 10 m of your hook (`GameConfig.SEEN_DISTANCE_M`; in dark water it must also be inside the
+lit circle): its card shows a silhouette in its own colour, its name and depths. **Caught**
+fills in its weight, base points, rarity stars and your records. Unknown species are a dark
+silhouette with "???" and their depths. Tap a card for its page, and swipe to flip through the
+Dex. Seen fish are only a log feature: not scored and not sent online.
+
+Once found, **Secrets** and **Skins** sections appear next to Species. The Secrets section has a
+card for every secret: found ones show their name and picture and open their explanation; locked
+ones show only their number, tier and discovery reward ("a legendary skin set" for tier 5, never
+the set's name). The Skins section is a library of every legendary set, with an animated preview:
+tap a tile to wear it, tap again to go back to the classic look. Locked tiles show only their slot.
+
 ### Fishing secrets (spoilers)
 
 Hidden mechanics, explained in game the first time they happen (with a "show this again next
-time?" question) and then listed under **Fishing secrets** on the home screen. The tour hints that
-secrets exist but never reveals them.
+time?" question) and then listed in the Dex's **Secrets** section. The tour hints that secrets
+exist but never reveals them.
 
 Every secret adds a **bonus to the cast every time** it's pulled off (solo and in battles, for
 the computer rival too; online, the server recomputes it from the cast) and gives a **one-time
@@ -32,7 +64,7 @@ discovery reward**. Cast-wide multipliers add up rather than compound. Numbers l
 
 | Tier | Secret | Trigger | Each time | Discovery reward |
 | --- | --- | --- | --- | --- |
-| — | The last bump hooks what it hits | The 4th bump hooks the fish whose head it hit (even over the weight limit) or snags the object: the only way to land rocks (200), driftwood (100) and jellies (150 base, × depth) | the hooked catch | — |
+| 1 | The last bump hooks what it hits | The 4th bump hooks the fish whose head it hit (even over the weight limit) or snags the object: the only way to land rocks (200), driftwood (100) and jellies (150 base, × depth) | the hooked catch | — |
 | 1 | Free pass | 3 fish heads passed through in the bump-free first 30 m | +50 | 250 |
 | 1 | Schooling | 3+ fish of one species in a cast | +100 | 300 |
 | 1 | Surface skim | A fish caught on the way up shallower than 10 m | +50 | 300 |
@@ -73,7 +105,7 @@ cast, so they are bounded but trusted.
 ### Skins
 
 Legendary (tier 5) secrets each unlock a full set of five cosmetics, chosen per slot in the
-**Skins** screen (with an animated preview). The button appears once something is unlocked.
+Dex's **Skins** section (with an animated preview), which appears once something is unlocked.
 
 | Set (secret) | Hook | Line | Boat | Bubble trail | Title |
 | --- | --- | --- | --- | --- | --- |
@@ -81,28 +113,28 @@ Legendary (tier 5) secrets each unlock a full set of five cosmetics, chosen per 
 | Prismatic (Perfect cast) | Prism hook cycling colours | Rainbow line | Prism sail, rainbow trim | Prism trail | Perfectionist |
 | Sovereign (Master angler) | Crown hook in gold | Golden line with glints | Royal boat: purple crowned sail, gold trim | Golden trail | Master angler |
 
-The title shows under your name on the home screen and in battles (online opponents see it too).
+The title shows under your name on the Fish tab and in battles (online opponents see it too).
 Skins are purely visual: same hook size and hitbox, and all the effects are drawn under the
 darkness layer and only around your own gear, so they never light up dark water or reveal fish.
 
 ### Guided tour
 
 On first launch a guided tour walks through the game: it highlights each part of the app and
-explains casting, steering, bumps, heads, weight, points, upgrades, Lanterns, the fish log,
+explains the tabs, casting, steering, bumps, heads, weight, points, upgrades, Lanterns, the Dex,
 milestones and battles. It can be skipped at any time; when it closes, it asks whether to show
-it again next time. **Take the tour** on the home screen replays it. When new features add tour
+it again next time. The **?** button at the top of the Fish tab replays it. When new features add tour
 steps, returning players get a short "What's new" tour of just those steps
 (`app/.../ui/tour/Tour.kt`).
 
 ### Around the casts
 
 There is no time limit: it is an ongoing collection game. Explore deeper zones as your rope
-improves and try to fill the fish log.
+improves and try to fill the Dex.
 
-- **Fish log.** 200 species across 4 depth zones (Sunlit Shallows, Twilight Reef, Midnight
+- **Species.** 200 species across 4 depth zones (Sunlit Shallows, Twilight Reef, Midnight
   Trench, Abyssal Floor): 16 hand-made ones, 183 generated from a fixed seed
-  (`core/.../SpeciesGenerator.kt`) and the legendary Deep Sovereign. It records count, Sparkling count, deepest catch and best score per
-  species. Undiscovered fish show as silhouettes.
+  (`core/.../SpeciesGenerator.kt`) and the legendary Deep Sovereign. The Dex records count,
+  Sparkling count, deepest catch and best score per species.
 - **Points and milestones.** Every catch earns points. Milestones are based on the lifetime
   total earned, so spending points never loses milestone progress. Milestones reward bonus
   points and Lanterns.
@@ -171,7 +203,7 @@ core/   Pure Kotlin game logic (no Android dependency) + unit tests
         Entities.kt        fish, obstacles, hit-tests (head vs. body)
         Scoring.kt         points and lighting
         WorldGenerator.kt  spawns fish/obstacles by depth zone
-        Progress.kt        points, milestones, upgrades, fish log
+        Progress.kt        points, milestones, upgrades, fish log, Dex states (seen / caught)
         Battle.kt          1v1 battle modes, turns, scoring
         Bot.kt             computer rival
         Persistence.kt     save/load (key=value text)
@@ -182,7 +214,10 @@ app/    Android app (Jetpack Compose)
         OnlineConnection.kt WebSocket client (Ktor + OkHttp)
         ui/CastScreen.kt   game loop, HUD, pause, results
         ui/CastRenderer.kt underwater scene drawn on a Canvas
-        ui/*Screen.kt      home, upgrades, fish log, milestones, battle setup / hub
+        ui/MainScaffold.kt the four tabs (bottom navigation bar)
+        ui/dex/            the Dex: species grid and pages, secrets, skins library, FishPortrait
+        ui/GameIcons.kt    icons drawn in code
+        ui/*Screen.kt      Fish tab (HomeScreen), upgrades, milestones, battle setup / hub
 ```
 
 ## Building

@@ -40,7 +40,26 @@ import com.deepline.fishing.ui.tour.Tour
 import com.deepline.fishing.ui.tour.TourSession
 import kotlin.random.Random
 
-enum class Screen { HOME, CAST, UPGRADES, COLLECTION, MILESTONES, BATTLE_SETUP, BATTLE, ONLINE_LOBBY, SECRETS, SKINS }
+/**
+ * Where the player is. [HOME] (the Fish tab), [DEX], [UPGRADES] and [BATTLE_SETUP] are the four
+ * bottom-bar tabs; the others are full screens pushed on top of them (no tab bar).
+ */
+enum class Screen { HOME, DEX, UPGRADES, BATTLE_SETUP, CAST, FISH_DETAIL, MILESTONES, BATTLE, ONLINE_LOBBY }
+
+/** The four top-level destinations of the bottom navigation bar, in order. */
+enum class MainTab(val label: String, val screen: Screen) {
+    FISH("Fish", Screen.HOME),
+    DEX("Dex", Screen.DEX),
+    UPGRADES("Upgrades", Screen.UPGRADES),
+    BATTLE("Battle", Screen.BATTLE_SETUP);
+
+    companion object {
+        fun of(screen: Screen): MainTab? = entries.firstOrNull { it.screen == screen }
+    }
+}
+
+/** The sections of the Dex tab. Secrets and Skins only appear once something is found. */
+enum class DexSection(val label: String) { FISH("Species"), SECRETS("Secrets"), SKINS("Skins") }
 
 /** A short message flashed over the game screen. */
 data class Notice(val text: String, val shownAtSeconds: Float)
@@ -61,6 +80,11 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     var progress by mutableStateOf(repository.load())
         private set
     var screen by mutableStateOf(Screen.HOME)
+        private set
+    var dexSection by mutableStateOf(DexSection.FISH)
+        private set
+    /** The species shown by the Dex detail page (an index in `FishCatalog.all`). */
+    var dexFishIndex by mutableIntStateOf(0)
         private set
     var useLantern by mutableStateOf(false)
         private set
@@ -131,7 +155,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         if (this.session != null) return
         askTourAgain = false
         tour = session
-        screen = session.current.screen
+        showTourStep(session)
     }
 
     fun tourNext() {
@@ -139,7 +163,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         if (t.isLast) return endTour()
         val next = t.copy(index = t.index + 1)
         tour = next
-        screen = next.current.screen
+        showTourStep(next)
     }
 
     fun tourBack() {
@@ -147,7 +171,12 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         if (t.isFirst) return
         val previous = t.copy(index = t.index - 1)
         tour = previous
-        screen = previous.current.screen
+        showTourStep(previous)
+    }
+
+    private fun showTourStep(t: TourSession) {
+        screen = t.current.screen
+        if (screen == Screen.DEX) dexSection = DexSection.FISH
     }
 
     /** Skipping and finishing both close the tour and ask about next time. */
@@ -173,6 +202,38 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     fun navigate(target: Screen) {
         if (target == Screen.CAST) return startCast()
         screen = target
+    }
+
+    /** A tap on the bottom navigation bar. */
+    fun selectTab(tab: MainTab) {
+        screen = tab.screen
+    }
+
+    /** Opens the Dex on [section] (falls back to Species if that section isn't unlocked yet). */
+    fun openDex(section: DexSection = dexSection) {
+        dexSection = if (section in availableDexSections) section else DexSection.FISH
+        screen = Screen.DEX
+    }
+
+    /** Dex sections the player can open: Secrets once one is found, Skins once one is unlocked. */
+    val availableDexSections: List<DexSection>
+        get() = DexSection.entries.filter {
+            when (it) {
+                DexSection.FISH -> true
+                DexSection.SECRETS -> progress.discoveredSecrets.isNotEmpty()
+                DexSection.SKINS -> progress.unlockedCosmetics.isNotEmpty()
+            }
+        }
+
+    /** Opens the Dex page of the species at [index] in `FishCatalog.all`. */
+    fun openFishDetail(index: Int) {
+        dexFishIndex = index
+        screen = Screen.FISH_DETAIL
+    }
+
+    /** Remembers which page the detail pager is on, so back returns to the right place. */
+    fun showFishDetail(index: Int) {
+        dexFishIndex = index
     }
 
     fun toggleLantern(enabled: Boolean) {
@@ -464,7 +525,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             onBattleChanged()
         }
         clearBattle()
-        screen = if (wasOnline) Screen.ONLINE_LOBBY else Screen.HOME
+        screen = if (wasOnline) Screen.ONLINE_LOBBY else Screen.BATTLE_SETUP
     }
 
     private fun clearBattle() {
@@ -492,16 +553,18 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    /** Handles the system back button. */
+    /**
+     * Handles the system back button: a pushed screen goes back to where it came from, any other
+     * tab goes back to the Fish tab, and on the Fish tab back leaves the app (not handled here).
+     */
     fun onBack() {
         when (screen) {
             Screen.HOME -> Unit
             Screen.CAST -> if (pendingResult != null) collectResult() else if (paused) resume() else pause()
             Screen.BATTLE -> if (battle?.isOver != false) leaveBattle() else Unit
-            Screen.BATTLE_SETUP -> screen = Screen.HOME
             Screen.ONLINE_LOBBY -> closeOnlineLobby()
-            Screen.SECRETS, Screen.SKINS -> screen = Screen.HOME
-            else -> screen = Screen.HOME
+            Screen.FISH_DETAIL -> screen = Screen.DEX
+            Screen.DEX, Screen.UPGRADES, Screen.BATTLE_SETUP, Screen.MILESTONES -> screen = Screen.HOME
         }
     }
 

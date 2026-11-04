@@ -8,6 +8,7 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onFirst
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -84,7 +85,13 @@ class TourUiTest {
         compose.onNodeWithText("Welcome to Deep Line!").assertExists()
         compose.shot("22_tour_welcome")
 
-        val shots = mapOf("descent" to "23_tour_bumps", "upgrades" to "24_tour_upgrades", "opponents" to "25_tour_opponents")
+        val shots = mapOf(
+            "tabs" to "22b_tour_tabs",
+            "descent" to "23_tour_bumps",
+            "upgrades" to "24_tour_upgrades",
+            "dex" to "24b_tour_dex",
+            "opponents" to "25_tour_opponents",
+        )
         Tour.steps.forEachIndexed { i, step ->
             assertEquals("step ${step.id} is showing", true, isShowing(step.title))
             compose.onNodeWithText("${i + 1} / ${Tour.steps.size}").assertExists()
@@ -110,7 +117,7 @@ class TourUiTest {
         launch()
         assertEquals(false, isShowing("Welcome to Deep Line!"))
 
-        compose.click("Take the tour")
+        compose.onNodeWithContentDescription("Take the tour").performClick()
         compose.onNodeWithText("Welcome to Deep Line!").assertExists()
         compose.click("Next")
         compose.click("Skip tour")
