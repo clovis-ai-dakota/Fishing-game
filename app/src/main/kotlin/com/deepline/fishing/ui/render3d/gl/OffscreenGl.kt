@@ -106,7 +106,7 @@ object OffscreenGl {
         if (context == EGL14.EGL_NO_CONTEXT) return false
         surface = EGL14.eglCreatePbufferSurface(display, config, intArrayOf(EGL14.EGL_WIDTH, 16, EGL14.EGL_HEIGHT, 16, EGL14.EGL_NONE), 0)
         if (!EGL14.eglMakeCurrent(display, surface, surface, context)) return false
-        backend = GlBackend(appContext.assets) { Render3d.failed = true }.also { it.onSurfaceCreated(null, null) }
+        backend = GlBackend(appContext.assets, onError = { Render3d.failed = true }).also { it.onSurfaceCreated(null, null) }
         return backend?.hasFailed == false
     }
 

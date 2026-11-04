@@ -34,8 +34,18 @@ object Render3d {
 }
 
 /** A GL surface that draws whatever [Frame] it was last given. */
-class Scene3dView(context: Context) : GLSurfaceView(context) {
-    private val backend = GlBackend(context.assets) { post { Render3d.failed = true } }
+class Scene3dView(context: Context, onFirstFrame: () -> Unit = {}) : GLSurfaceView(context) {
+    private var drewOne = false
+    private val backend = GlBackend(
+        context.assets,
+        onError = { post { Render3d.failed = true } },
+        onFrameDrawn = {
+            if (!drewOne) {
+                drewOne = true
+                post(onFirstFrame)
+            }
+        },
+    )
 
     init {
         setEGLContextClientVersion(3)
@@ -55,6 +65,10 @@ class Scene3dView(context: Context) : GLSurfaceView(context) {
 class Scene3dHandle {
     internal var view: Scene3dView? = null
 
+    /** True once the 3D view has drawn a frame (until then, the screen shows the 2D scene). */
+    var ready by mutableStateOf(false)
+        internal set
+
     /** Builds a frame for the view's current size (once it has one) and shows it. */
     fun render(build: (widthPx: Int, heightPx: Int) -> Frame) {
         val v = view ?: return
@@ -67,7 +81,7 @@ class Scene3dHandle {
 fun Scene3d(handle: Scene3dHandle, modifier: Modifier = Modifier) {
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     AndroidView(
-        factory = { ctx -> Scene3dView(ctx).also { handle.view = it } },
+        factory = { ctx -> Scene3dView(ctx) { handle.ready = true }.also { handle.view = it } },
         modifier = modifier,
         onRelease = { if (handle.view === it) handle.view = null },
     )

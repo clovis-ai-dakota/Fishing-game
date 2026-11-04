@@ -144,7 +144,8 @@ fun CastScreen(vm: GameViewModel) {
                     }
                 },
         ) {
-            if (use3d) drawCastOverlay(session, time, textMeasurer, aimX = steer.targetX())
+            // Until the 3D view has drawn its first frame, the 2D scene covers it (no black flash).
+            if (use3d && scene3d.ready) drawCastOverlay(session, time, textMeasurer, aimX = steer.targetX())
             else drawCastScene(session, time, textMeasurer, aimX = steer.targetX(), skins = skins)
         }
 

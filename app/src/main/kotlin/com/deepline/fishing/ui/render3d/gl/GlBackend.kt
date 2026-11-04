@@ -25,7 +25,12 @@ import javax.microedition.khronos.opengles.GL10
  * checks the shaders with WebGL2). Any shader failure is reported once through [onError] so the
  * app can fall back to the 2D renderer.
  */
-class GlBackend(private val assets: AssetManager, private val onError: (String) -> Unit) : GLSurfaceView.Renderer {
+class GlBackend(
+    private val assets: AssetManager,
+    private val onError: (String) -> Unit,
+    /** Called (on the GL thread) after each frame drawn from a submitted [Frame]. */
+    private val onFrameDrawn: () -> Unit = {},
+) : GLSurfaceView.Renderer {
     private val latest = AtomicReference<Frame?>(null)
     private val programs = HashMap<Program, GlProgram>()
     private val meshes = HashMap<String, GlMesh>()
@@ -69,6 +74,7 @@ class GlBackend(private val assets: AssetManager, private val onError: (String) 
         val frame = latest.get() ?: return
         try {
             draw(frame)
+            if (!failed) onFrameDrawn()
         } catch (e: Exception) {
             fail("Draw: ${e.message}")
         }
