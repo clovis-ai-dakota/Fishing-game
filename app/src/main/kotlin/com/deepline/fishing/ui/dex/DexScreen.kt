@@ -16,8 +16,9 @@ import com.deepline.fishing.core.FishCatalog
 import com.deepline.fishing.ui.TabScreen
 
 /**
- * The Dex tab: numbered cards for every species (and, once found, every secret and skin). The
- * Secrets and Skins sections only appear after the first secret or skin is found.
+ * The Dex tab: numbered cards for every species, every secret (once one is found) and the skins.
+ * The Secrets section only appears after the first secret is found; Skins (with boat
+ * customisation, the shop and the atmosphere) is always there.
  */
 @Composable
 fun DexScreen(vm: GameViewModel) {

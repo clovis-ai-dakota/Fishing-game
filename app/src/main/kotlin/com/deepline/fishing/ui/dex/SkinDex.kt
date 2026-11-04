@@ -47,21 +47,30 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import com.deepline.fishing.GameViewModel
+import com.deepline.fishing.core.Atmosphere
 import com.deepline.fishing.core.Cosmetic
 import com.deepline.fishing.core.CosmeticSlot
+import com.deepline.fishing.core.DepthZone
 import com.deepline.fishing.ui.GameIcons
 import com.deepline.fishing.ui.SkinPreview
-import com.deepline.fishing.ui.Skins
 import com.deepline.fishing.ui.TitleBadge
-import com.deepline.fishing.ui.drawBoatRig
-import com.deepline.fishing.ui.drawCabin
+import com.deepline.fishing.ui.drawBoat
+import com.deepline.fishing.ui.drawBoatTile
 import com.deepline.fishing.ui.drawHook
 import com.deepline.fishing.ui.drawHookAura
 import com.deepline.fishing.ui.drawHookTrail
 import com.deepline.fishing.ui.drawSkinnedLine
-import com.deepline.fishing.ui.hullBrush
-import com.deepline.fishing.ui.trimBrush
+import com.deepline.fishing.ui.tour.TourTarget
+import com.deepline.fishing.ui.tour.tourTarget
 import kotlin.math.min
 
 /**
@@ -86,7 +95,17 @@ fun SkinDex(vm: GameViewModel) {
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        item(key = "preview", span = { GridItemSpan(maxLineSpan) }) { SkinPreview(Skins.of(p.equippedSkins), height = 240.dp) }
+        item(key = "preview", span = { GridItemSpan(maxLineSpan) }) { SkinPreview(vm.skins, height = 240.dp) }
+        item(key = "boat", span = { GridItemSpan(maxLineSpan) }) { YourBoatCard(vm, time) }
+        item(key = "atmosphere", span = { GridItemSpan(maxLineSpan) }) { AtmosphereCard(vm) }
+        item(key = "legendary", span = { GridItemSpan(maxLineSpan) }) {
+            Text(
+                "Legendary skins",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(top = 8.dp),
+            )
+        }
         item(key = "note", span = { GridItemSpan(maxLineSpan) }) {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 vm.title?.let { t ->
@@ -190,6 +209,82 @@ private fun SkinTile(c: Cosmetic, unlocked: Boolean, equipped: Boolean, time: Fl
 
 private val TileWater = Brush.verticalGradient(listOf(Color(0xFF0288D1), Color(0xFF01396B)))
 
+/** The hand-made boat: wear it, design it, or browse the shop's premade boats. */
+@Composable
+private fun YourBoatCard(vm: GameViewModel, time: Float) {
+    val p = vm.progress
+    Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) {
+        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Your boat", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                Canvas(
+                    Modifier
+                        .size(width = 120.dp, height = 92.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .semantics { contentDescription = "Your hand-made boat" },
+                ) { drawBoatTile(null, p.boatDesign, time) }
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(
+                        "Paint and rig it yourself. Basic options are free; more unlock with points and as you progress.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    if (p.customBoatEquipped) {
+                        TextButton(onClick = { vm.equipCustomBoat(false) }) { Text("Worn ✓ · use the classic boat") }
+                    } else {
+                        TextButton(onClick = { vm.equipCustomBoat(true) }) { Text("Wear my boat") }
+                    }
+                }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(onClick = vm::openBoatEditor, modifier = Modifier.weight(1f).tourTarget(TourTarget.SKINS_CUSTOMISE)) { Text("Customise boat") }
+                OutlinedButton(onClick = vm::openShop, modifier = Modifier.weight(1f)) { Text("Premium skins") }
+            }
+        }
+    }
+}
+
+/** Family (default) or Nightmare deep water: locked until the Abyssal Floor is reached. */
+@Composable
+private fun AtmosphereCard(vm: GameViewModel) {
+    val p = vm.progress
+    Card(Modifier.fillMaxWidth().tourTarget(TourTarget.SKINS_ATMOSPHERE), shape = RoundedCornerShape(14.dp)) {
+        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Atmosphere", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                if (!p.atmosphereUnlocked) Icon(GameIcons.Lock, contentDescription = "Locked", modifier = Modifier.size(18.dp))
+            }
+            if (!p.atmosphereUnlocked) {
+                Text(
+                    "Reach the ${DepthZone.ABYSS.displayName} to unlock ${Atmosphere.NIGHTMARE.displayName}: a frightening " +
+                        "look for the deep water.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            } else {
+                SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+                    Atmosphere.entries.forEachIndexed { i, a ->
+                        SegmentedButton(
+                            selected = p.atmosphere == a,
+                            onClick = { vm.setAtmosphere(a) },
+                            shape = SegmentedButtonDefaults.itemShape(i, Atmosphere.entries.size),
+                        ) { Text(a.displayName) }
+                    }
+                }
+                Text(
+                    if (p.atmosphere == Atmosphere.NIGHTMARE) {
+                        "The deep is properly frightening. You still see exactly as much as before: only the mood changes."
+                    } else {
+                        "Harmless at the surface, spookier the deeper you go."
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
 /** Draws [block] as a flat dark silhouette. */
 private fun DrawScope.drawSilhouette(block: DrawScope.() -> Unit) {
     drawIntoCanvas { canvas ->
@@ -224,26 +319,7 @@ private fun DrawScope.drawSlotArt(slot: CosmeticSlot, c: Cosmetic?, time: Float)
         }
         CosmeticSlot.BOAT -> {
             drawRect(Brush.verticalGradient(listOf(Color(0xFF8FD3F4), Color(0xFFD7F1FF))), size = size.copy(height = h * 0.8f))
-            val scale = min(w / 6f, h / 6.6f)
-            val cx = w / 2f
-            val surfaceY = h * 0.8f
-            drawBoatRig(cx, surfaceY, scale, time, c)
-            val hull = Path().apply {
-                moveTo(cx - 2.5f * scale, surfaceY - 1.0f * scale)
-                lineTo(cx + 2.5f * scale, surfaceY - 1.0f * scale)
-                quadraticTo(cx + 2.2f * scale, surfaceY + 0.2f * scale, cx + 1.5f * scale, surfaceY + 0.4f * scale)
-                lineTo(cx - 1.5f * scale, surfaceY + 0.4f * scale)
-                quadraticTo(cx - 2.2f * scale, surfaceY + 0.2f * scale, cx - 2.5f * scale, surfaceY - 1.0f * scale)
-                close()
-            }
-            drawPath(hull, hullBrush(c, surfaceY - 1f * scale, surfaceY + 0.4f * scale, time))
-            drawLine(
-                trimBrush(c, cx - 2.4f * scale, cx + 2.4f * scale, time),
-                Offset(cx - 2.4f * scale, surfaceY - 0.9f * scale),
-                Offset(cx + 2.4f * scale, surfaceY - 0.9f * scale),
-                strokeWidth = maxOf(3f, 0.16f * scale),
-            )
-            drawCabin(cx, surfaceY, scale, c)
+            drawBoat(w / 2f, h * 0.8f, min(w / 6f, h / 6.6f), time, c)
         }
         CosmeticSlot.TRAIL -> {
             val scale = h / 4.2f

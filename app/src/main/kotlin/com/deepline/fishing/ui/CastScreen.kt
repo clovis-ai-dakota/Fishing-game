@@ -77,7 +77,7 @@ fun CastScreen(vm: GameViewModel) {
     val steer = remember(session) { SteerInput() }
     var time by remember(session) { mutableFloatStateOf(0f) }
     val textMeasurer = rememberTextMeasurer()
-    val skins = Skins.of(vm.progress.equippedSkins)
+    val skins = vm.skins
     // The 3D renderer where the phone supports it (and it hasn't failed), otherwise 2D.
     val context = androidx.compose.ui.platform.LocalContext.current
     val use3d = remember { com.deepline.fishing.ui.render3d.gl.Render3d.isSupported(context) } &&

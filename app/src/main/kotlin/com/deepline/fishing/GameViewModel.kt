@@ -7,11 +7,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.deepline.fishing.core.Atmosphere
 import com.deepline.fishing.core.Battle
 import com.deepline.fishing.core.BattleCast
 import com.deepline.fishing.core.BattleMode
 import com.deepline.fishing.core.BattlePlayer
 import com.deepline.fishing.core.BattleTurn
+import com.deepline.fishing.core.BoatDesign
+import com.deepline.fishing.core.BoatPart
 import com.deepline.fishing.core.BotDifficulty
 import com.deepline.fishing.core.BotPlayer
 import com.deepline.fishing.core.CastEvent
@@ -36,6 +39,7 @@ import com.deepline.fishing.core.online.OnlineMatch
 import com.deepline.fishing.core.online.OnlineProtocol
 import com.deepline.fishing.core.online.ServerMessage
 import com.deepline.fishing.core.online.toDto
+import com.deepline.fishing.ui.Skins
 import com.deepline.fishing.ui.tour.Tour
 import com.deepline.fishing.ui.tour.TourSession
 import kotlin.random.Random
@@ -44,7 +48,7 @@ import kotlin.random.Random
  * Where the player is. [HOME] (the Fish tab), [DEX], [UPGRADES] and [BATTLE_SETUP] are the four
  * bottom-bar tabs; the others are full screens pushed on top of them (no tab bar).
  */
-enum class Screen { HOME, DEX, UPGRADES, BATTLE_SETUP, CAST, FISH_DETAIL, MILESTONES, BATTLE, ONLINE_LOBBY }
+enum class Screen { HOME, DEX, UPGRADES, BATTLE_SETUP, CAST, FISH_DETAIL, MILESTONES, BATTLE, ONLINE_LOBBY, BOAT_EDITOR, SHOP }
 
 /** The four top-level destinations of the bottom navigation bar, in order. */
 enum class MainTab(val label: String, val screen: Screen) {
@@ -58,7 +62,7 @@ enum class MainTab(val label: String, val screen: Screen) {
     }
 }
 
-/** The sections of the Dex tab. Secrets and Skins only appear once something is found. */
+/** The sections of the Dex tab. Secrets only appears once one is found; Skins is always there. */
 enum class DexSection(val label: String) { FISH("Species"), SECRETS("Secrets"), SKINS("Skins") }
 
 /** A short message flashed over the game screen. */
@@ -176,7 +180,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
 
     private fun showTourStep(t: TourSession) {
         screen = t.current.screen
-        if (screen == Screen.DEX) dexSection = DexSection.FISH
+        if (screen == Screen.DEX) dexSection = t.current.dexSection ?: DexSection.FISH
     }
 
     /** Skipping and finishing both close the tour and ask about next time. */
@@ -215,15 +219,55 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         screen = Screen.DEX
     }
 
-    /** Dex sections the player can open: Secrets once one is found, Skins once one is unlocked. */
+    /** Dex sections the player can open: Secrets once one is found; Skins (boat customising) always. */
     val availableDexSections: List<DexSection>
         get() = DexSection.entries.filter {
             when (it) {
                 DexSection.FISH -> true
                 DexSection.SECRETS -> progress.discoveredSecrets.isNotEmpty()
-                DexSection.SKINS -> progress.unlockedCosmetics.isNotEmpty()
+                DexSection.SKINS -> true
             }
         }
+
+    // --- Skins: boat customisation, shop, atmosphere ------------------------------------------
+
+    /** Everything the player wears, as the renderers need it. */
+    val skins: Skins
+        get() = Skins.of(
+            progress.equippedSkins,
+            customBoat = progress.boatDesign.takeIf { progress.customBoatEquipped },
+            atmosphere = progress.atmosphere,
+        )
+
+    fun openBoatEditor() {
+        screen = Screen.BOAT_EDITOR
+    }
+
+    fun openShop() {
+        screen = Screen.SHOP
+    }
+
+    /** Buys a boat option with points; false if it can't be bought or isn't affordable. */
+    fun unlockBoatPart(part: BoatPart): Boolean {
+        val next = Progression.unlockBoatPart(progress, part) ?: return false
+        update(next)
+        return true
+    }
+
+    /** Saves [design] and wears it; false if it uses an option that's still locked. */
+    fun saveBoatDesign(design: BoatDesign): Boolean {
+        val next = Progression.setBoatDesign(progress, design) ?: return false
+        update(Progression.equipCustomBoat(next, true))
+        return true
+    }
+
+    fun equipCustomBoat(on: Boolean) {
+        update(Progression.equipCustomBoat(progress, on))
+    }
+
+    fun setAtmosphere(atmosphere: Atmosphere) {
+        Progression.setAtmosphere(progress, atmosphere)?.let(::update)
+    }
 
     /** Opens the Dex page of the species at [index] in `FishCatalog.all`. */
     fun openFishDetail(index: Int) {
@@ -564,6 +608,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             Screen.BATTLE -> if (battle?.isOver != false) leaveBattle() else Unit
             Screen.ONLINE_LOBBY -> closeOnlineLobby()
             Screen.FISH_DETAIL -> screen = Screen.DEX
+            Screen.BOAT_EDITOR, Screen.SHOP -> openDex(DexSection.SKINS)
             Screen.DEX, Screen.UPGRADES, Screen.BATTLE_SETUP, Screen.MILESTONES -> screen = Screen.HOME
         }
     }

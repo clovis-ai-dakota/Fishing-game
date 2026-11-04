@@ -31,6 +31,11 @@ object ProgressCodec {
         appendLine("snagged=${p.objectsSnagged}")
         appendLine("seen=${p.seenSpecies.sorted().joinToString(",")}")
         appendLine("skins=${p.equippedSkins.entries.joinToString(",") { "${it.key.name}:${it.value.name}" }}")
+        appendLine("boat=${encodeDesign(p.boatDesign)}")
+        appendLine("customBoat=${if (p.customBoatEquipped) 1 else 0}")
+        appendLine("boatParts=${p.unlockedBoatParts.sorted().joinToString(",")}")
+        appendLine("atmosphereUnlocked=${if (p.atmosphereUnlocked) 1 else 0}")
+        appendLine("atmosphere=${p.atmosphere.name}")
         for ((stat, level) in p.ropeLevels) appendLine("rope.${stat.name}=$level")
         for ((id, e) in p.collection) {
             appendLine("fish.$id=${e.caught},${e.sparklingCaught},${e.deepestM},${e.bestPoints}")
@@ -65,6 +70,13 @@ object ProgressCodec {
                         if (s != null && c != null && c.slot == s) s to c else null
                     }.toMap(),
                 )
+                key == "boat" -> decodeDesign(value)?.let { p = p.copy(boatDesign = it) }
+                key == "customBoat" -> p = p.copy(customBoatEquipped = value.trim() == "1")
+                key == "boatParts" -> p = p.copy(
+                    unlockedBoatParts = value.split(',').map { it.trim() }.filter { BoatPart.fromKey(it) != null }.toSet(),
+                )
+                key == "atmosphereUnlocked" -> p = p.copy(atmosphereUnlocked = value.trim() == "1")
+                key == "atmosphere" -> Atmosphere.entries.firstOrNull { it.name == value.trim() }?.let { p = p.copy(atmosphere = it) }
                 key == "battle" -> {
                     val parts = value.split(',').map { it.trim().toIntOrNull() }
                     if (parts.size == 3 && parts.all { it != null }) {
@@ -91,7 +103,27 @@ object ProgressCodec {
                 }
             }
         }
+        // A saved Nightmare choice without the unlock (hand-edited save) falls back to Family.
+        if (p.atmosphere == Atmosphere.NIGHTMARE && !p.atmosphereUnlocked) p = p.copy(atmosphere = Atmosphere.FAMILY)
         return p.copy(ropeLevels = ropeLevels, collection = collection)
+    }
+
+    /** Colours as palette indexes, then the pattern, sail, flag and emblem names. */
+    private fun encodeDesign(d: BoatDesign) =
+        listOf(d.hull, d.hullBottom, d.trim, d.cabin, d.sail, d.flag).joinToString(",") +
+            ",${d.pattern.name},${d.sailStyle.name},${d.flagStyle.name},${d.emblem.name}"
+
+    private fun decodeDesign(value: String): BoatDesign? {
+        val parts = value.split(',').map { it.trim() }
+        if (parts.size != 10) return null
+        val colors = parts.take(6).map { it.toIntOrNull()?.takeIf { i -> i in BoatPalette.swatches.indices } ?: return null }
+        return BoatDesign(
+            hull = colors[0], hullBottom = colors[1], trim = colors[2], cabin = colors[3], sail = colors[4], flag = colors[5],
+            pattern = HullPattern.entries.firstOrNull { it.name == parts[6] } ?: return null,
+            sailStyle = SailStyle.entries.firstOrNull { it.name == parts[7] } ?: return null,
+            flagStyle = FlagStyle.entries.firstOrNull { it.name == parts[8] } ?: return null,
+            emblem = Emblem.entries.firstOrNull { it.name == parts[9] } ?: return null,
+        )
     }
 }
 

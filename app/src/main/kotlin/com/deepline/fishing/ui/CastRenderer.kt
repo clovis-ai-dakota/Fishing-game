@@ -390,33 +390,8 @@ private fun DrawScope.drawBoatAndRod(
     skins: Skins,
     timeSeconds: Float,
 ) {
-    drawBoatRig(cx, surfaceY, scale, timeSeconds, skins.boat)
-    val hull = Path().apply {
-        moveTo(cx - 2.5f * scale, surfaceY - 1.0f * scale)
-        lineTo(cx + 2.5f * scale, surfaceY - 1.0f * scale)
-        quadraticTo(cx + 2.2f * scale, surfaceY + 0.2f * scale, cx + 1.5f * scale, surfaceY + 0.4f * scale)
-        lineTo(cx - 1.5f * scale, surfaceY + 0.4f * scale)
-        quadraticTo(cx - 2.2f * scale, surfaceY + 0.2f * scale, cx - 2.5f * scale, surfaceY - 1.0f * scale)
-        close()
-    }
-    drawPath(hull, hullBrush(skins.boat, surfaceY - 1f * scale, surfaceY + 0.4f * scale, timeSeconds))
-    val trimWidth = if (skins.boat == null) max(2f, 0.08f * scale) else max(3f, 0.16f * scale)
-    drawLine(
-        trimBrush(skins.boat, cx - 2.4f * scale, cx + 2.4f * scale, timeSeconds),
-        Offset(cx - 2.4f * scale, surfaceY - 0.9f * scale),
-        Offset(cx + 2.4f * scale, surfaceY - 0.9f * scale),
-        strokeWidth = trimWidth,
-    )
-    if (skins.boat != null) {
-        drawLine(
-            trimBrush(skins.boat, cx - 2f * scale, cx + 2f * scale, timeSeconds),
-            Offset(cx - 1.9f * scale, surfaceY - 0.15f * scale),
-            Offset(cx + 1.9f * scale, surfaceY - 0.15f * scale),
-            strokeWidth = trimWidth * 0.6f,
-        )
-    }
-    // Cabin with a window.
-    drawCabin(cx, surfaceY, scale, skins.boat)
+    // The boat itself: classic, a boat skin, or the player's own design (BoatArt.kt).
+    drawBoat(cx, surfaceY, scale, timeSeconds, skins.boat, skins.customBoat)
     // Rod: a tapering curve from the reel to the tip.
     val control = Offset(rodBase.x + (rodTip.x - rodBase.x) * 0.3f, rodBase.y + (rodTip.y - rodBase.y) * 0.8f)
     val rod = Path().apply {

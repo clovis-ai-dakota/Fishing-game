@@ -1,6 +1,7 @@
 package com.deepline.fishing.ui.tour
 
 import com.deepline.fishing.Screen
+import com.deepline.fishing.core.Atmosphere
 import com.deepline.fishing.core.CosmeticSlot
 import com.deepline.fishing.core.DepthZone
 import com.deepline.fishing.core.FishCatalog
@@ -9,9 +10,10 @@ import com.deepline.fishing.core.online.OnlineProtocol
 
 /** A UI element a tour step can point at (see `Modifier.tourTarget`). */
 enum class TourTarget {
-    HOME_CAST, HOME_POINTS, HOME_LANTERN, HOME_MILESTONES, HOME_TOUR,
+    HOME_CAST, HOME_POINTS, HOME_LANTERN, HOME_MILESTONES, HOME_TOUR, HOME_BOAT,
     NAV_BAR, TAB_DEX, TAB_UPGRADES, TAB_BATTLE,
     UPGRADES_ROPE, DEX_HEADER, DEX_FILTERS, MILESTONES_FIRST, BATTLE_MODES, BATTLE_OPPONENT,
+    SKINS_CUSTOMISE, SKINS_ATMOSPHERE, SHOP_ITEMS,
 }
 
 /** A small illustration shown in a tour card. */
@@ -30,6 +32,8 @@ data class TourStep(
     val target: TourTarget? = null,
     val art: TourArt? = null,
     val sinceVersion: Int = 1,
+    /** For a Dex step: which section to show (Species when null). */
+    val dexSection: com.deepline.fishing.DexSection? = null,
 )
 
 /**
@@ -46,8 +50,9 @@ object Tour {
      * 3: more secrets with bonuses that also count in battles, and skins.
      * 4: rope downgrades with a full refund, many more species, bolder skins and titles.
      * 5: bottom tabs (Fish, Dex, Upgrades, Battle) and the Dex with seen and caught fish.
+     * 6: boat customisation, the premium skins shop (coming soon) and the Atmosphere option.
      */
-    const val VERSION = 5
+    const val VERSION = 6
 
     private val bumps = GameConfig.DESCENT_TOUCH_LIMIT
     private val bumpFree = GameConfig.BUMP_FREE_DEPTH.toInt()
@@ -184,6 +189,37 @@ object Tour {
             screen = Screen.DEX,
             target = TourTarget.TAB_DEX,
             sinceVersion = 5,
+        ),
+        TourStep(
+            id = "boat",
+            title = "Customise your boat",
+            body = "Tap your boat at the top of the Fish tab to open the Skins section of the Dex. Customise boat " +
+                "lets you paint the hull, trim and cabin, and add a pattern, sails, a flag and an emblem. Basic " +
+                "colours are free; the rest unlock with points, or as you catch more species, reach new zones " +
+                "and claim milestones.",
+            screen = Screen.HOME,
+            target = TourTarget.HOME_BOAT,
+            sinceVersion = 6,
+        ),
+        TourStep(
+            id = "shop",
+            title = "Premium skins",
+            body = "Premade boats will be sold here, a shortcut to a great-looking boat. Coming soon: they can't " +
+                "be bought yet. Like every skin, they only change how your boat looks.",
+            screen = Screen.SHOP,
+            target = TourTarget.SHOP_ITEMS,
+            sinceVersion = 6,
+        ),
+        TourStep(
+            id = "atmosphere",
+            title = "Atmosphere",
+            body = "The water is harmless near the surface and gets spookier the deeper you go. Reach the " +
+                "${DepthZone.ABYSS.displayName} to unlock ${Atmosphere.NIGHTMARE.displayName}, a frightening look " +
+                "for the deep: you see exactly as much as before, only the mood changes.",
+            screen = Screen.DEX,
+            target = TourTarget.SKINS_ATMOSPHERE,
+            sinceVersion = 6,
+            dexSection = com.deepline.fishing.DexSection.SKINS,
         ),
         TourStep(
             id = "battle",
