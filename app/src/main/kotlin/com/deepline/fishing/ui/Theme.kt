@@ -8,17 +8,19 @@ import androidx.compose.ui.graphics.Color
 /**
  * The app's colours, after Material's dark theme guidance: dark navy surfaces (not pure black),
  * desaturated "200-tone" accents that keep at least 4.5:1 contrast with text, off-white text
- * (not pure white), and accents used sparingly: aqua for actions, coral and gold for rewards.
+ * (not pure white), and accents used sparingly: aqua for actions, calm blue for selection, gold
+ * for rewards.
  */
 private val DeepLineColors = darkColorScheme(
     primary = Color(0xFF7FDBEA),
     onPrimary = Color(0xFF00363D),
     primaryContainer = Color(0xFF00505A),
     onPrimaryContainer = Color(0xFFA6F2FF),
-    secondary = Color(0xFFFFB4A2),
-    onSecondary = Color(0xFF5C1A0E),
-    secondaryContainer = Color(0xFF6E2A1C),
-    onSecondaryContainer = Color(0xFFFFDAD2),
+    // Selection (tabs, chips) in a calm blue: warm colours are kept for rewards.
+    secondary = Color(0xFFB6C8FF),
+    onSecondary = Color(0xFF1B2E5C),
+    secondaryContainer = Color(0xFF2B4170),
+    onSecondaryContainer = Color(0xFFDCE4FF),
     tertiary = Color(0xFFFFD580),
     onTertiary = Color(0xFF3F2E00),
     tertiaryContainer = Color(0xFF5B4300),
