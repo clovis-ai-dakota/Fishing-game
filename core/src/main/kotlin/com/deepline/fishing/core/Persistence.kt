@@ -29,6 +29,7 @@ object ProgressCodec {
         appendLine("secrets=${p.discoveredSecrets.sorted().joinToString(",")}")
         appendLine("secretsMuted=${p.mutedSecretPopups.sorted().joinToString(",")}")
         appendLine("snagged=${p.objectsSnagged}")
+        appendLine("seen=${p.seenSpecies.sorted().joinToString(",")}")
         appendLine("skins=${p.equippedSkins.entries.joinToString(",") { "${it.key.name}:${it.value.name}" }}")
         for ((stat, level) in p.ropeLevels) appendLine("rope.${stat.name}=$level")
         for ((id, e) in p.collection) {
@@ -54,6 +55,7 @@ object ProgressCodec {
                 key == "lanterns" -> value.toIntOrNull()?.let { p = p.copy(lanterns = it) }
                 key == "secrets" -> p = p.copy(discoveredSecrets = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet())
                 key == "secretsMuted" -> p = p.copy(mutedSecretPopups = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet())
+                key == "seen" -> p = p.copy(seenSpecies = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet())
                 key == "snagged" -> value.toIntOrNull()?.let { p = p.copy(objectsSnagged = it) }
                 key == "skins" -> p = p.copy(
                     equippedSkins = value.split(',').mapNotNull { entry ->

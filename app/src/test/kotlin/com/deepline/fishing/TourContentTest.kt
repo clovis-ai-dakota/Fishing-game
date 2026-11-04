@@ -4,6 +4,7 @@ import com.deepline.fishing.core.BattleMode
 import com.deepline.fishing.core.GameConfig
 import com.deepline.fishing.core.RopeStat
 import com.deepline.fishing.ui.tour.Tour
+import com.deepline.fishing.ui.tour.TourTarget
 import com.deepline.fishing.ui.tour.TourStep
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -20,9 +21,9 @@ class TourContentTest {
     @Test
     fun everyMenuScreenIsVisited() {
         // CAST, BATTLE and ONLINE_LOBBY need a live cast, battle or connection, so they're
-        // explained from the screens that lead to them. SECRETS only exists once a secret is
-        // discovered; the "secrets" step explains it from the home screen.
-        val explainedElsewhere = setOf(Screen.CAST, Screen.BATTLE, Screen.ONLINE_LOBBY, Screen.SECRETS, Screen.SKINS)
+        // explained from the screens that lead to them. A species' page (FISH_DETAIL) is
+        // explained from the Dex, which opens it.
+        val explainedElsewhere = setOf(Screen.CAST, Screen.BATTLE, Screen.ONLINE_LOBBY, Screen.FISH_DETAIL)
         val visited = Tour.steps.map { it.screen }.toSet()
         for (screen in Screen.entries - explainedElsewhere) {
             assertTrue("The tour never shows the $screen screen", screen in visited)
@@ -33,7 +34,7 @@ class TourContentTest {
     fun everyBattleModeRopeUpgradeAndCoreRuleIsExplained() {
         for (mode in BattleMode.entries) assertTrue("Tour doesn't mention ${mode.title}", mode.title in text)
         for (stat in RopeStat.entries) assertTrue("Tour doesn't mention ${stat.displayName}", stat.displayName in text)
-        for (topic in listOf("Lantern", "Sparkling", "head", "Load", "Fish log", "Milestone", "online", "Quick match", "Fishing secrets", "Skins")) {
+        for (topic in listOf("Lantern", "Sparkling", "head", "Load", "Dex", "Milestone", "online", "Quick match", "Fishing secrets", "Skins")) {
             assertTrue("Tour doesn't mention $topic", text.contains(topic, ignoreCase = true))
         }
         assertTrue("${GameConfig.BUMP_FREE_DEPTH.toInt()} m" in text)
@@ -45,6 +46,24 @@ class TourContentTest {
         for (slot in com.deepline.fishing.core.CosmeticSlot.entries) {
             assertTrue("Tour doesn't mention the ${slot.displayName} skin slot", slot.displayName.lowercase() in text.lowercase())
         }
+        // Version 5: every tab of the bottom bar, the Dex's seen/caught states, filters and pages.
+        for (tab in com.deepline.fishing.MainTab.entries) assertTrue("Tour doesn't mention the ${tab.label} tab", tab.label in text)
+        for (topic in listOf("Seen", "Catch it", "Filter", "swipe", "trophy", "Secrets section", "? button")) {
+            assertTrue("Tour doesn't mention $topic", text.contains(topic, ignoreCase = true))
+        }
+    }
+
+    @Test
+    fun everyTabIsPointedAt() {
+        // The bar itself, and every tab the tour sends the player to, is highlighted at least once.
+        val targets = Tour.steps.mapNotNull { it.target }.toSet()
+        assertTrue(TourTarget.NAV_BAR in targets)
+        for (t in listOf(TourTarget.HOME_CAST, TourTarget.HOME_POINTS, TourTarget.HOME_TOUR, TourTarget.DEX_HEADER, TourTarget.DEX_FILTERS)) {
+            assertTrue("No step points at $t", t in targets)
+        }
+        // Changed in version 5, so returning players see them in "What's new".
+        val whatsNew = Tour.steps.filter { it.sinceVersion == Tour.VERSION }.map { it.id }
+        assertTrue(whatsNew.containsAll(listOf("tabs", "cast", "upgrades", "dex", "dex_filters", "milestones", "secrets", "replay")))
     }
 
     @Test

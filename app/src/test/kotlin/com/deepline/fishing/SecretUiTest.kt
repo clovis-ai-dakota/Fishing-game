@@ -8,6 +8,7 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onFirst
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -119,7 +120,9 @@ class SecretUiTest {
         scenario!!.onActivity { vm = ViewModelProvider(it)[GameViewModel::class.java] }
         vm.castFactory = ::snagWater
 
-        assertTrue("no secrets button before any discovery", !isShowing("Secrets"))
+        compose.onNodeWithTag("tab_dex").performClick()
+        assertTrue("no Secrets section before any discovery", !isShowing("Secrets"))
+        compose.onNodeWithTag("tab_fish").performClick()
 
         // First snag: the cast pauses and the secret is explained.
         compose.click("Cast line")
@@ -137,11 +140,12 @@ class SecretUiTest {
         assertTrue(Secrets.LAST_BUMP in vm.progress.mutedSecretPopups)
         assertEquals(1, vm.progress.objectsSnagged)
 
-        // The secret is now listed on its own screen.
+        // The secret is now listed in the Dex's Secrets section.
+        compose.onNodeWithTag("tab_dex").performClick()
         compose.click("Secrets")
         compose.onNodeWithText("The last bump hooks what it hits").assertExists()
         compose.shot("29_fishing_secrets")
-        compose.click("‹ Back")
+        compose.onNodeWithTag("tab_fish").performClick()
 
         // Second snag: the player said "No thanks", so no popup this time.
         compose.click("Cast line")

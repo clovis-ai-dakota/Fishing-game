@@ -8,6 +8,7 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onFirst
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -147,7 +148,9 @@ class LegendarySecretUiTest {
         assertEquals(lanternsBefore + reward.lanterns, vm.progress.lanterns)
         assertTrue(vm.progress.unlockedCosmetics.isNotEmpty())
 
-        // Skins: wear the whole set (hook, line, boat, trail and title), then fish with them.
+        // Skins: the Dex now has a Skins section. Wear the whole set (hook, line, boat, trail and
+        // title), then fish with them.
+        compose.onNodeWithTag("tab_dex").performClick()
         compose.click("Skins")
         val set = com.deepline.fishing.core.Cosmetic.entries.filter { it.unlockedBy == Secrets.DAVID_AND_GOLIATH }
         assertEquals(com.deepline.fishing.core.CosmeticSlot.entries.size, set.size)
@@ -156,7 +159,11 @@ class LegendarySecretUiTest {
         compose.shot("32_skins")
         assertEquals(set.size, vm.progress.equippedSkins.size)
         assertEquals("Giant-slayer", vm.title)
-        compose.click("‹ Back")
+        // Tapping a worn skin again goes back to the classic look.
+        compose.click("Tide trail")
+        assertEquals(null, vm.progress.equippedSkins[com.deepline.fishing.core.CosmeticSlot.TRAIL])
+        compose.click("Tide trail")
+        compose.onNodeWithTag("tab_fish").performClick()
         // The title is shown off on the home screen.
         compose.onNodeWithText("★ Giant-slayer").assertExists()
 

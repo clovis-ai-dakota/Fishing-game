@@ -231,6 +231,21 @@ object FishingSecrets {
         }
         return parts.takeIf { it.isNotEmpty() }?.joinToString(" · ")
     }
+
+    /**
+     * The reward shown on a locked Dex card: points and Lanterns, and only "a legendary skin set"
+     * for cosmetics (set names would hint at the secret).
+     */
+    fun lockedRewardText(id: String): String? {
+        val r = SecretRewards.of(id)
+        val parts = buildList {
+            if (r.points > 0) add("+${formatPoints(r.points)} points")
+            if (r.lanterns == 1) add("1 Lantern")
+            if (r.lanterns > 1) add("${r.lanterns} Lanterns")
+            if (r.cosmetics.isNotEmpty()) add("a legendary skin set")
+        }
+        return parts.takeIf { it.isNotEmpty() }?.joinToString(" · ")
+    }
 }
 
 private val ArtWater = Brush.verticalGradient(listOf(Color(0xFF0288D1), Color(0xFF01396B)))
@@ -390,18 +405,18 @@ private fun DrawScope.drawGoliathArt() {
 }
 
 @Composable
-private fun SecretArt(secret: FishingSecret) {
+internal fun SecretArt(secret: FishingSecret, height: androidx.compose.ui.unit.Dp = 120.dp) {
     val art = secret.art ?: return
     Canvas(
         Modifier
             .fillMaxWidth()
-            .height(120.dp)
+            .height(height)
             .clip(RoundedCornerShape(12.dp)),
     ) { art() }
 }
 
 @Composable
-private fun SecretDetails(secret: FishingSecret) {
+internal fun SecretDetails(secret: FishingSecret) {
     Text(secret.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
     SecretArt(secret)
     Text(secret.body, style = MaterialTheme.typography.bodyMedium)
@@ -425,7 +440,7 @@ fun SecretDiscoveredDialog(secret: FishingSecret, onAnswer: (showAgain: Boolean)
                     Text("Discovery reward: $it", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
                 }
                 Text(
-                    "You can read it again any time with the Secrets button on the home screen.\n\n" +
+                    "You can read it again any time in the Dex, under Secrets.\n\n" +
                         "Show this explanation again the next time it happens?",
                     style = MaterialTheme.typography.bodySmall,
                 )
@@ -434,41 +449,4 @@ fun SecretDiscoveredDialog(secret: FishingSecret, onAnswer: (showAgain: Boolean)
         confirmButton = { TextButton(onClick = { onAnswer(true) }) { Text("Yes, show again") } },
         dismissButton = { TextButton(onClick = { onAnswer(false) }) { Text("No thanks") } },
     )
-}
-
-/** The secrets the player has discovered so far. Undiscovered ones stay hidden. */
-@Composable
-fun SecretsScreen(vm: GameViewModel) {
-    val discovered = FishingSecrets.all.filter { it.id in vm.progress.discoveredSecrets }
-    SubScreen(title = "Fishing secrets", onBack = { vm.navigate(Screen.HOME) }) {
-        LazyColumn(
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            item {
-                Text(
-                    "Discovered ${discovered.size} of ${FishingSecrets.all.size}",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.secondary,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
-            items(discovered, key = { it.id }) { secret ->
-                Card(Modifier.fillMaxWidth()) {
-                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        SecretDetails(secret)
-                    }
-                }
-            }
-            if (discovered.size < FishingSecrets.all.size) {
-                item {
-                    Text(
-                        "More secrets are waiting in the deep. Keep fishing!",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-        }
-    }
 }

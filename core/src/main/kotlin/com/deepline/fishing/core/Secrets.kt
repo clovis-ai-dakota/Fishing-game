@@ -60,6 +60,19 @@ object Secrets {
         DAVID_AND_GOLIATH, PERFECT_CAST, MASTER_ANGLER,
     )
 
+    /** Difficulty tier of each secret, 1 (easiest) to [MAX_TIER] (legendary). */
+    private val tiers: Map<String, Int> = mapOf(
+        LAST_BUMP to 1, FREE_PASS to 1, SCHOOLING to 1, SURFACE_SKIM to 1, ZEN_CAST to 1,
+        PINBALL to 2, SECOND_ENCOUNTER to 2, CLEAN_DROP to 2, ROCK_BOTTOM to 2, BUZZER_BEATER to 2,
+        CORNER_POCKET to 3, GRAND_TOUR to 3, SPARKLE_SNAG to 3, LADDER to 3, PERFECT_LOAD to 3, MOONLIT_ANGLER to 3, SHUTOUT to 3,
+        WHILE_IT_FLEES to 4, BLIND_DROP to 4, ZONE_SWEEP to 4, GRAND_SLAM to 4, DOUBLE_HEADER to 4,
+        DAVID_AND_GOLIATH to 5, PERFECT_CAST to 5, MASTER_ANGLER to 5,
+    )
+
+    const val MAX_TIER = 5
+
+    fun tierOf(id: String): Int = tiers[id] ?: 1
+
     /** Which secrets this cast revealed. */
     fun revealedBy(result: CastResult): Set<String> {
         val ids = result.secretBonuses.map { it.secretId }.toMutableSet()

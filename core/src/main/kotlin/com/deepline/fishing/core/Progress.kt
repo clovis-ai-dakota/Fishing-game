@@ -34,6 +34,8 @@ data class PlayerProgress(
     val objectsSnagged: Int = 0,
     /** The cosmetic worn in each slot (absent = classic look). */
     val equippedSkins: Map<CosmeticSlot, Cosmetic> = emptyMap(),
+    /** Species that have come into view during a cast (caught ones count as seen too). */
+    val seenSpecies: Set<String> = emptySet(),
 ) {
     fun level(stat: RopeStat): Int = ropeLevels[stat] ?: 0
     val specs: RopeSpecs get() = RopeSpecs.fromLevels(ropeLevels)
@@ -41,12 +43,31 @@ data class PlayerProgress(
 
     fun isDiscovered(species: FishSpecies): Boolean = (collection[species.id]?.caught ?: 0) > 0
 
+    /** Species seen or caught, for the Dex. */
+    val seenCount: Int get() = FishCatalog.all.count { Progression.dexState(this, it.id) != DexState.UNKNOWN }
+
     /** Cosmetics unlocked by the secrets discovered so far. */
     val unlockedCosmetics: List<Cosmetic> get() = Cosmetic.entries.filter { it.unlockedBy in discoveredSecrets }
 }
 
+/** How much the Dex knows about a species. Caught implies seen. */
+enum class DexState { UNKNOWN, SEEN, CAUGHT }
+
 /** Pure functions that turn one [PlayerProgress] into the next. */
 object Progression {
+    fun dexState(p: PlayerProgress, speciesId: String): DexState = when {
+        (p.collection[speciesId]?.caught ?: 0) > 0 -> DexState.CAUGHT
+        speciesId in p.seenSpecies -> DexState.SEEN
+        else -> DexState.UNKNOWN
+    }
+
+    /** 1 to 5 stars: the rarer the species (lower spawn weight), the more stars. */
+    fun rarityStars(species: FishSpecies): Int =
+        1 + GameConfig.RARITY_STAR_WEIGHTS.count { species.rarity <= it }
+
+    /** The species' Dex number, from 1 (in [FishCatalog.all] order). */
+    fun dexNumber(species: FishSpecies): Int = FishCatalog.all.indexOf(species) + 1
+
     fun applyCast(p: PlayerProgress, result: CastResult): PlayerProgress {
         val collection = p.collection.toMutableMap()
         for (c in result.catches) {
@@ -63,6 +84,7 @@ object Progression {
             pointsBalance = p.pointsBalance + gained,
             pointsEarned = p.pointsEarned + gained,
             collection = collection,
+            seenSpecies = p.seenSpecies + result.seenSpeciesIds + result.catches.map { it.species.id },
             castsMade = p.castsMade + 1,
             // Discovery rewards are granted when a secret is first explained (discoverSecret).
             discoveredSecrets = p.discoveredSecrets + Secrets.revealedBy(result),
