@@ -131,7 +131,8 @@ class Render3dExportTest {
             com.deepline.fishing.core.BoatDesign(hull = 12, hullBottom = 16, trim = 4, cabin = 0, sail = 15, flag = 7, pattern = com.deepline.fishing.core.HullPattern.DOTS, sailStyle = com.deepline.fishing.core.SailStyle.SQUARE, flagStyle = com.deepline.fishing.core.FlagStyle.SWALLOWTAIL, emblem = com.deepline.fishing.core.Emblem.HEART),
             com.deepline.fishing.core.BoatDesign(hull = 6, hullBottom = 23, trim = 22, cabin = 5, sail = 6, flag = 17, pattern = com.deepline.fishing.core.HullPattern.CHECKER, sailStyle = com.deepline.fishing.core.SailStyle.TWIN, flagStyle = com.deepline.fishing.core.FlagStyle.BANNER, emblem = com.deepline.fishing.core.Emblem.ANCHOR),
         )
-        designs.forEachIndexed { i, d ->
+        val premium = com.deepline.fishing.core.PremiumSkins.all.map { it.design }
+        (designs + premium).forEachIndexed { i, d ->
             export("boat_custom_$i", SceneBuilder().build(surfaceSession(), 1.3f, w, h, Skins(customBoat = d), cameraTop = -7f))
         }
     }

@@ -80,6 +80,19 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     `GlBackend`'s draw rules: change both together.
   - GL keeps uniforms per program: per-item uniforms must be in `GlBackend.DEFAULTS` (and the
     preview's `defaults`) so one item's values never leak into the next.
+- **Colours** come from `ui/ColorScript.kt`, shared by the 3D renderer, the 2D fallback and the
+  Dex: the water, light and specks by depth (bright and warm in the shallows, then cooler, darker
+  and less saturated, near-black with sparse red/cyan glows in the abyss), and `FishLooks` for
+  every species (zone palettes, designed looks for the hand-made ones, and "menace" features by
+  depth: round, big-eyed, blushing fish near the surface; spines, teeth, glowing/slit eyes and
+  photophores deeper). Don't hard-code fish or water colours elsewhere. Glowing eyes and
+  photophores are drawn before the darkness (only lures shine through it), so deep fish are no
+  easier to see. The app theme (`Theme.kt`) follows Material's dark-theme guidance: navy surfaces,
+  desaturated accents with 4.5:1 text contrast, aqua for actions, blue for selection, gold for
+  rewards.
+- **Atmosphere** (`Atmosphere.NIGHTMARE`, a cosmetic): changes colours, fish menace and decor in
+  the deep only; the lit radius and what's visible stay exactly the same (darkness alpha is
+  unchanged, only its tint).
 - All tunable numbers live in `core/.../GameConfig.kt` (plus the tables in `FishSpecies.kt`,
   `Upgrades.kt` and `Secrets.kt`). The tour and HUD read them, so don't hard-code them in UI text.
 - Run `./gradlew :core:test :server:test :app:testDebugUnitTest` before pushing. App UI tests

@@ -282,6 +282,17 @@ object PropModels {
             val at = emblemAt ?: Vec3(1.0f, 0.45f, 1.22f).also { emblemSize = 0.32f }
             val outline = emblemShape(emblem).map { (x, y) -> at.x + x * emblemSize to at.y + y * emblemSize }
             b.extrude(outline, 0.04f, Part.EMBLEM, z = at.z)
+            if (emblem == Emblem.SKULL) {
+                // Eyes and nose, in front of the skull.
+                for (ex in listOf(-0.17f, 0.17f)) {
+                    val eye = (0 until 10).map { k ->
+                        val a = k / 10f * 2f * PI.toFloat()
+                        at.x + (ex + cos(a) * 0.11f) * emblemSize to at.y + (0.06f + sin(a) * 0.12f) * emblemSize
+                    }
+                    b.extrude(eye, 0.02f, Part.MAST, z = at.z + 0.03f)
+                }
+                b.extrude(listOf(-0.05f to -0.16f, 0.05f to -0.16f, 0f to -0.06f).map { (x, y) -> at.x + x * emblemSize to at.y + y * emblemSize }, 0.02f, Part.MAST, z = at.z + 0.03f)
+            }
         }
         b.build()
     }
@@ -313,6 +324,13 @@ object PropModels {
         )
         Emblem.WAVE -> (0..12).map { k -> -0.5f + k / 12f to 0.08f + sin(k / 12f * 2f * PI.toFloat() * 1.5f) * 0.14f } +
             (12 downTo 0).map { k -> -0.5f + k / 12f to -0.12f + sin(k / 12f * 2f * PI.toFloat() * 1.5f) * 0.14f }
+        Emblem.CROWN -> listOf(-0.5f to -0.32f, 0.5f to -0.32f, 0.5f to 0.22f, 0.25f to -0.02f, 0f to 0.4f, -0.25f to -0.02f, -0.5f to 0.22f)
+        // A friendly cartoon skull: round cranium, jaw, and no gore.
+        Emblem.SKULL -> (0..18).map { k ->
+            val a = -0.15f * PI.toFloat() + k / 18f * 1.3f * PI.toFloat()
+            cos(a) * 0.42f to 0.08f + sin(a) * 0.4f
+        } + listOf(-0.28f to -0.28f, -0.2f to -0.46f, 0.2f to -0.46f, 0.28f to -0.28f)
+        Emblem.LIGHTNING -> listOf(0.12f to 0.5f, -0.28f to -0.04f, -0.02f to -0.04f, -0.14f to -0.5f, 0.3f to 0.08f, 0.04f to 0.08f)
         Emblem.NONE -> emptyList()
     }
 

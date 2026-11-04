@@ -257,7 +257,8 @@ Surface obstacleSurface() {
 Surface boatSurface() {
     if (isPart(vPart, 30.0)) {
         vec3 col = mix(uAccent, uBase, smoothstep(-0.4, 1.0, vLocal.y));
-        // Hand-made hulls: 1 racing stripe, 2 two-tone, 3 waves, 4 polka dots, 5 checkers.
+        // Hand-made hulls: 1 racing stripe, 2 two-tone, 3 waves, 4 polka dots, 5 checkers;
+        // premium: 6 flames, 7 starry night.
         float pattern = uBoatMode.z;
         vec2 q = vec2(vLocal.x, vLocal.y);
         if (pattern > 0.5 && pattern < 1.5) {
@@ -269,9 +270,19 @@ Surface boatSurface() {
         } else if (pattern > 3.5 && pattern < 4.5) {
             vec2 cell = fract(vec2(q.x * 2.2, q.y * 2.6 + floor(q.x * 2.2) * 0.5)) - 0.5;
             if (length(cell) < 0.22) col = uExtra;
-        } else if (pattern > 4.5) {
+        } else if (pattern > 4.5 && pattern < 5.5) {
             float c = mod(floor(q.x * 2.0) + floor(q.y * 2.4 + 10.0), 2.0);
             col = c > 0.5 ? uBase : uAccent;
+        } else if (pattern > 5.5 && pattern < 6.5) {
+            // Flames licking up from the waterline, flickering.
+            float tongue = -0.1 + 0.45 * (0.5 + 0.5 * sin(q.x * 5.0 + sin(q.x * 11.0) + uTime * 3.0));
+            if (q.y < tongue) col = mix(uExtra, vec3(1.0, 0.95, 0.5), smoothstep(tongue, tongue - 0.35, q.y));
+        } else if (pattern > 6.5) {
+            // A night sky: twinkling stars over the base colour.
+            vec2 cell = floor(vec2(q.x * 5.0, q.y * 6.0));
+            vec2 f = fract(vec2(q.x * 5.0, q.y * 6.0)) - 0.5;
+            float star = hash21(cell);
+            if (star > 0.55 && length(f) < 0.09 + 0.05 * sin(uTime * 3.0 + star * 20.0)) col = vec3(1.0, 0.97, 0.85);
         }
         Surface s = surface(col);
         s.spec = 0.3;
