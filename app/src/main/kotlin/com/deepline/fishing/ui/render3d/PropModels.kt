@@ -1,6 +1,9 @@
 package com.deepline.fishing.ui.render3d
 
 import com.deepline.fishing.core.Cosmetic
+import com.deepline.fishing.core.Emblem
+import com.deepline.fishing.core.FlagStyle
+import com.deepline.fishing.core.SailStyle
 import com.deepline.fishing.core.GameConfig
 import kotlin.math.PI
 import kotlin.math.cos
@@ -218,6 +221,99 @@ object PropModels {
             else -> Unit
         }
         b.build()
+    }
+
+    /**
+     * A hand-made boat (Skins > Customise): the classic hull and cabin, plus the chosen sail,
+     * flag and emblem. Colours and the hull pattern are shader uniforms, so only these three
+     * choices change the mesh.
+     */
+    fun customBoat(sail: SailStyle, flag: FlagStyle, emblem: Emblem): MeshData = cached("boatd:${sail.name}:${flag.name}:${emblem.name}") {
+        val b = MeshBuilder()
+        b.append(boat(null))
+        // Where the emblem goes: on the sail, else the flag, else the hull's side.
+        var emblemAt: Vec3? = null
+        var emblemSize = 0.7f
+        when (sail) {
+            SailStyle.NONE -> Unit
+            SailStyle.TRIANGLE -> {
+                b.tube(listOf(Vec3(-0.2f, 1.0f, 0f), Vec3(-0.2f, 5.2f, 0f)), { 0.06f }, 8, Part.MAST)
+                b.extrude(quadratic(-0.3f to 5.0f, -1.8f to 3.2f, -2.4f to 1.5f, 10) + listOf(-0.3f to 1.5f), 0.04f, Part.SAIL, z = 0.1f)
+                emblemAt = Vec3(-0.95f, 2.5f, 0.16f); emblemSize = 0.6f
+            }
+            SailStyle.SQUARE -> {
+                b.tube(listOf(Vec3(-0.2f, 1.0f, 0f), Vec3(-0.2f, 5.3f, 0f)), { 0.07f }, 8, Part.MAST)
+                val top = 4.9f; val bottom = 2.6f
+                val sailShape = listOf(-1.7f to top, 1.3f to top) + quadratic(1.3f to top, 1.65f to (top + bottom) / 2f, 1.2f to bottom, 6).drop(1) +
+                    listOf(-1.6f to bottom) + quadratic(-1.6f to bottom, -1.4f to (top + bottom) / 2f, -1.7f to top, 6).drop(1).dropLast(1)
+                b.extrude(sailShape, 0.05f, Part.SAIL, z = 0.12f)
+                b.tube(listOf(Vec3(-1.9f, top + 0.05f, 0.05f), Vec3(1.5f, top + 0.05f, 0.05f)), { 0.05f }, 6, Part.MAST)
+                emblemAt = Vec3(-0.2f, 3.75f, 0.18f); emblemSize = 0.85f
+            }
+            SailStyle.TWIN -> {
+                b.tube(listOf(Vec3(-1.2f, 1.0f, 0f), Vec3(-1.2f, 4.6f, 0f)), { 0.055f }, 8, Part.MAST)
+                b.tube(listOf(Vec3(0.6f, 1.0f, 0f), Vec3(0.6f, 5.4f, 0f)), { 0.06f }, 8, Part.MAST)
+                b.extrude(quadratic(-1.3f to 4.4f, -2.3f to 3.0f, -2.7f to 1.6f, 8) + listOf(-1.3f to 1.6f), 0.04f, Part.SAIL, z = 0.1f)
+                b.extrude(quadratic(0.5f to 5.2f, -0.6f to 3.4f, -0.9f to 2.5f, 8) + listOf(0.5f to 2.5f), 0.04f, Part.SAIL, z = 0.1f)
+                emblemAt = Vec3(-0.05f, 3.2f, 0.16f); emblemSize = 0.5f
+            }
+        }
+        val mastTop = when (sail) {
+            SailStyle.NONE -> null
+            SailStyle.TRIANGLE -> Vec3(-0.2f, 5.2f, 0f)
+            SailStyle.SQUARE -> Vec3(-0.2f, 5.3f, 0f)
+            SailStyle.TWIN -> Vec3(0.6f, 5.4f, 0f)
+        }
+        if (flag != FlagStyle.NONE) {
+            // Without a sail, the flag gets its own little mast on the cabin.
+            val top = mastTop ?: Vec3(-0.5f, 4.0f, 0f).also { b.tube(listOf(Vec3(-0.5f, 2.3f, 0f), it), { 0.05f }, 8, Part.MAST) }
+            val shape = when (flag) {
+                FlagStyle.PENNANT -> listOf(0f to 0f, 1.6f to -0.35f, 0f to -0.7f)
+                FlagStyle.SWALLOWTAIL -> listOf(0f to 0f, 1.5f to 0f, 1.0f to -0.4f, 1.5f to -0.8f, 0f to -0.8f)
+                FlagStyle.BANNER -> listOf(0f to 0f, 1.3f to 0f, 1.3f to -0.9f, 0.65f to -1.25f, 0f to -0.9f)
+                FlagStyle.NONE -> emptyList()
+            }
+            b.extrude(shape.map { (x, y) -> top.x + x to top.y + y }, 0.03f, Part.FLAG, z = 0.02f)
+            if (emblemAt == null) {
+                emblemAt = Vec3(top.x + 0.55f, top.y - 0.4f, 0.06f); emblemSize = 0.3f
+            }
+        }
+        if (emblem != Emblem.NONE) {
+            val at = emblemAt ?: Vec3(1.0f, 0.45f, 1.22f).also { emblemSize = 0.32f }
+            val outline = emblemShape(emblem).map { (x, y) -> at.x + x * emblemSize to at.y + y * emblemSize }
+            b.extrude(outline, 0.04f, Part.EMBLEM, z = at.z)
+        }
+        b.build()
+    }
+
+    /** Emblem outlines, about 1 across, centred on the origin. */
+    private fun emblemShape(e: Emblem): List<Pair<Float, Float>> = when (e) {
+        Emblem.STAR -> (0 until 10).map { k ->
+            val a = PI.toFloat() / 2f + k * PI.toFloat() / 5f
+            val r = if (k % 2 == 0) 0.5f else 0.21f
+            cos(a) * r to sin(a) * r
+        }
+        Emblem.HEART -> (0..24).map { k ->
+            val t = k / 24f * 2f * PI.toFloat()
+            val x = 16f * sin(t) * sin(t) * sin(t)
+            val y = 13f * cos(t) - 5f * cos(2f * t) - 2f * cos(3f * t) - cos(4f * t)
+            x / 34f to y / 34f + 0.05f
+        }.reversed()
+        Emblem.MOON -> (0..16).map { k ->
+            val a = -PI.toFloat() * 0.75f + k / 16f * PI.toFloat() * 1.5f
+            cos(a) * 0.5f to sin(a) * 0.5f
+        } + (16 downTo 0).map { k ->
+            val a = -PI.toFloat() * 0.6f + k / 16f * PI.toFloat() * 1.2f
+            0.18f + cos(a) * 0.38f to sin(a) * 0.4f
+        }
+        Emblem.FISH -> listOf(0.5f to 0f, 0.3f to 0.2f, 0f to 0.24f, -0.25f to 0.08f, -0.5f to 0.25f, -0.42f to 0f, -0.5f to -0.25f, -0.25f to -0.08f, 0f to -0.24f, 0.3f to -0.2f)
+        Emblem.ANCHOR -> listOf(
+            -0.06f to 0.38f, -0.06f to -0.22f, -0.3f to -0.08f, -0.38f to -0.16f, -0.06f to -0.48f, 0.06f to -0.48f,
+            0.38f to -0.16f, 0.3f to -0.08f, 0.06f to -0.22f, 0.06f to 0.38f, 0.22f to 0.38f, 0.22f to 0.48f, -0.22f to 0.48f, -0.22f to 0.38f,
+        )
+        Emblem.WAVE -> (0..12).map { k -> -0.5f + k / 12f to 0.08f + sin(k / 12f * 2f * PI.toFloat() * 1.5f) * 0.14f } +
+            (12 downTo 0).map { k -> -0.5f + k / 12f to -0.12f + sin(k / 12f * 2f * PI.toFloat() * 1.5f) * 0.14f }
+        Emblem.NONE -> emptyList()
     }
 
     /** The Giant-slayer pennant's flag (the shader waves it), hung from the mast top at the origin. */

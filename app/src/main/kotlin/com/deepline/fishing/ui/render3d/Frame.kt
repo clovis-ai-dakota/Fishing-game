@@ -49,7 +49,12 @@ object Meshes {
         val arg = key.substringAfter(':', "")
         fun cosmetic() = Cosmetic.entries.firstOrNull { it.name == arg }
         return when (kind) {
-            "fish" -> FishModels.mesh(FishCatalog.byId(arg) ?: error("Unknown species $arg"))
+            "fish" -> {
+                // "fish:<id>" or "fish:<id>:NIGHTMARE".
+                val id = arg.substringBefore(':')
+                val atmosphere = if (arg.endsWith(":NIGHTMARE")) com.deepline.fishing.core.Atmosphere.NIGHTMARE else com.deepline.fishing.core.Atmosphere.FAMILY
+                FishModels.mesh(FishCatalog.byId(id) ?: error("Unknown species $id"), atmosphere)
+            }
             "hook" -> PropModels.hook(cosmetic())
             "worm" -> PropModels.worm()
             "sinker" -> PropModels.sinker()
@@ -57,6 +62,15 @@ object Meshes {
             "wood" -> PropModels.driftwood(arg.toInt())
             "jelly" -> PropModels.jelly()
             "boat" -> PropModels.boat(cosmetic())
+            "boatd" -> {
+                // "boatd:<sail>:<flag>:<emblem>"
+                val (sail, flag, emblem) = arg.split(':')
+                PropModels.customBoat(
+                    com.deepline.fishing.core.SailStyle.valueOf(sail),
+                    com.deepline.fishing.core.FlagStyle.valueOf(flag),
+                    com.deepline.fishing.core.Emblem.valueOf(emblem),
+                )
+            }
             "flag" -> if (arg == "royal") PropModels.royalStreamer() else PropModels.pennantFlag()
             "kelp" -> PropModels.kelp(arg.toInt())
             "decor" -> PropModels.decorRock(arg.toInt())

@@ -55,9 +55,32 @@ class Scene3dView(context: Context, onFirstFrame: () -> Unit = {}) : GLSurfaceVi
         renderMode = RENDERMODE_WHEN_DIRTY
     }
 
+    /** The size frames are rendered at: at most [MAX_RENDER_WIDTH] wide, scaled up to the view. */
+    var renderWidth = 0
+        private set
+    var renderHeight = 0
+        private set
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        val k = minOf(1f, MAX_RENDER_WIDTH / w.coerceAtLeast(1).toFloat())
+        renderWidth = (w * k).toInt().coerceAtLeast(1)
+        renderHeight = (h * k).toInt().coerceAtLeast(1)
+        holder.setFixedSize(renderWidth, renderHeight)
+    }
+
     fun show(frame: Frame) {
         backend.submit(frame)
         requestRender()
+    }
+
+    companion object {
+        /**
+         * Full HD phones render at about two thirds of their width: the fill-rate cost drops by
+         * more than half, the compositor scales it up for free, and the 2D overlay (labels, aim,
+         * HUD) stays sharp because it is drawn at full resolution on top.
+         */
+        const val MAX_RENDER_WIDTH = 720f
     }
 }
 
@@ -72,8 +95,8 @@ class Scene3dHandle {
     /** Builds a frame for the view's current size (once it has one) and shows it. */
     fun render(build: (widthPx: Int, heightPx: Int) -> Frame) {
         val v = view ?: return
-        if (v.width <= 0 || v.height <= 0) return
-        v.show(build(v.width, v.height))
+        if (v.renderWidth <= 0 || v.renderHeight <= 0) return
+        v.show(build(v.renderWidth, v.renderHeight))
     }
 }
 

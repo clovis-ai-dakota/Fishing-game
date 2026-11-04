@@ -7,6 +7,10 @@ precision highp float;
 // see the sky; below it, the water volume behind the glass, with the underside of the surface
 // receding into the distance, light rays and caustics.
 uniform mat4 uInvViewProj;
+uniform vec3 uWaterTop;     // water colour at the depth seen at the top of the screen
+uniform vec3 uWaterBottom;  // ...and at the bottom (from the colour script)
+uniform vec2 uDepthRange;   // those two depths
+uniform float uAtmosphere;  // 1 in the Nightmare atmosphere
 in vec2 vNdc;
 out vec4 fragColor;
 
@@ -37,7 +41,8 @@ void main() {
         return;
     }
     float depth = -p0.y;
-    vec3 col = waterColor(depth);
+    float k = clamp((depth - uDepthRange.x) / max(uDepthRange.y - uDepthRange.x, 1.0), 0.0, 1.0);
+    vec3 col = mix(uWaterTop, uWaterBottom, k);
     // Looking up into the water behind the glass: the silvery underside of the surface.
     if (dir.y > 0.0) {
         float t1 = -o.y / dir.y;
@@ -61,12 +66,18 @@ void main() {
         float x = p0.x + depth * (0.18 + 0.05 * fk) + sin(uTime * 0.3 + fk * 1.7) * 0.8;
         rays += pow(max(0.0, sin(x * (0.35 + 0.12 * fk) + fk * 2.0)), 18.0);
     }
-    col += vec3(0.85, 0.97, 1.0) * rays * 0.12 * smoothstep(90.0, 0.0, depth);
+    col += vec3(1.0, 0.96, 0.82) * rays * 0.14 * smoothstep(90.0, 0.0, depth);
     // Caustic shimmer near the surface.
     float c = sin(p0.x * 1.7 + sin(depth * 1.3 + uTime * 1.1) * 1.5) * sin(depth * 1.9 + sin(p0.x * 1.1 - uTime) * 1.5);
     col += vec3(0.7, 0.9, 1.0) * smoothstep(0.8, 1.0, abs(c)) * 0.07 * smoothstep(35.0, 0.0, depth);
-    // Gentle vignette for depth.
+    // Gentle vignette for depth, heavier the deeper you are.
     vec2 uv = gl_FragCoord.xy / uResolution;
-    col *= 1.0 - 0.18 * pow(length(uv - 0.5) * 1.3, 2.0);
+    float deep = smoothstep(150.0, 550.0, depth);
+    col *= 1.0 - (0.18 + 0.3 * deep) * pow(length(uv - 0.5) * 1.3, 2.0);
+    // Nightmare: a slow, sick red pulse at the edges of the deep water.
+    if (uAtmosphere > 0.5) {
+        float pulse = 0.5 + 0.5 * sin(uTime * 1.3);
+        col += vec3(0.35, 0.0, 0.02) * deep * pow(length(uv - 0.5) * 1.4, 3.0) * (0.5 + 0.5 * pulse);
+    }
     fragColor = vec4(col, 1.0);
 }

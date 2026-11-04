@@ -10,6 +10,7 @@ uniform float uPxPerMeter;
 uniform float uVisibleRadius; // meters
 uniform float uDarkness;      // 0..1
 uniform float uMode;
+uniform vec3 uDarkColor;      // black, or blood-black in the Nightmare atmosphere
 in vec2 vNdc;
 out vec4 fragColor;
 
@@ -21,5 +22,5 @@ void main() {
         return;
     }
     float a = d < 0.6 ? mix(0.0, 0.45, d / 0.6) : (d < 1.0 ? mix(0.45, 0.97, (d - 0.6) / 0.4) : 0.97);
-    fragColor = vec4(0.0, 0.0, 0.0, a * uDarkness);
+    fragColor = vec4(uDarkColor, a * uDarkness);
 }

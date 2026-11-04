@@ -87,7 +87,13 @@ class GlBackend(
         onError(message)
     }
 
+    private var frameStamp = 0
+    private var currentProgram = -1
+    private val outlineWidth = FloatArray(1)
+
     private fun draw(frame: Frame) {
+        frameStamp++
+        currentProgram = -1
         var dynamicIndex = 0
         // The frame was laid out for its own size; the viewport follows the surface.
         val scaleOutline = width / 540f
@@ -108,12 +114,21 @@ class GlBackend(
     }
 
     private fun drawPass(p: GlProgram, item: DrawItem, mesh: GlMesh, frame: Frame, outline: Boolean, outlineScale: Float) {
-        GLES30.glUseProgram(p.id)
-        for ((k, v) in DEFAULTS) p.set(k, v)
-        for ((k, v) in frame.globals) p.set(k, v)
+        if (currentProgram != p.id) {
+            GLES30.glUseProgram(p.id)
+            currentProgram = p.id
+        }
+        // Frame-wide uniforms once per program per frame; per-item ones (or their defaults) for
+        // every draw. GlProgram.set skips values the program already holds.
+        if (p.frameStamp != frameStamp) {
+            p.frameStamp = frameStamp
+            for ((k, v) in frame.globals) p.set(k, v)
+        }
+        for ((k, v) in DEFAULTS) if (!item.uniforms.containsKey(k)) p.set(k, v)
         for ((k, v) in item.uniforms) p.set(k, v)
         if (outline) {
-            p.set("uOutlineWidth", floatArrayOf(item.outlinePx * outlineScale))
+            outlineWidth[0] = item.outlinePx * outlineScale
+            p.set("uOutlineWidth", outlineWidth)
             p.set("uOutlineColor", item.outlineColor ?: INK)
             GLES30.glEnable(GLES30.GL_CULL_FACE)
             GLES30.glCullFace(GLES30.GL_FRONT)
@@ -156,11 +171,15 @@ class GlBackend(
             "uFlags" to floatArrayOf(0f, 0f, 0f, 0f),
             "uSwim" to floatArrayOf(0f, 0f, 0f, 0f),
             "uFish" to floatArrayOf(0f, 0f, 0f, 0f),
+            "uFish2" to floatArrayOf(0f, 0f, 0f, 0f),
+            "uEye" to floatArrayOf(0.1f, 0.1f, 0.15f, 1f),
             "uBase" to floatArrayOf(0.5f, 0.5f, 0.5f),
             "uAccent" to floatArrayOf(0.5f, 0.5f, 0.5f),
             "uExtra" to floatArrayOf(0.5f, 0.5f, 0.5f),
             "uExtra2" to floatArrayOf(0.9f, 0.9f, 0.85f),
             "uBoatMode" to floatArrayOf(0f, 0f, 0f, 0f),
+            "uSailColor" to floatArrayOf(0.96f, 0.92f, 0.85f),
+            "uFlagColor" to floatArrayOf(1f, 0.5f, 0.42f),
             "uMaterial" to floatArrayOf(0f),
             "uMode" to floatArrayOf(0f),
             "uAdditive" to floatArrayOf(0f),
@@ -170,10 +189,16 @@ class GlBackend(
 
 private class GlProgram(val id: Int) {
     private val locations = HashMap<String, Int>()
+    /** The value each uniform location holds, to skip redundant GL calls. */
+    private val held = HashMap<Int, FloatArray>()
+    var frameStamp = -1
 
     fun set(name: String, v: FloatArray) {
         val loc = locations.getOrPut(name) { GLES30.glGetUniformLocation(id, name) }
         if (loc < 0) return
+        val last = held[loc]
+        if (last != null && last.size == v.size && last.contentEquals(v)) return
+        held[loc] = if (last != null && last.size == v.size) last.also { v.copyInto(it) } else v.copyOf()
         when (v.size) {
             1 -> GLES30.glUniform1f(loc, v[0])
             2 -> GLES30.glUniform2fv(loc, 1, v, 0)

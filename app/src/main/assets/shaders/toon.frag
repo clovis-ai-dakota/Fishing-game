@@ -9,8 +9,12 @@ uniform vec3 uAccent;     // second colour (fish accent, hull bottom...)
 uniform vec3 uExtra;      // third colour (boat trim, coral tint...)
 uniform vec3 uExtra2;     // fourth colour (boat cabin, sail)
 uniform vec4 uFlags;      // x: sparkling / touched, y: silhouette (1 unknown, 2 seen), z: pattern, w: skin mode
-uniform vec4 uFish;       // x: height ratio, y: gill x, z: unused, w: unused
-uniform vec4 uBoatMode;   // x: trim mode, y: sail mode
+uniform vec4 uFish;       // x: height ratio, y: gill x, z: cuteness, w: menace
+uniform vec4 uFish2;      // x, y: eye position (unit space), z: eye radius, w: photophores
+uniform vec4 uEye;        // rgb: iris colour, w: style (0 cute, 1 normal, 2 glowing, 3 slit)
+uniform vec4 uBoatMode;   // x: trim mode, y: sail mode, z: hull pattern, w: custom flag
+uniform vec3 uSailColor;
+uniform vec3 uFlagColor;
 uniform vec3 uLightDir;
 uniform vec3 uLightColor;
 uniform vec3 uAmbient;
@@ -52,28 +56,48 @@ Surface fishSurface() {
     vec3 accent = uAccent;
     Surface s = surface(base);
     if (isPart(vPart, 2.0)) {
-        // Anime eye, facing the camera: white, a big gradient iris, pupil, two highlights.
+        // Anime eye, facing the camera. Cute: huge iris and sparkles. Normal: smaller.
+        // Glowing: a luminous iris. Slit: a narrow pupil in a burning iris, on a dark eyeball.
         vec2 e = vViewNormal.xy;
-        vec3 col = vec3(0.98);
+        float style = uEye.w;
+        vec3 irisCol = uEye.rgb;
+        vec3 col = style > 2.5 ? mix(vec3(0.08, 0.04, 0.05), irisCol * 0.25, 0.3) : vec3(0.98);
+        float irisR = style < 0.5 ? 0.78 : (style < 1.5 ? 0.66 : 0.7);
         float iris = length(e - vec2(0.04, -0.02));
-        vec3 irisTop = mix(accent, vec3(0.02, 0.03, 0.08), 0.55);
-        vec3 irisBottom = mix(accent, vec3(1.0), 0.25);
-        if (iris < 0.72) col = mix(irisTop, irisBottom, smoothstep(0.5, -0.6, e.y));
-        if (iris < 0.72 && iris > 0.64) col *= 0.55;
-        if (iris < 0.36) col = vec3(0.02, 0.02, 0.05);
-        if (length(e - vec2(-0.22, 0.30)) < 0.2) col = vec3(1.0);
-        if (length(e - vec2(0.24, -0.22)) < 0.09) col = vec3(1.0);
+        vec3 irisTop = mix(irisCol, vec3(0.02, 0.03, 0.08), 0.55);
+        vec3 irisBottom = mix(irisCol, vec3(1.0), 0.3);
+        float glow = 0.35;
+        if (iris < irisR) col = mix(irisTop, irisBottom, smoothstep(0.5, -0.6, e.y));
+        if (iris < irisR && iris > irisR - 0.08) col *= 0.55;
+        if (style > 1.5) {
+            // Luminous iris: bright core.
+            if (iris < irisR) col = mix(irisCol * 1.3, vec3(1.0, 0.95, 0.8), smoothstep(irisR, 0.0, iris) * 0.5);
+            glow = 0.9;
+        }
+        if (style > 2.5) {
+            // A vertical slit pupil.
+            vec2 q = e - vec2(0.04, -0.02);
+            if (abs(q.x) < 0.09 * (1.0 - q.y * q.y) && iris < irisR * 0.95) col = vec3(0.02, 0.0, 0.0);
+        } else if (iris < irisR * 0.48) {
+            col = vec3(0.02, 0.02, 0.05);
+        }
+        if (style < 2.5) {
+            float big = style < 0.5 ? 0.26 : 0.18;
+            if (length(e - vec2(-0.24, 0.30)) < big) col = vec3(1.0);
+            if (length(e - vec2(0.26, -0.24)) < big * 0.42) col = vec3(1.0);
+            if (style < 0.5 && length(e - vec2(0.05, 0.42)) < 0.07) col = vec3(1.0);
+        }
         s = surface(col);
-        s.spec = 0.0; s.rim = 0.0; s.emissive = 0.35;
+        s.spec = 0.0; s.rim = 0.0; s.emissive = glow;
         return s;
     }
     if (isPart(vPart, 3.0)) {
-        s = surface(mix(accent, vec3(1.0, 0.98, 0.85), 0.55));
+        s = surface(mix(uExtra, vec3(1.0, 0.98, 0.85), 0.55));
         s.emissive = 1.0;
         return s;
     }
     if (isPart(vPart, 4.0)) {
-        s = surface(vec3(0.95, 0.95, 0.9));
+        s = surface(mix(vec3(0.97, 0.96, 0.9), vec3(0.85, 0.8, 0.6), uFish.w));
         s.rim = 0.0;
         return s;
     }
@@ -93,10 +117,12 @@ Surface fishSurface() {
         s = surface(mix(base, accent, 0.3));
         return s;
     }
-    // Body: darker back, pale belly (countershading), then the species' markings.
+    // Body: darker back, pale belly (countershading), then the species' markings. Deep fish
+    // have a darker, harsher back.
     float ny = vLocalNormal.y;
-    vec3 back = mix(base, accent, 0.5) * 0.85;
-    vec3 belly = mix(base, vec3(1.0), 0.55);
+    float menace = uFish.w;
+    vec3 back = mix(base, accent, 0.5) * mix(0.85, 0.45, menace);
+    vec3 belly = mix(base, vec3(1.0), mix(0.55, 0.2, menace));
     vec3 col = ny > 0.0 ? mix(base, back, smoothstep(0.0, 0.9, ny)) : mix(base, belly, smoothstep(0.0, 0.8, -ny));
     float pattern = uFlags.z;
     float x = vLocal.x;
@@ -118,9 +144,30 @@ Surface fishSurface() {
     // Gill line.
     float gx = uFish.y - 0.07 * yh * yh * 4.0;
     if (abs(x - gx) < 0.007 && abs(yh) < 0.32 && abs(vLocalNormal.z) > 0.3) col = mix(col, accent * 0.5, 0.6);
+    // Friendly shallow fish: rosy cheeks and a little smile.
+    float cute = uFish.z;
+    vec2 eyeP = uFish2.xy;
+    float eyeR = uFish2.z;
+    if (cute > 0.4 && abs(vLocalNormal.z) > 0.25) {
+        vec2 c = vLocal.xy - (eyeP + vec2(-0.02, -eyeR * 1.55));
+        float blush = 1.0 - smoothstep(0.75, 1.0, length(c / vec2(eyeR * 1.0, eyeR * 0.5)));
+        col = mix(col, vec3(1.0, 0.55, 0.62), 0.45 * blush * cute);
+        vec2 m = vLocal.xy - (eyeP + vec2(eyeR * 0.75, -eyeR * 1.35));
+        float arc = abs(length(m * vec2(1.0, 1.6)) - eyeR * 0.55);
+        if (arc < 0.006 && m.y < 0.0 && cute > 0.6) col = mix(col, vec3(0.25, 0.08, 0.12), 0.8);
+    }
     s = surface(col);
-    s.spec = 0.55;
+    s.spec = mix(0.55, 0.85, menace);
     s.rim = 0.65;
+    // Deep fish: a row of glowing photophores along the flank.
+    if (uFish2.w > 0.5 && abs(vLocalNormal.z) > 0.3) {
+        float rowY = -0.22 * h;
+        vec2 q = vec2(fract((x + 0.3) / 0.07) - 0.5, (vLocal.y - rowY) / 0.035);
+        if (x > -0.3 && x < 0.32 && length(q * vec2(0.07, 0.035) / 0.022) < 1.0) {
+            s.albedo = mix(uExtra, vec3(1.0), 0.35);
+            s.emissive = 1.0;
+        }
+    }
     return s;
 }
 
@@ -209,7 +256,24 @@ Surface obstacleSurface() {
 
 Surface boatSurface() {
     if (isPart(vPart, 30.0)) {
-        Surface s = surface(mix(uAccent, uBase, smoothstep(-0.4, 1.0, vLocal.y)));
+        vec3 col = mix(uAccent, uBase, smoothstep(-0.4, 1.0, vLocal.y));
+        // Hand-made hulls: 1 racing stripe, 2 two-tone, 3 waves, 4 polka dots, 5 checkers.
+        float pattern = uBoatMode.z;
+        vec2 q = vec2(vLocal.x, vLocal.y);
+        if (pattern > 0.5 && pattern < 1.5) {
+            if (abs(q.y - 0.42) < 0.12) col = uExtra;
+        } else if (pattern > 1.5 && pattern < 2.5) {
+            col = q.y > 0.3 ? uBase : uAccent;
+        } else if (pattern > 2.5 && pattern < 3.5) {
+            col = q.y > 0.3 + 0.12 * sin(q.x * 4.0) ? uBase : uAccent;
+        } else if (pattern > 3.5 && pattern < 4.5) {
+            vec2 cell = fract(vec2(q.x * 2.2, q.y * 2.6 + floor(q.x * 2.2) * 0.5)) - 0.5;
+            if (length(cell) < 0.22) col = uExtra;
+        } else if (pattern > 4.5) {
+            float c = mod(floor(q.x * 2.0) + floor(q.y * 2.4 + 10.0), 2.0);
+            col = c > 0.5 ? uBase : uAccent;
+        }
+        Surface s = surface(col);
         s.spec = 0.3;
         return s;
     }
@@ -234,10 +298,19 @@ Surface boatSurface() {
         float mode = uBoatMode.y;
         vec3 col = vec3(0.56, 0.14, 0.67);
         if (mode < 0.5) col = hsv2rgb(vec3(fract(vLocal.y * 0.18 + uTime * 0.2), 0.7, 1.0));
-        else col = mix(vec3(0.56, 0.14, 0.67), vec3(0.42, 0.11, 0.60), vUv.y);
+        else if (mode < 1.5) col = mix(vec3(0.56, 0.14, 0.67), vec3(0.42, 0.11, 0.60), vUv.y);
+        else col = uSailColor * (0.92 + 0.08 * step(0.5, fract(vUv.x * 4.0)));
         Surface s = surface(col);
         s.spec = 0.25;
         return s;
+    }
+    if (isPart(vPart, 38.0)) {
+        Surface s = surface(mix(uExtra, vec3(1.0), 0.15));
+        s.spec = 0.8;
+        return s;
+    }
+    if (isPart(vPart, 35.0) && uBoatMode.w > 0.5) {
+        return surface(uFlagColor);
     }
     if (isPart(vPart, 35.0)) {
         vec3 col = vec3(0.06, 0.13, 0.15);
@@ -316,10 +389,13 @@ void main() {
     // Things under water take a little of its colour.
     if (vWorld.y < 0.0) col = mix(col, uWaterTint, 0.12);
 
-    // Silhouettes, for fish the Dex hasn't recorded yet.
+    // Silhouettes: fish the Dex hasn't recorded yet (1 unknown, 2 seen), and the Nightmare
+    // atmosphere's giant shadows (3).
     if (uFlags.y > 0.5) {
         vec3 dark = vec3(0.11, 0.18, 0.24);
-        col = uFlags.y < 1.5 ? dark + 0.06 * smoothstep(0.6, 0.75, fres) : mix(dark, uBase * 0.6, 0.6) + 0.25 * smoothstep(0.6, 0.75, fres) * uBase;
+        if (uFlags.y < 1.5) col = dark + 0.06 * smoothstep(0.6, 0.75, fres);
+        else if (uFlags.y < 2.5) col = mix(dark, uBase * 0.6, 0.6) + 0.25 * smoothstep(0.6, 0.75, fres) * uBase;
+        else col = vec3(0.03, 0.008, 0.012) + vec3(0.25, 0.02, 0.03) * smoothstep(0.6, 0.8, fres);
     }
 
     float fog = fogAmount(length(uCamPos - vWorld));

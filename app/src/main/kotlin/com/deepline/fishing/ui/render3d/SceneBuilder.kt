@@ -9,6 +9,9 @@ import com.deepline.fishing.core.FishSpecies
 import com.deepline.fishing.core.GameConfig
 import com.deepline.fishing.core.Lighting
 import com.deepline.fishing.core.ObstacleKind
+import com.deepline.fishing.core.Atmosphere
+import com.deepline.fishing.ui.ColorScript
+import com.deepline.fishing.ui.FishLooks
 import com.deepline.fishing.ui.FishStyles
 import com.deepline.fishing.ui.Skins
 import kotlin.math.PI
@@ -54,21 +57,8 @@ class Camera3d(val widthPx: Int, val heightPx: Int, val topDepth: Float) {
     }
 }
 
-/** Water colour by depth (the same stops as the shaders and the 2D renderer). */
-internal fun waterColor(depth: Float): FloatArray {
-    val stops = listOf(0f to 0xFF4FC3F7, 100f to 0xFF0288D1, 300f to 0xFF01396B, 500f to 0xFF061A3A, 700f to 0xFF02060F)
-    val d = max(depth, 0f)
-    for (i in 1 until stops.size) {
-        val (d1, c1) = stops[i]
-        if (d <= d1) {
-            val (d0, c0) = stops[i - 1]
-            val t = (d - d0) / (d1 - d0)
-            val a = rgb(c0); val b = rgb(c1)
-            return FloatArray(3) { a[it] + (b[it] - a[it]) * t }
-        }
-    }
-    return rgb(stops.last().second)
-}
+/** Water colour by depth, from the shared [ColorScript]. */
+internal fun waterColor(depth: Float, atmosphere: Atmosphere = Atmosphere.FAMILY): FloatArray = rgb(ColorScript.water(depth, atmosphere))
 
 /**
  * Turns a cast into a [Frame]. It keeps a little state between frames (how far each fish has
@@ -96,8 +86,10 @@ class SceneBuilder {
 
         // Light: bright sun near the surface, dimmer and bluer deeper.
         val camDepth = max(cam.centerDepth, 0f)
-        val lightK = 1f - 0.45f * smoothstep(0f, 300f, camDepth) - 0.2f * smoothstep(300f, 600f, camDepth)
-        val water = waterColor(camDepth)
+        val atmo = skins.atmosphere
+        val lightK = ColorScript.lightStrength(camDepth)
+        val lightTint = rgb(ColorScript.light(camDepth, atmo))
+        val water = waterColor(camDepth, atmo)
         val darkness = Lighting.darkness(hookDepth)
         val hookWorld = Vec3(session.hookX, -hookDepth, 0f)
         val (hookSx, hookSy) = cam.toScreen(hookWorld)
@@ -109,8 +101,14 @@ class SceneBuilder {
             "uResolution" to f(widthPx.toFloat(), heightPx.toFloat()),
             "uCamPos" to f(cam.eye.x, cam.eye.y, cam.eye.z),
             "uLightDir" to f(0.35f, 1f, 0.55f),
-            "uLightColor" to f(lightK, lightK, min(1f, lightK + 0.08f)),
+            "uLightColor" to FloatArray(3) { lightTint[it] * lightK },
             "uAmbient" to FloatArray(3) { water[it] * 0.8f + 0.12f },
+            // The background's water gradient, from the colour script (screen top to bottom).
+            "uWaterTop" to waterColor(max(top, 0f), atmo),
+            "uWaterBottom" to waterColor(max(bottom, 0f), atmo),
+            "uDepthRange" to f(top, bottom),
+            "uAtmosphere" to f(if (atmo == Atmosphere.NIGHTMARE) 1f else 0f),
+            "uDarkColor" to if (atmo == Atmosphere.NIGHTMARE) f(0.06f, 0f, 0.01f) else f(0f, 0f, 0.01f),
             "uFogColor" to water,
             "uWaterTint" to water,
             "uFogNear" to f(cam.distance + 3f),
@@ -122,7 +120,7 @@ class SceneBuilder {
         )
 
         items += DrawItem(Program.BACKGROUND, "fullscreen", depthTest = false, depthWrite = false, cullBack = false)
-        addDecor(items, top, bottom, timeSeconds)
+        addDecor(items, top, bottom, timeSeconds, atmo)
 
         // Obstacles.
         for (o in session.world.obstacles) {
@@ -142,7 +140,7 @@ class SceneBuilder {
             val y = if (abs(target - current) <= step) target else current + step * if (target > current) 1f else -1f
             yaw[fe.id] = y
             val swimPhase = timeSeconds * (if (fe.isFleeing) 14f else 6f) + fe.id * 1.7f
-            items += fishItem(fe.species, Vec3(fe.x, -fe.depth, 0f), y, 0f, swimPhase, if (fe.isFleeing) 1.6f else 1f, fe.sparkling, fe.id.toFloat())
+            items += fishItem(fe.species, Vec3(fe.x, -fe.depth, 0f), y, 0f, swimPhase, if (fe.isFleeing) 1.6f else 1f, fe.sparkling, fe.id.toFloat(), atmosphere = atmo)
             if (fe.sparkling) addGlints(sprites, Vec3(fe.x, -fe.depth, 0f), fe.species.bodyLengthM, timeSeconds, fe.id)
         }
 
@@ -154,7 +152,7 @@ class SceneBuilder {
         val rodBase = Vec3(cx + 0.9f, 1.0f + boatBob, 0.8f)
         val rodTip = Vec3(cx + 1.9f + bend * 0.6f, 2.9f - bend + boatBob, 0.8f)
         if (-top < 8f) {
-            items += boatItems(skins.boat, Vec3(cx, boatBob, 0f), timeSeconds)
+            items += boatItems(skins.boat, Vec3(cx, boatBob, 0f), timeSeconds, skins.customBoat)
             items += rodItem(rodBase, rodTip)
         }
 
@@ -195,7 +193,7 @@ class SceneBuilder {
             val len = fe.species.bodyLengthM
             val ox = (i - (n - 1) / 2f) * 0.35f
             val center = Vec3(hookWorld.x + ox, hookWorld.y - s * 0.9f - len / 2f, 0.05f * i)
-            items += fishItem(fe.species, center, FACING_RIGHT, PI.toFloat() / 2f, timeSeconds * 16f + fe.id, 2.2f, fe.sparkling, fe.id.toFloat())
+            items += fishItem(fe.species, center, FACING_RIGHT, PI.toFloat() / 2f, timeSeconds * 16f + fe.id, 2.2f, fe.sparkling, fe.id.toFloat(), atmosphere = atmo)
         }
 
         // The line, drawn over the scene (it's thin, so no depth fight with the water).
@@ -204,7 +202,8 @@ class SceneBuilder {
         // Skins: an aura around the hook and a trail of bubbles or sparkles.
         addHookAura(sprites, hookWorld, s, timeSeconds, skins.hook)
         addTrail(sprites, hookEye, timeSeconds, skins.trail)
-        addMarineSnow(sprites, top, bottom, timeSeconds)
+        addMarineSnow(sprites, top, bottom, timeSeconds, atmo)
+        if (atmo == Atmosphere.NIGHTMARE) addNightmare(items, sprites, top, bottom, timeSeconds)
 
         // Jellies are see-through: drawn after the opaque things.
         items.sortWith(compareBy { if (it.blend == Blend.OPAQUE) 0 else 1 })
@@ -225,7 +224,7 @@ class SceneBuilder {
             val len = fe.species.bodyLengthM
             val yw = yaw[fe.id] ?: FACING_RIGHT
             val world = Mat4.transformPoint(Mat4.trs(Vec3(fe.x, -fe.depth, 0f), rotY = yw, scale = Vec3(len, len, len)), tip)
-            val accent = rgb(fe.species.accentColor)
+            val accent = rgb(FishLooks.of(fe.species, atmo).glow)
             glows.quad(world, max(len * 0.7f, 0.5f), floatArrayOf(accent[0], accent[1], accent[2], 0.85f * strength), SHAPE_HALO)
             glows.quad(world, max(len * 0.08f, 0.12f), floatArrayOf(1f, 1f, 0.95f, strength), SHAPE_DOT)
         }
@@ -274,9 +273,28 @@ class SceneBuilder {
         }
     }
 
-    private fun boatItems(skin: Cosmetic?, at: Vec3, t: Float): List<DrawItem> {
+    private fun boatItems(skin: Cosmetic?, at: Vec3, t: Float, design: com.deepline.fishing.core.BoatDesign? = null): List<DrawItem> {
         val roll = sin(t * 1.1f) * 0.025f
         val m = Mat4.trs(at, rotZ = roll)
+        if (skin == null && design != null) {
+            return listOf(
+                DrawItem(
+                    Program.TOON, "boatd:${design.sailStyle.name}:${design.flagStyle.name}:${design.emblem.name}",
+                    uniforms = model(m) + mapOf(
+                        "uMaterial" to f(3f),
+                        "uBase" to rgb(design.hullColor()),
+                        "uAccent" to rgb(design.hullBottomColor()),
+                        "uExtra" to rgb(design.trimColor()),
+                        "uExtra2" to rgb(design.cabinColor()),
+                        "uSailColor" to rgb(design.sailColor()),
+                        "uFlagColor" to rgb(design.flagColor()),
+                        // x: trim mode (solid), y: sail mode (custom), z: hull pattern, w: custom flag.
+                        "uBoatMode" to f(0f, 2f, design.pattern.ordinal.toFloat(), 1f),
+                    ),
+                    outlinePx = 2.4f, outlineColor = OUTLINE_INK,
+                ),
+            )
+        }
         val (hullTop, hullBottom, trim, trimMode) = when (skin) {
             Cosmetic.GIANT_SLAYER_PENNANT -> listOf(rgb(0xFF37474F), rgb(0xFF102027), rgb(0xFF4DD0E1), f(0f))
             Cosmetic.PRISM_SAIL -> listOf(rgb(0xFFFAFAFA), rgb(0xFFB0BEC5), rgb(0xFFFFFFFF), f(1f))
@@ -361,7 +379,7 @@ class SceneBuilder {
     // ---- Decor and particles -------------------------------------------------------------------
 
     /** Rock formations, kelp and coral far behind the play plane (decor only, never in play). */
-    private fun addDecor(items: MutableList<DrawItem>, top: Float, bottom: Float, t: Float) {
+    private fun addDecor(items: MutableList<DrawItem>, top: Float, bottom: Float, t: Float, atmo: Atmosphere) {
         val tile = 40f
         for (k in floor(max(top, 0f) / tile).toInt()..floor(bottom / tile).toInt()) {
             for (i in 0 until 2) {
@@ -371,8 +389,20 @@ class SceneBuilder {
                 val z = -45f - hash01(i, k, 12) * 30f
                 val x = -14f + hash01(i, k, 13) * 48f
                 val size = 5f + hash01(i, k, 14) * 7f
-                val tint = waterColor(depth)
-                val rockCol = FloatArray(3) { 0.55f * tint[it] + 0.08f }
+                val tint = waterColor(depth, atmo)
+                // Sandy rocks in the sun, slate deeper, black spires in the abyss.
+                val stone = rgb(
+                    when {
+                        depth < 120f -> 0xFFC9B48A
+                        depth < 320f -> 0xFF5B6E8C
+                        else -> 0xFF22252E
+                    },
+                )
+                // Below the sunlit water the formations fade to dark silhouettes, so the deep feels
+                // vast and empty and nothing behind the fish competes with them.
+                val sunlit = 1f - ColorScript.smooth(80f, 200f, depth)
+                val rockCol = FloatArray(3) { (0.45f * tint[it] + 0.4f * stone[it]) * (0.55f + 0.45f * sunlit) }
+                if (sunlit < 0.5f && i == 1) continue
                 items += DrawItem(
                     Program.TOON, "decor:${(i + k * 3) % 6}",
                     uniforms = model(Mat4.trs(Vec3(x, -depth, z), rotY = hash01(i, k, 15) * 6f, scale = Vec3(size, size, size))) +
@@ -387,7 +417,7 @@ class SceneBuilder {
                             mapOf("uMaterial" to f(4f), "uSwim" to f(0f, 0f, i + k * 1.3f, 0f)),
                         cullBack = false,
                     )
-                    val coral = listOf(rgb(0xFFFF8A80), rgb(0xFFFFB74D), rgb(0xFFBA68C8), rgb(0xFF4DB6AC))[(i + k) % 4]
+                    val coral = listOf(rgb(0xFFFF7A6B), rgb(0xFFFFB347), rgb(0xFFF78FD0), rgb(0xFF5EE6B5))[(i + k) % 4]
                     items += DrawItem(
                         Program.TOON, "coral:${(i * 2 + k) % 4}",
                         uniforms = model(Mat4.trs(Vec3(x - size * 0.3f, -depth + size * 0.9f, z + 2f), scale = Vec3(2.4f, 2.4f, 2.4f))) +
@@ -398,16 +428,48 @@ class SceneBuilder {
         }
     }
 
-    private fun addMarineSnow(sprites: SpriteBatch, top: Float, bottom: Float, t: Float) {
+    /**
+     * The Nightmare atmosphere's decor: huge shadowy shapes gliding far behind the play plane
+     * with red eyes, below the twilight. Drawn before the darkness like everything else, so they
+     * only show where the player can see anyway.
+     */
+    private fun addNightmare(items: MutableList<DrawItem>, sprites: SpriteBatch, top: Float, bottom: Float, t: Float) {
+        val tile = 90f
+        val shadow = FishCatalog.byId("abyss_wyrm") ?: return
+        for (k in floor(max(top, 250f) / tile).toInt()..floor(bottom / tile).toInt()) {
+            val depth = k * tile + hash01(k, 3, 21) * tile
+            if (depth < 250f || depth < top - 20f || depth > bottom + 20f) continue
+            val dir = if (hash01(k, 4, 22) > 0.5f) 1 else -1
+            val span = 70f
+            val x = -25f + ((t * 1.8f + hash01(k, 5, 23) * span) % span) .let { if (dir > 0) it else span - it }
+            val z = -55f - hash01(k, 6, 24) * 20f
+            val len = 22f + hash01(k, 7, 25) * 14f
+            val yaw = if (dir > 0) 0f else PI.toFloat()
+            val m = Mat4.trs(Vec3(x, -depth, z), rotY = yaw, scale = Vec3(len, len, len))
+            items += DrawItem(
+                Program.TOON, "fish:${shadow.id}:NIGHTMARE",
+                uniforms = model(m) + fishUniforms(shadow, t * 1.5f, 0.6f, false, k.toFloat(), silhouette = 3f, atmosphere = Atmosphere.NIGHTMARE),
+            )
+            // Two red eyes on the shadow.
+            val eye = FishModels.eyeOf(shadow, Atmosphere.NIGHTMARE)
+            val p = Mat4.transformPoint(m, Vec3(eye.x, eye.y, 0.3f))
+            val glow = 0.6f + 0.4f * sin(t * 2.3f + k)
+            sprites.quad(p, len * 0.06f, floatArrayOf(1f, 0.1f, 0.08f, 0.9f * glow), SHAPE_HALO)
+            sprites.quad(p, len * 0.018f, floatArrayOf(1f, 0.55f, 0.4f, glow), SHAPE_DOT)
+        }
+    }
+
+    private fun addMarineSnow(sprites: SpriteBatch, top: Float, bottom: Float, t: Float, atmo: Atmosphere) {
         val tile = 30f
         for (k in floor(top / tile).toInt()..floor(bottom / tile).toInt()) {
-            for (i in 0 until 26) {
+            val speck = rgb(ColorScript.specks(k * tile + tile / 2f, atmo))
+            for (i in 0 until 20) {
                 val depth = k * tile + hash01(i, k, 2) * tile
                 if (depth < 0.5f) continue
                 val z = -28f + hash01(i, k, 5) * 32f
                 val x = -8f + hash01(i, k, 1) * 36f + sin(t * 0.5f + i + k) * 0.2f
                 val size = 0.06f + 0.1f * hash01(i, k, 4)
-                sprites.quad(Vec3(x, -depth + sin(t * 0.3f + i) * 0.2f, z), size, floatArrayOf(1f, 1f, 1f, 0.25f + 0.3f * hash01(i, k, 3)), SHAPE_DOT)
+                sprites.quad(Vec3(x, -depth + sin(t * 0.3f + i) * 0.2f, z), size, floatArrayOf(speck[0], speck[1], speck[2], 0.25f + 0.35f * hash01(i, k, 3)), SHAPE_DOT)
             }
         }
     }
@@ -493,14 +555,28 @@ class SceneBuilder {
         const val SHAPE_HALO = 4f
 
         /** The uniforms that paint [species]: colours, pattern, swimming. */
-        fun fishUniforms(species: FishSpecies, swimPhase: Float, amplitude: Float, sparkling: Boolean, seed: Float, silhouette: Float = 0f): Map<String, FloatArray> {
+        fun fishUniforms(
+            species: FishSpecies,
+            swimPhase: Float,
+            amplitude: Float,
+            sparkling: Boolean,
+            seed: Float,
+            silhouette: Float = 0f,
+            atmosphere: Atmosphere = Atmosphere.FAMILY,
+        ): Map<String, FloatArray> {
             val style = FishStyles.of(species)
+            val look = FishLooks.of(species, atmosphere)
+            val eye = FishModels.eyeOf(species, atmosphere)
+            val iris = rgb(look.iris)
             return mapOf(
                 "uMaterial" to f(0f),
-                "uBase" to rgb(species.bodyColor),
-                "uAccent" to rgb(species.accentColor),
+                "uBase" to rgb(look.body),
+                "uAccent" to rgb(look.accent),
+                "uExtra" to rgb(look.glow),
                 "uFlags" to f(if (sparkling) 1f else 0f, silhouette, style.pattern.ordinal.toFloat(), 0f),
-                "uFish" to f(species.heightRatio, gillX(style.shape), 0f, 0f),
+                "uFish" to f(species.heightRatio, gillX(style.shape), look.cute, look.menace),
+                "uFish2" to f(eye.x, eye.y, eye.z, if (look.photophores) 1f else 0f),
+                "uEye" to f(iris[0], iris[1], iris[2], look.eyeStyle.ordinal.toFloat()),
                 "uSwim" to f(swimPhase, amplitude, seed, 0f),
             )
         }
@@ -523,12 +599,16 @@ class SceneBuilder {
             seed: Float,
             silhouette: Float = 0f,
             len: Float = species.bodyLengthM,
+            atmosphere: Atmosphere = Atmosphere.FAMILY,
         ): DrawItem {
             val m = Mat4.trs(at, rotY = yaw, rotZ = rotZ, scale = Vec3(len, len, len))
-            val ink = rgb(species.accentColor).let { a -> f(a[0] * 0.22f + 0.02f, a[1] * 0.22f + 0.03f, a[2] * 0.22f + 0.06f) }
+            val look = FishLooks.of(species, atmosphere)
+            // Ink lines: a dark shade of the fish's own colours (anime style), not plain black.
+            val ink = rgb(ColorScript.mix(look.body, 0xFF0A0E1A, 0.78f))
+            val key = if (atmosphere == Atmosphere.NIGHTMARE) "fish:${species.id}:NIGHTMARE" else "fish:${species.id}"
             return DrawItem(
-                Program.TOON, "fish:${species.id}",
-                uniforms = mapOf("uModel" to m, "uNormalMatrix" to Mat4.normalMatrix(m)) + fishUniforms(species, swimPhase, amplitude, sparkling, seed, silhouette),
+                Program.TOON, key,
+                uniforms = mapOf("uModel" to m, "uNormalMatrix" to Mat4.normalMatrix(m)) + fishUniforms(species, swimPhase, amplitude, sparkling, seed, silhouette, atmosphere),
                 outlinePx = 2.2f, outlineColor = if (silhouette > 0f) f(0.03f, 0.05f, 0.08f) else ink,
             )
         }

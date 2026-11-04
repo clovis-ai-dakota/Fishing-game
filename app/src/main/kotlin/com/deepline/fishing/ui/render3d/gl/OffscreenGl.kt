@@ -26,6 +26,11 @@ object OffscreenGl {
     @Volatile
     var failed = false
         private set
+
+    /** Live previews share this flag: after any failure, pictures use the 2D art. */
+    fun markFailed() {
+        failed = true
+    }
     private val thread by lazy { HandlerThread("DeepLine3D-offscreen").apply { start() } }
     private val handler by lazy { Handler(thread.looper) }
 

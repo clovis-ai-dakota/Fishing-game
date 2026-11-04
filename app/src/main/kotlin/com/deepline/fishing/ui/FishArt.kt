@@ -93,8 +93,10 @@ private class FishGeometry(species: FishSpecies) {
     val ventral = ventralPath(style.shape, h)
     val tailPivot = Offset(if (style.shape == FishShape.EEL) -0.45f else -0.37f, 0f)
 
-    val bodyColor = Color(species.bodyColor)
-    val accent = Color(species.accentColor)
+    // Colours from the colour script (bright near the surface, dark and harsh in the deep).
+    val look = FishLooks.of(species)
+    val bodyColor = Color(look.body)
+    val accent = Color(look.accent)
     val bodyBrush = Brush.verticalGradient(
         0f to lerp(bodyColor, accent, 0.45f),
         0.55f to bodyColor,

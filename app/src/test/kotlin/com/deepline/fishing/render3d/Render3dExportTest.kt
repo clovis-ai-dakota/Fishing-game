@@ -87,6 +87,26 @@ class Render3dExportTest {
     fun darkWater() = export("dark_no_lantern", SceneBuilder().build(deepSession(false), 3f, w, h))
 
     @Test
+    fun nightmare() {
+        val skins = Skins(atmosphere = com.deepline.fishing.core.Atmosphere.NIGHTMARE)
+        export("nightmare_lantern", SceneBuilder().build(deepSession(true), 3f, w, h, skins))
+        export("nightmare_no_lantern", SceneBuilder().build(deepSession(false), 3f, w, h, skins))
+    }
+
+    /** The same species at each depth band, to see the mood go from friendly to menacing. */
+    @Test
+    fun depthProgression() {
+        for ((name, depth) in listOf("zone_shallows" to 40f, "zone_twilight" to 200f, "zone_midnight" to 380f, "zone_abyss" to 560f)) {
+            val zoneFish = FishCatalog.all.filter { depth >= it.minDepth && depth <= it.maxDepth && !it.lastBumpOnly }.take(6)
+            val c = GameConfig.WORLD_WIDTH / 2f
+            val fish = zoneFish.mapIndexed { i, sp -> FishEntity(i, sp, i == 2, 3f + (i % 2) * 12f, depth - 8f + i * 3.5f, if (i % 2 == 0) 1 else -1, 0f) }
+            val session = CastSession(RopeSpecs(700f, 20f, 9f), true, World(fish, listOf(Obstacle(0, ObstacleKind.ROCK, c + 5f, depth + 6f, 1.2f))))
+            while (session.hookDepth < depth - 9f) session.update(1f / 60f, null)
+            export(name, SceneBuilder().build(session, 2f, w, h))
+        }
+    }
+
+    @Test
     fun darkWaterLantern() = export("dark_lantern", SceneBuilder().build(deepSession(true), 3f, w, h))
 
     private fun surfaceSession(): CastSession {
@@ -99,6 +119,20 @@ class Render3dExportTest {
     fun skinSets() {
         for (set in listOf("Giant-slayer", "Prismatic", "Sovereign")) {
             export("skins_${set.lowercase()}", SceneBuilder().build(surfaceSession(), 1.3f, w, h, Skins.ofSet(set), cameraTop = -7f))
+        }
+    }
+
+    /** Hand-made boats: every sail and flag style, patterns and emblems. */
+    @Test
+    fun customBoats() {
+        val designs = listOf(
+            com.deepline.fishing.core.BoatDesign(),
+            com.deepline.fishing.core.BoatDesign(hull = 9, hullBottom = 10, trim = 14, cabin = 4, sail = 0, flag = 12, pattern = com.deepline.fishing.core.HullPattern.STRIPE, sailStyle = com.deepline.fishing.core.SailStyle.TRIANGLE, flagStyle = com.deepline.fishing.core.FlagStyle.PENNANT, emblem = com.deepline.fishing.core.Emblem.STAR),
+            com.deepline.fishing.core.BoatDesign(hull = 12, hullBottom = 16, trim = 4, cabin = 0, sail = 15, flag = 7, pattern = com.deepline.fishing.core.HullPattern.DOTS, sailStyle = com.deepline.fishing.core.SailStyle.SQUARE, flagStyle = com.deepline.fishing.core.FlagStyle.SWALLOWTAIL, emblem = com.deepline.fishing.core.Emblem.HEART),
+            com.deepline.fishing.core.BoatDesign(hull = 6, hullBottom = 23, trim = 22, cabin = 5, sail = 6, flag = 17, pattern = com.deepline.fishing.core.HullPattern.CHECKER, sailStyle = com.deepline.fishing.core.SailStyle.TWIN, flagStyle = com.deepline.fishing.core.FlagStyle.BANNER, emblem = com.deepline.fishing.core.Emblem.ANCHOR),
+        )
+        designs.forEachIndexed { i, d ->
+            export("boat_custom_$i", SceneBuilder().build(surfaceSession(), 1.3f, w, h, Skins(customBoat = d), cameraTop = -7f))
         }
     }
 
@@ -120,7 +154,8 @@ class Render3dExportTest {
         val session = CastSession(RopeSpecs(120f, 10f, 9f), false, World(emptyList(), emptyList()))
         while (session.hookDepth < 30f) session.update(1f / 60f, null)
         val base = SceneBuilder().build(session, 0.6f, w, h, cameraTop = 40f)
-        val species = FishCatalog.all.take(16) + FishCatalog.all.drop(16).filterIndexed { i, _ -> i % 23 == 0 } + FishCatalog.sovereign
+        // Ordered by depth: friendly at the top, menacing at the bottom.
+        val species = (FishCatalog.all.take(16) + FishCatalog.all.drop(16).filterIndexed { i, _ -> i % 23 == 0 } + FishCatalog.sovereign).sortedBy { it.minDepth }
         val cols = 3
         val rows = (species.size + cols - 1) / cols
         val viewH = GameConfig.WORLD_WIDTH / (w / h.toFloat())

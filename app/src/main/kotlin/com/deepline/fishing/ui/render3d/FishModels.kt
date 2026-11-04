@@ -1,6 +1,9 @@
 package com.deepline.fishing.ui.render3d
 
+import com.deepline.fishing.core.Atmosphere
 import com.deepline.fishing.core.FishSpecies
+import com.deepline.fishing.ui.FishLook
+import com.deepline.fishing.ui.FishLooks
 import com.deepline.fishing.ui.FishShape
 import com.deepline.fishing.ui.FishStyles
 import kotlin.math.PI
@@ -17,7 +20,17 @@ import kotlin.math.sqrt
 object FishModels {
     private val cache = HashMap<String, MeshData>()
 
-    fun mesh(species: FishSpecies): MeshData = synchronized(cache) { cache.getOrPut(species.id) { build(species) } }
+    /** The mesh for [species] as it looks in [atmosphere] (features come from its [FishLook]). */
+    fun mesh(species: FishSpecies, atmosphere: Atmosphere = Atmosphere.FAMILY): MeshData {
+        val look = FishLooks.of(species, atmosphere)
+        return synchronized(cache) { cache.getOrPut("${species.id}:${look.geometryKey}") { build(species, look) } }
+    }
+
+    /** Where the eye sits (x, y) and its radius (z), in unit space, as the mesh draws it. */
+    fun eyeOf(species: FishSpecies, atmosphere: Atmosphere = Atmosphere.FAMILY): Vec3 {
+        val o = Outline.of(FishStyles.of(species).shape, species.heightRatio)
+        return Vec3(o.eye.x, o.eye.y, o.eyeRadius * FishLooks.of(species, atmosphere).eyeScale)
+    }
 
     /** Where an anglerfish's lure bulb sits, in unit space (null for fish without one). */
     fun lureTip(species: FishSpecies): Vec3? =
@@ -32,7 +45,7 @@ object FishModels {
         FishShape.CUTTLE -> 0.8f
     }
 
-    fun build(species: FishSpecies): MeshData {
+    fun build(species: FishSpecies, look: FishLook = FishLooks.of(species)): MeshData {
         val style = FishStyles.of(species)
         val shape = style.shape
         val h = species.heightRatio
@@ -83,9 +96,9 @@ object FishModels {
             }
         }
 
-        // Big glossy anime eyes on both sides of the head.
+        // Big glossy anime eyes on both sides of the head (smaller and meaner in the deep).
         val eye = outline.eye
-        val eyeR = outline.eyeRadius
+        val eyeR = outline.eyeRadius * look.eyeScale
         for (side in listOf(1f, -1f)) {
             val z = side * halfWidthAt(eye.x) * 0.78f
             b.sphere(Vec3(eye.x, eye.y, z), eyeR, Part.EYE, lat = 10, lon = 16, scale = Vec3(1f, 1f, 0.75f))
@@ -127,6 +140,7 @@ object FishModels {
             }
             else -> Unit
         }
+        addMenace(b, outline, shape, h, look, ::halfWidthAt)
         if (species.id == "deep_sovereign") {
             // A crown of spines along the head.
             val crest = ArrayList<Pair<Float, Float>>()
@@ -141,6 +155,63 @@ object FishModels {
             b.extrude(crest, 0.02f, Part.LURE)
         }
         return b.build()
+    }
+
+    /**
+     * What makes deep fish look dangerous: spines along the back (and belly), teeth or fangs at
+     * the mouth, and sharper tail tips. Shape language: round reads friendly, pointed reads
+     * menacing. Purely visual: hitboxes don't change.
+     */
+    private fun addMenace(b: MeshBuilder, outline: Outline, shape: FishShape, h: Float, look: FishLook, halfWidthAt: (Float) -> Float) {
+        if (shape == FishShape.CUTTLE) return
+        if (look.spines > 0) {
+            val count = if (look.spines == 1) 5 else 8
+            val height = (if (look.spines == 1) 0.12f else 0.22f) * h + 0.01f
+            for (k in 0 until count) {
+                val x = 0.2f - k * (0.45f / count)
+                val top = outline.heightAt(x).first
+                if (top <= 0f) continue
+                val w = 0.45f / count * 0.45f
+                b.extrude(listOf(x - w to top - 0.02f * h, x + w to top - 0.02f * h, x - w * 0.6f to top + height * (0.8f + 0.2f * (k % 2))), 0.012f, Part.FIN)
+            }
+            if (look.spines == 2) for (k in 0 until 4) {
+                val x = 0.05f - k * 0.09f
+                val bottom = outline.heightAt(x).second
+                val w = 0.025f
+                b.extrude(listOf(x - w to bottom + 0.02f * h, x + w to bottom + 0.02f * h, x - w * 0.8f to bottom - 0.12f * h - 0.005f), 0.012f, Part.FIN)
+            }
+        }
+        if (look.teeth > 0 && shape != FishShape.ANGLER) {
+            // The mouth sits a little below the middle of the nose.
+            val nx = outline.maxX - 0.035f
+            val (top, bottom) = outline.heightAt(nx)
+            val mouth = (top + bottom) / 2f - (top - bottom) * 0.18f
+            val tooth = MeshBuilder().apply {
+                extrude(listOf(-0.007f to 0f, 0.007f to 0f, 0f to -(0.05f * h + 0.008f)), 0.008f, Part.TEETH)
+            }.build()
+            for (k in 0 until 3) {
+                val x = nx - k * 0.022f
+                for (z in listOf(0.55f, -0.55f)) b.append(tooth, Mat4.translation(x, mouth + 0.01f * h, z * halfWidthAt(x)))
+            }
+            if (look.teeth == 2) {
+                // Fangs: two long ones down from the upper jaw, one up from the lower.
+                val fang = MeshBuilder().apply {
+                    extrude(listOf(-0.012f to 0f, 0.012f to 0f, 0.004f to -(0.2f * h + 0.02f)), 0.012f, Part.TEETH)
+                }.build()
+                for (z in listOf(0.5f, -0.5f)) {
+                    b.append(fang, Mat4.translation(nx - 0.03f, mouth + 0.04f * h, z * halfWidthAt(nx - 0.03f)))
+                    b.append(fang, Mat4.trs(Vec3(nx - 0.05f, mouth - 0.05f * h, z * halfWidthAt(nx - 0.05f)), rotZ = PI.toFloat(), scale = Vec3(0.8f, 0.7f, 1f)))
+                }
+            }
+        }
+        if (look.menace > 0.75f && shape != FishShape.EEL) {
+            // Hooked tips on the tail fork.
+            val tail = outline.tail
+            val tipTop = tail.maxByOrNull { it.second } ?: return
+            val tipBottom = tail.minByOrNull { it.second } ?: return
+            b.extrude(listOf(tipTop.first + 0.03f to tipTop.second - 0.06f * h, tipTop.first to tipTop.second - 0.02f * h, tipTop.first - 0.06f to tipTop.second + 0.1f * h), 0.016f, Part.TAIL)
+            b.extrude(listOf(tipBottom.first + 0.03f to tipBottom.second + 0.06f * h, tipBottom.first - 0.06f to tipBottom.second - 0.1f * h, tipBottom.first to tipBottom.second + 0.02f * h), 0.016f, Part.TAIL)
+        }
     }
 
     /** The 2D outline of a species (y up), and where its fins and eye go. */

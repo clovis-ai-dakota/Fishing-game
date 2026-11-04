@@ -85,35 +85,21 @@ fun FishPortrait3d(
 
 @Composable
 private fun FishTurntable(species: FishSpecies, look: PortraitLook, sparkling: Boolean, modifier: Modifier, fallback: @Composable androidx.compose.foundation.layout.BoxScope.() -> Unit) {
-    val context = LocalContext.current
-    var turn by remember(species) { mutableFloatStateOf(0f) }
-    var shown by remember(species, look) { mutableStateOf<ImageBitmap?>(null) }
-    BoxWithConstraints(modifier.pointerInput(species) { detectHorizontalDragGestures { _, dx -> turn += dx * 0.012f } }) {
-        val w = min(constraints.maxWidth.takeIf { it > 0 } ?: 600, 720)
-        val h = (w / 1.5f).toInt().coerceAtLeast(64)
-        LaunchedEffect(species, look, w, h) {
-            val buffers = arrayOf(Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888), Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888))
-            var i = 0
-            val start = System.nanoTime()
-            while (isActive) {
-                val t = (System.nanoTime() - start) / 1_000_000_000f
-                val yaw = SceneBuilder.FACING_RIGHT + sin(t * 0.6f) * 0.45f + turn
-                val frame = PortraitScene.build(species, look, w, h, yaw, t, sparkling)
-                val bmp = OffscreenGl.render(context, frame, into = buffers[i]) ?: break
-                shown = bmp.asImageBitmap()
-                i = 1 - i
-                withFrameNanos { }
-            }
+    // The drag angle is read by the render thread.
+    val turn = remember(species) { floatArrayOf(0f) }
+    val source = remember(species, look, sparkling) {
+        FrameSource { w, h, t ->
+            PortraitScene.build(species, look, w, h, SceneBuilder.FACING_RIGHT + sin(t * 0.6f) * 0.45f + turn[0], t, sparkling)
         }
-        val s = shown
-        if (s != null) Image(s, contentDescription = null, contentScale = ContentScale.Fit, modifier = Modifier.fillMaxSize(), filterQuality = FilterQuality.High)
-        else fallback()
+    }
+    Box(modifier.pointerInput(species) { detectHorizontalDragGestures { _, dx -> turn[0] += dx * 0.012f } }) {
+        LivePreview(source, transparent = true, modifier = Modifier.matchParentSize(), key = "$species$look$sparkling")
     }
 }
 
 /**
- * The boat, line and hook at the surface wearing [skins], animated (for the Skins screen), or
- * [fallback] where 3D isn't available.
+ * The boat, line and hook at the surface wearing [skins], animated (the Fish tab and the Skins
+ * screens), or [fallback] where 3D isn't available.
  */
 @Composable
 fun SkinPreview3d(skins: Skins, modifier: Modifier = Modifier, fallback: @Composable androidx.compose.foundation.layout.BoxScope.() -> Unit) {
@@ -123,34 +109,41 @@ fun SkinPreview3d(skins: Skins, modifier: Modifier = Modifier, fallback: @Compos
         Box(modifier) { fallback() }
         return
     }
-    val session = remember {
-        CastSession(RopeSpecs(120f, 10f, 9f), false, World(emptyList(), emptyList())).also {
+    // The skins can change while the preview runs: the render thread reads the latest.
+    val current = remember { arrayOf(skins) }
+    current[0] = skins
+    val source = remember {
+        val session = CastSession(RopeSpecs(120f, 10f, 9f), false, World(emptyList(), emptyList())).also {
             while (it.hookDepth < 5f) it.update(1f / 60f, 2f)
         }
+        val builder = SceneBuilder()
+        FrameSource { w, h, t -> builder.build(session, 0.8f + t, w, h, current[0], cameraTop = -6.5f) }
     }
-    var shown by remember { mutableStateOf<ImageBitmap?>(null) }
-    BoxWithConstraints(modifier) {
-        // Rendered at up to 540 px wide and scaled up: plenty for a preview, and light on the GPU.
-        val fullW = constraints.maxWidth.takeIf { it > 0 } ?: 540
-        val fullH = constraints.maxHeight.takeIf { it in 1..4000 } ?: (fullW * 1.2f).toInt()
-        val k = min(1f, 540f / fullW)
-        val w = (fullW * k).toInt().coerceAtLeast(64)
-        val h = (fullH * k).toInt().coerceAtLeast(64)
-        LaunchedEffect(skins, w, h) {
-            val builder = SceneBuilder()
-            val buffers = arrayOf(Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888), Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888))
-            var i = 0
-            val start = System.nanoTime()
-            while (isActive) {
-                val t = 0.8f + (System.nanoTime() - start) / 1_000_000_000f
-                val bmp = OffscreenGl.render(context, builder.build(session, t, w, h, skins, cameraTop = -6.5f), opaque = true, into = buffers[i]) ?: break
-                shown = bmp.asImageBitmap()
-                i = 1 - i
-                withFrameNanos { }
+    Box(modifier) {
+        LivePreview(source, transparent = false, modifier = Modifier.matchParentSize(), key = "skins")
+    }
+}
+
+/** Hosts a [GlTextureView], paused with the screen's lifecycle. */
+@Composable
+private fun LivePreview(source: FrameSource, transparent: Boolean, modifier: Modifier, key: Any) {
+    val lifecycle = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
+    val viewRef = remember(key) { arrayOfNulls<GlTextureView>(1) }
+    androidx.compose.runtime.key(key) {
+        androidx.compose.ui.viewinterop.AndroidView(
+            factory = { ctx -> GlTextureView(ctx, source, transparent).also { viewRef[0] = it } },
+            modifier = modifier,
+        )
+    }
+    androidx.compose.runtime.DisposableEffect(lifecycle, key) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            when (event) {
+                androidx.lifecycle.Lifecycle.Event.ON_PAUSE -> viewRef[0]?.setPaused(true)
+                androidx.lifecycle.Lifecycle.Event.ON_RESUME -> viewRef[0]?.setPaused(false)
+                else -> Unit
             }
         }
-        val s = shown
-        if (s != null) Image(s, contentDescription = null, contentScale = ContentScale.FillBounds, modifier = Modifier.fillMaxSize(), filterQuality = FilterQuality.High)
-        else fallback()
+        lifecycle.addObserver(observer)
+        onDispose { lifecycle.removeObserver(observer) }
     }
 }

@@ -61,6 +61,7 @@ object Part {
     const val SAIL = 34f
     const val FLAG = 35f
     const val MAST = 36f
+    const val EMBLEM = 38f
     const val KELP = 40f
     const val DECOR_ROCK = 41f
     const val CORAL = 42f
@@ -68,29 +69,50 @@ object Part {
 
 /** Builds meshes vertex by vertex, with helpers for the shapes the game needs. */
 class MeshBuilder {
-    private val pos = ArrayList<Float>()
-    private val nor = ArrayList<Float>()
-    private val uv = ArrayList<Float>()
-    private val part = ArrayList<Float>()
-    private val col = ArrayList<Float>()
-    private val idx = ArrayList<Int>()
+    // Growable primitive arrays: no boxing, so building particles every frame stays cheap.
+    private var pos = FloatArray(64 * 3)
+    private var nor = FloatArray(64 * 3)
+    private var uv = FloatArray(64 * 2)
+    private var part = FloatArray(64)
+    private var col = FloatArray(64 * 4)
+    private var idx = IntArray(256)
+    private var vCount = 0
+    private var iCount = 0
     private var hasColors = false
 
-    val vertexCount get() = pos.size / 3
+    val vertexCount get() = vCount
+
+    private fun ensureVertex() {
+        if (vCount < part.size) return
+        val n = part.size * 2
+        pos = pos.copyOf(n * 3); nor = nor.copyOf(n * 3); uv = uv.copyOf(n * 2); part = part.copyOf(n); col = col.copyOf(n * 4)
+    }
+
+    private fun ensureIndex(extra: Int) {
+        if (iCount + extra <= idx.size) return
+        idx = idx.copyOf(maxOf(idx.size * 2, iCount + extra))
+    }
 
     fun vertex(p: Vec3, n: Vec3, u: Float, v: Float, partId: Float, color: FloatArray? = null): Int {
-        pos += p.x; pos += p.y; pos += p.z
-        nor += n.x; nor += n.y; nor += n.z
-        uv += u; uv += v
-        part += partId
-        if (color != null) hasColors = true
-        val c = color ?: WHITE
-        col += c[0]; col += c[1]; col += c[2]; col += c[3]
-        return vertexCount - 1
+        ensureVertex()
+        val i = vCount
+        pos[i * 3] = p.x; pos[i * 3 + 1] = p.y; pos[i * 3 + 2] = p.z
+        nor[i * 3] = n.x; nor[i * 3 + 1] = n.y; nor[i * 3 + 2] = n.z
+        uv[i * 2] = u; uv[i * 2 + 1] = v
+        part[i] = partId
+        if (color != null) {
+            hasColors = true
+            col[i * 4] = color[0]; col[i * 4 + 1] = color[1]; col[i * 4 + 2] = color[2]; col[i * 4 + 3] = color[3]
+        } else {
+            col[i * 4] = 1f; col[i * 4 + 1] = 1f; col[i * 4 + 2] = 1f; col[i * 4 + 3] = 1f
+        }
+        vCount++
+        return i
     }
 
     fun triangle(a: Int, b: Int, c: Int) {
-        idx += a; idx += b; idx += c
+        ensureIndex(3)
+        idx[iCount++] = a; idx[iCount++] = b; idx[iCount++] = c
     }
 
     fun quad(a: Int, b: Int, c: Int, d: Int) {
@@ -113,14 +135,15 @@ class MeshBuilder {
             val c = m.colors?.let { floatArrayOf(it[i * 4], it[i * 4 + 1], it[i * 4 + 2], it[i * 4 + 3]) }
             vertex(p, n, m.uvs[i * 2], m.uvs[i * 2 + 1], m.parts[i], c)
         }
-        for (k in m.indices) idx += base + k
+        ensureIndex(m.indices.size)
+        for (k in m.indices) idx[iCount++] = base + k
     }
 
     /** Replaces the normals of vertices [from] until the end by smooth normals from the faces. */
     fun smoothNormals(from: Int = 0, triangleFrom: Int = 0) {
         val n = FloatArray((vertexCount - from) * 3)
         var t = triangleFrom * 3
-        while (t < idx.size) {
+        while (t < iCount) {
             val a = idx[t]; val b = idx[t + 1]; val c = idx[t + 2]
             t += 3
             if (a < from || b < from || c < from) continue
@@ -138,17 +161,17 @@ class MeshBuilder {
         }
     }
 
-    val triangleCount get() = idx.size / 3
+    val triangleCount get() = iCount / 3
 
     private fun p(i: Int) = Vec3(pos[i * 3], pos[i * 3 + 1], pos[i * 3 + 2])
 
     fun build() = MeshData(
-        pos.toFloatArray(),
-        nor.toFloatArray(),
-        uv.toFloatArray(),
-        part.toFloatArray(),
-        if (hasColors) col.toFloatArray() else null,
-        idx.toIntArray(),
+        pos.copyOf(vCount * 3),
+        nor.copyOf(vCount * 3),
+        uv.copyOf(vCount * 2),
+        part.copyOf(vCount),
+        if (hasColors) col.copyOf(vCount * 4) else null,
+        idx.copyOf(iCount),
     )
 
     // ---- Shapes ----------------------------------------------------------------------------
@@ -334,8 +357,6 @@ class MeshBuilder {
     }
 
     companion object {
-        private val WHITE = floatArrayOf(1f, 1f, 1f, 1f)
-
         private fun signedArea(p: List<Pair<Float, Float>>): Float {
             var a = 0f
             for (i in p.indices) {

@@ -32,25 +32,13 @@ import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.sin
 
-private val waterStops = listOf(
-    0f to Color(0xFF4FC3F7),
-    100f to Color(0xFF0288D1),
-    300f to Color(0xFF01396B),
-    500f to Color(0xFF061A3A),
-    700f to Color(0xFF02060F),
-)
+/** Water colour by depth, from the shared colour script (the same as the 3D renderer). */
+private fun waterColor(depth: Float, atmosphere: com.deepline.fishing.core.Atmosphere = com.deepline.fishing.core.Atmosphere.FAMILY): Color =
+    Color(ColorScript.water(depth, atmosphere))
 
-private fun waterColor(depth: Float): Color {
-    if (depth <= waterStops.first().first) return waterStops.first().second
-    for (i in 1 until waterStops.size) {
-        val (d1, c1) = waterStops[i]
-        if (depth <= d1) {
-            val (d0, c0) = waterStops[i - 1]
-            return lerp(c0, c1, (depth - d0) / (d1 - d0))
-        }
-    }
-    return waterStops.last().second
-}
+/** The darkness colour: black, or blood-black in the Nightmare atmosphere (same visibility). */
+private fun darkTint(skins: Skins) =
+    if (skins.atmosphere == com.deepline.fishing.core.Atmosphere.NIGHTMARE) Color(0xFF0F0003) else Color.Black
 
 /** Stable pseudo-random number in 0..1, so particles stay put from frame to frame. */
 private fun hash01(i: Int, k: Int, salt: Int): Float {
@@ -104,7 +92,7 @@ fun DrawScope.drawCastScene(
     val waterTop = surfaceY.coerceAtLeast(0f)
     drawRect(
         Brush.verticalGradient(
-            listOf(waterColor(max(top, 0f)), waterColor(bottom)),
+            listOf(waterColor(max(top, 0f), skins.atmosphere), waterColor(bottom, skins.atmosphere)),
             startY = waterTop,
             endY = size.height,
         ),
@@ -355,8 +343,8 @@ fun DrawScope.drawCastScene(
         drawRect(
             Brush.radialGradient(
                 0f to Color.Transparent,
-                0.6f to Color.Black.copy(alpha = 0.45f * darkness),
-                1f to Color.Black.copy(alpha = 0.97f * darkness),
+                0.6f to darkTint(skins).copy(alpha = 0.45f * darkness),
+                1f to darkTint(skins).copy(alpha = 0.97f * darkness),
                 center = hook,
                 radius = radius,
             ),
