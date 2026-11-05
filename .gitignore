@@ -11,3 +11,5 @@ captures/
 *.aab
 .claude/worktrees/
 .kotlin/
+# Battle server account files (written by the server and the online UI tests)
+data/accounts/
