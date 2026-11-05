@@ -30,6 +30,7 @@ import kotlin.math.ceil
 import kotlin.math.cos
 import kotlin.math.floor
 import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.sin
 
 /** Water colour by depth, from the shared colour script (the same as the 3D renderer). */
@@ -414,20 +415,58 @@ private fun DrawScope.drawBoatAndRod(
 ) {
     // The boat itself: classic, a boat skin, or the player's own design (BoatArt.kt).
     drawBoat(cx, surfaceY, scale, timeSeconds, skins.boat, skins.customBoat)
-    // Rod: a tapering curve from the reel to the tip.
+    // Rod (as in 3D): a navy graphite blank tapering to the tip, a cork grip, a reel hanging
+    // below with a turning crank, and guides the line runs through.
     val control = Offset(rodBase.x + (rodTip.x - rodBase.x) * 0.3f, rodBase.y + (rodTip.y - rodBase.y) * 0.8f)
-    val rod = Path().apply {
-        moveTo(rodBase.x, rodBase.y)
-        quadraticTo(control.x, control.y, rodTip.x, rodTip.y)
+    fun at(u: Float) = quadPoint(rodBase, control, rodTip, u)
+    fun below(u: Float): Offset {
+        val d = at(min(1f, u + 0.01f)) - at(max(0f, u - 0.01f))
+        val len = max(1e-3f, d.getDistance())
+        val n = Offset(d.y / len, -d.x / len)
+        return if (n.y < 0f) -n else n // screen y grows downwards
     }
-    drawPath(
-        rod,
-        Brush.linearGradient(listOf(Color(0xFF3E2723), Color(0xFFBCAAA4)), start = rodBase, end = rodTip),
-        style = Stroke(width = max(3f, 0.09f * scale), cap = StrokeCap.Round),
-    )
-    val reel = quadPoint(rodBase, control, rodTip, 0.12f)
-    drawCircle(Color(0xFFB0BEC5), radius = max(3f, 0.16f * scale), center = reel)
-    drawCircle(Color(0xFF546E7A), radius = max(1.5f, 0.07f * scale), center = reel)
+    val ink = Color(0xFF14202E)
+    val steps = 12
+    fun width(u: Float) = max(2f, (0.11f - 0.075f * u) * scale)
+    // Outline first, then the blank, then its highlight, so the segments join seamlessly.
+    for (pass in 0 until 3) for (i in 0 until steps) {
+        val u0 = i / steps.toFloat()
+        val u1 = (i + 1) / steps.toFloat()
+        val w = width(u0)
+        when (pass) {
+            0 -> drawLine(ink, at(u0), at(u1), strokeWidth = w + 2f, cap = StrokeCap.Round)
+            1 -> drawLine(Color(0xFF243B5A), at(u0), at(u1), strokeWidth = w, cap = StrokeCap.Round)
+            else -> drawLine(Color(0xFF7FA7D1).copy(alpha = 0.7f), at(u0) - below(u0) * (w * 0.22f), at(u1) - below(u1) * (w * 0.22f), strokeWidth = max(1f, w * 0.25f), cap = StrokeCap.Round)
+        }
+    }
+    // Cork grip and butt cap.
+    for (i in 0 until 4) {
+        val u0 = i / 4f * 0.17f
+        val u1 = (i + 1) / 4f * 0.17f
+        drawLine(ink, at(u0), at(u1), strokeWidth = max(3f, 0.17f * scale) + 2f, cap = StrokeCap.Butt)
+        drawLine(if (i % 2 == 0) Color(0xFFC9A26B) else Color(0xFFB88D55), at(u0), at(u1), strokeWidth = max(3f, 0.17f * scale), cap = StrokeCap.Butt)
+    }
+    drawCircle(Color(0xFF90A4AE), radius = max(2f, 0.085f * scale), center = rodBase)
+    // Guides, smaller towards the tip.
+    for (k in 0 until 5) {
+        val u = floatArrayOf(0.36f, 0.52f, 0.67f, 0.8f, 0.92f)[k]
+        val c = at(u) + below(u) * ((0.11f - 0.012f * k) * scale)
+        drawLine(Color(0xFFB0BEC5), at(u), c, strokeWidth = max(1f, 0.025f * scale))
+        drawCircle(Color(0xFFCFD8DC), radius = max(1.5f, (0.055f - 0.007f * k) * scale), center = c, style = Stroke(width = max(1f, 0.022f * scale)))
+    }
+    // The reel below the blank, its spool showing line, and a crank that turns.
+    val seat = at(0.2f)
+    val reel = seat + below(0.2f) * (0.22f * scale)
+    drawLine(Color(0xFF90A4AE), seat, reel, strokeWidth = max(1.5f, 0.056f * scale))
+    drawCircle(ink, radius = max(3f, 0.14f * scale), center = reel)
+    drawCircle(Brush.radialGradient(listOf(Color(0xFFE3EBF0), Color(0xFF78909C)), center = reel - Offset(0.04f * scale, 0.04f * scale), radius = 0.16f * scale), radius = max(2.5f, 0.13f * scale), center = reel)
+    drawCircle(Color(BoatLook.LINE_R, BoatLook.LINE_G, BoatLook.LINE_B), radius = max(1.5f, 0.08f * scale), center = reel)
+    drawCircle(Color(0xFF546E7A), radius = max(1f, 0.035f * scale), center = reel)
+    val a = timeSeconds * 2.2f
+    val knob = reel + Offset(cos(a), sin(a)) * (0.15f * scale)
+    drawLine(Color(0xFF546E7A), reel, knob, strokeWidth = max(1.2f, 0.04f * scale), cap = StrokeCap.Round)
+    drawCircle(Color(0xFFC9A26B), radius = max(1.5f, 0.045f * scale), center = knob)
+    drawCircle(Color(0xFFCFD8DC), radius = max(1.5f, 0.03f * scale), center = rodTip)
 }
 
 /**
@@ -444,9 +483,10 @@ fun DrawScope.drawHook(bend: Offset, s: Float, timeSeconds: Float, withBait: Boo
         cubicTo(bend.x, bend.y + 0.95f * s, bend.x + 0.95f * s, bend.y + 0.95f * s, pointTip.x, pointTip.y)
     }
     if (withBait) {
-        // Worm threaded on the shank, with its tail dangling below the bend.
+        // Worm threaded on the shank, with its tail dangling below the bend: a darker back,
+        // segment rings, the saddle band and a wet highlight (as in 3D).
         val pink = Color(0xFFE57373)
-        drawLine(pink, Offset(bend.x, bend.y - 0.65f * s), Offset(bend.x, bend.y + 0.35f * s), strokeWidth = s * 0.32f, cap = StrokeCap.Round)
+        val dark = Color(0xFFB4485A)
         val tail = Path()
         for (i in 0..8) {
             val u = i / 8f
@@ -455,11 +495,16 @@ fun DrawScope.drawHook(bend: Offset, s: Float, timeSeconds: Float, withBait: Boo
             if (i == 0) tail.moveTo(bend.x + 0.05f * s, bend.y + 0.45f * s)
             tail.lineTo(x, y)
         }
-        drawPath(tail, pink, style = Stroke(width = s * 0.26f, cap = StrokeCap.Round))
-        for (k in 0 until 3) {
-            val y = bend.y + (-0.45f + k * 0.3f) * s
-            drawLine(Color(0xFFC62828).copy(alpha = 0.6f), Offset(bend.x - s * 0.14f, y), Offset(bend.x + s * 0.14f, y), strokeWidth = 1.5f)
+        drawPath(tail, dark, style = Stroke(width = s * 0.3f, cap = StrokeCap.Round))
+        drawPath(tail, pink, style = Stroke(width = s * 0.2f, cap = StrokeCap.Round))
+        drawLine(dark, Offset(bend.x, bend.y - 0.65f * s), Offset(bend.x, bend.y + 0.35f * s), strokeWidth = s * 0.36f, cap = StrokeCap.Round)
+        drawLine(pink, Offset(bend.x - s * 0.03f, bend.y - 0.65f * s), Offset(bend.x - s * 0.03f, bend.y + 0.35f * s), strokeWidth = s * 0.26f, cap = StrokeCap.Round)
+        drawRoundRect(Color(0xFFD9707E), topLeft = Offset(bend.x - s * 0.19f, bend.y - 0.42f * s), size = Size(s * 0.38f, s * 0.2f), cornerRadius = CornerRadius(s * 0.08f))
+        for (k in 0 until 6) {
+            val y = bend.y + (-0.55f + k * 0.17f) * s
+            drawLine(Color(0xFF8E2A3C).copy(alpha = 0.45f), Offset(bend.x - s * 0.15f, y), Offset(bend.x + s * 0.15f, y), strokeWidth = max(1f, s * 0.035f))
         }
+        drawLine(Color.White.copy(alpha = 0.55f), Offset(bend.x - s * 0.09f, bend.y - 0.58f * s), Offset(bend.x - s * 0.09f, bend.y + 0.2f * s), strokeWidth = max(1f, s * 0.05f), cap = StrokeCap.Round)
     }
     drawCircle(metal, radius = s * 0.17f, center = Offset(bend.x, bend.y - 1.4f * s), style = Stroke(width = w * 0.8f))
     drawPath(shankAndBend, metal, style = Stroke(width = w, cap = StrokeCap.Round))

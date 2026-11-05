@@ -62,6 +62,14 @@ object Part {
     const val FLAG = 35f
     const val MAST = 36f
     const val EMBLEM = 38f
+    // Boat details (boat material).
+    const val ROOF = 43f
+    const val LIFE_RING = 44f
+    const val FENDER = 45f
+    const val LAMP = 46f
+    const val CORK = 47f
+    const val REEL = 48f
+    const val ROPE = 49f
     const val KELP = 40f
     const val DECOR_ROCK = 41f
     const val CORAL = 42f
@@ -162,6 +170,9 @@ class MeshBuilder {
     }
 
     val triangleCount get() = iCount / 3
+
+    /** Where vertex [i] is. */
+    fun position(i: Int): Vec3 = p(i)
 
     private fun p(i: Int) = Vec3(pos[i * 3], pos[i * 3 + 1], pos[i * 3 + 2])
 

@@ -18,6 +18,7 @@ import com.deepline.fishing.core.ObstacleKind
 import com.deepline.fishing.core.RopeSpecs
 import com.deepline.fishing.core.World
 import com.deepline.fishing.ui.DeepLineTheme
+import com.deepline.fishing.ui.drawBoat
 import com.deepline.fishing.ui.drawCastScene
 import com.deepline.fishing.ui.drawFish
 import com.deepline.fishing.ui.drawFishGlow
@@ -145,6 +146,30 @@ class SceneRenderTest {
 
     @Test
     fun sovereignSkins() = renderSet(2, "Sovereign")
+
+    /** The classic boat, rod and line up close (the 2D twin of the 3D boat). */
+    @Test
+    fun classicBoatUpClose() = render("44_classic_boat", surfaceSession(), com.deepline.fishing.ui.Skins.CLASSIC, cameraTop = -7f, time = 1.3f)
+
+    /** Every shop boat and the default design, as the 2D fallback draws them. */
+    @Test
+    fun shopBoatsUpClose() {
+        val designs = listOf(com.deepline.fishing.core.BoatDesign.DEFAULT) + com.deepline.fishing.core.PremiumSkins.all.map { it.design }
+        renderCanvas("45_shop_boats") {
+            val cols = 2
+            val rows = (designs.size + cols - 1) / cols
+            val w = size.width / cols
+            val h = size.height / rows
+            for ((i, d) in designs.withIndex()) {
+                val x0 = (i % cols) * w
+                val y0 = (i / cols) * h
+                val surface = y0 + h * 0.8f
+                drawRect(androidx.compose.ui.graphics.Color(0xFFBFE3F2), topLeft = androidx.compose.ui.geometry.Offset(x0, y0), size = androidx.compose.ui.geometry.Size(w, surface - y0))
+                drawRect(androidx.compose.ui.graphics.Color(com.deepline.fishing.ui.ColorScript.water(1f)), topLeft = androidx.compose.ui.geometry.Offset(x0, surface), size = androidx.compose.ui.geometry.Size(w, y0 + h - surface))
+                drawBoat(x0 + w * 0.5f, surface, kotlin.math.min(w / 6.2f, h / 6.4f), 1.3f + i, null, d)
+            }
+        }
+    }
 
     /** Skins in dark water: they never light it up (the lit circle is the same as classic). */
     @Test

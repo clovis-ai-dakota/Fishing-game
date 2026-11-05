@@ -1,5 +1,6 @@
 package com.deepline.fishing.ui
 
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
@@ -31,47 +32,198 @@ import kotlin.math.sin
  * waterline [surfaceY], [scale] pixels per meter; the boat spans 5 m and its deck is 1 m up.
  */
 
-/** The hull outline: a flat deck 1 m above the water, rounded down to a keel 0.4 m below. */
-internal fun hullPath(cx: Float, surfaceY: Float, scale: Float) = Path().apply {
-    moveTo(cx - 2.5f * scale, surfaceY - 1.0f * scale)
-    lineTo(cx + 2.5f * scale, surfaceY - 1.0f * scale)
-    quadraticTo(cx + 2.2f * scale, surfaceY + 0.2f * scale, cx + 1.5f * scale, surfaceY + 0.4f * scale)
-    lineTo(cx - 1.5f * scale, surfaceY + 0.4f * scale)
-    quadraticTo(cx - 2.2f * scale, surfaceY + 0.2f * scale, cx - 2.5f * scale, surfaceY - 1.0f * scale)
-    close()
+/**
+ * The classic boat's and line's colours, shared by the 3D renderer and the 2D drawing: lagoon-blue
+ * topsides, a white boot stripe and rails, red bottom paint, a cream wheelhouse, and a pale
+ * hi-vis line that reads against the water.
+ */
+object BoatLook {
+    const val CLASSIC_HULL = 0xFF23708CL
+    const val CLASSIC_BOTTOM = 0xFFB83B2EL
+    const val CLASSIC_TRIM = 0xFFF4F1E8L
+    const val CLASSIC_CABIN = 0xFFF8F3EAL
+    const val LINE_R = 0.98f
+    const val LINE_G = 0.97f
+    const val LINE_B = 0.80f
 }
 
 /**
- * The whole boat (rig, hull, pattern, trim, cabin), without the rod. A boat [skin] wins over a
- * hand-made [design]; with neither it's the classic boat.
+ * The hull's side, as the 3D boat (PropModels): a raked bow to the left rising to 1.44 m, the
+ * sheer dipping to the deck (1 m) amidships, a flat transom to the right, the keel 0.45 m down.
+ */
+internal fun hullPath(cx: Float, surfaceY: Float, scale: Float) = Path().apply {
+    fun x(v: Float) = cx + v * scale
+    fun y(v: Float) = surfaceY - v * scale
+    moveTo(x(-2.72f), y(1.44f))
+    quadraticTo(x(-1.6f), y(1.06f), x(-0.2f), y(1.0f))
+    quadraticTo(x(1.4f), y(1.0f), x(2.45f), y(1.06f))
+    lineTo(x(2.45f), y(-0.08f))
+    quadraticTo(x(2.42f), y(-0.4f), x(1.9f), y(-0.45f))
+    lineTo(x(-1.35f), y(-0.45f))
+    quadraticTo(x(-2.3f), y(-0.42f), x(-2.46f), y(0.2f))
+    quadraticTo(x(-2.6f), y(0.9f), x(-2.72f), y(1.44f))
+    close()
+}
+
+/** The sheer line (top edge of the hull), bow to stern, for the rails. */
+private fun sheerPath(cx: Float, surfaceY: Float, scale: Float, drop: Float = 0f) = Path().apply {
+    fun x(v: Float) = cx + v * scale
+    fun y(v: Float) = surfaceY - (v - drop) * scale
+    moveTo(x(-2.66f + drop * 0.5f), y(1.42f))
+    quadraticTo(x(-1.6f), y(1.06f), x(-0.2f), y(1.0f))
+    quadraticTo(x(1.4f), y(1.0f), x(2.42f), y(1.06f))
+}
+
+/** The sheer's height at [x] (boat metres), matching [hullPath]. */
+internal fun sheer2d(x: Float): Float = 1.0f + 0.42f * smooth(0.2f, 2.6f, -x).let { it * kotlin.math.sqrt(it) } + 0.05f * smooth(1.6f, 2.45f, x)
+
+private fun smooth(a: Float, b: Float, v: Float): Float {
+    val t = ((v - a) / (b - a)).coerceIn(0f, 1f)
+    return t * t * (3f - 2f * t)
+}
+
+/**
+ * The whole boat (rig, hull, pattern, trim, wheelhouse and fittings), without the rod. A boat
+ * [skin] wins over a hand-made [design]; with neither it's the classic boat.
  */
 internal fun DrawScope.drawBoat(cx: Float, surfaceY: Float, scale: Float, timeSeconds: Float, skin: Cosmetic?, design: BoatDesign? = null) {
     val d = design.takeIf { skin == null }
     drawBoatRig(cx, surfaceY, scale, timeSeconds, skin, d)
     val hull = hullPath(cx, surfaceY, scale)
-    drawPath(hull, hullBrush(skin, surfaceY - 1f * scale, surfaceY + 0.4f * scale, timeSeconds, d))
-    if (d != null) drawHullPattern(d, hull, cx, surfaceY, scale, timeSeconds)
-    val trimWidth = if (skin == null && d == null) max(2f, 0.08f * scale) else max(3f, 0.16f * scale)
-    drawLine(
-        trimBrush(skin, cx - 2.4f * scale, cx + 2.4f * scale, timeSeconds, d),
-        Offset(cx - 2.4f * scale, surfaceY - 0.9f * scale),
-        Offset(cx + 2.4f * scale, surfaceY - 0.9f * scale),
-        strokeWidth = trimWidth,
-    )
-    if (skin != null) {
-        drawLine(
-            trimBrush(skin, cx - 2f * scale, cx + 2f * scale, timeSeconds),
-            Offset(cx - 1.9f * scale, surfaceY - 0.15f * scale),
-            Offset(cx + 1.9f * scale, surfaceY - 0.15f * scale),
-            strokeWidth = trimWidth * 0.6f,
-        )
+    val left = cx - 2.8f * scale
+    val right = cx + 2.5f * scale
+    drawPath(hull, hullBrush(skin, surfaceY - 1.44f * scale, surfaceY + 0.45f * scale, timeSeconds, d))
+    val trim = trimBrush(skin, cx - 2.6f * scale, cx + 2.4f * scale, timeSeconds, d)
+    clipPath(hull) {
+        // Bottom paint below the waterline and a boot stripe in the trim colour (not on two-tone hulls).
+        if (d?.pattern != HullPattern.TWO_TONE) {
+            drawRect(Color(bottomPaint(skin, d)), topLeft = Offset(left, surfaceY - 0.07f * scale), size = Size(right - left, 0.6f * scale))
+            drawRect(trim, topLeft = Offset(left, surfaceY - 0.21f * scale), size = Size(right - left, 0.13f * scale))
+        }
+        // Plank seams, faint over any paint.
+        for (k in 0 until 5) {
+            val yy = surfaceY - (0.47f + 0.25f * k) * scale
+            drawLine(Color.Black.copy(alpha = 0.13f), Offset(left, yy), Offset(right, yy), strokeWidth = max(1f, 0.025f * scale))
+        }
     }
-    if (d != null) drawPath(hull, Color.Black.copy(alpha = 0.25f), style = Stroke(width = max(1.5f, 0.05f * scale)))
-    drawCabin(cx, surfaceY, scale, skin, d)
+    if (d != null) drawHullPattern(d, hull, cx, surfaceY, scale, timeSeconds)
+    // Rails along the sheer and a rubbing strake below them.
+    val railWidth = if (skin == null && d == null) max(2.5f, 0.12f * scale) else max(3f, 0.16f * scale)
+    drawPath(sheerPath(cx, surfaceY, scale), trim, style = Stroke(width = railWidth, cap = StrokeCap.Round))
+    drawPath(sheerPath(cx, surfaceY, scale, drop = 0.36f), trim, style = Stroke(width = railWidth * 0.55f, cap = StrokeCap.Round))
+    drawPath(hull, Color.Black.copy(alpha = 0.3f), style = Stroke(width = max(1.5f, 0.05f * scale)))
+    drawWheelhouse(cx, surfaceY, scale, skin, d, timeSeconds)
+    drawFittings(cx, surfaceY, scale, trim, rigged = skin != null || (d != null && d.sailStyle != SailStyle.NONE))
     // With neither sail nor flag, the emblem goes on the hull.
     if (d != null && d.emblem != Emblem.NONE && d.sailStyle == SailStyle.NONE && d.flagStyle == FlagStyle.NONE) {
-        drawEmblem(d.emblem, Offset(cx + 1.2f * scale, surfaceY - 0.45f * scale), 0.38f * scale, Color(d.trimColor()), timeSeconds)
+        drawEmblem(d.emblem, Offset(cx + 1.2f * scale, surfaceY - 0.55f * scale), 0.34f * scale, Color(d.trimColor()), timeSeconds)
     }
+    // The hull below the waterline seen through the water, and foam lapping along it.
+    clipPath(hull) {
+        drawRect(Color(ColorScript.water(1.5f)).copy(alpha = 0.32f), topLeft = Offset(left, surfaceY), size = Size(right - left, 0.6f * scale))
+    }
+    for (k in 0 until 22) {
+        val fx = cx + (-2.5f + 4.95f * k / 21f) * scale
+        val wob = sin(timeSeconds * 2.3f + k * 1.7f)
+        val rw = (0.1f + 0.06f * ((k * 7 % 5) / 4f) + 0.03f * wob) * scale
+        drawOval(Color.White.copy(alpha = 0.45f + 0.2f * wob), topLeft = Offset(fx - rw, surfaceY - 0.02f * scale - rw * 0.22f), size = Size(rw * 2f, rw * 0.44f))
+    }
+}
+
+/** Bottom paint: the design's bottom colour, the skin's dark tone, or the classic red. */
+private fun bottomPaint(skin: Cosmetic?, d: BoatDesign?): Long = when {
+    d != null -> d.hullBottomColor()
+    skin == Cosmetic.GIANT_SLAYER_PENNANT -> 0xFF102027
+    skin == Cosmetic.PRISM_SAIL -> 0xFFB0BEC5
+    skin == Cosmetic.ROYAL_BOAT -> 0xFF38006B
+    else -> BoatLook.CLASSIC_BOTTOM
+}
+
+/** The wheelhouse: a raked windscreen, framed windows, a door, a life ring and a roof. */
+private fun DrawScope.drawWheelhouse(cx: Float, surfaceY: Float, scale: Float, skin: Cosmetic?, d: BoatDesign?, t: Float) {
+    fun o(x: Float, y: Float) = Offset(cx + x * scale, surfaceY - y * scale)
+    val wall = when {
+        d != null -> Color(d.cabinColor())
+        skin == Cosmetic.ROYAL_BOAT -> Color(0xFFFFF8E1)
+        else -> Color(BoatLook.CLASSIC_CABIN)
+    }
+    val roof = when {
+        d != null -> lerp(Color(d.hullColor()), Color.White, 0.1f)
+        skin == Cosmetic.GIANT_SLAYER_PENNANT -> Color(0xFF37474F)
+        skin == Cosmetic.PRISM_SAIL -> Color(0xFFECEFF1)
+        skin == Cosmetic.ROYAL_BOAT -> Color(0xFF7B1FA2)
+        else -> lerp(Color(BoatLook.CLASSIC_HULL), Color.White, 0.1f)
+    }
+    val body = Path().apply {
+        val p = listOf(o(-1.35f, 0.95f), o(0.35f, 0.95f), o(0.35f, 2.19f), o(0.29f, 2.25f), o(-1.03f, 2.25f), o(-1.08f, 2.21f), o(-1.35f, 1.72f))
+        moveTo(p[0].x, p[0].y)
+        for (q in p.drop(1)) lineTo(q.x, q.y)
+        close()
+    }
+    drawPath(body, Brush.verticalGradient(listOf(wall, wall, lerp(wall, Color.Black, 0.25f)), startY = o(0f, 2.25f).y, endY = o(0f, 0.95f).y))
+    // Shade under the roof.
+    drawRect(Color.Black.copy(alpha = 0.1f), topLeft = o(-1.05f, 2.25f), size = Size(1.4f * scale, 0.12f * scale))
+    drawPath(body, Color.Black.copy(alpha = 0.3f), style = Stroke(width = max(1.2f, 0.035f * scale)))
+    fun pane(x0: Float, x1: Float, y0: Float, y1: Float) {
+        val tl = o(x0, y1)
+        val sz = Size((x1 - x0) * scale, (y1 - y0) * scale)
+        drawRect(Brush.verticalGradient(listOf(Color(0xFFD2EEFF), Color(0xFF4A86B8)), startY = tl.y, endY = tl.y + sz.height), topLeft = tl, size = sz)
+        // A glint crossing the glass.
+        val g = ((t * 0.06f) % 1f)
+        drawLine(Color.White.copy(alpha = 0.55f), Offset(tl.x + sz.width * (0.15f + 0.5f * g), tl.y + sz.height), Offset(tl.x + sz.width * (0.45f + 0.5f * g), tl.y), strokeWidth = max(1.5f, 0.05f * scale))
+        drawRect(Color(BoatLook.CLASSIC_TRIM), topLeft = tl, size = sz, style = Stroke(width = max(1.5f, 0.06f * scale)))
+    }
+    pane(-1.02f, -0.62f, 1.62f, 2.05f)
+    pane(-0.5f, -0.18f, 1.62f, 2.05f)
+    // The windscreen on the raked front.
+    drawLine(Color(0xFF4A86B8), o(-1.31f, 1.8f), o(-1.08f, 2.16f), strokeWidth = max(2f, 0.1f * scale), cap = StrokeCap.Round)
+    // The door with a porthole and a handle.
+    drawRoundRect(roof, topLeft = o(-0.12f, 1.92f), size = Size(0.4f * scale, 0.97f * scale), cornerRadius = CornerRadius(0.05f * scale))
+    drawRoundRect(Color(BoatLook.CLASSIC_TRIM), topLeft = o(-0.12f, 1.92f), size = Size(0.4f * scale, 0.97f * scale), cornerRadius = CornerRadius(0.05f * scale), style = Stroke(width = max(1f, 0.04f * scale)))
+    drawCircle(Color(0xFF9FD3F5), radius = 0.1f * scale, center = o(0.08f, 1.72f))
+    drawCircle(Color(BoatLook.CLASSIC_TRIM), radius = 0.11f * scale, center = o(0.08f, 1.72f), style = Stroke(width = max(1f, 0.04f * scale)))
+    drawCircle(Color(0xFFB0BEC5), radius = 0.035f * scale, center = o(0.22f, 1.38f))
+    // A life ring, red and white.
+    val ring = o(-0.52f, 1.28f)
+    for (k in 0 until 8) {
+        drawArc(
+            if (k % 2 == 0) Color(0xFFE53935) else Color(0xFFF7F6F2),
+            startAngle = k * 45f, sweepAngle = 45f, useCenter = false,
+            topLeft = ring - Offset(0.17f * scale, 0.17f * scale), size = Size(0.34f * scale, 0.34f * scale),
+            style = Stroke(width = 0.1f * scale),
+        )
+    }
+    // The roof: an overhanging slab with a lip, in the hull's colour.
+    drawRoundRect(roof, topLeft = o(-1.43f, 2.39f), size = Size(2.03f * scale, 0.14f * scale), cornerRadius = CornerRadius(0.04f * scale))
+    drawRect(lerp(roof, Color.Black, 0.2f), topLeft = o(-1.35f, 2.43f), size = Size(1.87f * scale, 0.04f * scale))
+    drawRoundRect(Color.Black.copy(alpha = 0.3f), topLeft = o(-1.43f, 2.39f), size = Size(2.03f * scale, 0.14f * scale), cornerRadius = CornerRadius(0.04f * scale), style = Stroke(width = max(1f, 0.03f * scale)))
+}
+
+/** Antenna and lantern (unless a mast stands there), searchlight, fenders and the aft rails. */
+private fun DrawScope.drawFittings(cx: Float, surfaceY: Float, scale: Float, trim: Brush, rigged: Boolean) {
+    fun o(x: Float, y: Float) = Offset(cx + x * scale, surfaceY - y * scale)
+    val mast = Color(0xFF5D4037)
+    if (!rigged) {
+        drawLine(mast, o(0.18f, 2.42f), o(0.18f, 3.45f), strokeWidth = max(1.5f, 0.06f * scale), cap = StrokeCap.Round)
+        drawLine(mast, o(-0.08f, 3.05f), o(0.44f, 3.05f), strokeWidth = max(1.2f, 0.04f * scale), cap = StrokeCap.Round)
+        drawCircle(Color(0x66FFE9A0), radius = 0.16f * scale, center = o(0.18f, 3.5f))
+        drawCircle(Color(0xFFFFEDA6), radius = 0.07f * scale, center = o(0.18f, 3.5f))
+    }
+    // Searchlight on the roof.
+    drawRoundRect(Color(0xFF90A4AE), topLeft = o(-1.1f, 2.54f), size = Size(0.2f * scale, 0.15f * scale), cornerRadius = CornerRadius(0.05f * scale))
+    drawCircle(Color(0xFFFFF3C4), radius = 0.05f * scale, center = o(-1.1f, 2.47f))
+    // Fenders on ropes over the side.
+    for (x in listOf(-1.75f, 1.25f)) {
+        val top = sheer2d(x) - 0.42f
+        drawLine(Color(0xFFD7C9A6), o(x, sheer2d(x)), o(x, top), strokeWidth = max(1f, 0.03f * scale))
+        drawRoundRect(Color(0xFFF5F5F2), topLeft = o(x - 0.12f, top), size = Size(0.24f * scale, 0.52f * scale), cornerRadius = CornerRadius(0.12f * scale))
+        drawRoundRect(Color(0xFF1E4D8C), topLeft = o(x - 0.08f, top - 0.43f), size = Size(0.16f * scale, 0.09f * scale), cornerRadius = CornerRadius(0.04f * scale))
+        drawRoundRect(Color.Black.copy(alpha = 0.3f), topLeft = o(x - 0.12f, top), size = Size(0.24f * scale, 0.52f * scale), cornerRadius = CornerRadius(0.12f * scale), style = Stroke(width = max(1f, 0.03f * scale)))
+    }
+    // Rails along the working deck.
+    val posts = listOf(0.55f, 1.05f, 1.55f, 2.05f)
+    for (x in posts) drawLine(trim, o(x, sheer2d(x)), o(x, sheer2d(x) + 0.42f), strokeWidth = max(1.2f, 0.045f * scale))
+    drawLine(trim, o(posts.first(), sheer2d(posts.first()) + 0.42f), o(posts.last(), sheer2d(posts.last()) + 0.42f), strokeWidth = max(1.5f, 0.05f * scale), cap = StrokeCap.Round)
 }
 
 /** Hull colours of a hand-made boat: top colour fading to the bottom colour. */
@@ -210,7 +362,7 @@ internal fun DrawScope.drawCustomRig(d: BoatDesign, cx: Float, surfaceY: Float, 
     val emblemColor = Color(d.trimColor())
     val hasSail = d.sailStyle != SailStyle.NONE
     val mastX = cx - 0.2f * scale
-    val mastBottom = if (hasSail) surfaceY - 1.0f * scale else surfaceY - 2.3f * scale
+    val mastBottom = if (hasSail) surfaceY - 1.0f * scale else surfaceY - 2.42f * scale
     val mastTop = surfaceY - (if (hasSail) 5.2f else 4.6f) * scale
     val billow = sin(timeSeconds * 2f) * 0.15f * scale
     val edge = Color.Black.copy(alpha = 0.3f)

@@ -2,7 +2,10 @@
 
 An original fishing mini-game for Android, written in Kotlin with Jetpack Compose.
 All art is made in code (no image or model assets): the game draws in real-time 3D with OpenGL
-ES 3.0, in a cel-shaded anime style, with a 2D renderer as the fallback.
+ES 3.0, in a cel-shaded anime style, with a 2D renderer as the fallback. The player's boat is a
+little fishing trawler (raked bow, wheelhouse with framed windows and a life ring, fenders, rails,
+a searchlight), fishing with a graphite rod, a reel that turns as the line runs, and a pale
+monofilament line; the 2D fallback draws the same boat.
 
 ## How it plays
 

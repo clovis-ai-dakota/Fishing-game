@@ -291,8 +291,14 @@ fun DrawScope.drawSkinnedLine(points: List<Offset>, timeSeconds: Float, bumpFlas
             )
         }
         else -> {
-            drawPath(path, Color.Black.copy(alpha = 0.22f), style = Stroke(width = 3.5f, cap = StrokeCap.Round))
-            drawPath(path, flash(Color(0xFFE8F4FA)).copy(alpha = 0.9f), style = Stroke(width = 1.7f, cap = StrokeCap.Round))
+            // Pale hi-vis monofilament with a glint running down it (as in 3D).
+            drawPath(path, Color.Black.copy(alpha = 0.22f), style = Stroke(width = 3.6f, cap = StrokeCap.Round))
+            drawPath(path, flash(Color(BoatLook.LINE_R, BoatLook.LINE_G, BoatLook.LINE_B)), style = Stroke(width = 2f, cap = StrokeCap.Round))
+            drawPath(
+                path,
+                Color.White.copy(alpha = 0.9f * (1f - bumpFlash)),
+                style = Stroke(width = 1.6f, cap = StrokeCap.Round, pathEffect = PathEffect.dashPathEffect(floatArrayOf(6f * u, 70f * u), -timeSeconds * 50f * u)),
+            )
         }
     }
 }
@@ -371,7 +377,7 @@ internal fun hullBrush(skin: Cosmetic?, top: Float, bottom: Float, timeSeconds: 
     Cosmetic.GIANT_SLAYER_PENNANT -> Brush.verticalGradient(listOf(Color(0xFF37474F), Color(0xFF102027)), startY = top, endY = bottom)
     Cosmetic.PRISM_SAIL -> Brush.verticalGradient(listOf(Color(0xFFFAFAFA), Color(0xFFB0BEC5)), startY = top, endY = bottom)
     Cosmetic.ROYAL_BOAT -> Brush.verticalGradient(listOf(Color(0xFF7B1FA2), Color(0xFF38006B)), startY = top, endY = bottom)
-    else -> Brush.verticalGradient(listOf(Color(0xFFA1662F), Color(0xFF5D3A1A)), startY = top, endY = bottom)
+    else -> Brush.verticalGradient(listOf(lerp(Color(BoatLook.CLASSIC_HULL), Color.White, 0.12f), Color(BoatLook.CLASSIC_HULL), lerp(Color(BoatLook.CLASSIC_HULL), Color.Black, 0.2f)), startY = top, endY = bottom)
 }
 
 internal fun trimBrush(skin: Cosmetic?, left: Float, right: Float, timeSeconds: Float, design: com.deepline.fishing.core.BoatDesign? = null): Brush =
@@ -380,7 +386,7 @@ internal fun trimBrush(skin: Cosmetic?, left: Float, right: Float, timeSeconds: 
     Cosmetic.GIANT_SLAYER_PENNANT -> Brush.horizontalGradient(listOf(Cyan, CyanPale, Cyan), startX = left, endX = right)
     Cosmetic.PRISM_SAIL -> Brush.horizontalGradient(prismColors(timeSeconds), startX = left, endX = right)
     Cosmetic.ROYAL_BOAT -> Brush.horizontalGradient(listOf(GoldDeep, GoldPale, Gold, GoldDeep), startX = left, endX = right)
-    else -> Brush.horizontalGradient(listOf(Color(0xFFE8D5B5), Color(0xFFE8D5B5)), startX = left, endX = right)
+    else -> Brush.horizontalGradient(listOf(Color(BoatLook.CLASSIC_TRIM), Color(BoatLook.CLASSIC_TRIM)), startX = left, endX = right)
 }
 
 /** Masts, sails and flags behind the cabin. */
@@ -451,7 +457,7 @@ internal fun DrawScope.drawBoatRig(cx: Float, surfaceY: Float, scale: Float, tim
 
 /** The Giant-slayer pennant: a mast on the cabin with a waving flag showing a leviathan. */
 private fun DrawScope.drawPennant(cx: Float, surfaceY: Float, scale: Float, timeSeconds: Float) {
-    val mastBase = Offset(cx - 0.4f * scale, surfaceY - 2.3f * scale)
+    val mastBase = Offset(cx - 0.4f * scale, surfaceY - 2.42f * scale)
     val mastTop = Offset(mastBase.x, surfaceY - 5.0f * scale)
     drawLine(Color(0xFF5D4037), mastBase, mastTop, strokeWidth = max(2f, 0.08f * scale), cap = StrokeCap.Round)
     val wave = sin(timeSeconds * 3f) * 0.15f * scale
@@ -474,21 +480,3 @@ private fun DrawScope.drawPennant(cx: Float, surfaceY: Float, scale: Float, time
 }
 
 /** A small badge drawn for a set, used on the Skins screen and the secret details. */
-internal fun DrawScope.drawCabin(cx: Float, surfaceY: Float, scale: Float, skin: Cosmetic?, design: com.deepline.fishing.core.BoatDesign? = null) {
-    drawRoundRect(
-        when {
-            skin == null && design != null -> Color(design.cabinColor())
-            skin == Cosmetic.ROYAL_BOAT -> GoldPale
-            else -> Color(0xFFF5E6CC)
-        },
-        topLeft = Offset(cx - 1.3f * scale, surfaceY - 2.3f * scale),
-        size = Size(1.7f * scale, 1.3f * scale),
-        cornerRadius = CornerRadius(0.15f * scale),
-    )
-    drawRoundRect(
-        Color(0xFF81D4FA),
-        topLeft = Offset(cx - 1.0f * scale, surfaceY - 2.05f * scale),
-        size = Size(0.6f * scale, 0.5f * scale),
-        cornerRadius = CornerRadius(0.08f * scale),
-    )
-}

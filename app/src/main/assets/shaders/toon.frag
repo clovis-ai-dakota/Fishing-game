@@ -176,10 +176,16 @@ Surface fishSurface() {
 Surface hookSurface() {
     float mode = uFlags.w; // 0 classic steel, 1 bone, 2 prism, 3 gold, 4 coral, 5 neon, 6 obsidian
     if (isPart(vPart, 11.0) || isPart(vPart, 12.0)) {
-        vec3 pink = vec3(0.90, 0.45, 0.45);
-        pink *= 0.88 + 0.12 * step(0.5, fract(vUv.x * 9.0));
+        // A juicy worm: darker along its back, ringed, with a pale band (the clitellum) and a
+        // wet highlight.
+        vec3 n = normalize(vNormal);
+        vec3 pink = mix(vec3(0.72, 0.30, 0.34), vec3(0.96, 0.55, 0.52), smoothstep(-0.6, 0.8, n.z));
+        pink *= 0.86 + 0.14 * smoothstep(0.2, 0.5, abs(fract(vUv.x * (isPart(vPart, 11.0) ? 18.0 : 14.0)) - 0.5));
+        if (isPart(vPart, 11.0)) pink = mix(pink, vec3(1.0, 0.74, 0.66), smoothstep(0.02, 0.0, abs(vUv.x - 0.28) - 0.07));
         Surface s = surface(pink);
-        s.spec = 0.45;
+        s.spec = 0.8;
+        s.rim = 0.6;
+        s.rimColor = vec3(1.0, 0.85, 0.85);
         return s;
     }
     if (isPart(vPart, 13.0)) {
@@ -298,7 +304,16 @@ vec3 clothPrint(vec3 col, vec3 ink, float cloth) {
 
 Surface boatSurface() {
     if (isPart(vPart, 30.0)) {
-        vec3 col = mix(uAccent, uBase, smoothstep(-0.4, 1.0, vLocal.y));
+        // Topsides in the hull colour (lighter up high), a boot stripe at the waterline in the
+        // trim colour, and the bottom paint below it, like a real painted boat.
+        float hy = vLocal.y;
+        vec3 col = mix(uBase * 0.88, uBase * 1.06, smoothstep(0.2, 1.3, hy));
+        col = mix(col, uAccent, 1.0 - smoothstep(0.05, 0.075, hy));
+        col = mix(col, uExtra, smoothstep(0.075, 0.095, hy) * (1.0 - smoothstep(0.2, 0.22, hy)));
+        // Plank seams above the stripe: faint, over any paint.
+        float f = fract((hy - 0.22) * 4.0);
+        float seam = smoothstep(0.0, 0.05, f) * smoothstep(1.0, 0.95, f);
+        col *= mix(1.0, mix(0.84, 1.0, seam), step(0.24, hy));
         // Hand-made hulls: 1 racing stripe, 2 two-tone, 3 waves, 4 polka dots, 5 checkers;
         // shop: 6 flames, 7 starry night, 8 metallic, 9 neon; Captain's Club: 10 aurora.
         float pattern = uBoatMode.z;
@@ -355,11 +370,58 @@ Surface boatSurface() {
         s.emissive = mode > 0.5 ? 0.2 : 0.0;
         return s;
     }
-    if (isPart(vPart, 32.0)) return surface(uExtra2);
-    if (isPart(vPart, 33.0)) {
-        Surface s = surface(vec3(0.51, 0.83, 0.98));
+    if (isPart(vPart, 32.0)) {
+        // Wheelhouse walls: shaded where they meet the deck and under the roof's overhang.
+        float ao = mix(0.72, 1.0, smoothstep(0.92, 1.3, vLocal.y)) * mix(0.8, 1.0, smoothstep(2.25, 2.05, vLocal.y));
+        Surface s = surface(uExtra2 * ao);
+        s.spec = 0.2;
+        return s;
+    }
+    if (isPart(vPart, 43.0)) {
+        Surface s = surface(mix(uBase, vec3(1.0), 0.1));
+        s.spec = 0.45;
+        return s;
+    }
+    if (isPart(vPart, 44.0)) {
+        Surface s = surface(step(0.5, fract(vUv.x * 4.0)) > 0.5 ? vec3(0.92, 0.22, 0.18) : vec3(0.97, 0.96, 0.93));
+        s.spec = 0.5;
+        return s;
+    }
+    if (isPart(vPart, 45.0)) {
+        float cap = max(smoothstep(0.84, 0.9, vUv.y), 1.0 - smoothstep(0.1, 0.16, vUv.y));
+        Surface s = surface(mix(vec3(0.96, 0.96, 0.94), vec3(0.12, 0.30, 0.55), cap));
+        s.spec = 0.6;
+        return s;
+    }
+    if (isPart(vPart, 46.0)) {
+        Surface s = surface(vec3(1.0, 0.93, 0.62));
+        s.emissive = 1.0;
+        return s;
+    }
+    if (isPart(vPart, 47.0)) {
+        Surface s = surface(vec3(0.80, 0.63, 0.43) * (0.9 + 0.1 * noise2(vLocal.xy * 60.0)));
+        s.spec = 0.1;
+        return s;
+    }
+    if (isPart(vPart, 48.0)) {
+        vec3 n = normalize(vNormal);
+        Surface s = surface(mix(vec3(0.24, 0.27, 0.31), vec3(0.86, 0.89, 0.92), smoothstep(-0.3, 0.6, n.y)));
         s.spec = 1.0;
-        s.emissive = 0.2;
+        s.rimColor = vec3(1.0);
+        return s;
+    }
+    if (isPart(vPart, 49.0)) {
+        Surface s = surface(vec3(0.86, 0.77, 0.58) * (0.86 + 0.14 * step(0.5, fract(vUv.x * 36.0 + vUv.y * 2.0))));
+        s.spec = 0.1;
+        return s;
+    }
+    if (isPart(vPart, 33.0)) {
+        // Glass reflecting the sky, with a diagonal glint.
+        vec3 col = mix(vec3(0.26, 0.50, 0.74), vec3(0.82, 0.94, 1.0), smoothstep(0.0, 1.0, vUv.y));
+        col += vec3(0.6) * smoothstep(0.09, 0.0, abs(fract(vUv.x * 0.9 + vUv.y * 0.7 - 0.25 + uTime * 0.02) - 0.5) - 0.02);
+        Surface s = surface(col);
+        s.spec = 1.0;
+        s.emissive = 0.25;
         return s;
     }
     if (isPart(vPart, 34.0)) {
@@ -387,10 +449,19 @@ Surface boatSurface() {
         return surface(col);
     }
     if (isPart(vPart, 36.0)) return surface(vec3(0.36, 0.25, 0.22));
-    if (isPart(vPart, 37.0)) return surface(mix(vec3(0.24, 0.15, 0.14), vec3(0.74, 0.67, 0.64), vUv.x));
+    if (isPart(vPart, 37.0)) {
+        // The rod blank: deep blue graphite with a sheen.
+        Surface s = surface(mix(vec3(0.10, 0.15, 0.26), vec3(0.20, 0.32, 0.52), vUv.x));
+        s.spec = 0.9;
+        s.rim = 0.7;
+        return s;
+    }
     if (isPart(vPart, 20.0)) {
+        // Deck planks, darker by the rails and around the wheelhouse.
         float plank = 0.9 + 0.1 * step(0.5, fract(vLocal.z * 3.0));
-        return surface(vec3(0.70, 0.52, 0.33) * plank);
+        vec2 cabin = max(vec2(max(-1.35 - vLocal.x, vLocal.x - 0.35), abs(vLocal.z) - 0.62), vec2(0.0));
+        float ao = mix(0.68, 1.0, smoothstep(0.0, 0.35, length(cabin))) * mix(0.78, 1.0, smoothstep(0.0, 0.1, min(vUv.y, 1.0 - vUv.y)));
+        return surface(vec3(0.72, 0.54, 0.34) * plank * ao);
     }
     if (isPart(vPart, 10.0)) return surface(vec3(0.69, 0.75, 0.77));
     return surface(uBase);
@@ -433,7 +504,8 @@ void main() {
     float t2 = smoothstep(0.42, 0.50, ndl);
     vec3 shadowCol = s.albedo * mix(vec3(1.0), vec3(0.60, 0.66, 0.92), s.shadowCool) * 0.62;
     vec3 lit = mix(mix(shadowCol, s.albedo * 0.86, t1), s.albedo * 1.05, t2);
-    vec3 col = lit * uLightColor + s.albedo * uAmbient * 0.3;
+    // Ambient light from the sky above and the water below (hemispheric).
+    vec3 col = lit * uLightColor + s.albedo * uAmbient * 0.3 * mix(0.7, 1.3, n.y * 0.5 + 0.5);
 
     // Hard-edged highlight and rim light, the anime way.
     vec3 hv = normalize(l + v);
@@ -454,8 +526,18 @@ void main() {
 
     col = mix(col, s.albedo, s.emissive);
 
-    // Things under water take a little of its colour.
-    if (vWorld.y < 0.0) col = mix(col, uWaterTint, 0.12);
+    // Things under water take a little of its colour. The hull darkens with depth and catches
+    // the caustics of the waves above.
+    if (vWorld.y < 0.0) {
+        if (uMaterial > 2.5 && uMaterial < 3.5) {
+            float d = clamp(-vWorld.y / 0.9, 0.0, 1.0);
+            col = mix(col, uWaterTint * 0.8, 0.22 + 0.4 * d);
+            float c = sin(vWorld.x * 4.3 + uTime * 1.6) + sin(vWorld.x * 2.1 - vWorld.y * 6.0 - uTime * 1.1) + sin((vWorld.x + vWorld.y) * 3.1 + uTime * 0.7);
+            col += vec3(0.85, 0.97, 1.0) * smoothstep(1.4, 2.4, c) * 0.22 * (1.0 - d);
+        } else {
+            col = mix(col, uWaterTint, 0.12);
+        }
+    }
 
     // Silhouettes: fish the Dex hasn't recorded yet (1 unknown, 2 seen), and the Nightmare
     // atmosphere's giant shadows (3).

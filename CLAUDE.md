@@ -85,6 +85,13 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     `GlBackend`'s draw rules: change both together.
   - GL keeps uniforms per program: per-item uniforms must be in `GlBackend.DEFAULTS` (and the
     preview's `defaults`) so one item's values never leak into the next.
+  - The boat, rod and line are one design in 3D and 2D: the hull's lines (`PropModels.sheerAt`,
+    `keelAt`, `halfBeamAt`) match `hullPath`/`sheer2d` in `BoatArt.kt`; the rod (`rodItem`) matches
+    `drawBoatAndRod` (graphite blank, cork grip, reel, guides); classic colours are in `BoatLook`.
+    Change both renderers together. The hull's near side sits in front of the play plane, so a
+    translucent `waterSkirt` and the hull's depth fade keep it reading as under water.
+  - Lighting follows the usual stylised recipe: a cel ramp with cool shadows, a stepped specular,
+    rim light, hemispheric ambient and analytic AO in the material functions (no textures).
 - **Colours** come from `ui/ColorScript.kt`, shared by the 3D renderer, the 2D fallback and the
   Dex: the water, light and specks by depth (bright and warm in the shallows, then cooler, darker
   and less saturated, near-black with sparse red/cyan glows in the abyss), and `FishLooks` for

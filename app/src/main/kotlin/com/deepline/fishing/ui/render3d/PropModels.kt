@@ -6,6 +6,8 @@ import com.deepline.fishing.core.FlagStyle
 import com.deepline.fishing.core.SailStyle
 import com.deepline.fishing.core.GameConfig
 import kotlin.math.PI
+import kotlin.math.pow
+import kotlin.math.sqrt
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.sin
@@ -30,12 +32,13 @@ object PropModels {
         val b = MeshBuilder()
         val r = s * 0.08f
         val shank = listOf(Vec3(0f, 1.23f * s, 0f), Vec3(0f, 0.5f * s, 0f), Vec3(0f, -0.15f * s, 0f))
-        val bend = cubic(0f to -0.15f * s, 0f to -0.95f * s, 0.95f * s to -0.95f * s, 0.85f * s to 0.10f * s, 14)
+        val bend = cubic(0f to -0.15f * s, 0f to -0.95f * s, 0.95f * s to -0.95f * s, 0.85f * s to 0.10f * s, 22)
             .drop(1).map { Vec3(it.first, it.second, 0f) }
         val path = shank + bend
-        b.tube(path, { u -> r * (1f - 0.35f * smoothstep(0.75f, 1f, u)) }, 10, Part.METAL)
-        // Barb.
-        b.tube(listOf(Vec3(0.85f * s, 0.10f * s, 0f), Vec3(0.62f * s, -0.20f * s, 0f)), { u -> r * (0.8f - 0.5f * u) }, 8, Part.METAL)
+        // Forged wire: full thickness along the shank and bend, tapering to a sharp point.
+        b.tube(path, { u -> r * (1f - 0.8f * smoothstep(0.82f, 1f, u)) }, 10, Part.METAL)
+        // The barb: a flattened spur angled back from just below the point.
+        b.tube(listOf(Vec3(0.83f * s, 0.02f * s, 0f), Vec3(0.66f * s, -0.24f * s, 0f)), { u -> r * (0.75f - 0.7f * u) }, 8, Part.METAL, flattenZ = 0.6f)
         // Eye: a ring the line ties to.
         val eye = (0..20).map { k ->
             val a = k / 20f * 2f * PI.toFloat()
@@ -76,12 +79,14 @@ object PropModels {
     /** The worm threaded on the shank, with a tail the shader wriggles. */
     fun worm(): MeshData = cached("worm") {
         val b = MeshBuilder()
-        b.tube(listOf(Vec3(0.02f * s, 0.65f * s, 0.06f * s), Vec3(0.02f * s, 0.15f * s, 0.08f * s), Vec3(0.02f * s, -0.35f * s, 0.06f * s)), { 0.16f * s }, 10, Part.WORM)
-        val tail = (0..10).map { i ->
-            val u = i / 10f
+        // A ringed body threaded on the shank (rings bulge slightly), rounded at the top.
+        val body = (0..18).map { i -> val u = i / 18f; Vec3(0.02f * s, (0.68f - 1.05f * u) * s, (0.06f + 0.02f * sin(u * PI.toFloat())) * s) }
+        b.tube(body, { u -> 0.16f * s * (1f + 0.07f * cos(u * 18f * 2f * PI.toFloat()) - 0.15f * smoothstep(0.85f, 1f, 1f - u)) }, 10, Part.WORM)
+        val tail = (0..16).map { i ->
+            val u = i / 16f
             Vec3(0.05f * s + 0.25f * s * u, -0.45f * s - 1.0f * s * u, 0.05f * s)
         }
-        b.tube(tail, { u -> 0.13f * s * (1f - 0.5f * u) }, 8, Part.WORM_TAIL)
+        b.tube(tail, { u -> 0.13f * s * (1f - 0.55f * u) * (1f + 0.06f * cos(u * 14f * 2f * PI.toFloat())) }, 8, Part.WORM_TAIL)
         b.build()
     }
 
@@ -147,59 +152,41 @@ object PropModels {
         b.build()
     }
 
-    /** The boat's hull, deck, cabin and trim, centred on x = 0 with the waterline at y = 0. */
+    // ---- The boat --------------------------------------------------------------------------------
+    //
+    // A small wooden fishing boat seen from the side: the bow (raked, higher) to the left (-x),
+    // a flat transom to the right, the wheelhouse forward and the working deck aft, where the
+    // rod is. The waterline is y = 0, the deck about y = 1, the hull 5 m long and 2.3 m wide, the
+    // same envelope as the 2D boat (BoatArt.kt), so skins and hand-made rigs sit where they did.
+
+    /** The top of the hull's side (the sheer), rising towards the bow. */
+    fun sheerAt(x: Float): Float = 1.0f + 0.42f * smoothstep(0.2f, 2.6f, -x).let { it * sqrt(it) } + 0.05f * smoothstep(1.6f, 2.45f, x)
+
+    /** The bottom of the hull, rising to the forefoot at the bow and a little at the stern. */
+    fun keelAt(x: Float): Float = -0.45f + 0.6f * smoothstep(1.1f, 2.7f, -x) + 0.22f * smoothstep(1.5f, 2.45f, x)
+
+    /** Half the beam: a fine bow, full in the middle, slightly narrower at the transom. */
+    fun halfBeamAt(x: Float): Float =
+        if (x < 0f) 1.15f * (1f - smoothstep(0.5f, 2.72f, -x).let { it * it }) + 0.02f else 1.15f * (1f - 0.2f * smoothstep(1.0f, 2.45f, x)) + 0.02f
+
+    /** How far the bow's stem leans forward at the top (it is vertical aft). */
+    private fun rakeAt(x: Float) = 0.38f * smoothstep(1.4f, 2.7f, -x)
+
+    private const val BOW_X = -2.7f
+    private const val STERN_X = 2.45f
+
+    /** The deck's height at [x] (a little below the sheer, inside the rails). */
+    fun deckAt(x: Float) = sheerAt(x) - 0.06f
+
+    /** The hull, deck, wheelhouse and fittings shared by every boat; [skin] adds its rigging. */
     fun boat(skin: Cosmetic?): MeshData = cached("boat:${skin?.name}") {
         val b = MeshBuilder()
-        // Hull: U-shaped sections from bow to stern, deck at y = 1.
-        val stations = 24
-        val sides = 14
-        val first = b.vertexCount
-        val firstTri = b.triangleCount
-        fun bottomAt(x: Float) = if (kotlin.math.abs(x) < 1.5f) -0.4f else -0.4f + 1.4f * smoothstep(1.5f, 2.5f, kotlin.math.abs(x))
-        fun halfWidthAt(x: Float) = 1.15f * (1f - 0.85f * smoothstep(1.2f, 2.5f, kotlin.math.abs(x))) + 0.04f
-        for (i in 0..stations) {
-            val x = -2.5f + 5f * i / stations
-            val bottom = bottomAt(x)
-            val w = halfWidthAt(x)
-            for (k in 0..sides) {
-                val a = k / sides.toFloat() * PI.toFloat() // 0: +z side at deck, pi: -z side at deck
-                val z = cos(a) * w
-                val y = 1f - (1f - bottom) * sin(a)
-                b.vertex(Vec3(x, y, z), Vec3(0f, -sin(a), cos(a)), i / stations.toFloat(), k / sides.toFloat(), Part.HULL)
-            }
-        }
-        val stride = sides + 1
-        for (i in 0 until stations) for (k in 0 until sides) {
-            val a = first + i * stride + k
-            val c = a + stride
-            b.quad(a, a + 1, c + 1, c)
-        }
-        b.smoothNormals(first, firstTri)
-        // Deck.
-        val deck = (0..stations).flatMap { i ->
-            val x = -2.5f + 5f * i / stations
-            listOf(x to halfWidthAt(x), x to -halfWidthAt(x))
-        }
-        val deckStart = b.vertexCount
-        for ((x, z) in deck) b.vertex(Vec3(x, 0.99f, z), Vec3.UP, (x + 2.5f) / 5f, if (z > 0) 1f else 0f, Part.WOOD)
-        for (i in 0 until stations) {
-            val a = deckStart + i * 2
-            b.quad(a, a + 2, a + 3, a + 1)
-        }
-        // Trim along the gunwale, and a second stripe near the waterline for skins.
-        val trimPath = (0..stations).map { i -> val x = -2.45f + 4.9f * i / stations; Vec3(x, 0.92f, halfWidthAt(x) + 0.02f) }
-        b.tube(trimPath, { 0.07f }, 6, Part.TRIM)
-        b.tube(trimPath.map { Vec3(it.x, it.y, -it.z) }, { 0.07f }, 6, Part.TRIM)
+        b.append(boatBase(antenna = skin == null))
         if (skin != null) {
-            val low = (0..stations).map { i -> val x = -1.9f + 3.8f * i / stations; Vec3(x, 0.15f, halfWidthAt(x) + 0.03f) }
-            b.tube(low, { 0.05f }, 6, Part.TRIM)
+            // A second stripe near the waterline, for the skins' two-colour hulls.
+            val low = (0..24).map { i -> val x = -1.9f + 3.9f * i / 24f; Vec3(x, 0.32f, halfBeamAt(x) + 0.03f) }
+            b.tube(low, { 0.045f }, 6, Part.TRIM)
         }
-        // Cabin with windows and a roof.
-        b.box(Vec3(-0.45f, 1.65f, 0f), Vec3(1.7f, 1.3f, 1.3f), Part.CABIN)
-        b.box(Vec3(-0.45f, 2.36f, 0f), Vec3(1.9f, 0.12f, 1.5f), Part.MAST)
-        b.box(Vec3(-0.7f, 1.78f, 0.66f), Vec3(0.6f, 0.5f, 0.03f), Part.WINDOW)
-        b.box(Vec3(-0.7f, 1.78f, -0.66f), Vec3(0.6f, 0.5f, 0.03f), Part.WINDOW)
-        b.box(Vec3(0.41f, 1.78f, 0f), Vec3(0.03f, 0.45f, 0.8f), Part.WINDOW)
         // Rigging, by skin.
         when (skin) {
             Cosmetic.GIANT_SLAYER_PENNANT -> {
@@ -227,6 +214,194 @@ object PropModels {
         b.build()
     }
 
+    /** Hull, wheelhouse and fittings; the antenna only on boats without a mast of their own. */
+    private fun boatBase(antenna: Boolean): MeshData = cached("boatbase:$antenna") {
+        val b = MeshBuilder()
+        addHull(b)
+        addWheelhouse(b)
+        addFittings(b, rigged = !antenna)
+        b.build()
+    }
+
+    /** For hand-made boats with sails: their mast replaces the antenna. */
+    private fun boatWithoutAntenna(): MeshData = boatBase(antenna = false)
+
+    private fun addHull(b: MeshBuilder) {
+        val stations = 34
+        val sides = 16
+        val first = b.vertexCount
+        val firstTri = b.triangleCount
+        val rings = ArrayList<List<Int>>()
+        for (i in 0..stations) {
+            val x0 = BOW_X + (STERN_X - BOW_X) * i / stations
+            val sheer = sheerAt(x0)
+            val keel = keelAt(x0)
+            val w = halfBeamAt(x0)
+            val ring = ArrayList<Int>()
+            for (k in 0..sides) {
+                val a = k / sides.toFloat() * PI.toFloat() // 0: +z side at the sheer, pi: -z side at the sheer
+                // Fuller sections (a firm bilge) with a little flare at the top.
+                val down = sin(a).let { kotlin.math.abs(it) }.toDouble().pow(0.7).toFloat()
+                val y = sheer - (sheer - keel) * down
+                val flare = 1f + 0.06f * (1f - down)
+                val z = cos(a) * w * flare
+                val x = x0 - rakeAt(x0) * (y - keel) / max(0.05f, sheer - keel)
+                ring += b.vertex(Vec3(x, y, z), Vec3(0f, -sin(a), cos(a)), i / stations.toFloat(), k / sides.toFloat(), Part.HULL)
+            }
+            rings += ring
+        }
+        for (i in 0 until stations) for (k in 0 until sides) {
+            val a = rings[i][k]; val c = rings[i + 1][k]
+            b.quad(a, a + 1, c + 1, c)
+        }
+        b.smoothNormals(first, firstTri)
+        // The transom (flat stern) and a cap at the stem, facing out.
+        for ((end, sign) in listOf(stations to 1f, 0 to -1f)) {
+            val x0 = BOW_X + (STERN_X - BOW_X) * end / stations
+            val n = Vec3(sign, 0f, 0f)
+            val ring = rings[end].map { idx -> b.position(idx) }
+            val mid = Vec3(ring.sumOf { it.x.toDouble() }.toFloat() / ring.size, (sheerAt(x0) + keelAt(x0)) / 2f, 0f)
+            val c = b.vertex(mid, n, 0.5f, 0.5f, Part.HULL)
+            val ids = ring.map { b.vertex(it, n, 0.5f, 0.5f, Part.HULL) }
+            for (k in 0 until ids.size - 1) if (sign > 0) b.triangle(c, ids[k], ids[k + 1]) else b.triangle(c, ids[k + 1], ids[k])
+            if (sign > 0) b.triangle(c, ids.last(), ids.first()) else b.triangle(c, ids.first(), ids.last())
+        }
+        // Deck planks, inside the rails.
+        val deckStart = b.vertexCount
+        val deckStations = 24
+        for (i in 0..deckStations) {
+            val x0 = BOW_X + 0.15f + (STERN_X - 0.05f - BOW_X - 0.15f) * i / deckStations
+            val x = x0 - rakeAt(x0)
+            val w = (halfBeamAt(x0) - 0.05f).coerceAtLeast(0.01f)
+            b.vertex(Vec3(x, deckAt(x0), w), Vec3.UP, i / deckStations.toFloat(), 1f, Part.WOOD)
+            b.vertex(Vec3(x, deckAt(x0), -w), Vec3.UP, i / deckStations.toFloat(), 0f, Part.WOOD)
+        }
+        for (i in 0 until deckStations) {
+            val a = deckStart + i * 2
+            b.quad(a, a + 2, a + 3, a + 1)
+        }
+        // Rails along the sheer, and a rubbing strake below them.
+        for (side in listOf(1f, -1f)) {
+            val rail = (0..30).map { i ->
+                val x0 = BOW_X + 0.08f + (STERN_X - BOW_X - 0.1f) * i / 30f
+                Vec3(x0 - rakeAt(x0), sheerAt(x0) + 0.01f, side * (halfBeamAt(x0) * 1.06f + 0.015f))
+            }
+            b.tube(rail, { 0.07f }, 6, Part.TRIM)
+            val strake = (0..26).map { i ->
+                val x0 = BOW_X + 0.45f + (STERN_X - BOW_X - 0.5f) * i / 26f
+                val y = sheerAt(x0) - 0.36f
+                Vec3(x0 - rakeAt(x0) * 0.75f, y, side * (halfBeamAt(x0) * 1.05f + 0.02f))
+            }
+            b.tube(strake, { 0.04f }, 5, Part.TRIM)
+        }
+        // Keel and rudder, below the water.
+        b.extrude(listOf(-1.9f to -0.32f, 2.1f to -0.3f, 2.05f to -0.56f, -1.5f to -0.58f), 0.14f, Part.HULL)
+        b.extrude(listOf(2.32f to 0.05f, 2.66f to 0.0f, 2.62f to -0.52f, 2.36f to -0.6f), 0.08f, Part.HULL)
+        b.tube(listOf(Vec3(2.36f, -0.6f, 0f), Vec3(2.36f, 0.4f, 0f)), { 0.035f }, 6, Part.MAST)
+    }
+
+    /** The wheelhouse: a slanted windscreen, framed windows, a door, a life ring and a roof. */
+    private fun addWheelhouse(b: MeshBuilder) {
+        val back = 0.35f
+        val front = -1.35f
+        val top = 2.25f
+        val half = 0.62f
+        // Side profile: a raked windscreen at the front, softly rounded corners.
+        b.extrude(
+            listOf(front to 0.9f, back to 0.9f, back to top - 0.06f, back - 0.06f to top, front + 0.32f to top, front + 0.27f to top - 0.04f, front to 1.72f),
+            2f * half, Part.CABIN,
+        )
+        val face = half + 0.006f
+        fun pane(x0: Float, x1: Float, y0: Float, y1: Float) {
+            b.box(Vec3((x0 + x1) / 2f, (y0 + y1) / 2f, face), Vec3(x1 - x0, y1 - y0, 0.02f), Part.WINDOW)
+            // White frames.
+            b.box(Vec3((x0 + x1) / 2f, y1 + 0.035f, face + 0.012f), Vec3(x1 - x0 + 0.1f, 0.07f, 0.03f), Part.TRIM)
+            b.box(Vec3((x0 + x1) / 2f, y0 - 0.035f, face + 0.012f), Vec3(x1 - x0 + 0.1f, 0.07f, 0.03f), Part.TRIM)
+            b.box(Vec3(x0 - 0.035f, (y0 + y1) / 2f, face + 0.012f), Vec3(0.07f, y1 - y0, 0.03f), Part.TRIM)
+            b.box(Vec3(x1 + 0.035f, (y0 + y1) / 2f, face + 0.012f), Vec3(0.07f, y1 - y0, 0.03f), Part.TRIM)
+        }
+        pane(-1.02f, -0.62f, 1.62f, 2.05f)
+        pane(-0.5f, -0.18f, 1.62f, 2.05f)
+        // The windscreen, on the raked front.
+        run {
+            val p0 = Vec3(front + 0.04f, 1.80f, half - 0.08f); val p1 = Vec3(front + 0.27f, 2.16f, half - 0.08f)
+            val n = Vec3(-0.84f, 0.54f, 0f).normalized()
+            val off = n * 0.01f
+            val quad = listOf(p0 + off, p1 + off, Vec3(p1.x, p1.y, -half + 0.08f) + off, Vec3(p0.x, p0.y, -half + 0.08f) + off)
+            val ids = quad.mapIndexed { k, q -> b.vertex(q, n, if (k == 1 || k == 2) 1f else 0f, if (k >= 2) 1f else 0f, Part.WINDOW) }
+            b.quad(ids[0], ids[3], ids[2], ids[1])
+        }
+        // The door, aft, with a porthole and a handle.
+        b.box(Vec3(0.08f, 1.43f, face + 0.005f), Vec3(0.4f, 0.98f, 0.02f), Part.ROOF)
+        b.box(Vec3(0.08f, 1.43f, face + 0.016f), Vec3(0.46f, 1.04f, 0.01f), Part.TRIM)
+        b.box(Vec3(0.08f, 1.43f, face + 0.02f), Vec3(0.36f, 0.94f, 0.012f), Part.ROOF)
+        porthole(b, Vec3(0.08f, 1.72f, face + 0.03f), 0.1f)
+        b.sphere(Vec3(0.22f, 1.38f, face + 0.05f), 0.035f, Part.METAL, 4, 8)
+        // A life ring on the wall, red and white.
+        ring(b, Vec3(-0.52f, 1.28f, face + 0.05f), 0.19f, 0.055f, Part.LIFE_RING)
+        // The roof: an overhanging slab with a lip, in the hull's colour.
+        b.box(Vec3((front + back) / 2f + 0.08f, top + 0.07f, 0f), Vec3(back - front + 0.36f, 0.14f, 2f * half + 0.26f), Part.ROOF)
+        b.box(Vec3((front + back) / 2f + 0.08f, top + 0.155f, 0f), Vec3(back - front + 0.2f, 0.04f, 2f * half + 0.1f), Part.ROOF)
+    }
+
+    /** Antenna and light, fenders, a rope coil, aft rails and a rod holder. */
+    private fun addFittings(b: MeshBuilder, rigged: Boolean) {
+        val roof = 2.42f
+        // Antenna mast with a cross-tree and a lantern at the top (rigged skins carry their own mast).
+        if (!rigged) {
+            b.tube(listOf(Vec3(0.18f, roof, 0f), Vec3(0.18f, 3.45f, 0f)), { u -> 0.04f - 0.015f * u }, 6, Part.MAST)
+            b.tube(listOf(Vec3(-0.08f, 3.05f, 0f), Vec3(0.44f, 3.05f, 0f)), { 0.022f }, 5, Part.MAST)
+            b.sphere(Vec3(0.18f, 3.5f, 0f), 0.075f, Part.LAMP, 6, 10)
+        }
+        // A searchlight on the roof.
+        b.tube(listOf(Vec3(-0.9f, roof + 0.12f, 0.32f), Vec3(-1.08f, roof + 0.12f, 0.32f)), { 0.075f }, 10, Part.REEL)
+        b.sphere(Vec3(-1.09f, roof + 0.12f, 0.32f), 0.06f, Part.LAMP, 5, 10, Vec3(0.4f, 1f, 1f))
+        b.tube(listOf(Vec3(-0.98f, roof, 0.32f), Vec3(-0.98f, roof + 0.06f, 0.32f)), { 0.03f }, 5, Part.MAST)
+        // Fenders hanging over the side on short ropes.
+        for (x in listOf(-1.75f, 1.25f)) {
+            val z = halfBeamAt(x) * 1.07f + 0.12f
+            val yTop = sheerAt(x) - 0.42f
+            b.lathe(listOf(0.0f to 0.0f, 0.08f to -0.02f, 0.12f to -0.1f, 0.13f to -0.3f, 0.12f to -0.42f, 0.08f to -0.5f, 0.0f to -0.52f), 10, Part.FENDER, Vec3(x, yTop, z))
+            b.tube(listOf(Vec3(x, yTop, z), Vec3(x, sheerAt(x) + 0.02f, z - 0.06f)), { 0.015f }, 4, Part.ROPE)
+        }
+        // Aft rails: posts and a top rail along the working deck.
+        val posts = listOf(0.55f, 1.05f, 1.55f, 2.05f)
+        for (side in listOf(1f, -1f)) {
+            for (x in posts) {
+                val z = side * (halfBeamAt(x) * 1.04f)
+                b.tube(listOf(Vec3(x, sheerAt(x), z), Vec3(x, sheerAt(x) + 0.42f, z)), { 0.025f }, 5, Part.TRIM)
+            }
+            b.tube(posts.map { x -> Vec3(x, sheerAt(x) + 0.42f, side * (halfBeamAt(x) * 1.04f)) }, { 0.028f }, 5, Part.TRIM)
+        }
+        // A coil of rope on the deck.
+        for ((r, h) in listOf(0.24f to 0.04f, 0.17f to 0.09f)) {
+            ring(b, Vec3(1.65f, deckAt(1.65f) + h, -0.35f), r, 0.045f, Part.ROPE, flat = true)
+        }
+        // The rod holder on the rail, where the rod's butt sits.
+        b.tube(listOf(Vec3(0.86f, sheerAt(0.86f) - 0.1f, 0.84f), Vec3(0.94f, sheerAt(0.86f) + 0.22f, 0.84f)), { 0.05f }, 8, Part.REEL)
+        // A small anchor at the bow.
+        val ax = -2.15f
+        val az = halfBeamAt(ax) * 1.05f + 0.03f
+        val anchor = listOf(-0.04f to 0.2f, 0.04f to 0.2f, 0.04f to -0.08f, 0.14f to 0.0f, 0.16f to -0.05f, 0.03f to -0.2f, -0.03f to -0.2f, -0.16f to -0.05f, -0.14f to 0.0f, -0.04f to -0.08f)
+        b.extrude(anchor.map { (x, y) -> ax + x * 1.2f to sheerAt(ax) - 0.42f + y * 1.2f }, 0.03f, Part.MAST, z = az)
+    }
+
+    /** A torus: a ring of [r] around [c], facing +z (or flat, facing up), tube radius [tube]. */
+    private fun ring(b: MeshBuilder, c: Vec3, r: Float, tube: Float, part: Float, flat: Boolean = false) {
+        val path = (0..24).map { k ->
+            val a = k / 24f * 2f * PI.toFloat()
+            if (flat) Vec3(c.x + cos(a) * r, c.y, c.z + sin(a) * r) else Vec3(c.x + cos(a) * r, c.y + sin(a) * r, c.z)
+        }
+        b.tube(path, { tube }, 8, part, cap = false)
+    }
+
+    /** A round window with a frame, facing +z. */
+    private fun porthole(b: MeshBuilder, c: Vec3, r: Float) {
+        val glass = (0 until 14).map { k -> val a = k / 14f * 2f * PI.toFloat(); c.x + cos(a) * r to c.y + sin(a) * r }
+        b.extrude(glass, 0.01f, Part.WINDOW, z = c.z)
+        ring(b, c + Vec3(0f, 0f, 0.008f), r + 0.02f, 0.022f, Part.TRIM)
+    }
+
     /**
      * A hand-made boat (Skins > Customise): the classic hull and cabin, plus the chosen sail,
      * flag and emblem. Colours and the hull pattern are shader uniforms, so only these three
@@ -234,7 +409,7 @@ object PropModels {
      */
     fun customBoat(sail: SailStyle, flag: FlagStyle, emblem: Emblem): MeshData = cached("boatd:${sail.name}:${flag.name}:${emblem.name}") {
         val b = MeshBuilder()
-        b.append(boat(null))
+        b.append(if (sail == SailStyle.NONE) boat(null) else boatWithoutAntenna())
         // Where the emblem goes: on the sail, else the flag, else the hull's side.
         var emblemAt: Vec3? = null
         var emblemSize = 0.7f

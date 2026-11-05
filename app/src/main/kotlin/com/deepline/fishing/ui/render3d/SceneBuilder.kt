@@ -14,6 +14,7 @@ import com.deepline.fishing.ui.ColorScript
 import com.deepline.fishing.ui.FishLooks
 import com.deepline.fishing.ui.FishStyles
 import com.deepline.fishing.ui.Skins
+import com.deepline.fishing.ui.BoatLook
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
@@ -151,9 +152,11 @@ class SceneBuilder {
         val bend = if (session.phase == CastPhase.ASCENDING) 0.25f + 0.6f * load else 0.1f
         val rodBase = Vec3(cx + 0.9f, 1.0f + boatBob, 0.8f)
         val rodTip = Vec3(cx + 1.9f + bend * 0.6f, 2.9f - bend + boatBob, 0.8f)
-        if (-top < 8f) {
+        val nearSurface = -top < 8f
+        if (nearSurface) {
             items += boatItems(skins.boat, Vec3(cx, boatBob, 0f), timeSeconds, skins.customBoat)
-            items += rodItem(rodBase, rodTip)
+            items += rodItem(rodBase, rodTip, timeSeconds)
+            addBoatFoam(sprites, cx, boatBob, timeSeconds)
         }
 
         val s = GameConfig.HOOK_RADIUS
@@ -162,8 +165,22 @@ class SceneBuilder {
         val trail = (-session.hookVelocityX * 0.12f).coerceIn(-1.5f, 1.5f)
         val control = Vec3(hookEye.x + trail, entry.y + (hookEye.y - entry.y) * 0.6f, 0.15f)
         val linePts = ArrayList<Vec3>()
+        // From the reel along the rod, through its guides, to the tip...
+        if (nearSurface) linePts += rodLinePath(rodBase, rodTip)
         linePts += rodTip
-        linePts += entry
+        // ...then sagging a little to where it enters the water.
+        for (i in 1..8) {
+            val t = i / 8f
+            val sag = 4f * t * (1f - t) * (0.12f + 0.04f * (rodTip - entry).length())
+            linePts += Vec3.lerp(rodTip, entry, t) - Vec3(0f, sag, 0f)
+        }
+        if (nearSurface) {
+            // Rings spreading from where the line cuts the surface.
+            for (k in 0 until 2) {
+                val p = (timeSeconds * 0.45f + k * 0.5f) % 1f
+                sprites.quad(Vec3(entry.x, 0.02f, entry.z + 0.05f), 0.3f + 1.4f * p, (0.3f + 1.4f * p) * 0.22f, floatArrayOf(1f, 1f, 1f, 0.55f * (1f - p)), SHAPE_RING)
+            }
+        }
         for (i in 1..28) {
             val t = i / 28f
             val u = 1f - t
@@ -198,6 +215,8 @@ class SceneBuilder {
 
         // The line, drawn over the scene (it's thin, so no depth fight with the water).
         items += lineItem(linePts, skins.line, bumpFlash)
+        // The water in front of the hull: its submerged side is seen through the surface.
+        if (nearSurface) items += waterSkirt(cx, waterColor(1.5f, atmo), timeSeconds)
 
         // Skins: an aura around the hook and a trail of bubbles or sparkles.
         addHookAura(sprites, hookWorld, s, timeSeconds, skins.hook)
@@ -303,9 +322,10 @@ class SceneBuilder {
             Cosmetic.GIANT_SLAYER_PENNANT -> listOf(rgb(0xFF37474F), rgb(0xFF102027), rgb(0xFF4DD0E1), f(0f))
             Cosmetic.PRISM_SAIL -> listOf(rgb(0xFFFAFAFA), rgb(0xFFB0BEC5), rgb(0xFFFFFFFF), f(1f))
             Cosmetic.ROYAL_BOAT -> listOf(rgb(0xFF7B1FA2), rgb(0xFF38006B), rgb(0xFFFFD54F), f(2f))
-            else -> listOf(rgb(0xFFB5743A), rgb(0xFF5D3A1A), rgb(0xFFE8D5B5), f(0f))
+            // The classic boat: lagoon-blue topsides, a white boot stripe and rails, red bottom paint.
+            else -> listOf(rgb(BoatLook.CLASSIC_HULL), rgb(BoatLook.CLASSIC_BOTTOM), rgb(BoatLook.CLASSIC_TRIM), f(0f))
         }
-        val cabin = if (skin == Cosmetic.ROYAL_BOAT) rgb(0xFFFFF8E1) else rgb(0xFFF5E6CC)
+        val cabin = if (skin == Cosmetic.ROYAL_BOAT) rgb(0xFFFFF8E1) else rgb(BoatLook.CLASSIC_CABIN)
         val out = ArrayList<DrawItem>()
         out += DrawItem(
             Program.TOON, "boat:${skin?.name}",
@@ -332,21 +352,115 @@ class SceneBuilder {
         return out
     }
 
-    private fun rodItem(base: Vec3, tip: Vec3): DrawItem {
-        val b = MeshBuilder()
+    /** A point along the rod's bend, [u] from the butt (0) to the tip (1). */
+    private fun rodAt(base: Vec3, tip: Vec3, u: Float): Vec3 {
         val ctrl = Vec3(base.x + (tip.x - base.x) * 0.3f, base.y + (tip.y - base.y) * 0.8f, base.z)
-        val path = (0..10).map { i ->
-            val t = i / 10f
-            val u = 1f - t
-            base * (u * u) + ctrl * (2f * u * t) + tip * (t * t)
+        val v = 1f - u
+        return base * (v * v) + ctrl * (2f * u * v) + tip * (u * u)
+    }
+
+    /** Below the rod at [u], the side the reel and the guides hang from. */
+    private fun rodBelow(base: Vec3, tip: Vec3, u: Float): Vec3 {
+        val d = (rodAt(base, tip, min(1f, u + 0.01f)) - rodAt(base, tip, max(0f, u - 0.01f))).normalized()
+        val n = Vec3(d.y, -d.x, 0f)
+        return if (n.y > 0f) -n else n
+    }
+
+    private val guideAt = floatArrayOf(0.36f, 0.52f, 0.67f, 0.8f, 0.92f)
+
+    /** The line from the reel's spool through the guides (the rest goes from the tip). */
+    private fun rodLinePath(base: Vec3, tip: Vec3): List<Vec3> {
+        val pts = ArrayList<Vec3>()
+        pts += rodAt(base, tip, 0.2f) + rodBelow(base, tip, 0.2f) * 0.22f + Vec3(0f, 0f, 0.16f)
+        for ((k, u) in guideAt.withIndex()) pts += rodAt(base, tip, u) + rodBelow(base, tip, u) * (0.11f - 0.012f * k)
+        return pts
+    }
+
+    /**
+     * The rod: a tapering graphite blank, a cork grip, a reel hanging below with a turning
+     * handle, and guides the line runs through.
+     */
+    private fun rodItem(base: Vec3, tip: Vec3, t: Float): DrawItem {
+        val b = MeshBuilder()
+        b.tube((0..16).map { rodAt(base, tip, it / 16f) }, { u -> 0.055f - 0.038f * u }, 8, 37f)
+        b.tube((0..4).map { rodAt(base, tip, it / 4f * 0.17f) }, { u -> 0.085f - 0.01f * u }, 10, Part.CORK)
+        b.sphere(rodAt(base, tip, 0f), 0.085f, Part.REEL, 5, 10)
+        // The reel, its spool across the rod, and a crank.
+        val seat = rodAt(base, tip, 0.2f)
+        val reel = seat + rodBelow(base, tip, 0.2f) * 0.22f
+        b.tube(listOf(seat, reel), { 0.028f }, 5, Part.REEL)
+        b.tube(listOf(reel + Vec3(0f, 0f, -0.1f), reel + Vec3(0f, 0f, 0.1f)), { 0.13f }, 14, Part.REEL)
+        b.tube(listOf(reel + Vec3(0f, 0f, 0.1f), reel + Vec3(0f, 0f, 0.17f)), { 0.105f }, 14, Part.ROPE)
+        val crank = reel + Vec3(0f, 0f, -0.15f)
+        val a = t * 2.2f
+        val knob = crank + Vec3(cos(a) * 0.15f, sin(a) * 0.15f, -0.03f)
+        b.tube(listOf(crank, knob), { 0.02f }, 5, Part.REEL)
+        b.sphere(knob, 0.04f, Part.CORK, 4, 8)
+        // Guides: small rings standing off the blank, smaller towards the tip.
+        for ((k, u) in guideAt.withIndex()) {
+            val p = rodAt(base, tip, u)
+            val below = rodBelow(base, tip, u)
+            val r = 0.055f - 0.007f * k
+            val c = p + below * (0.11f - 0.012f * k)
+            b.tube(listOf(p, c - below * r), { 0.012f }, 4, Part.METAL)
+            val ring = (0..12).map { j ->
+                val ang = j / 12f * 2f * PI.toFloat()
+                c + below * (cos(ang) * r) + Vec3(0f, 0f, sin(ang) * r)
+            }
+            b.tube(ring, { 0.011f }, 4, Part.METAL, cap = false)
         }
-        b.tube(path, { u -> 0.07f - 0.045f * u }, 8, 37f)
-        b.sphere(Vec3.lerp(base, tip, 0.1f) + Vec3(0f, 0f, 0.05f), 0.16f, Part.METAL, 6, 10, Vec3(1f, 1f, 0.6f))
-        return DrawItem(Program.TOON, null, b.build(), uniforms = model(Mat4.identity()) + mapOf("uMaterial" to f(3f)), outlinePx = 1.8f, outlineColor = OUTLINE_INK)
+        b.sphere(tip, 0.028f, Part.METAL, 4, 8)
+        return DrawItem(Program.TOON, null, b.build(), uniforms = model(Mat4.identity()) + mapOf("uMaterial" to f(3f)), outlinePx = 1.6f, outlineColor = OUTLINE_INK)
+    }
+
+    /**
+     * A strip of water in front of the boat, from the surface down: the near side of the hull
+     * (which sits in front of the play plane) then reads as under water, as it should.
+     */
+    private fun waterSkirt(cx: Float, water: FloatArray, t: Float): DrawItem {
+        val b = MeshBuilder()
+        val z = 1.32f
+        val cols = 24
+        val rows = 4
+        val n = Vec3(0f, 0f, 1f)
+        for (r in 0..rows) {
+            val v = r / rows.toFloat()
+            val y = -1.1f * v
+            for (c in 0..cols) {
+                val u = c / cols.toFloat()
+                val x = cx - 3.6f + 7.2f * u
+                // Fades out at the ends, deeper is more opaque; the top follows the waves.
+                val edge = smoothstep(0f, 0.18f, u) * smoothstep(1f, 0.82f, u)
+                val a = (0.42f + 0.4f * v) * edge
+                val wave = if (r == 0) 0.03f * sin(x * 1.7f + t * 1.6f) else 0f
+                b.vertex(Vec3(x, y + wave, z), n, u, v, SHAPE_FLAT, floatArrayOf(water[0], water[1], water[2], a))
+            }
+        }
+        for (r in 0 until rows) for (c in 0 until cols) {
+            val a = r * (cols + 1) + c
+            b.quad(a, a + cols + 1, a + cols + 2, a + 1)
+        }
+        return DrawItem(Program.SPRITE, null, b.build(), uniforms = mapOf("uAdditive" to f(0f)), blend = Blend.ALPHA, cullBack = false, depthWrite = false)
+    }
+
+    /** Foam lapping along the hull at the waterline, a bow wave and a little wake. */
+    private fun addBoatFoam(sprites: SpriteBatch, cx: Float, bob: Float, t: Float) {
+        for (k in 0..30) {
+            val x = -2.65f + 5.1f * k / 30f
+            val z = PropModels.halfBeamAt(x) * 1.04f + 0.06f
+            val wobble = sin(t * 2.3f + k * 1.7f)
+            val size = 0.16f + 0.12f * hash01(k, 7, 3) + 0.04f * wobble
+            sprites.quad(Vec3(cx + x, 0.03f + bob * 0.3f + 0.015f * wobble, z), size * 1.6f, size, floatArrayOf(1f, 1f, 1f, 0.55f + 0.25f * wobble), SHAPE_DOT)
+        }
+        for (k in 0 until 3) {
+            val p = (t * 0.35f + k / 3f) % 1f
+            sprites.quad(Vec3(cx - 2.6f - p * 0.9f, 0.04f, 0.9f), 0.5f + 1.6f * p, (0.5f + 1.6f * p) * 0.2f, floatArrayOf(1f, 1f, 1f, 0.5f * (1f - p)), SHAPE_RING)
+            sprites.quad(Vec3(cx + 2.5f + p * 1.2f, 0.04f, 0.8f), 0.4f + 1.8f * p, (0.4f + 1.8f * p) * 0.18f, floatArrayOf(1f, 1f, 1f, 0.4f * (1f - p)), SHAPE_RING)
+        }
     }
 
     private fun lineItem(points: List<Vec3>, skin: Cosmetic?, bumpFlash: Float): DrawItem {
-        val width = if (skin == null) 0.05f else 0.09f
+        val width = if (skin == null) 0.06f else 0.09f
         val mode = when (skin) {
             Cosmetic.GIANTS_BRAID_LINE -> 1f
             Cosmetic.RAINBOW_LINE -> 2f
@@ -373,7 +487,8 @@ class SceneBuilder {
                     val u = i / (points.size - 1f).coerceAtLeast(1f)
                     floatArrayOf(0.39f + (0.08f - 0.39f) * u, 1f + (0.40f - 1f) * u, 0.85f + (0.75f - 0.85f) * u, 1f)
                 }
-                else -> floatArrayOf(0.91f, 0.96f, 0.98f, 0.95f)
+                // The classic line: pale hi-vis monofilament (the shader adds a running glint).
+                else -> floatArrayOf(BoatLook.LINE_R, BoatLook.LINE_G, BoatLook.LINE_B, 0.95f)
             }
             val color = floatArrayOf(
                 base[0] + (1f - base[0]) * bumpFlash, base[1] * (1f - 0.7f * bumpFlash), base[2] * (1f - 0.7f * bumpFlash), base[3],
@@ -577,6 +692,8 @@ class SceneBuilder {
         const val SHAPE_HALO = 4f
         const val SHAPE_HEART = 5f
         const val SHAPE_PETAL = 6f
+        /** No shape: the vertex colour as is (the water in front of the boat). */
+        const val SHAPE_FLAT = 7f
 
         /** The uniforms that paint [species]: colours, pattern, swimming. */
         fun fishUniforms(
@@ -662,13 +779,17 @@ class SpriteBatch {
 
     fun isNotEmpty() = count > 0
 
-    fun quad(center: Vec3, size: Float, color: FloatArray, shape: Float) {
-        val h = size / 2f
+    fun quad(center: Vec3, size: Float, color: FloatArray, shape: Float) = quad(center, size, size, color, shape)
+
+    /** A [width] by [height] sprite (a squashed one draws ripples seen from the side). */
+    fun quad(center: Vec3, width: Float, height: Float, color: FloatArray, shape: Float) {
+        val h = width / 2f
+        val v = height / 2f
         val n = Vec3(0f, 0f, 1f)
-        val a = b.vertex(center + Vec3(-h, -h, 0f), n, 0f, 0f, shape, color)
-        val c1 = b.vertex(center + Vec3(h, -h, 0f), n, 1f, 0f, shape, color)
-        val c2 = b.vertex(center + Vec3(h, h, 0f), n, 1f, 1f, shape, color)
-        val d = b.vertex(center + Vec3(-h, h, 0f), n, 0f, 1f, shape, color)
+        val a = b.vertex(center + Vec3(-h, -v, 0f), n, 0f, 0f, shape, color)
+        val c1 = b.vertex(center + Vec3(h, -v, 0f), n, 1f, 0f, shape, color)
+        val c2 = b.vertex(center + Vec3(h, v, 0f), n, 1f, 1f, shape, color)
+        val d = b.vertex(center + Vec3(-h, v, 0f), n, 0f, 1f, shape, color)
         b.quad(a, c1, c2, d)
         count++
     }

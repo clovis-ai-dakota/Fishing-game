@@ -4,7 +4,7 @@ precision highp float;
 #include "common.glsl"
 
 // Camera-facing particles and ribbons, built on the CPU. vShape picks the look:
-// 0 soft dot, 1 bubble ring, 2 four-point twinkle, 3 coin, 4 halo, 5 heart, 6 petal,
+// 0 soft dot, 1 bubble ring, 2 four-point twinkle, 3 coin, 4 halo, 5 heart, 6 petal, 7 flat,
 // 10+ fishing line skins.
 uniform float uAdditive;
 in vec2 vUv;
@@ -37,6 +37,9 @@ void main() {
         float f = k * k * k - h.x * h.x * h.y * h.y * h.y;
         a = smoothstep(0.03, -0.03, f);
         col = mix(col, vec3(1.0), 0.5 * smoothstep(0.18, 0.0, length(q - vec2(-0.3, 0.3))));
+    } else if (vShape > 6.5 && vShape < 7.5) {
+        // Flat: the vertex colour as is.
+        a = 1.0;
     } else if (vShape < 6.5) {
         // A petal: a pointed ellipse, slightly pinker at its base.
         vec2 e = vec2(q.x * 0.9, q.y * 1.8);
@@ -65,7 +68,12 @@ void main() {
             col = mix(vec3(0.62, 0.68, 0.72), vec3(0.90, 0.93, 0.95), smoothstep(0.9, 0.0, across));
             col += vec3(1.0) * smoothstep(0.97, 1.0, sin(vUv.x * 0.7 - uTime * 5.0));
         }
-        // mode 0 (classic), 2 (rainbow) and 4 (ocean) use the vertex colour as is.
+        else if (mode < 0.5) {
+            // The classic monofilament: a bright core and a glint running down it.
+            col = mix(col * 0.82, col, smoothstep(0.9, 0.1, across));
+            col += vec3(1.0) * smoothstep(0.97, 1.0, sin(vUv.x * 0.8 - uTime * 3.0)) * 0.55;
+        }
+        // Modes 2 (rainbow) and 4 (ocean) use the vertex colour as is.
     }
     a *= vColor.a * (1.0 - vFog);
     if (a < 0.003) discard;
