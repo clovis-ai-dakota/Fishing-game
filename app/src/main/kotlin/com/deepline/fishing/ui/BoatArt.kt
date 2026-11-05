@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.lerp
 import com.deepline.fishing.core.BoatDesign
+import com.deepline.fishing.core.ClothPattern
 import com.deepline.fishing.core.Cosmetic
 import com.deepline.fishing.core.Emblem
 import com.deepline.fishing.core.FlagStyle
@@ -163,6 +164,41 @@ private fun DrawScope.drawHullPattern(d: BoatDesign, hull: Path, cx: Float, surf
                 val tw = 0.6f + 0.4f * sin(timeSeconds * 2.5f + k * 1.7f)
                 twinkle(Offset(x, y), (0.09f + 0.06f * (k % 3)) * scale * tw, trim)
             }
+            HullPattern.METALLIC -> {
+                // Polished bands sliding along the hull.
+                for (k in 0 until 3) {
+                    val x0 = left + ((timeSeconds * 0.25f + k / 3f) % 1f) * (right - left + 2f * scale) - scale
+                    val band = Path().apply {
+                        moveTo(x0, top); lineTo(x0 + 0.35f * scale, top)
+                        lineTo(x0 - 0.25f * scale, bottom); lineTo(x0 - 0.6f * scale, bottom); close()
+                    }
+                    drawPath(band, Color.White.copy(alpha = 0.35f))
+                }
+                drawRect(Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.25f), Color.Transparent, Color.Black.copy(alpha = 0.2f)), startY = top, endY = bottom), topLeft = Offset(left, top), size = Size(right - left, bottom - top))
+            }
+            HullPattern.NEON -> {
+                val pulse = 0.65f + 0.35f * sin(timeSeconds * 3f)
+                for ((k, y) in listOf(surfaceY - 0.55f * scale, surfaceY - 0.2f * scale).withIndex()) {
+                    val c = if (k == 0) trim else lerp(trim, Color.White, 0.3f)
+                    drawLine(c.copy(alpha = 0.35f * pulse), Offset(left, y), Offset(right, y), strokeWidth = 0.28f * scale)
+                    drawLine(c.copy(alpha = pulse), Offset(left, y), Offset(right, y), strokeWidth = 0.09f * scale)
+                }
+            }
+            HullPattern.AURORA -> {
+                // Members-only: green and violet curtains drifting along the hull.
+                for (k in 0 until 4) {
+                    val c = if (k % 2 == 0) Color(0xFF64FFDA) else Color(0xFFB388FF)
+                    val wave = Path()
+                    var x = left
+                    val y0 = top + (0.2f + k * 0.28f) * scale
+                    wave.moveTo(x, y0)
+                    while (x <= right) {
+                        wave.lineTo(x, y0 + sin((x - left) / scale * 2.2f + timeSeconds * 1.4f + k) * 0.18f * scale)
+                        x += max(2f, scale * 0.1f)
+                    }
+                    drawPath(wave, c.copy(alpha = 0.55f), style = Stroke(width = 0.22f * scale, cap = StrokeCap.Round))
+                }
+            }
         }
     }
 }
@@ -193,6 +229,7 @@ internal fun DrawScope.drawCustomRig(d: BoatDesign, cx: Float, surfaceY: Float, 
                 close()
             }
             drawPath(main, Brush.verticalGradient(listOf(lerp(sailColor, Color.White, 0.25f), sailColor), startY = mastTop, endY = surfaceY - 1.5f * scale))
+            drawClothPrint(main, d.cloth, emblemColor, mastX - 2.3f * scale, mastTop, mastX, surfaceY - 1.5f * scale, scale, timeSeconds)
             drawPath(main, edge, style = Stroke(width = max(1.5f, 0.04f * scale)))
             emblemAt = Offset(mastX - 0.85f * scale, surfaceY - 2.4f * scale)
             emblemR = 0.42f * scale
@@ -205,6 +242,7 @@ internal fun DrawScope.drawCustomRig(d: BoatDesign, cx: Float, surfaceY: Float, 
                     close()
                 }
                 drawPath(jib, Brush.verticalGradient(listOf(lerp(sailColor, Color.White, 0.4f), lerp(sailColor, Color.White, 0.1f)), startY = mastTop, endY = surfaceY - 1.3f * scale))
+                drawClothPrint(jib, d.cloth, emblemColor, mastX, mastTop, mastX + 1.7f * scale, surfaceY - 1.3f * scale, scale, timeSeconds)
                 drawPath(jib, edge, style = Stroke(width = max(1.5f, 0.04f * scale)))
             }
         }
@@ -220,6 +258,7 @@ internal fun DrawScope.drawCustomRig(d: BoatDesign, cx: Float, surfaceY: Float, 
                 close()
             }
             drawPath(sail, Brush.verticalGradient(listOf(lerp(sailColor, Color.White, 0.2f), sailColor), startY = sailTop, endY = sailBottom))
+            drawClothPrint(sail, d.cloth, emblemColor, mastX - 1.7f * scale, sailTop, mastX + 2.0f * scale, sailBottom, scale, timeSeconds)
             drawPath(sail, edge, style = Stroke(width = max(1.5f, 0.05f * scale)))
             drawLine(edge, Offset(mastX - 1.6f * scale, sailTop), Offset(mastX + 1.6f * scale, sailTop), strokeWidth = max(2f, 0.07f * scale))
             emblemAt = Offset(mastX, (sailTop + sailBottom) / 2f)
@@ -254,6 +293,7 @@ internal fun DrawScope.drawCustomRig(d: BoatDesign, cx: Float, surfaceY: Float, 
     }
     if (flag != null) {
         drawPath(flag, flagColor)
+        drawClothPrint(flag, d.cloth, lerp(flagColor, Color.White, 0.6f), mastX, mastTop - 0.3f * scale, mastX + 2.3f * scale, mastTop + 1.4f * scale, scale * 0.5f, timeSeconds)
         drawPath(flag, edge, style = Stroke(width = max(1.2f, 0.04f * scale)))
         if (emblemAt == null) {
             emblemAt = Offset(mastX + 0.75f * scale, mastTop + (if (d.flagStyle == FlagStyle.BANNER) 0.6f else 0.45f) * scale + wave * 0.7f)
@@ -261,6 +301,60 @@ internal fun DrawScope.drawCustomRig(d: BoatDesign, cx: Float, surfaceY: Float, 
         }
     }
     if (d.emblem != Emblem.NONE && emblemAt != null) drawEmblem(d.emblem, emblemAt, emblemR, emblemColor, timeSeconds)
+}
+
+/**
+ * The print on a sail or flag ([shape], within the given bounds): stripes, stars or waves in [ink].
+ * The 3D renderer prints the same patterns (toon.frag, uCloth).
+ */
+internal fun DrawScope.drawClothPrint(
+    shape: Path, cloth: ClothPattern, ink: Color,
+    left: Float, top: Float, right: Float, bottom: Float, scale: Float, timeSeconds: Float,
+) {
+    if (cloth == ClothPattern.PLAIN) return
+    val c = ink.copy(alpha = 0.7f)
+    clipPath(shape) {
+        when (cloth) {
+            ClothPattern.PLAIN -> Unit
+            ClothPattern.STRIPES -> {
+                var y = top + 0.35f * scale
+                while (y < bottom) {
+                    drawRect(c, topLeft = Offset(left, y), size = Size(right - left, 0.22f * scale))
+                    y += 0.6f * scale
+                }
+            }
+            ClothPattern.STARS -> {
+                val step = 0.7f * scale
+                var row = 0
+                var y = top + step * 0.5f
+                while (y < bottom) {
+                    var x = left + (if (row % 2 == 0) step * 0.3f else step * 0.8f)
+                    while (x < right) {
+                        drawPath(starPath(Offset(x, y), 0.16f * scale, 0.07f * scale, 5), c)
+                        x += step
+                    }
+                    y += step
+                    row++
+                }
+            }
+            ClothPattern.WAVES -> {
+                var y = top + 0.4f * scale
+                var k = 0
+                while (y < bottom) {
+                    val w = Path()
+                    var x = left
+                    w.moveTo(x, y)
+                    while (x <= right) {
+                        w.lineTo(x, y + sin((x - left) / scale * 4f + timeSeconds * 1.5f + k) * 0.1f * scale)
+                        x += max(2f, scale * 0.08f)
+                    }
+                    drawPath(w, c, style = Stroke(width = 0.1f * scale, cap = StrokeCap.Round))
+                    y += 0.55f * scale
+                    k++
+                }
+            }
+        }
+    }
 }
 
 /** A boat emblem of radius [r] at [c], filled with [fill] and outlined for contrast. */
@@ -336,6 +430,35 @@ internal fun DrawScope.drawEmblem(emblem: Emblem, c: Offset, r: Float, fill: Col
             drawCircle(eye, radius = r * 0.22f, center = c + Offset(-r * 0.3f, -r * 0.15f))
             drawCircle(eye, radius = r * 0.22f, center = c + Offset(r * 0.3f, -r * 0.15f))
             for (k in -1..1) drawLine(eye, c + Offset(k * r * 0.2f, r * 0.45f), c + Offset(k * r * 0.2f, r * 0.8f), strokeWidth = max(1f, r * 0.07f))
+        }
+        Emblem.SHELL -> {
+            val fan = Path().apply {
+                moveTo(c.x, c.y + r * 0.85f)
+                for (k in 0..10) {
+                    val a = PI.toFloat() * (1f + k / 10f)
+                    val rr = r * (0.95f + 0.08f * sin(k * PI.toFloat()))
+                    lineTo(c.x + cos(a) * rr, c.y + r * 0.35f + sin(a) * rr)
+                }
+                close()
+            }
+            fillAndInk(fan)
+            for (k in 1 until 6) {
+                val a = PI.toFloat() * (1f + k / 6f)
+                drawLine(Color.Black.copy(alpha = 0.35f), Offset(c.x, c.y + r * 0.85f), Offset(c.x + cos(a) * r * 0.85f, c.y + r * 0.35f + sin(a) * r * 0.85f), strokeWidth = max(1f, r * 0.06f))
+            }
+        }
+        Emblem.TRIDENT -> {
+            val w = max(1.5f, r * 0.16f)
+            drawLine(fill, c + Offset(0f, -r * 0.6f), c + Offset(0f, r), strokeWidth = w, cap = StrokeCap.Round)
+            drawLine(fill, c + Offset(-r * 0.6f, -r * 0.35f), c + Offset(r * 0.6f, -r * 0.35f), strokeWidth = w, cap = StrokeCap.Round)
+            for (dx in listOf(-0.6f, 0f, 0.6f)) {
+                fillAndInk(Path().apply {
+                    moveTo(c.x + dx * r - w, c.y - r * 0.35f)
+                    lineTo(c.x + dx * r, c.y - r)
+                    lineTo(c.x + dx * r + w, c.y - r * 0.35f)
+                    close()
+                })
+            }
         }
         Emblem.LIGHTNING -> fillAndInk(
             Path().apply {

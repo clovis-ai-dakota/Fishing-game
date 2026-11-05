@@ -97,7 +97,7 @@ fun ShopScreen(vm: GameViewModel) {
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                         )
-                        Text(skin.price, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Bold)
+                        Text(com.deepline.fishing.core.ShopCatalog.byId("boat_${skin.id}")?.euroLabel ?: "", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Bold)
                         Button(onClick = {}, enabled = false, modifier = Modifier.fillMaxWidth()) { Text("Coming soon", maxLines = 1) }
                     }
                 }

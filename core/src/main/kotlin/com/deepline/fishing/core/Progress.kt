@@ -23,6 +23,15 @@ data class PlayerProgress(
     val lanterns: Int = GameConfig.STARTING_LANTERNS,
     val luckyCharms: Int = 0,
     val sparkleLures: Int = 0,
+    val detectors: Int = 0,
+    /** Shop items owned (ids from [ShopCatalog]) and other unlock keys ("badge:RAINBOW"...). */
+    val ownedItems: Set<String> = emptySet(),
+    /** Captain's Club membership ends at this time (epoch ms; 0: never a member). */
+    val clubUntilMs: Long = 0L,
+    /** How many times the app was opened (for the starter pack's timing). */
+    val sessions: Int = 0,
+    /** When the starter pack offer ends (epoch ms; 0: not offered yet). */
+    val starterOfferEndsMs: Long = 0L,
     val collection: Map<String, CollectionEntry> = emptyMap(),
     val castsMade: Int = 0,
     /** Record against the computer rival. */
@@ -57,7 +66,8 @@ data class PlayerProgress(
     val seenCount: Int get() = FishCatalog.all.count { Progression.dexState(this, it.id) != DexState.UNKNOWN }
 
     /** Cosmetics unlocked by the secrets discovered so far. */
-    val unlockedCosmetics: List<Cosmetic> get() = Cosmetic.entries.filter { it.unlockedBy in discoveredSecrets }
+    val unlockedCosmetics: List<Cosmetic>
+        get() = Cosmetic.entries.filter { it.unlockedBy in discoveredSecrets || (it.fromShop && ShopCatalog.ownsCosmetic(this, it)) }
 }
 
 /** How much the Dex knows about a species. Caught implies seen. */
@@ -206,12 +216,14 @@ object Progression {
         Tackle.LANTERN -> p.lanterns
         Tackle.LUCKY_CHARM -> p.luckyCharms
         Tackle.SPARKLE_LURE -> p.sparkleLures
+        Tackle.DETECTOR -> p.detectors
     }
 
-    private fun withTackle(p: PlayerProgress, item: Tackle, count: Int) = when (item) {
+    internal fun withTackle(p: PlayerProgress, item: Tackle, count: Int) = when (item) {
         Tackle.LANTERN -> p.copy(lanterns = count)
         Tackle.LUCKY_CHARM -> p.copy(luckyCharms = count)
         Tackle.SPARKLE_LURE -> p.copy(sparkleLures = count)
+        Tackle.DETECTOR -> p.copy(detectors = count)
     }
 
     fun buyTackle(p: PlayerProgress, item: Tackle): PlayerProgress? {

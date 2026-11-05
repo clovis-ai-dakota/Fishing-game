@@ -340,4 +340,24 @@ enum class Cosmetic(
     ROYAL_BOAT("Royal boat", "A gold-trimmed hull and a purple crowned sail.", CosmeticSlot.BOAT, Secrets.MASTER_ANGLER, "Sovereign"),
     GOLDEN_TRAIL("Golden trail", "Golden sparkles behind your hook.", CosmeticSlot.TRAIL, Secrets.MASTER_ANGLER, "Sovereign"),
     MASTER_ANGLER_TITLE("Master angler", "Title: every fish in the log.", CosmeticSlot.TITLE, Secrets.MASTER_ANGLER, "Sovereign"),
+
+    // Shop pieces (bought with euros or points; see ShopCatalog). Same size and hitbox as the
+    // classic gear: looks only. Legendary sets above stay earn-only.
+    CORAL_HOOK("Coral hook", "Pink coral with a pearl at the eye.", CosmeticSlot.HOOK, SHOP_SOURCE, "Coral Reef"),
+    NEON_HOOK("Neon hook", "Glowing magenta tubing.", CosmeticSlot.HOOK, SHOP_SOURCE, "Neon Nights"),
+    OBSIDIAN_HOOK("Obsidian hook", "Black glass with a violet sheen.", CosmeticSlot.HOOK, SHOP_SOURCE, ""),
+    OCEAN_LINE("Ocean line", "Turquoise fading to deep blue.", CosmeticSlot.LINE, SHOP_SOURCE, "Coral Reef"),
+    NEON_LINE("Neon line", "A pulsing pink and cyan line.", CosmeticSlot.LINE, SHOP_SOURCE, "Neon Nights"),
+    SILVER_LINE("Silver line", "Polished silver with a running glint.", CosmeticSlot.LINE, SHOP_SOURCE, ""),
+    HEART_TRAIL("Heart trail", "Little hearts instead of bubbles.", CosmeticSlot.TRAIL, SHOP_SOURCE, "Coral Reef"),
+    STAR_TRAIL("Star trail", "Neon stars instead of bubbles.", CosmeticSlot.TRAIL, SHOP_SOURCE, "Neon Nights"),
+    PETAL_TRAIL("Petal trail", "Drifting blossom petals.", CosmeticSlot.TRAIL, SHOP_SOURCE, ""),
+    FOUNDER_TITLE("Founder", "Title: you backed Deep Line from the start.", CosmeticSlot.TITLE, SHOP_SOURCE, ""),
+    ;
+
+    /** Sold in the shop (rather than unlocked by a legendary secret). */
+    val fromShop: Boolean get() = unlockedBy == SHOP_SOURCE
 }
+
+/** [Cosmetic.unlockedBy] for pieces sold in the shop. */
+const val SHOP_SOURCE = "shop"

@@ -85,7 +85,7 @@ class DexTest {
     @Test
     fun everySecretHasATierAndTheLegendaryOnesAreTopTier() {
         assertTrue(Secrets.all.all { Secrets.tierOf(it) in 1..Secrets.MAX_TIER })
-        val legendary = Cosmetic.entries.map { it.unlockedBy }.toSet()
+        val legendary = Cosmetic.entries.filter { !it.fromShop }.map { it.unlockedBy }.toSet()
         assertEquals(legendary, Secrets.all.filter { Secrets.tierOf(it) == Secrets.MAX_TIER }.toSet())
         // Tiers never go down along the list.
         assertEquals(Secrets.all.map(Secrets::tierOf).sorted(), Secrets.all.map(Secrets::tierOf))

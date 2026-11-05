@@ -26,6 +26,11 @@ object ProgressCodec {
         appendLine("lanterns=${p.lanterns}")
         appendLine("luckyCharms=${p.luckyCharms}")
         appendLine("sparkleLures=${p.sparkleLures}")
+        appendLine("detectors=${p.detectors}")
+        appendLine("ownedItems=${p.ownedItems.joinToString(",")}")
+        appendLine("clubUntil=${p.clubUntilMs}")
+        appendLine("sessions=${p.sessions}")
+        appendLine("starterOfferEnds=${p.starterOfferEndsMs}")
         appendLine("casts=${p.castsMade}")
         appendLine("battle=${p.battleWins},${p.battleLosses},${p.battleDraws}")
         appendLine("secrets=${p.discoveredSecrets.sorted().joinToString(",")}")
@@ -62,6 +67,11 @@ object ProgressCodec {
                 key == "lanterns" -> value.toIntOrNull()?.let { p = p.copy(lanterns = it) }
                 key == "luckyCharms" -> value.toIntOrNull()?.let { p = p.copy(luckyCharms = it) }
                 key == "sparkleLures" -> value.toIntOrNull()?.let { p = p.copy(sparkleLures = it) }
+                key == "detectors" -> value.toIntOrNull()?.let { p = p.copy(detectors = it) }
+                key == "ownedItems" -> p = p.copy(ownedItems = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet())
+                key == "clubUntil" -> value.toLongOrNull()?.let { p = p.copy(clubUntilMs = it) }
+                key == "sessions" -> value.toIntOrNull()?.let { p = p.copy(sessions = it) }
+                key == "starterOfferEnds" -> value.toLongOrNull()?.let { p = p.copy(starterOfferEndsMs = it) }
                 key == "secrets" -> p = p.copy(discoveredSecrets = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet())
                 key == "secretsMuted" -> p = p.copy(mutedSecretPopups = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet())
                 key == "seen" -> p = p.copy(seenSpecies = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet())
@@ -115,11 +125,11 @@ object ProgressCodec {
     /** Colours as palette indexes, then the pattern, sail, flag and emblem names. */
     private fun encodeDesign(d: BoatDesign) =
         listOf(d.hull, d.hullBottom, d.trim, d.cabin, d.sail, d.flag).joinToString(",") +
-            ",${d.pattern.name},${d.sailStyle.name},${d.flagStyle.name},${d.emblem.name}"
+            ",${d.pattern.name},${d.sailStyle.name},${d.flagStyle.name},${d.emblem.name},${d.cloth.name}"
 
     private fun decodeDesign(value: String): BoatDesign? {
         val parts = value.split(',').map { it.trim() }
-        if (parts.size != 10) return null
+        if (parts.size != 10 && parts.size != 11) return null
         val colors = parts.take(6).map { it.toIntOrNull()?.takeIf { i -> i in BoatPalette.swatches.indices } ?: return null }
         return BoatDesign(
             hull = colors[0], hullBottom = colors[1], trim = colors[2], cabin = colors[3], sail = colors[4], flag = colors[5],
@@ -127,6 +137,7 @@ object ProgressCodec {
             sailStyle = SailStyle.entries.firstOrNull { it.name == parts[7] } ?: return null,
             flagStyle = FlagStyle.entries.firstOrNull { it.name == parts[8] } ?: return null,
             emblem = Emblem.entries.firstOrNull { it.name == parts[9] } ?: return null,
+            cloth = parts.getOrNull(10)?.let { n -> ClothPattern.entries.firstOrNull { it.name == n } } ?: ClothPattern.PLAIN,
         )
     }
 }

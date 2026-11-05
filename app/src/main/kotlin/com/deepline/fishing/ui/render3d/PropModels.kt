@@ -331,6 +331,18 @@ object PropModels {
             cos(a) * 0.42f to 0.08f + sin(a) * 0.4f
         } + listOf(-0.28f to -0.28f, -0.2f to -0.46f, 0.2f to -0.46f, 0.28f to -0.28f)
         Emblem.LIGHTNING -> listOf(0.12f to 0.5f, -0.28f to -0.04f, -0.02f to -0.04f, -0.14f to -0.5f, 0.3f to 0.08f, 0.04f to 0.08f)
+        // A scallop: a fan of rounded lobes over a small hinge.
+        Emblem.SHELL -> (0..20).map { k ->
+            val a = k / 20f * PI.toFloat()
+            val r = 0.42f + 0.05f * cos(k * PI.toFloat())
+            cos(a) * r to -0.12f + sin(a) * r
+        }.reversed() + listOf(-0.12f to -0.2f, -0.1f to -0.4f, 0.1f to -0.4f, 0.12f to -0.2f).reversed()
+        Emblem.TRIDENT -> listOf(
+            -0.05f to -0.5f, 0.05f to -0.5f, 0.05f to 0.02f, 0.27f to 0.02f, 0.27f to 0.28f, 0.35f to 0.28f, 0.31f to 0.5f,
+            0.19f to 0.28f, 0.19f to 0.1f, 0.05f to 0.1f, 0.05f to 0.32f, 0.1f to 0.32f, 0f to 0.52f, -0.1f to 0.32f,
+            -0.05f to 0.32f, -0.05f to 0.1f, -0.19f to 0.1f, -0.19f to 0.28f, -0.31f to 0.5f, -0.35f to 0.28f, -0.27f to 0.28f,
+            -0.27f to 0.02f, -0.05f to 0.02f,
+        )
         Emblem.NONE -> emptyList()
     }
 

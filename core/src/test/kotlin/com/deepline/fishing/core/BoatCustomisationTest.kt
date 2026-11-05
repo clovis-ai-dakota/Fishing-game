@@ -21,13 +21,13 @@ class BoatCustomisationTest {
     @Test
     fun everyOptionHasARequirementAndARoundTripKey() {
         val expected = BoatPalette.swatches.size + HullPattern.entries.size + SailStyle.entries.size +
-            FlagStyle.entries.size + Emblem.entries.size
+            FlagStyle.entries.size + Emblem.entries.size + ClothPattern.entries.size
         assertEquals(expected, BoatParts.all.size)
         assertEquals(expected, BoatParts.all.map { it.key }.toSet().size)
         for (part in BoatParts.all) assertEquals(part, BoatPart.fromKey(part.key))
-        // A mix of ways to unlock things: free basics, points, progress and premium-only.
+        // A mix of ways to unlock things: free basics, points, progress, the shop and the club.
         val kinds = BoatParts.all.map { BoatParts.requirement(it)::class }.toSet()
-        assertEquals(6, kinds.size)
+        assertEquals(7, kinds.size)
     }
 
     @Test
@@ -145,10 +145,9 @@ class BoatCustomisationTest {
 
     @Test
     fun premiumSkinsAreValidDesignsAndShowOffPremiumOptions() {
-        assertTrue(PremiumSkins.all.size in 6..8)
+        assertTrue(PremiumSkins.all.size in 6..10)
         assertEquals(PremiumSkins.all.size, PremiumSkins.all.map { it.id }.toSet().size)
         for (s in PremiumSkins.all) {
-            assertTrue(s.price.startsWith("$"), s.id)
             assertTrue(BoatParts.partsOf(s.design).all { it in BoatParts.all }, s.id)
         }
         assertTrue(PremiumSkins.all.any { s -> BoatParts.partsOf(s.design).any { BoatParts.isPremiumOnly(it) } })

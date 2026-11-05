@@ -254,11 +254,29 @@ Surface obstacleSurface() {
 
 // ---- Boat ----------------------------------------------------------------------------------
 
+// The print on a hand-made boat's sail and flag (ClothPattern: 0 plain, 1 stripes, 2 stars,
+// 3 waves), in the sail's uv space. Matches drawClothPrint in BoatArt.kt.
+vec3 clothPrint(vec3 col, vec3 ink, float cloth) {
+    if (cloth > 0.5 && cloth < 1.5) {
+        if (fract(vUv.y * 5.0) < 0.35) col = mix(col, ink, 0.7);
+    } else if (cloth > 1.5 && cloth < 2.5) {
+        vec2 g = vec2(vUv.x * 5.0 + floor(vUv.y * 6.0) * 0.5, vUv.y * 6.0);
+        vec2 f = fract(g) - 0.5;
+        float a = atan(f.y, f.x);
+        float r = 0.16 + 0.1 * cos(a * 5.0);
+        if (length(f) < r) col = mix(col, ink, 0.7);
+    } else if (cloth > 2.5) {
+        float y = fract(vUv.y * 5.0 + 0.06 * sin(vUv.x * 18.0 + uTime * 1.5));
+        if (abs(y - 0.5) < 0.09) col = mix(col, ink, 0.7);
+    }
+    return col;
+}
+
 Surface boatSurface() {
     if (isPart(vPart, 30.0)) {
         vec3 col = mix(uAccent, uBase, smoothstep(-0.4, 1.0, vLocal.y));
         // Hand-made hulls: 1 racing stripe, 2 two-tone, 3 waves, 4 polka dots, 5 checkers;
-        // premium: 6 flames, 7 starry night.
+        // shop: 6 flames, 7 starry night, 8 metallic, 9 neon; Captain's Club: 10 aurora.
         float pattern = uBoatMode.z;
         vec2 q = vec2(vLocal.x, vLocal.y);
         if (pattern > 0.5 && pattern < 1.5) {
@@ -277,15 +295,30 @@ Surface boatSurface() {
             // Flames licking up from the waterline, flickering.
             float tongue = -0.1 + 0.45 * (0.5 + 0.5 * sin(q.x * 5.0 + sin(q.x * 11.0) + uTime * 3.0));
             if (q.y < tongue) col = mix(uExtra, vec3(1.0, 0.95, 0.5), smoothstep(tongue, tongue - 0.35, q.y));
-        } else if (pattern > 6.5) {
+        } else if (pattern > 6.5 && pattern < 7.5) {
             // A night sky: twinkling stars over the base colour.
             vec2 cell = floor(vec2(q.x * 5.0, q.y * 6.0));
             vec2 f = fract(vec2(q.x * 5.0, q.y * 6.0)) - 0.5;
             float star = hash21(cell);
             if (star > 0.55 && length(f) < 0.09 + 0.05 * sin(uTime * 3.0 + star * 20.0)) col = vec3(1.0, 0.97, 0.85);
+        } else if (pattern > 7.5 && pattern < 8.5) {
+            // Polished metal: slanted sheen bands sliding along the hull.
+            float band = fract((q.x + q.y * 0.6) * 0.35 - uTime * 0.25);
+            col = mix(col, vec3(1.0), 0.45 * smoothstep(0.12, 0.0, abs(band - 0.5)));
+        } else if (pattern > 8.5 && pattern < 9.5) {
+            // Two pulsing neon tubes in the trim colour.
+            float pulse = 0.65 + 0.35 * sin(uTime * 3.0);
+            float tube = max(smoothstep(0.07, 0.0, abs(q.y - 0.45)), smoothstep(0.07, 0.0, abs(q.y - 0.8)));
+            col = mix(col, uExtra * (1.0 + pulse * 0.5), tube * pulse);
+        } else if (pattern > 9.5) {
+            // Aurora curtains, green and violet, drifting along the hull.
+            float w1 = smoothstep(0.1, 0.0, abs(q.y - 0.35 - 0.12 * sin(q.x * 2.2 + uTime * 1.4)));
+            float w2 = smoothstep(0.1, 0.0, abs(q.y - 0.7 - 0.12 * sin(q.x * 2.2 + uTime * 1.4 + 1.0)));
+            col = mix(col, vec3(0.39, 1.0, 0.85), w1 * 0.7);
+            col = mix(col, vec3(0.70, 0.53, 1.0), w2 * 0.7);
         }
         Surface s = surface(col);
-        s.spec = 0.3;
+        s.spec = pattern > 7.5 && pattern < 8.5 ? 0.9 : 0.3;
         return s;
     }
     if (isPart(vPart, 31.0)) {
@@ -310,7 +343,7 @@ Surface boatSurface() {
         vec3 col = vec3(0.56, 0.14, 0.67);
         if (mode < 0.5) col = hsv2rgb(vec3(fract(vLocal.y * 0.18 + uTime * 0.2), 0.7, 1.0));
         else if (mode < 1.5) col = mix(vec3(0.56, 0.14, 0.67), vec3(0.42, 0.11, 0.60), vUv.y);
-        else col = uSailColor * (0.92 + 0.08 * step(0.5, fract(vUv.x * 4.0)));
+        else col = clothPrint(uSailColor * (0.92 + 0.08 * step(0.5, fract(vUv.x * 4.0))), uExtra, uBoatMode.w - 1.0);
         Surface s = surface(col);
         s.spec = 0.25;
         return s;
@@ -321,7 +354,7 @@ Surface boatSurface() {
         return s;
     }
     if (isPart(vPart, 35.0) && uBoatMode.w > 0.5) {
-        return surface(uFlagColor);
+        return surface(clothPrint(uFlagColor, mix(uFlagColor, vec3(1.0), 0.6), uBoatMode.w - 1.0));
     }
     if (isPart(vPart, 35.0)) {
         vec3 col = vec3(0.06, 0.13, 0.15);

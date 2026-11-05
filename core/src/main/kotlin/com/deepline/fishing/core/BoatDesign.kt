@@ -16,6 +16,8 @@ data class BoatDesign(
     val sailStyle: SailStyle = SailStyle.NONE,
     val flagStyle: FlagStyle = FlagStyle.NONE,
     val emblem: Emblem = Emblem.NONE,
+    /** Printed on the sail and the flag. */
+    val cloth: ClothPattern = ClothPattern.PLAIN,
 ) {
     /** ARGB colours, resolved from the palette. */
     fun hullColor() = BoatPalette.color(hull)
@@ -38,9 +40,22 @@ enum class HullPattern(val displayName: String) {
     DOTS("Polka dots"),
     CHECKER("Checkers"),
 
-    // Premium only (premade shop skins): see BoatParts.
+    // Shop paints (euros or points): see ShopCatalog.
     FLAMES("Flames"),
     STARRY("Starry night"),
+    METALLIC("Metallic"),
+    NEON("Neon"),
+
+    // Captain's Club members only, while subscribed.
+    AURORA("Aurora"),
+}
+
+/** The print on the sail and the flag. PLAIN is free; the others are sold in the shop. */
+enum class ClothPattern(val displayName: String) {
+    PLAIN("Plain"),
+    STRIPES("Stripes"),
+    STARS("Stars"),
+    WAVES("Waves"),
 }
 
 enum class SailStyle(val displayName: String) {
@@ -66,10 +81,12 @@ enum class Emblem(val displayName: String) {
     MOON("Moon"),
     WAVE("Wave"),
 
-    // Premium only (premade shop skins): see BoatParts.
+    // Shop emblems (euros or points): see ShopCatalog.
     CROWN("Crown"),
     SKULL("Skull"),
     LIGHTNING("Lightning"),
+    SHELL("Shell"),
+    TRIDENT("Trident"),
 }
 
 /**

@@ -130,6 +130,40 @@ object GameConfig {
         BotDifficulty.HARD -> 2.4f
     }
 
+    /** How far from the hook the rare fish detector marks uncaught species (meters). */
+    const val DETECTOR_RADIUS_M = 25f
+
+    /**
+     * The shop's exchange rate between euros and points: an item costs, in points, as much as a
+     * good player earns in this many minutes of fishing per euro of its price, at their rope's
+     * reach ([POINTS_PER_MINUTE_BY_LENGTH_LEVEL]). Paying saves a typical player about a day and
+     * a half of play per euro, while free players still reach everything.
+     */
+    const val MINUTES_PER_EURO = 45f
+
+    /** Lanterns are a key item for progress: their packs cost a full hour per euro in points. */
+    const val LANTERN_MINUTES_PER_EURO = 60f
+
+    /** Bigger purchases give more value per euro (the usual tier bonus). */
+    fun tierBonus(euroCents: Int): Float = when {
+        euroCents >= 999 -> 1.4f
+        euroCents >= 499 -> 1.2f
+        else -> 1f
+    }
+
+    /**
+     * Points a good player earns per minute (casts plus menus) by Rope Length level, measured by
+     * the career simulation (EconomyTest checks it still holds).
+     */
+    val POINTS_PER_MINUTE_BY_LENGTH_LEVEL = intArrayOf(380, 870, 1_700, 2_800, 5_200, 8_100, 8_800, 10_100, 12_100, 13_900, 17_100)
+
+    /** The starter pack is offered from this app session on, for this long, once. */
+    const val STARTER_OFFER_FROM_SESSION = 3
+    const val STARTER_OFFER_HOURS = 72
+
+    /** One Captain's Club month. */
+    const val CLUB_DAYS = 30
+
     /** Boat options bought with points cost their table price times this. */
     const val BOAT_PART_PRICE_SCALE = 6
     const val STARTING_LANTERNS = 1

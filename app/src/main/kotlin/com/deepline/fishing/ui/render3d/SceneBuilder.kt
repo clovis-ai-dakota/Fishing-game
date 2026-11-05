@@ -288,8 +288,9 @@ class SceneBuilder {
                         "uExtra2" to rgb(design.cabinColor()),
                         "uSailColor" to rgb(design.sailColor()),
                         "uFlagColor" to rgb(design.flagColor()),
-                        // x: trim mode (solid), y: sail mode (custom), z: hull pattern, w: custom flag.
-                        "uBoatMode" to f(0f, 2f, design.pattern.ordinal.toFloat(), 1f),
+                        // x: trim mode (solid), y: sail mode (custom), z: hull pattern,
+                        // w: custom flag, 1 + the sail and flag print (ClothPattern).
+                        "uBoatMode" to f(0f, 2f, design.pattern.ordinal.toFloat(), 1f + design.cloth.ordinal),
                     ),
                     outlinePx = 2.4f, outlineColor = OUTLINE_INK,
                 ),

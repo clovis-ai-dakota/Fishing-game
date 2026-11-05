@@ -1,7 +1,7 @@
 package com.deepline.fishing.core
 
 /** The kinds of choices in the boat editor. Colours are unlocked per swatch, for every slot. */
-enum class BoatPartKind { COLOR, PATTERN, SAIL, FLAG, EMBLEM }
+enum class BoatPartKind { COLOR, PATTERN, SAIL, FLAG, EMBLEM, CLOTH }
 
 /** One option of the boat editor: a swatch, a hull pattern, a sail, a flag or an emblem. */
 data class BoatPart(val kind: BoatPartKind, val id: String) {
@@ -14,6 +14,7 @@ data class BoatPart(val kind: BoatPartKind, val id: String) {
         fun of(s: SailStyle) = BoatPart(BoatPartKind.SAIL, s.name)
         fun of(f: FlagStyle) = BoatPart(BoatPartKind.FLAG, f.name)
         fun of(e: Emblem) = BoatPart(BoatPartKind.EMBLEM, e.name)
+        fun of(c: ClothPattern) = BoatPart(BoatPartKind.CLOTH, c.name)
 
         fun fromKey(key: String): BoatPart? {
             val kind = BoatPartKind.entries.firstOrNull { it.name == key.substringBefore(':') } ?: return null
@@ -40,8 +41,11 @@ sealed interface PartRequirement {
     /** Available once this many milestones have been claimed. */
     data class MilestonesClaimed(val count: Int) : PartRequirement
 
-    /** Only on the premade premium skins of the shop: never in the editor. */
+    /** Sold in the shop (euros or points, see [ShopCatalog]); in the editor once owned. */
     data object PremiumOnly : PartRequirement
+
+    /** Captain's Club members only, while subscribed. */
+    data object ClubOnly : PartRequirement
 }
 
 /**
@@ -89,6 +93,9 @@ object BoatParts {
         HullPattern.CHECKER to PartRequirement.SpeciesCaught(40),
         HullPattern.FLAMES to PartRequirement.PremiumOnly,
         HullPattern.STARRY to PartRequirement.PremiumOnly,
+        HullPattern.METALLIC to PartRequirement.PremiumOnly,
+        HullPattern.NEON to PartRequirement.PremiumOnly,
+        HullPattern.AURORA to PartRequirement.ClubOnly,
     )
 
     private val sails: Map<SailStyle, PartRequirement> = mapOf(
@@ -116,7 +123,13 @@ object BoatParts {
         Emblem.CROWN to PartRequirement.PremiumOnly,
         Emblem.SKULL to PartRequirement.PremiumOnly,
         Emblem.LIGHTNING to PartRequirement.PremiumOnly,
+        Emblem.SHELL to PartRequirement.PremiumOnly,
+        Emblem.TRIDENT to PartRequirement.PremiumOnly,
     )
+
+    private val cloths: Map<ClothPattern, PartRequirement> = ClothPattern.entries.associateWith {
+        if (it == ClothPattern.PLAIN) free else PartRequirement.PremiumOnly
+    }
 
     /** Every option, in editor order. */
     val all: List<BoatPart> =
@@ -124,7 +137,8 @@ object BoatParts {
             HullPattern.entries.map { BoatPart.of(it) } +
             SailStyle.entries.map { BoatPart.of(it) } +
             FlagStyle.entries.map { BoatPart.of(it) } +
-            Emblem.entries.map { BoatPart.of(it) }
+            Emblem.entries.map { BoatPart.of(it) } +
+            ClothPattern.entries.map { BoatPart.of(it) }
 
     fun requirement(part: BoatPart): PartRequirement = when (part.kind) {
         BoatPartKind.COLOR -> colors[part.id]
@@ -132,18 +146,20 @@ object BoatParts {
         BoatPartKind.SAIL -> sails[SailStyle.entries.firstOrNull { it.name == part.id }]
         BoatPartKind.FLAG -> flags[FlagStyle.entries.firstOrNull { it.name == part.id }]
         BoatPartKind.EMBLEM -> emblems[Emblem.entries.firstOrNull { it.name == part.id }]
+        BoatPartKind.CLOTH -> cloths[ClothPattern.entries.firstOrNull { it.name == part.id }]
     } ?: PartRequirement.PremiumOnly
 
     fun isPremiumOnly(part: BoatPart) = requirement(part) == PartRequirement.PremiumOnly
 
     /** Whether the player may use [part] in their own design now. */
-    fun isAvailable(p: PlayerProgress, part: BoatPart): Boolean = when (val r = requirement(part)) {
+    fun isAvailable(p: PlayerProgress, part: BoatPart): Boolean = part.key in p.unlockedBoatParts || when (val r = requirement(part)) {
         PartRequirement.Free -> true
         is PartRequirement.Points -> part.key in p.unlockedBoatParts
         is PartRequirement.SpeciesCaught -> p.discoveredCount >= r.count
         is PartRequirement.FishInZone -> p.collection.any { (id, e) -> e.caught > 0 && FishCatalog.byId(id)?.zone == r.zone }
         is PartRequirement.MilestonesClaimed -> p.claimedMilestones.size >= r.count
-        PartRequirement.PremiumOnly -> false
+        PartRequirement.PremiumOnly -> part.key in p.unlockedBoatParts
+        PartRequirement.ClubOnly -> ShopCatalog.isClubMember(p, ShopClock.now())
     }
 
     /** The options [design] uses (each colour once). */
@@ -151,49 +167,55 @@ object BoatParts {
         BoatPart.color(design.hull), BoatPart.color(design.hullBottom), BoatPart.color(design.trim),
         BoatPart.color(design.cabin), BoatPart.color(design.sail), BoatPart.color(design.flag),
         BoatPart.of(design.pattern), BoatPart.of(design.sailStyle), BoatPart.of(design.flagStyle), BoatPart.of(design.emblem),
+        BoatPart.of(design.cloth),
     )
 }
 
-/** A premade boat for the shop. */
-data class PremiumSkin(val id: String, val name: String, val tagline: String, val price: String, val design: BoatDesign)
+/** A premade boat for the shop (its price is in [ShopCatalog]). */
+data class PremiumSkin(val id: String, val name: String, val tagline: String, val design: BoatDesign)
 
-/**
- * The shop's premade boats. They can't be bought or worn yet: payments are not wired, so the shop
- * shows them as "coming soon".
- *
- * PLACEHOLDER PRICES: set the real ones (and the store product ids) when payments are added.
- */
+/** The shop's premade boats: buying one gives its design and every option it uses. */
 object PremiumSkins {
     private fun c(name: String) = BoatPalette.indexOf(name)
 
     val all: List<PremiumSkin> = listOf(
         PremiumSkin(
-            "coral_cruiser", "Coral Reef Cruiser", "Sunny colours and a rose sail.", "$0.99",
+            "coral_cruiser", "Coral Reef Cruiser", "Sunny colours and a rose sail.",
             BoatDesign(c("Coral"), c("Pearl"), c("Sunflower"), c("Cream"), c("Rose"), c("Lagoon"), HullPattern.WAVES, SailStyle.TRIANGLE, FlagStyle.PENNANT, Emblem.STAR),
         ),
         PremiumSkin(
-            "lagoon_explorer", "Lagoon Explorer", "Polka dots and an anchor, ready for adventure.", "$0.99",
+            "lagoon_explorer", "Lagoon Explorer", "Polka dots and an anchor, ready for adventure.",
             BoatDesign(c("Lagoon"), c("Teal"), c("Pearl"), c("Seafoam"), c("Pearl"), c("Sunflower"), HullPattern.DOTS, SailStyle.TRIANGLE, FlagStyle.PENNANT, Emblem.ANCHOR),
         ),
         PremiumSkin(
-            "sunset_racer", "Sunset Racer", "Flames from bow to stern.", "$1.49",
+            "sunset_racer", "Sunset Racer", "Flames from bow to stern.",
             BoatDesign(c("Tangerine"), c("Berry"), c("Sunflower"), c("Cream"), c("Sunflower"), c("Crimson"), HullPattern.FLAMES, SailStyle.TRIANGLE, FlagStyle.PENNANT, Emblem.LIGHTNING),
         ),
         PremiumSkin(
-            "midnight_corsair", "Midnight Corsair", "A pirate ship with black sails.", "$1.99",
+            "midnight_corsair", "Midnight Corsair", "A pirate ship with black sails.",
             BoatDesign(c("Charcoal"), c("Midnight"), c("Crimson"), c("Slate"), c("Midnight"), c("Crimson"), HullPattern.STRIPE, SailStyle.SQUARE, FlagStyle.SWALLOWTAIL, Emblem.SKULL),
         ),
         PremiumSkin(
-            "starlight_voyager", "Starlight Voyager", "A night sky painted on the hull.", "$2.99",
+            "starlight_voyager", "Starlight Voyager", "A night sky painted on the hull.",
             BoatDesign(c("Navy"), c("Midnight"), c("Gold"), c("Lilac"), c("Lilac"), c("Gold"), HullPattern.STARRY, SailStyle.TWIN, FlagStyle.BANNER, Emblem.MOON),
         ),
         PremiumSkin(
-            "royal_regatta", "Royal Regatta", "Gold trim and a crowned sail.", "$3.99",
+            "royal_regatta", "Royal Regatta", "Gold trim and a crowned sail.",
             BoatDesign(c("Pearl"), c("Navy"), c("Gold"), c("Cream"), c("Navy"), c("Navy"), HullPattern.TWO_TONE, SailStyle.SQUARE, FlagStyle.BANNER, Emblem.CROWN),
         ),
         PremiumSkin(
-            "galaxy_dreamer", "Galaxy Dreamer", "Violet stars and mint highlights.", "$4.99",
+            "galaxy_dreamer", "Galaxy Dreamer", "Violet stars and mint highlights.",
             BoatDesign(c("Violet"), c("Midnight"), c("Mint"), c("Lilac"), c("Violet"), c("Mint"), HullPattern.STARRY, SailStyle.TWIN, FlagStyle.SWALLOWTAIL, Emblem.STAR),
         ),
+        PremiumSkin(
+            "neon_nights", "Neon Nights", "Glowing tubes and a starry print.",
+            BoatDesign(c("Midnight"), c("Charcoal"), c("Mint"), c("Violet"), c("Midnight"), c("Rose"), HullPattern.NEON, SailStyle.TRIANGLE, FlagStyle.PENNANT, Emblem.LIGHTNING, ClothPattern.STARS),
+        ),
+        PremiumSkin(
+            "founders_flagship", "Founder's Flagship", "Navy and gold, a trident on a starry sail.",
+            BoatDesign(c("Navy"), c("Midnight"), c("Gold"), c("Pearl"), c("Navy"), c("Gold"), HullPattern.METALLIC, SailStyle.SQUARE, FlagStyle.BANNER, Emblem.TRIDENT, ClothPattern.STARS),
+        ),
     )
+
+    fun byId(id: String) = all.firstOrNull { it.id == id }
 }

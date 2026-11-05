@@ -40,7 +40,9 @@ object Career {
                 val stat = RopeStat.entries.filter { Progression.canUpgrade(p, it) }.minByOrNull { Progression.upgradeCost(p, it)!! } ?: break
                 p = Progression.upgrade(p, stat)!!
             }
-            if (buyLanterns && p.specs.lengthM > GameConfig.DARK_DEPTH && p.lanterns == 0) {
+            if (buyLanterns && p.specs.lengthM > GameConfig.DARK_DEPTH && p.lanterns == 0 &&
+                p.pointsBalance >= 3 * Progression.tacklePrice(p, Tackle.LANTERN)
+            ) {
                 Progression.buyLantern(p)?.let { p = it; lanternsBought++ }
             }
             val lvl = p.level(RopeStat.LENGTH)

@@ -1,15 +1,25 @@
 package com.deepline.fishing.core
 
 /**
- * One-cast consumables bought with points in Upgrades and switched on before a solo cast (never
- * in battles). Their price grows with the rope's reach, because deeper casts earn more: they stay
- * a real decision all game long instead of becoming pocket change.
+ * One-cast consumables, bought in the Shop (singly with points, or in packs for euros or points)
+ * and switched on before a cast. Their points price grows with the rope's reach, because deeper
+ * casts earn more. The Lantern and the detector change only what you see, never the water, so
+ * they're allowed in battles too; the charm and the lure change the rules or the water, so they're
+ * solo only.
  */
-enum class Tackle(val displayName: String, val description: String, private val priceFactor: Float) {
+enum class Tackle(
+    val displayName: String,
+    val description: String,
+    private val priceFactor: Float,
+    /** Can be switched on for a battle cast (it only changes what the player sees). */
+    val usableInBattles: Boolean = false,
+) {
     LANTERN(
         "Lantern",
         "Lights up much more of the dark water below ${GameConfig.DARK_DEPTH.toInt()} m for one cast.",
-        0.6f,
+        // A key item for progress: a little dearer than the others (see GameConfig.LANTERN_MINUTES_PER_EURO).
+        0.8f,
+        usableInBattles = true,
     ),
     LUCKY_CHARM(
         "Lucky charm",
@@ -20,6 +30,12 @@ enum class Tackle(val displayName: String, val description: String, private val 
         "Sparkle lure",
         "${GameConfig.SPARKLE_LURE_MULTIPLIER.toInt()}× as many Sparkling fish in the water for one cast.",
         0.5f,
+    ),
+    DETECTOR(
+        "Rare fish detector",
+        "For one cast, marks species you haven't caught yet within ${GameConfig.DETECTOR_RADIUS_M.toInt()} m of the hook, even in the dark.",
+        0.5f,
+        usableInBattles = true,
     );
 
     /** The price with a rope at Length level [lengthLevel]. */
