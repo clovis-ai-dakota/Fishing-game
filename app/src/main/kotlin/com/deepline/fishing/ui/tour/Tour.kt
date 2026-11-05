@@ -19,6 +19,7 @@ enum class TourTarget {
     SKINS_CUSTOMISE, SKINS_ATMOSPHERE, SHOP_STYLE,
     SHOP_TACKLE, BATTLE_WAGER,
     SHOP_PRICES, SHOP_PASSES, BATTLE_TACKLE, SHOP_SEASON,
+    DEX_AQUARIUM, SHOP_AQUARIUM, SKINS_BADGE,
 }
 
 /** A small illustration shown in a tour card. */
@@ -264,6 +265,16 @@ object Tour {
             shopPage = com.deepline.fishing.ShopPage.STYLE,
         ),
         TourStep(
+            id = "aquarium",
+            title = "Your aquarium",
+            body = "The fish you've caught swim in your aquarium: open it with the Aquarium button in the Dex and " +
+                "pick who swims there. Decor and a bigger tank are on the Shop's Aquarium page.",
+            screen = Screen.SHOP,
+            target = TourTarget.SHOP_AQUARIUM,
+            sinceVersion = 9,
+            shopPage = com.deepline.fishing.ShopPage.AQUARIUM,
+        ),
+        TourStep(
             id = "season",
             title = "Seasons and weekend events",
             body = "Each season lasts ${GameConfig.SEASON_WEEKS} weeks. Every solo cast earns season XP and opens tiers " +
@@ -284,6 +295,16 @@ object Tour {
             target = TourTarget.SHOP_PASSES,
             sinceVersion = 9,
             shopPage = com.deepline.fishing.ShopPage.PASSES,
+        ),
+        TourStep(
+            id = "badges",
+            title = "Title badges and Dex cards",
+            body = "Choose the frame of your title badge (shown under your name, online too) and how the Dex " +
+                "shows the species you've caught. More come from the Shop, season passes and events.",
+            screen = Screen.DEX,
+            target = TourTarget.SKINS_BADGE,
+            sinceVersion = 9,
+            dexSection = com.deepline.fishing.DexSection.SKINS,
         ),
         TourStep(
             id = "atmosphere",
@@ -321,6 +342,15 @@ object Tour {
                 "Sparkle lure are for solo casts only.",
             screen = Screen.BATTLE_SETUP,
             target = TourTarget.BATTLE_TACKLE,
+            sinceVersion = 9,
+        ),
+        TourStep(
+            id = "gifts",
+            title = "Gifts and cloud save",
+            body = "After an online battle you can send your opponent a gift: tackle or looks, paid with euros or " +
+                "points. Gifts for you arrive when you open the game. Captain's Club members are backed up on the " +
+                "server: the Shop's Account button shows the recovery code that restores it on a new phone.",
+            screen = Screen.BATTLE_SETUP,
             sinceVersion = 9,
         ),
         TourStep(

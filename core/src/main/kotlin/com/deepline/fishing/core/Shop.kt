@@ -184,7 +184,7 @@ object ShopCatalog {
     }
 
     val all: List<ShopItem>
-        get() = tackle + style + passes + Seasons.shopItems + synchronized(extensions) { extensions.flatMap { it() } }
+        get() = tackle + style + passes + Seasons.shopItems + Showcase.shopItems + synchronized(extensions) { extensions.flatMap { it() } }
 
     fun byId(id: String): ShopItem? = all.firstOrNull { it.id == id }
 

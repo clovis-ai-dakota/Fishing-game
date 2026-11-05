@@ -35,6 +35,12 @@ data class PlayerProgress(
     val seasonXp: Int = 0,
     /** Season rewards claimed ("f3": free tier 3, "p3": premium tier 3). */
     val seasonClaims: Set<String> = emptySet(),
+    /** Looks for showing off (see `Showcase`): the title badge's frame and the Dex's card style. */
+    val titleFrame: String = TitleFrame.GOLD.name,
+    val cardStyle: String = CardStyle.CLASSIC.name,
+    /** Species picked for the aquarium (empty: the best catches), and decor put away. */
+    val tankFish: List<String> = emptyList(),
+    val hiddenDecor: Set<String> = emptySet(),
     /** The weekend event [eventProgress] and [eventClaims] belong to. */
     val eventKey: String = "",
     val eventProgress: Int = 0,

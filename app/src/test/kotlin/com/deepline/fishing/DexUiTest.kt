@@ -206,6 +206,7 @@ class DexUiTest {
         val vm = launch(midGame())
         compose.tab("dex")
         compose.click("Skins")
+        compose.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Giant-slayer set"))
         compose.onNodeWithText("Giant-slayer set").assertExists()
         compose.shot("53_dex_skins")
         // Locked sets show their slots only.

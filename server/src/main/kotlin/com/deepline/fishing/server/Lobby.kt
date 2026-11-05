@@ -23,6 +23,8 @@ import kotlin.random.Random
 class Connection(private val session: WebSocketSession, val id: Long) {
     var name: String = "Angler"
     var title: String? = null
+    var titleFrame: String? = null
+    var playerId: String? = null
     var match: Match? = null
     var playerIndex: Int = -1
     var waitingRoom: String? = null
@@ -56,8 +58,10 @@ class Match(val mode: BattleMode, val players: List<Connection>, seed: Long) {
         }
         val names = players.map { it.name }
         val titles = players.map { it.title }
+        val frames = players.map { it.titleFrame }
+        val ids = players.map { it.playerId }
         players.forEachIndexed { i, c ->
-            c.send(ServerMessage.MatchStarted(mode, battle.seed, i, names, titles))
+            c.send(ServerMessage.MatchStarted(mode, battle.seed, i, names, titles, frames, ids))
         }
     }
 
@@ -130,6 +134,8 @@ class Lobby(private val random: Random = Random.Default) {
                 c.name = OnlineProtocol.sanitizeName(message.name)
                 // Only titles that exist as cosmetics are passed on.
                 c.title = message.title?.takeIf { t -> Cosmetic.entries.any { it.slot == CosmeticSlot.TITLE && it.displayName == t } }
+                c.titleFrame = message.titleFrame?.takeIf { f -> com.deepline.fishing.core.TitleFrame.entries.any { it.name == f } }
+                c.playerId = message.playerId?.takeIf(com.deepline.fishing.core.PlayerId::isValid)
             }
             is ClientMessage.CreateRoom -> createRoom(c, message.mode)
             is ClientMessage.JoinRoom -> joinRoom(c, OnlineProtocol.normalizeRoomCode(message.code))

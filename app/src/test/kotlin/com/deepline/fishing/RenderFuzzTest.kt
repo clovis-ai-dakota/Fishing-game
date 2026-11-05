@@ -43,6 +43,7 @@ class RenderFuzzTest {
         heightPx: Int,
         density: Float,
         skins: com.deepline.fishing.ui.Skins = com.deepline.fishing.ui.Skins.CLASSIC,
+        detect: Set<String>? = null,
     ) {
         val d = Density(density)
         val measurer = TextMeasurer(createFontFamilyResolver(context), d, LayoutDirection.Ltr)
@@ -59,9 +60,9 @@ class RenderFuzzTest {
             t += dt
             try {
                 drawScope.draw(d, LayoutDirection.Ltr, canvas, Size(widthPx.toFloat(), heightPx.toFloat())) {
-                    drawCastScene(session, t, measurer, aimX = session.hookX + 1f, skins = skins)
+                    drawCastScene(session, t, measurer, aimX = session.hookX + 1f, skins = skins, detect = detect)
                     // The 2D layer drawn over the 3D renderer.
-                    drawCastOverlay(session, t, measurer, aimX = session.hookX + 1f)
+                    drawCastOverlay(session, t, measurer, aimX = session.hookX + 1f, detect = detect)
                 }
             } catch (e: Throwable) {
                 throw AssertionError(
@@ -84,6 +85,20 @@ class RenderFuzzTest {
         for (set in listOf("Giant-slayer", "Prismatic", "Sovereign")) {
             playAndRenderEveryFrame(rope(0), seed = 1, lantern = false, widthPx = 540, heightPx = 1200, density = 1.3f, skins = com.deepline.fishing.ui.Skins.ofSet(set))
         }
+        // The shop's gear, and a boat with the new paints and prints.
+        val C = com.deepline.fishing.core.Cosmetic.entries.filter { it.fromShop && it.slot != com.deepline.fishing.core.CosmeticSlot.TITLE }
+        for (i in 0 until 3) {
+            val gear = C.filterIndexed { k, _ -> k % 3 == i }.associateBy { it.slot }
+            val boat = com.deepline.fishing.core.PremiumSkins.all[i * 4 % com.deepline.fishing.core.PremiumSkins.all.size].design
+            playAndRenderEveryFrame(rope(0), seed = 10L + i, lantern = false, widthPx = 540, heightPx = 1200, density = 1.3f, skins = com.deepline.fishing.ui.Skins.of(gear, customBoat = boat))
+        }
+    }
+
+    /** The rare fish detector's markers, deep in the dark (every species counts as uncaught). */
+    @Test
+    fun detectorMarksInTheDark() {
+        val all = com.deepline.fishing.core.FishCatalog.all.map { it.id }.toSet()
+        playAndRenderEveryFrame(rope(10), seed = 21, lantern = true, widthPx = 360, heightPx = 800, density = 1f, detect = all)
     }
 
     /**

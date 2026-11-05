@@ -164,3 +164,42 @@ class ShopTest {
         assertTrue(back.result.lanternUsed && back.result.detectorUsed)
     }
 }
+
+class ShowcaseTest {
+    private val now = 1_800_000_000_000L
+
+    @Test
+    fun titleFramesNeedTheirUnlock() {
+        val p = PlayerProgress()
+        assertNull(Showcase.setTitleFrame(p, TitleFrame.OCEAN, now))
+        val owner = ShopCatalog.grant(p, ShopCatalog.byId("badge_ocean")!!, now)
+        assertEquals(TitleFrame.OCEAN, Showcase.titleFrame(Showcase.setTitleFrame(owner, TitleFrame.OCEAN, now)!!, now))
+        // The Club frame lasts as long as the membership.
+        val member = ShopCatalog.grant(p, ShopCatalog.byId("captains_club")!!, now)
+        val worn = Showcase.setTitleFrame(member, TitleFrame.CLUB, now)!!
+        assertEquals(TitleFrame.CLUB, Showcase.titleFrame(worn, now))
+        assertEquals(TitleFrame.GOLD, Showcase.titleFrame(worn, now + 40 * 86_400_000L))
+    }
+
+    @Test
+    fun theAquariumHoldsCaughtFishOnly() {
+        val caught = FishCatalog.all.take(8)
+        val p = PlayerProgress(collection = caught.withIndex().associate { (i, s) -> s.id to CollectionEntry(1, 0, 10f, 100 + i) })
+        assertEquals(Showcase.TANK_SIZE, Showcase.tankFish(p).size)
+        assertEquals(caught.last(), Showcase.tankFish(p).first(), "best catches first")
+        assertNull(Showcase.toggleTankFish(p, FishCatalog.all.last().id), "not caught")
+        val fewer = Showcase.toggleTankFish(p, Showcase.tankFish(p).first().id)!!
+        assertEquals(Showcase.TANK_SIZE - 1, Showcase.tankFish(fewer).size)
+        val big = ShopCatalog.grant(p, ShopCatalog.byId("aquarium_expansion")!!, now)
+        assertEquals(8, Showcase.tankFish(big).size)
+        assertTrue(Showcase.shownDecor(p).all { it.free })
+        val decorated = ShopCatalog.grant(p, ShopCatalog.byId("decor_sunken_ship")!!, now)
+        assertTrue(Decor.SUNKEN_SHIP in Showcase.shownDecor(decorated))
+        assertFalse(Decor.SUNKEN_SHIP in Showcase.shownDecor(Showcase.toggleDecor(decorated, Decor.SUNKEN_SHIP)!!))
+        val back = ProgressCodec.decode(ProgressCodec.encode(fewer.copy(titleFrame = "OCEAN", cardStyle = "HOLO", hiddenDecor = setOf("PLANTS"))))
+        assertEquals(fewer.tankFish, back.tankFish)
+        assertEquals("OCEAN", back.titleFrame)
+        assertEquals("HOLO", back.cardStyle)
+        assertEquals(setOf("PLANTS"), back.hiddenDecor)
+    }
+}

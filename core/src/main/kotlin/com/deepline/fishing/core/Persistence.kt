@@ -34,6 +34,10 @@ object ProgressCodec {
         appendLine("seasonClaims=${p.seasonClaims.sorted().joinToString(",")}")
         appendLine("event=${p.eventKey},${p.eventProgress}")
         appendLine("eventClaims=${p.eventClaims.sorted().joinToString(",")}")
+        appendLine("titleFrame=${p.titleFrame}")
+        appendLine("cardStyle=${p.cardStyle}")
+        appendLine("tankFish=${p.tankFish.joinToString(",")}")
+        appendLine("hiddenDecor=${p.hiddenDecor.sorted().joinToString(",")}")
         appendLine("sessions=${p.sessions}")
         appendLine("starterOfferEnds=${p.starterOfferEndsMs}")
         appendLine("casts=${p.castsMade}")
@@ -87,6 +91,10 @@ object ProgressCodec {
                     if (v.size == 2 && progress != null) p = p.copy(eventKey = v[0], eventProgress = progress)
                 }
                 key == "eventClaims" -> p = p.copy(eventClaims = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet())
+                key == "titleFrame" -> p = p.copy(titleFrame = TitleFrame.of(value.trim()).name)
+                key == "cardStyle" -> p = p.copy(cardStyle = CardStyle.of(value.trim()).name)
+                key == "tankFish" -> p = p.copy(tankFish = value.split(',').map { it.trim() }.filter { FishCatalog.byId(it) != null })
+                key == "hiddenDecor" -> p = p.copy(hiddenDecor = value.split(',').map { it.trim() }.filter { n -> Decor.entries.any { it.name == n } }.toSet())
                 key == "sessions" -> value.toIntOrNull()?.let { p = p.copy(sessions = it) }
                 key == "starterOfferEnds" -> value.toLongOrNull()?.let { p = p.copy(starterOfferEndsMs = it) }
                 key == "secrets" -> p = p.copy(discoveredSecrets = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet())

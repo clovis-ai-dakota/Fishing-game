@@ -82,7 +82,9 @@ import kotlin.math.min
 fun SkinDex(vm: GameViewModel) {
     val p = vm.progress
     val unlocked = p.unlockedCosmetics.toSet()
-    val sets = Cosmetic.entries.map { it.setName }.distinct()
+    // Legendary sets (earned with secrets); shop pieces have their own group below.
+    val sets = Cosmetic.entries.filterNot { it.fromShop }.map { it.setName }.distinct()
+    val shopGear = Cosmetic.entries.filter { it.fromShop && it in unlocked && it.slot != CosmeticSlot.TITLE }
     val time by rememberInfiniteTransition(label = "skin tiles").animateFloat(
         initialValue = 0f,
         targetValue = 60f,
@@ -116,14 +118,14 @@ fun SkinDex(vm: GameViewModel) {
                 }
                 Text(
                     "Skins only change how your gear looks: they never change how the game plays. " +
-                        "Unlocked ${unlocked.size} of ${Cosmetic.entries.size}.",
+                        "Legendary skins unlocked: ${unlocked.count { !it.fromShop }} of ${Cosmetic.entries.count { !it.fromShop }}.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
         for (set in sets) {
-            val items = Cosmetic.entries.filter { it.setName == set }.sortedBy { it.slot.ordinal }
+            val items = Cosmetic.entries.filter { it.setName == set && !it.fromShop }.sortedBy { it.slot.ordinal }
             val open = items.any { it in unlocked }
             item(key = "set-$set", span = { GridItemSpan(maxLineSpan) }) {
                 Text(
@@ -141,6 +143,17 @@ fun SkinDex(vm: GameViewModel) {
                 }
             }
         }
+        item(key = "shop_gear", span = { GridItemSpan(maxLineSpan) }) {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 8.dp)) {
+                Text("Shop gear", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary, modifier = Modifier.weight(1f))
+                TextButton(onClick = { vm.openShop(com.deepline.fishing.ShopPage.STYLE) }) { Text(if (shopGear.isEmpty()) "Browse the Shop" else "More in the Shop") }
+            }
+        }
+        items(shopGear, key = { it.name }) { c ->
+            val equipped = p.equippedSkins[c.slot] == c
+            SkinTile(c, true, equipped, time) { vm.equipSkin(c.slot, if (equipped) null else c) }
+        }
+        item(key = "badge", span = { GridItemSpan(maxLineSpan) }) { ShowOffCard(vm) }
     }
 }
 
@@ -240,6 +253,31 @@ private fun YourBoatCard(vm: GameViewModel, time: Float) {
                 Button(onClick = vm::openBoatEditor, modifier = Modifier.weight(1f).tourTarget(TourTarget.SKINS_CUSTOMISE)) { Text("Customise boat") }
                 OutlinedButton(onClick = { vm.openShop(com.deepline.fishing.ShopPage.STYLE) }, modifier = Modifier.weight(1f)) { Text("Shop boats") }
             }
+        }
+    }
+}
+
+/** The title badge's frame and the Dex's card style: the ones owned can be picked here. */
+@Composable
+private fun ShowOffCard(vm: GameViewModel) {
+    val p = vm.progress
+    val now = com.deepline.fishing.core.ShopClock.now()
+    Card(Modifier.fillMaxWidth().tourTarget(TourTarget.SKINS_BADGE), shape = RoundedCornerShape(14.dp)) {
+        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Title badge", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            TitleBadge(vm.title ?: vm.playerName, frame = vm.titleFrame)
+            androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                for (f in com.deepline.fishing.core.TitleFrame.entries.filter { it.isAvailable(p, now) }) {
+                    androidx.compose.material3.FilterChip(selected = vm.titleFrame == f, onClick = { vm.setTitleFrame(f) }, label = { Text(f.displayName) })
+                }
+            }
+            Text("Dex cards", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                for (s in com.deepline.fishing.core.CardStyle.entries.filter { it.isAvailable(p) }) {
+                    androidx.compose.material3.FilterChip(selected = vm.cardStyle == s, onClick = { vm.setCardStyle(s) }, label = { Text(s.displayName) })
+                }
+            }
+            TextButton(onClick = { vm.openShop(com.deepline.fishing.ShopPage.STYLE) }) { Text("More badges and card styles in the Shop") }
         }
     }
 }

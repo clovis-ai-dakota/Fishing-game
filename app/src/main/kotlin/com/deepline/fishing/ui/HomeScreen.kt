@@ -70,8 +70,12 @@ fun HomeScreen(vm: GameViewModel) {
         title = "Deep Line",
         subtitle = {
             val t = vm.title
+            val frame = vm.titleFrame
             if (t != null) {
-                TitleBadge(t, Modifier.padding(top = 2.dp))
+                TitleBadge(t, Modifier.padding(top = 2.dp), frame = frame)
+            } else if (frame != com.deepline.fishing.core.TitleFrame.GOLD) {
+                // A badge frame without a title yet: the player's name, framed.
+                TitleBadge(vm.playerName, Modifier.padding(top = 2.dp), frame = frame)
             } else {
                 Text(
                     "Catch every fish in the deep",

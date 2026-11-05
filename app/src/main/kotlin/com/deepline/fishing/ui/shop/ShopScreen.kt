@@ -145,7 +145,7 @@ fun ShopScreen(vm: GameViewModel) {
                 ShopPage.TACKLE -> tacklePage(vm, actions)
                 ShopPage.STYLE -> stylePage(vm, actions, time)
                 ShopPage.PASSES -> passesPage(vm, actions)
-                ShopPage.AQUARIUM -> genericPage(vm, ShopSection.AQUARIUM, actions)
+                ShopPage.AQUARIUM -> aquariumPage(vm, actions)
             }
             if (page != ShopPage.ROPE) footer(vm)
         }
@@ -426,7 +426,9 @@ private fun LazyGridScope.stylePage(vm: GameViewModel, actions: ShopActions, tim
     val sets = style.filter { it.grants.size > 1 && it.grants.any { g -> g is Grant.Preset } }
     val parts = style.filter { it.grants.singleOrNull() is Grant.BoatParts }
     val gear = style.filter { it.grants.singleOrNull() is Grant.Cosmetics }
-    val known = (boats + sets + parts + gear).toSet()
+    val badges = style.filter { (it.grants.singleOrNull() as? Grant.Unlock)?.key?.startsWith("badge:") == true }
+    val cards = style.filter { (it.grants.singleOrNull() as? Grant.Unlock)?.key?.startsWith("card:") == true }
+    val known = (boats + sets + parts + gear + badges + cards).toSet()
     header(
         "boats_header",
         "Premade boats",
@@ -442,6 +444,10 @@ private fun LazyGridScope.stylePage(vm: GameViewModel, actions: ShopActions, tim
     items(parts, key = { it.id }) { PartTile(vm, it, actions, time) }
     header("gear_header", "Hooks, lines and trails", "Same size and hitbox as the classic gear: they only change the look.")
     items(gear, key = { it.id }) { GearTile(vm, it, actions, time) }
+    header("badges_header", "Title badges", "The frame around your title (or your name), shown online too. Season passes, events and the Club add more.")
+    items(badges, key = { it.id }) { BadgeTile(vm, it, actions) }
+    header("cards_header", "Dex card styles", "How the Dex shows the species you've caught.")
+    items(cards, key = { it.id }) { CardStyleTile(vm, it, actions) }
     val others = style - known
     if (others.isNotEmpty()) {
         header("style_more", "More")
@@ -537,6 +543,57 @@ private fun GearTile(vm: GameViewModel, item: ShopItem, actions: ShopActions, ti
             worn -> OwnedRow("Worn ✓") { TextButton(onClick = { vm.equipSkin(c.slot, null) }) { Text("Take off") } }
             ShopCatalog.ownsCosmetic(p, c) -> OwnedRow { TextButton(onClick = { vm.equipSkin(c.slot, c) }) { Text("Wear") } }
             else -> PriceButtons(item, actions)
+        }
+    }
+}
+
+@Composable
+private fun BadgeTile(vm: GameViewModel, item: ShopItem, actions: ShopActions) {
+    val key = (item.grants.first() as Grant.Unlock).key
+    val frame = com.deepline.fishing.core.TitleFrame.entries.first { it.unlockKey == key }
+    Tile(item.name, item.badge, preview = {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            com.deepline.fishing.ui.TitleBadge(vm.title ?: vm.playerName, frame = frame)
+        }
+    }) {
+        when {
+            vm.titleFrame == frame -> OwnedRow("In use ✓")
+            ShopCatalog.owns(vm.progress, key) -> OwnedRow { TextButton(onClick = { vm.setTitleFrame(frame) }) { Text("Use") } }
+            else -> PriceButtons(item, actions)
+        }
+    }
+}
+
+@Composable
+private fun CardStyleTile(vm: GameViewModel, item: ShopItem, actions: ShopActions) {
+    val key = (item.grants.first() as Grant.Unlock).key
+    val style = com.deepline.fishing.core.CardStyle.entries.first { it.unlockKey == key }
+    Tile(item.name, item.badge, preview = { com.deepline.fishing.ui.dex.CardStyleSample(style, Modifier.fillMaxSize()) }) {
+        when {
+            vm.cardStyle == style -> OwnedRow("In use ✓")
+            ShopCatalog.owns(vm.progress, key) -> OwnedRow { TextButton(onClick = { vm.setCardStyle(style) }) { Text("Use") } }
+            else -> PriceButtons(item, actions)
+        }
+    }
+}
+
+// ---- Aquarium ----------------------------------------------------------------------------------------
+
+private fun LazyGridScope.aquariumPage(vm: GameViewModel, actions: ShopActions) {
+    val p = vm.progress
+    val items = ShopCatalog.inSection(ShopSection.AQUARIUM)
+    header("aquarium_header", "Aquarium", "Your caught fish swim in your aquarium (Dex > Aquarium). Decor and a bigger tank only change how it looks.")
+    full("aquarium_tank") {
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            AquariumTank(p, height = 200.dp, modifier = Modifier.tourTarget(TourTarget.SHOP_AQUARIUM))
+            TextButton(onClick = vm::openAquarium, modifier = Modifier.testTag("open_aquarium")) { Text("Open your aquarium") }
+        }
+    }
+    for (item in items.filter { (it.grants.single() as? Grant.Unlock)?.key == "aquarium:big" }) full(item.id) { ItemCard(vm, item, actions) }
+    items(items.filter { (it.grants.single() as? Grant.Unlock)?.key?.startsWith("decor:") == true }, key = { it.id }) { item ->
+        val decor = com.deepline.fishing.core.Decor.entries.first { it.unlockKey == (item.grants.single() as Grant.Unlock).key }
+        Tile(item.name, item.badge, preview = { AquariumTank(p, height = 120.dp, extraDecor = decor) }) {
+            if (ShopCatalog.owns(p, item.id)) OwnedRow() else PriceButtons(item, actions)
         }
     }
 }
@@ -643,5 +700,8 @@ private fun LazyGridScope.footer(vm: GameViewModel) = full("footer") {
             )
             TextButton(onClick = vm::restorePurchases) { Text("Restore purchases") }
         }
+        var account by remember { mutableStateOf(false) }
+        TextButton(onClick = { account = true }, modifier = Modifier.testTag("open_account")) { Text("Account, cloud save and gifts") }
+        if (account) AccountDialog(vm, onClose = { account = false })
     }
 }

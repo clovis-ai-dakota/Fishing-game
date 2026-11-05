@@ -14,6 +14,7 @@ import com.deepline.fishing.DexSection
 import com.deepline.fishing.GameViewModel
 import com.deepline.fishing.core.FishCatalog
 import com.deepline.fishing.ui.TabScreen
+import com.deepline.fishing.ui.tour.tourTarget
 
 /**
  * The Dex tab: numbered cards for every species, every secret (once one is found) and the skins.
@@ -32,6 +33,13 @@ fun DexScreen(vm: GameViewModel) {
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+        },
+        actions = {
+            // The aquarium shows off caught fish.
+            androidx.compose.material3.TextButton(
+                onClick = vm::openAquarium,
+                modifier = androidx.compose.ui.Modifier.tourTarget(com.deepline.fishing.ui.tour.TourTarget.DEX_AQUARIUM),
+            ) { Text("Aquarium") }
         },
     ) {
         if (sections.size > 1) {

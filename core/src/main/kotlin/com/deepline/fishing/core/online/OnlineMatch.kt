@@ -18,6 +18,12 @@ class OnlineMatch(start: ServerMessage.MatchStarted) {
     /** Each player's title (a cosmetic), or null. */
     val titles: List<String?> = List(start.playerNames.size) { start.playerTitles.getOrNull(it) }
 
+    /** Each player's title badge frame (a `TitleFrame` name), or null for the plain one. */
+    val frames: List<String?> = List(start.playerNames.size) { start.playerFrames.getOrNull(it) }
+
+    /** Each player's public id, for gifts (null for older apps). */
+    val playerIds: List<String?> = List(start.playerNames.size) { start.playerIds.getOrNull(it) }
+
     var opponentLive: LiveStatus? = null
         private set
     var outcome: BattleOutcome? = null

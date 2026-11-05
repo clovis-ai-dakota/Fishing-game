@@ -1,5 +1,6 @@
 package com.deepline.fishing.ui.dex
 
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -35,6 +36,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -96,7 +99,7 @@ fun SpeciesDex(vm: GameViewModel) {
             }
         }
         items(shown, key = { it.value.id }) { (index, species) ->
-            FishCard(index + 1, species, p) { vm.openFishDetail(index) }
+            FishCard(index + 1, species, p, vm.cardStyle) { vm.openFishDetail(index) }
         }
         if (shown.isEmpty()) {
             item(key = "empty", span = { GridItemSpan(maxLineSpan) }) {
@@ -159,19 +162,30 @@ private fun DexHeader(p: PlayerProgress) {
 
 /** One numbered card: zone-coloured frame and water, the portrait, the name (or ???). */
 @Composable
-private fun FishCard(number: Int, species: FishSpecies, p: PlayerProgress, onClick: () -> Unit) {
+private fun FishCard(number: Int, species: FishSpecies, p: PlayerProgress, style: com.deepline.fishing.core.CardStyle, onClick: () -> Unit) {
     val state = Progression.dexState(p, species.id)
     val entry = p.collection[species.id]
     val frame = zoneColor(species.zone)
+    // Caught cards wear the player's card style (a frame and a sheen; the fish is unchanged).
+    val styled = state == DexState.CAUGHT && style != com.deepline.fishing.core.CardStyle.CLASSIC
+    val t = if (styled) {
+        val anim by androidx.compose.animation.core.rememberInfiniteTransition(label = "card").animateFloat(
+            0f, 1f, androidx.compose.animation.core.infiniteRepeatable(androidx.compose.animation.core.tween(4_000, easing = androidx.compose.animation.core.LinearEasing)), label = "card time",
+        )
+        anim
+    } else {
+        0f
+    }
     Card(
         onClick = onClick,
         shape = RoundedCornerShape(14.dp),
-        border = BorderStroke(if (state == DexState.CAUGHT) 2.dp else 1.dp, frame.copy(alpha = if (state == DexState.UNKNOWN) 0.35f else 0.9f)),
+        border = if (styled) BorderStroke(2.5.dp, cardFrame(style, species.zone, t)) else BorderStroke(if (state == DexState.CAUGHT) 2.dp else 1.dp, frame.copy(alpha = if (state == DexState.UNKNOWN) 0.35f else 0.9f)),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
     ) {
         Column(
             Modifier
                 .background(zoneBackground(species.zone))
+                .then(if (styled) Modifier.drawWithContent { drawContent(); drawCardSheen(style, t) } else Modifier)
                 .padding(6.dp),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {

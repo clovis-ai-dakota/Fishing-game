@@ -33,7 +33,7 @@ import kotlin.math.max
 import kotlin.math.sin
 
 /** Water colour by depth, from the shared colour script (the same as the 3D renderer). */
-private fun waterColor(depth: Float, atmosphere: com.deepline.fishing.core.Atmosphere = com.deepline.fishing.core.Atmosphere.FAMILY): Color =
+internal fun waterColor(depth: Float, atmosphere: com.deepline.fishing.core.Atmosphere = com.deepline.fishing.core.Atmosphere.FAMILY): Color =
     Color(ColorScript.water(depth, atmosphere))
 
 /** The darkness colour: black, or blood-black in the Nightmare atmosphere (same visibility). */

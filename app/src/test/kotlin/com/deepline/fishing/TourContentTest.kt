@@ -24,7 +24,8 @@ class TourContentTest {
         // explained from the screens that lead to them. A species' page (FISH_DETAIL) is
         // explained from the Dex, which opens it. The boat editor is explained from the Fish tab's
         // boat, which leads to it.
-        val explainedElsewhere = setOf(Screen.CAST, Screen.BATTLE, Screen.ONLINE_LOBBY, Screen.FISH_DETAIL, Screen.BOAT_EDITOR)
+        // The aquarium is explained from the Shop's Aquarium page (and opened from the Dex).
+        val explainedElsewhere = setOf(Screen.CAST, Screen.BATTLE, Screen.ONLINE_LOBBY, Screen.FISH_DETAIL, Screen.BOAT_EDITOR, Screen.AQUARIUM)
         val visited = Tour.steps.map { it.screen }.toSet()
         for (screen in Screen.entries - explainedElsewhere) {
             assertTrue("The tour never shows the $screen screen", screen in visited)
@@ -97,7 +98,7 @@ class TourContentTest {
         // Version 9: the Shop tab replaced Upgrades, with two prices for everything, passes, the
         // detector and sight tackle in battles. Returning players see these as "What's new".
         val v9 = Tour.steps.filter { it.sinceVersion == 9 }.map { it.id }
-        assertTrue(v9.containsAll(listOf("tabs", "upgrades", "tackle", "two_prices", "shop_style", "season", "passes", "battle_tackle")))
+        assertTrue(v9.containsAll(listOf("tabs", "upgrades", "tackle", "two_prices", "shop_style", "aquarium", "season", "passes", "badges", "gifts", "battle_tackle")))
         val targets = Tour.steps.mapNotNull { it.target }.toSet()
         for (t in listOf(TourTarget.SHOP_ROPE, TourTarget.SHOP_TACKLE, TourTarget.SHOP_PRICES, TourTarget.SHOP_STYLE, TourTarget.SHOP_SEASON, TourTarget.SHOP_PASSES, TourTarget.BATTLE_TACKLE)) {
             assertTrue("No step points at $t", t in targets)
@@ -108,7 +109,7 @@ class TourContentTest {
             val hasItems = page.section == null || com.deepline.fishing.core.ShopCatalog.inSection(page.section).isNotEmpty()
             if (hasItems) assertTrue("The tour never shows the Shop's ${page.label} page", page in shown)
         }
-        for (topic in listOf("euros", "points", "Captain's Club", "Starter pack", "battles", "${GameConfig.MINUTES_PER_EURO.toInt()} minutes")) {
+        for (topic in listOf("euros", "points", "Captain's Club", "Starter pack", "battles", "${GameConfig.MINUTES_PER_EURO.toInt()} minutes", "aquarium", "gift", "recovery code", "Dex cards", "season pass", "weekend")) {
             assertTrue("Tour doesn't mention $topic", text.contains(topic, ignoreCase = true))
         }
         // Battles: which tackle is allowed.

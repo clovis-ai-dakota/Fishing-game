@@ -28,6 +28,7 @@ import com.deepline.fishing.core.GameConfig
 import com.deepline.fishing.core.Milestone
 import com.deepline.fishing.core.PlayerProgress
 import com.deepline.fishing.core.Progression
+import com.deepline.fishing.core.ProgressCodec
 import com.deepline.fishing.core.ProgressRepository
 import com.deepline.fishing.core.ReverseReason
 import com.deepline.fishing.core.RopeSpecs
@@ -57,13 +58,14 @@ import com.deepline.fishing.ui.Skins
 import com.deepline.fishing.ui.shop.ShopText
 import com.deepline.fishing.ui.tour.Tour
 import com.deepline.fishing.ui.tour.TourSession
+import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 /**
  * Where the player is. [HOME] (the Fish tab), [DEX], [SHOP] and [BATTLE_SETUP] are the four
  * bottom-bar tabs; the others are full screens pushed on top of them (no tab bar).
  */
-enum class Screen { HOME, DEX, SHOP, BATTLE_SETUP, CAST, FISH_DETAIL, MILESTONES, BATTLE, ONLINE_LOBBY, BOAT_EDITOR }
+enum class Screen { HOME, DEX, SHOP, BATTLE_SETUP, CAST, FISH_DETAIL, MILESTONES, BATTLE, ONLINE_LOBBY, BOAT_EDITOR, AQUARIUM }
 
 /** The four top-level destinations of the bottom navigation bar, in order. */
 enum class MainTab(val label: String, val screen: Screen) {
@@ -242,6 +244,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     fun selectTab(tab: MainTab) {
         screen = tab.screen
         shopMessage = null
+        if (tab == MainTab.SHOP) checkGifts()
     }
 
     /** Opens the Dex on [section] (falls back to Species if that section isn't unlocked yet). */
@@ -283,6 +286,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     fun openShop(page: ShopPage = shopPage) {
         shopPage = page
         screen = Screen.SHOP
+        checkGifts()
     }
 
     fun selectShopPage(page: ShopPage) {
@@ -320,7 +324,11 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /** Pays with money: Google Play in release builds, the test store in debug builds and tests. */
-    val billing: Store = if (BuildConfig.USE_PLAY_BILLING) PlayStore(app, storeListener) { ShopCatalog.all } else TestStore(storeListener)
+    val billing: Store = if (BuildConfig.USE_PLAY_BILLING) {
+        PlayStore(app, storeListener) { com.deepline.fishing.core.online.AccountApi.storeProducts }
+    } else {
+        TestStore(storeListener)
+    }
 
     /** The test store, when that's what [billing] is (its dialog is part of the app). */
     val testStore: TestStore? get() = billing as? TestStore
@@ -329,6 +337,16 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     private val grantedTokens = LinkedHashSet(store.getString(KEY_GRANTED)?.split(',')?.filter { it.isNotBlank() }.orEmpty())
 
     private fun grantStorePurchase(purchase: StorePurchase) {
+        com.deepline.fishing.core.online.AccountApi.itemOfGiftProduct(purchase.productId)?.let { item ->
+            if (purchase.token !in grantedTokens) {
+                rememberToken(purchase.token)
+                val to = pendingGifts.remove(purchase.productId)
+                savePendingGifts()
+                if (to != null) deliverGift(item, to.first, to.second, refundPoints = 0L) else receiveGift(item, "You")
+            }
+            billing.finish(purchase)
+            return
+        }
         val item = ShopCatalog.byId(purchase.productId) ?: return
         if (purchase.token !in grantedTokens) {
             val owned = item.kind == ItemKind.PERMANENT && ShopCatalog.owns(progress, item.id)
@@ -337,11 +355,198 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
                 update(ShopCatalog.grant(progress, item, ShopClock.now()))
                 shopMessage = "Thank you! ${item.name}: $contents."
             }
-            grantedTokens += purchase.token
-            while (grantedTokens.size > MAX_GRANTED_TOKENS) grantedTokens.remove(grantedTokens.first())
-            store.putString(KEY_GRANTED, grantedTokens.joinToString(","))
+            rememberToken(purchase.token)
         }
         billing.finish(purchase)
+    }
+
+    private fun rememberToken(token: String) {
+        grantedTokens += token
+        while (grantedTokens.size > MAX_GRANTED_TOKENS) grantedTokens.remove(grantedTokens.first())
+        store.putString(KEY_GRANTED, grantedTokens.joinToString(","))
+    }
+
+    // --- Account: gifts and cloud save ---------------------------------------------------------
+
+    /** Who this player is on the battle server (made on first launch, or restored from a code). */
+    var playerIdentity by mutableStateOf(loadIdentity())
+        private set
+
+    private fun loadIdentity(): com.deepline.fishing.core.PlayerId {
+        val id = store.getString(KEY_PLAYER_ID)
+        val secret = store.getString(KEY_PLAYER_SECRET)
+        if (id != null && secret != null && com.deepline.fishing.core.PlayerId.isValid(id) && com.deepline.fishing.core.PlayerId.isValidSecret(secret)) {
+            return com.deepline.fishing.core.PlayerId(id, secret)
+        }
+        return com.deepline.fishing.core.PlayerId.random().also(::saveIdentity)
+    }
+
+    private fun saveIdentity(who: com.deepline.fishing.core.PlayerId) {
+        store.putString(KEY_PLAYER_ID, who.id)
+        store.putString(KEY_PLAYER_SECRET, who.secret)
+    }
+
+    /** Talks to the server's gift and cloud save API (tests swap in a fake). */
+    internal var accounts = AccountClient { com.deepline.fishing.core.online.AccountApi.httpBase(serverUrl) }
+
+    var lastBackupMs by mutableStateOf(store.getString(KEY_LAST_BACKUP)?.toLongOrNull() ?: 0L)
+        private set
+
+    /** A server request is running (the account dialog shows a spinner). */
+    var accountBusy by mutableStateOf(false)
+        private set
+
+    /** Cloud save is a Captain's Club perk. */
+    val canCloudSave: Boolean get() = isClubMember
+
+    private fun launchAccount(quiet: Boolean = false, block: suspend () -> Unit) {
+        viewModelScope.launch {
+            if (!quiet) accountBusy = true
+            try {
+                block()
+            } catch (e: AccountClient.AccountException) {
+                if (!quiet) shopMessage = e.message
+            } finally {
+                if (!quiet) accountBusy = false
+            }
+        }
+    }
+
+    fun backupNow(quiet: Boolean = false) {
+        if (!canCloudSave) {
+            if (!quiet) shopMessage = "Cloud save is a Captain's Club perk."
+            return
+        }
+        val data = ProgressCodec.encode(progress)
+        launchAccount(quiet) {
+            accounts.save(playerIdentity, data)
+            lastBackupMs = ShopClock.now()
+            store.putString(KEY_LAST_BACKUP, lastBackupMs.toString())
+            if (!quiet) shopMessage = "Your progress is backed up."
+        }
+    }
+
+    /** Club members are backed up after their casts, at most every few minutes. */
+    private fun autoBackup() {
+        if (canCloudSave && ShopClock.now() - lastBackupMs > AUTO_BACKUP_MS) backupNow(quiet = true)
+    }
+
+    /** Restores the progress saved for a recovery code (from another phone) onto this one. */
+    fun restoreFromCode(code: String) {
+        val who = com.deepline.fishing.core.PlayerId.fromRecoveryCode(code)
+        if (who == null) {
+            shopMessage = "That isn't a recovery code: it starts with DL- and has 24 letters and digits."
+            return
+        }
+        launchAccount {
+            val save = accounts.load(who)
+            saveIdentity(who)
+            playerIdentity = who
+            update(ProgressCodec.decode(save.data))
+            refreshTackleToggles()
+            shopMessage = "Progress restored."
+        }
+    }
+
+    /** Someone to send a gift to (an online opponent), while the gift picker is open. */
+    data class GiftTarget(val playerId: String, val name: String)
+
+    var giftTarget by mutableStateOf<GiftTarget?>(null)
+        private set
+
+    fun openGifts(target: GiftTarget) {
+        giftTarget = target
+    }
+
+    fun closeGifts() {
+        giftTarget = null
+    }
+
+    /** Gifts paid with euros, waiting for the store: gift product id → (recipient id, name). */
+    private val pendingGifts = HashMap<String, Pair<String, String>>().apply {
+        store.getString(KEY_PENDING_GIFTS)?.split(';')?.forEach { e ->
+            val parts = e.split('=', limit = 2)
+            val who = parts.getOrNull(1)?.split(',', limit = 2)
+            if (parts.size == 2 && who?.size == 2) put(parts[0], who[0] to who[1])
+        }
+    }
+
+    private fun savePendingGifts() =
+        store.putString(KEY_PENDING_GIFTS, pendingGifts.entries.joinToString(";") { "${it.key}=${it.value.first},${it.value.second}" })
+
+    fun sendGiftWithPoints(item: ShopItem) {
+        val to = giftTarget ?: return
+        val price = ShopCatalog.pointsPrice(item, progress)
+        if (progress.pointsBalance < price || !com.deepline.fishing.core.online.AccountApi.isGiftable(item)) return
+        update(progress.copy(pointsBalance = progress.pointsBalance - price))
+        giftTarget = null
+        deliverGift(item, to.playerId, to.name, refundPoints = price)
+    }
+
+    fun sendGiftWithMoney(item: ShopItem, activity: Activity?) {
+        val to = giftTarget ?: return
+        val product = com.deepline.fishing.core.online.AccountApi.giftProduct(item)
+        pendingGifts[product.id] = to.playerId to to.name
+        savePendingGifts()
+        giftTarget = null
+        billing.buy(activity, product)
+    }
+
+    /** Sends a paid gift; if the server can't take it, the points come back (or the item is kept). */
+    private fun deliverGift(item: ShopItem, toId: String, toName: String, refundPoints: Long) {
+        val fromName = OnlineProtocol.sanitizeName(playerName)
+        viewModelScope.launch {
+            try {
+                accounts.sendGift(playerIdentity, fromName, toId, item.id)
+                shopMessage = "${item.name} sent to $toName!"
+            } catch (e: AccountClient.AccountException) {
+                if (refundPoints > 0) {
+                    update(progress.copy(pointsBalance = progress.pointsBalance + refundPoints))
+                    shopMessage = "${e.message} Your points were given back."
+                } else {
+                    receiveGift(item, "You")
+                    shopMessage = "${e.message} The ${item.name} is yours instead."
+                }
+            }
+        }
+    }
+
+    private val grantedGiftIds = LinkedHashSet(store.getString(KEY_GIFTS_GRANTED)?.split(',')?.filter { it.isNotBlank() }.orEmpty())
+
+    /** Collects gifts waiting on the server (at launch, and when the Shop opens). */
+    fun checkGifts() = launchAccount(quiet = true) {
+        val gifts = accounts.inbox(playerIdentity)
+        if (gifts.isEmpty()) return@launchAccount
+        val lines = ArrayList<String>()
+        for (g in gifts) {
+            if (g.id in grantedGiftIds) continue
+            val item = ShopCatalog.byId(g.itemId) ?: continue
+            lines += receiveGift(item, g.fromName)
+            grantedGiftIds += g.id
+        }
+        while (grantedGiftIds.size > MAX_GRANTED_TOKENS) grantedGiftIds.remove(grantedGiftIds.first())
+        store.putString(KEY_GIFTS_GRANTED, grantedGiftIds.joinToString(","))
+        accounts.ack(playerIdentity, gifts.map { it.id })
+        if (lines.isNotEmpty()) shopMessage = lines.joinToString("\n")
+    }
+
+    init {
+        // Gifts sent while the app was closed.
+        checkGifts()
+    }
+
+    /** Gives [item] to this player; something they own already becomes its points price. */
+    private fun receiveGift(item: ShopItem, from: String): String {
+        val p = progress
+        return if (item.kind == ItemKind.PERMANENT && ShopCatalog.owns(p, item.id)) {
+            val points = ShopCatalog.pointsPrice(item, p)
+            update(p.copy(pointsBalance = p.pointsBalance + points))
+            "$from sent you ${item.name}. You had it already, so here are ${com.deepline.fishing.ui.formatPoints(points)} pts instead."
+        } else {
+            val contents = ShopText.contents(item, p)
+            update(ShopCatalog.grant(p, item, ShopClock.now()))
+            "$from sent you ${item.name}: $contents."
+        }
     }
 
     fun shopPointsPrice(item: ShopItem): Long = ShopCatalog.pointsPrice(item, progress)
@@ -709,6 +914,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         }
         // Battle casts never reach here: only regular casts count for points and the fish log.
         result?.let { update(Progression.applyCast(progress, it)) }
+        autoBackup()
         // Master angler: the fish log has just been completed (it can only happen once).
         (Secrets.revealedByProgress(progress) - progress.discoveredSecrets).forEach(::onSecretTriggered)
         refreshTackleToggles()
@@ -726,6 +932,32 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
 
     /** The title the player wears (shown at home and in battles), or null. */
     val title: String? get() = progress.equippedSkins[CosmeticSlot.TITLE]?.displayName
+
+    /** The frame of the player's title badge (gold unless another is chosen and available). */
+    val titleFrame: com.deepline.fishing.core.TitleFrame
+        get() = com.deepline.fishing.core.Showcase.titleFrame(progress, ShopClock.now())
+
+    fun setTitleFrame(frame: com.deepline.fishing.core.TitleFrame) {
+        com.deepline.fishing.core.Showcase.setTitleFrame(progress, frame, ShopClock.now())?.let(::update)
+    }
+
+    val cardStyle: com.deepline.fishing.core.CardStyle get() = com.deepline.fishing.core.Showcase.cardStyle(progress)
+
+    fun setCardStyle(style: com.deepline.fishing.core.CardStyle) {
+        com.deepline.fishing.core.Showcase.setCardStyle(progress, style)?.let(::update)
+    }
+
+    fun toggleTankFish(speciesId: String) {
+        com.deepline.fishing.core.Showcase.toggleTankFish(progress, speciesId)?.let(::update)
+    }
+
+    fun toggleDecor(decor: com.deepline.fishing.core.Decor) {
+        com.deepline.fishing.core.Showcase.toggleDecor(progress, decor)?.let(::update)
+    }
+
+    fun openAquarium() {
+        screen = Screen.AQUARIUM
+    }
 
     fun buyUpgrade(stat: RopeStat) {
         Progression.upgrade(progress, stat)?.let(::update)
@@ -900,6 +1132,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             Screen.ONLINE_LOBBY -> closeOnlineLobby()
             Screen.FISH_DETAIL -> screen = Screen.DEX
             Screen.BOAT_EDITOR -> openDex(DexSection.SKINS)
+            Screen.AQUARIUM -> openDex(DexSection.FISH)
             Screen.DEX, Screen.SHOP, Screen.BATTLE_SETUP, Screen.MILESTONES -> screen = Screen.HOME
         }
     }
@@ -951,7 +1184,8 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         if (connection == null) {
             onlineStatus = OnlineStatus.CONNECTING
             connection = OnlineConnection(viewModelScope, ::onServerMessage, ::onConnectionClosed).also {
-                it.connect(serverUrl, OnlineProtocol.sanitizeName(playerName), title)
+                val frame = com.deepline.fishing.core.Showcase.titleFrame(progress, ShopClock.now())
+                it.connect(serverUrl, OnlineProtocol.sanitizeName(playerName), title, frame.name, playerIdentity.id)
             }
         }
         connection?.send(message)
@@ -1020,6 +1254,8 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
 
     override fun onCleared() {
         connection?.close()
+        accounts.close()
+        billing.close()
         super.onCleared()
     }
 
@@ -1029,6 +1265,12 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         const val KEY_TOUR_AGAIN = "tour.showAgain"
         const val KEY_TOUR_SEEN = "tour.seenVersion"
         const val KEY_GRANTED = "store.granted"
+        const val KEY_PLAYER_ID = "account.id"
+        const val KEY_PLAYER_SECRET = "account.secret"
+        const val KEY_LAST_BACKUP = "account.lastBackup"
+        const val KEY_PENDING_GIFTS = "gifts.pending"
+        const val KEY_GIFTS_GRANTED = "gifts.granted"
+        const val AUTO_BACKUP_MS = 10 * 60_000L
         const val MAX_GRANTED_TOKENS = 200
         const val LIVE_INTERVAL_SEC = 0.5f
     }

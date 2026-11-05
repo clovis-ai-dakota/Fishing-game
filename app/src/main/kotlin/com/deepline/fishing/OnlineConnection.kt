@@ -33,12 +33,12 @@ class OnlineConnection(
     @Volatile
     private var closedByUser = false
 
-    fun connect(url: String, playerName: String, title: String? = null) {
+    fun connect(url: String, playerName: String, title: String? = null, titleFrame: String? = null, playerId: String? = null) {
         job = scope.launch {
             var error: String? = null
             try {
                 client.webSocket(urlString = url) {
-                    send(Frame.Text(OnlineProtocol.encode(ClientMessage.Hello(playerName, title = title))))
+                    send(Frame.Text(OnlineProtocol.encode(ClientMessage.Hello(playerName, title = title, titleFrame = titleFrame, playerId = playerId))))
                     val writer = launch {
                         for (m in outbox) send(Frame.Text(OnlineProtocol.encode(m)))
                     }

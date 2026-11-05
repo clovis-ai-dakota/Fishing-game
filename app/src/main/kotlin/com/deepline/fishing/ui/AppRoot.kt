@@ -53,6 +53,7 @@ fun AppRoot(vm: GameViewModel) {
                     Screen.BATTLE -> BattleScreen(vm)
                     Screen.ONLINE_LOBBY -> OnlineLobbyScreen(vm)
                     Screen.BOAT_EDITOR -> com.deepline.fishing.ui.boat.BoatEditorScreen(vm)
+                    Screen.AQUARIUM -> com.deepline.fishing.ui.shop.AquariumScreen(vm)
                 }
                 vm.tour?.let { TourOverlay(it, onNext = vm::tourNext, onBack = vm::tourBack, onSkip = vm::skipTour) }
                 // What just happened in the shop (a purchase, a pending payment), above the tab bar.
@@ -68,6 +69,8 @@ fun AppRoot(vm: GameViewModel) {
                 }
             }
         }
+        // Picking a gift for an online opponent.
+        if (vm.giftTarget != null) com.deepline.fishing.ui.shop.GiftDialog(vm)
         // Debug builds pay through the test store: the tester decides how each payment goes.
         vm.testStore?.request?.let { item -> TestStoreDialog(item, onAnswer = { vm.testStore?.answer(it) }) }
         // Fishing secrets are explained wherever they happen: in a cast, after a battle, at home.

@@ -35,7 +35,8 @@ object OnlineProtocol {
      * 3: fishing-secret bonuses (casts report what each bump hit and which fish were re-caught).
      * 4: all 24 secrets (more cast facts), the 200th fish, and player titles.
      * 5: full-line touches (the Crowd surfer secret).
-     * 6: Lanterns and rare fish detectors in battles (casts say whether they were used).
+     * 6: Lanterns and rare fish detectors in battles (casts say whether they were used), title
+     *    badge frames and public player ids (for gifts).
      */
     const val VERSION = 6
 
@@ -76,6 +77,10 @@ sealed interface ClientMessage {
         val protocolVersion: Int = OnlineProtocol.VERSION,
         /** The title the player wears (a cosmetic), shown to the opponent. */
         val title: String? = null,
+        /** The title badge's frame (a `TitleFrame` name). */
+        val titleFrame: String? = null,
+        /** The player's public id (see `PlayerId`), so the opponent can send them a gift. */
+        val playerId: String? = null,
     ) : ClientMessage
 
     @Serializable @SerialName("create_room")
@@ -122,6 +127,8 @@ sealed interface ServerMessage {
         val yourIndex: Int,
         val playerNames: List<String>,
         val playerTitles: List<String?> = emptyList(),
+        val playerFrames: List<String?> = emptyList(),
+        val playerIds: List<String?> = emptyList(),
     ) : ServerMessage
 
     @Serializable @SerialName("opponent_live")

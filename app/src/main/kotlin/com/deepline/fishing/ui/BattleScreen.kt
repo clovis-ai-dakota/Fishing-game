@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -43,7 +44,8 @@ fun BattleScreen(vm: GameViewModel) {
     val online = vm.onlineMatch?.takeIf { vm.isOnlineBattle }
     // Titles (a legendary cosmetic): online players send theirs; locally, yours is on player 1.
     val titles = online?.titles ?: listOf(vm.title, null)
-    val view = remember(b, version, titles) { BattleView.of(b, titles) }
+    val frames = online?.frames ?: listOf(vm.titleFrame.name, null)
+    val view = remember(b, version, titles, frames) { BattleView.of(b, titles, frames) }
     val outcome = if (online != null) online.outcome else b.outcome()
     val next = vm.battleNextTurn()
     var confirmForfeit by remember { mutableStateOf(false) }
@@ -129,6 +131,15 @@ fun BattleScreen(vm: GameViewModel) {
                             }
                             Button(onClick = vm::rematch, modifier = Modifier.fillMaxWidth()) {
                                 Text(if (online != null) "New online battle" else "Rematch")
+                            }
+                            // A good game? Send the opponent a gift (looks or tackle).
+                            val opponentId = online?.playerIds?.getOrNull(online.opponentIndex)
+                            if (online != null && opponentId != null) {
+                                val name = b.players[online.opponentIndex].name
+                                OutlinedButton(
+                                    onClick = { vm.openGifts(GameViewModel.GiftTarget(opponentId, name)) },
+                                    modifier = Modifier.fillMaxWidth().testTag("send_gift"),
+                                ) { Text("Send $name a gift") }
                             }
                             OutlinedButton(onClick = vm::leaveBattle, modifier = Modifier.fillMaxWidth()) {
                                 Text("Back to menu")
@@ -219,6 +230,7 @@ fun BattleScreen(vm: GameViewModel) {
 private data class PlayerView(
     val name: String,
     val title: String?,
+    val frame: com.deepline.fishing.core.TitleFrame,
     val scoreLabel: String,
     val totalPoints: Int,
     val timeLeft: Float?,
@@ -229,11 +241,12 @@ private data class RoundView(val number: Int, val points: List<Int>, val winnerN
 
 private data class BattleView(val players: List<PlayerView>, val rounds: List<RoundView>) {
     companion object {
-        fun of(b: Battle, titles: List<String?>) = BattleView(
+        fun of(b: Battle, titles: List<String?>, frames: List<String?>) = BattleView(
             players = (0..1).map { i ->
                 PlayerView(
                     name = b.players[i].name,
                     title = titles.getOrNull(i),
+                    frame = com.deepline.fishing.core.TitleFrame.of(frames.getOrNull(i)),
                     scoreLabel = b.score(i).label,
                     totalPoints = b.totalPoints(i),
                     timeLeft = b.mode.timeLimitSec?.let { (it - b.timeUsed(i)).coerceAtLeast(0f) },
@@ -254,7 +267,7 @@ private fun PlayerCard(player: PlayerView, highlighted: Boolean, isMe: Boolean, 
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
             )
-            player.title?.let { TitleBadge(it) }
+            player.title?.let { TitleBadge(it, frame = player.frame) }
             Text(
                 player.scoreLabel,
                 style = MaterialTheme.typography.titleMedium,

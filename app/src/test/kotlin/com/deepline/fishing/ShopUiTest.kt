@@ -240,3 +240,66 @@ class SeasonUiTest : BoatUiTestBase() {
         assertFalse(vm.seasonRewardsReady)
     }
 }
+
+/** The aquarium: caught fish swim there, picked from the Dex; decor comes from the Shop. */
+@RunWith(RobolectricTestRunner::class)
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+@Config(sdk = [36], qualifiers = "w400dp-h860dp-xxhdpi")
+class AquariumUiTest : BoatUiTestBase() {
+    @Test
+    fun fishSwimInTheAquariumAndDecorComesFromTheShop() {
+        val caught = com.deepline.fishing.core.FishCatalog.all.take(8)
+        val vm = launch(
+            midGamePlayer().copy(collection = caught.withIndex().associate { (i, s) -> s.id to com.deepline.fishing.core.CollectionEntry(1, 0, 20f, 100 + i) }),
+        )
+        compose.onNodeWithTag("tab_dex").performClick()
+        compose.onNodeWithText("Aquarium").performClick()
+        assertEquals(Screen.AQUARIUM, vm.screen)
+        compose.shot("70_aquarium")
+        assertEquals(com.deepline.fishing.core.Showcase.TANK_SIZE, com.deepline.fishing.core.Showcase.tankFish(vm.progress).size)
+        val first = com.deepline.fishing.core.Showcase.tankFish(vm.progress).first()
+        compose.onNodeWithTag("aquarium_list").performScrollToNode(hasTestTag("tank_${first.id}"))
+        compose.onNodeWithTag("tank_${first.id}").performClick()
+        assertFalse(first in com.deepline.fishing.core.Showcase.tankFish(vm.progress))
+
+        vm.openShop(ShopPage.AQUARIUM)
+        compose.waitForIdle()
+        compose.shot("71_shop_aquarium")
+        vm.buyWithMoney(ShopCatalog.byId("decor_sunken_ship")!!, null)
+        vm.testStore!!.answer(TestStore.TestOutcome.APPROVE)
+        compose.waitForIdle()
+        assertTrue(com.deepline.fishing.core.Decor.SUNKEN_SHIP in com.deepline.fishing.core.Showcase.shownDecor(vm.progress))
+    }
+}
+
+/** Gifts paid with points come back if the server can't be reached. */
+@RunWith(RobolectricTestRunner::class)
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+@Config(sdk = [36], qualifiers = "w400dp-h860dp-xxhdpi")
+class GiftUiTest : BoatUiTestBase() {
+    @Test
+    fun aGiftThatCantBeSentIsRefunded() {
+        val vm = launch(midGamePlayer())
+        // The server can't be reached.
+        vm.accounts = object : AccountClient({ "" }) {
+            override suspend fun sendGift(from: com.deepline.fishing.core.PlayerId, fromName: String, to: String, itemId: String) =
+                throw AccountException("Can't reach the server.")
+        }
+        vm.openGifts(GameViewModel.GiftTarget("ABCDEFGH", "Bob"))
+        compose.waitForIdle()
+        compose.shot("72_gift_picker")
+        val item = ShopCatalog.byId("gear_star_trail")!!
+        val price = vm.shopPointsPrice(item)
+        compose.onNodeWithTag("gift_list").performScrollToNode(hasTestTag("gift_pts_${item.id}"))
+        compose.onNodeWithTag("gift_pts_${item.id}").performClick()
+        assertNull(vm.giftTarget)
+        runCatching { compose.waitUntil(timeoutMillis = 15_000) { vm.progress.pointsBalance == 400_000L } }
+        assertEquals("balance ${vm.progress.pointsBalance} msg ${vm.shopMessage}", 400_000L, vm.progress.pointsBalance)
+        assertTrue(vm.shopMessage!!.contains("points were given back"))
+        assertTrue(price > 0)
+        assertFalse(ShopCatalog.ownsCosmetic(vm.progress, com.deepline.fishing.core.Cosmetic.STAR_TRAIL))
+        // The player's id and recovery code are ready for gifts and cloud saves.
+        assertTrue(com.deepline.fishing.core.PlayerId.isValid(vm.playerIdentity.id))
+        assertEquals(vm.playerIdentity, com.deepline.fishing.core.PlayerId.fromRecoveryCode(vm.playerIdentity.recoveryCode))
+    }
+}
