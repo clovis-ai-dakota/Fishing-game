@@ -42,7 +42,9 @@ labelled, in the thumb zone), so every main area is one tap away:
   holds your points, a trophy (with a badge when a milestone can be claimed) that opens
   Milestones, and **?** to replay the tour.
 - **Dex**: the collection (see below).
-- **Upgrades**: rope upgrades and downgrades, and the Lantern shop.
+- **Shop**: rope upgrades and downgrades (points only), then tackle, style, passes and the
+  aquarium, each with a euro price and a points price (see below). A dot on the tab means
+  something is waiting there (a Club gift, season rewards, the starter pack offer).
 - **Battle**: battle setup and the way online.
 
 Casts, battles, the online lobby, Milestones and Dex pages are full screens without the bar.
@@ -127,9 +129,11 @@ It has an animated preview of what you wear, then:
   some are bought once with points (from your balance: milestones keep counting), others come
   with progress (species caught, a fish from a deeper zone, milestones claimed). The default
   boat is entirely free. The unlock table is `core/.../BoatParts.kt`. Save, and your boat is worn.
-- **Premium skins**: a shop of premade boats with prices (placeholders), some using shop-only
-  patterns and emblems (flames, a starry night, crown, skull, lightning). **Coming soon**:
-  payments aren't wired, so they can't be bought or worn yet.
+- **Shop boats**: premade boats and shop-only options (paints such as flames, metallic or neon,
+  emblems, sail prints) are bought on the Shop's Style page and then worn or edited here.
+- **Title badge and Dex cards**: the frame of your title badge (gold, or rainbow, ocean, ember,
+  the Club's aurora, season, collector and event frames) and the style of your caught Dex cards.
+- **Shop gear**: hooks, lines and trails bought in the Shop, worn per slot like legendary skins.
 - **Atmosphere**: Family (the default) is harmless near the surface and gets spookier with
   depth. Reaching the Abyssal Floor unlocks **Nightmare**, a frightening look for the deep that
   shows exactly as much as before.
@@ -145,10 +149,49 @@ The title shows under your name on the Fish tab and in battles (online opponents
 Skins are purely visual: same hook size and hitbox, and all the effects are drawn under the
 darkness layer and only around your own gear, so they never light up dark water or reveal fish.
 
+### Shop
+
+Every item can be bought **with euros or with points**. A points price is fishing time: about
+**45 minutes of a good player's fishing per euro** at your rope's reach
+(`GameConfig.MINUTES_PER_EURO` × `POINTS_PER_MINUTE_BY_LENGTH_LEVEL`), and **1 hour per euro for
+Lantern packs**, a key item for progress. Bigger purchases give more: +20% at €4.99, +40% at €9.99.
+Paying only saves time: nothing is sold for euros that points can't buy. Points purchases ask
+for a confirmation. All prices and contents are in `core/.../Shop.kt`.
+
+| Page | What's there | Prices |
+| --- | --- | --- |
+| Rope | Length, Strength and Agility upgrades and downgrades | points only |
+| Tackle | Lantern, Rare fish detector, Lucky charm, Sparkle lure: one with points, or packs sized to their price | €0.50 to €4.99 |
+| Style | Premade boats, complete sets (cheaper than their pieces), paints, emblems, sail prints, hooks, lines, trails, title badges, Dex card styles | €0.50 to €2.99 |
+| Passes | Season pass, collector's edition, weekend event pass, Captain's Club (monthly), starter pack (one time, from the 3rd session, 72 h), founder's pack | €1.99 to €9.99 |
+| Aquarium | Decor and a bigger tank for the aquarium of caught fish | €0.50 to €4.99 |
+
+- **Rare fish detector**: for one cast, marks species you haven't caught yet within 25 m of the
+  hook, even in the dark. Like the Lantern it only changes what you see, so both are allowed in
+  battles (anyone can get them); the charm and the lure are solo only.
+- **Seasons** (6 weeks, `core/.../Seasons.kt`): every solo cast earns season XP (6 per cast, 1 per
+  fish, 10 per secret) towards 20 tiers. The free track has tackle and a little points; the season
+  pass adds a premium track (a season badge, the season boat at tier 10, lots of tackle); the
+  collector's edition is the pass plus 10 tiers, the boat and a badge straight away.
+- **Weekend events** (Friday 18:00 to Monday 06:00 UTC): one fishing goal with a reward; the event
+  pass doubles progress and adds a bigger reward and an event badge.
+- **Captain's Club**: the Aurora paint and a Club badge frame while a member, cloud save, and a
+  free Lantern pouch every month.
+- **Gifts**: after an online battle, send your opponent tackle or looks (euros or points). Gifts
+  arrive when the game or the Shop opens; something they own already becomes its points price.
+- **Aquarium** (Dex > Aquarium): caught fish swim among your decor; pick who's in the tank.
+
+Payments: release builds use **Google Play Billing** (`app/.../billing/PlayStore.kt`); create
+in-app products with the shop's item ids (tackle packs and seasonal items consumable, the rest
+kept), a `captains_club` subscription, and `gift_<id>` consumables for gifts. Debug builds use the
+in-app **test store**: buying shows a dialog where you approve, cancel, fail or leave the payment
+pending (pending ones clear with Restore purchases). Build with `-PdeeplinePlayBilling=true` to
+try Play billing in a debug build.
+
 ### Guided tour
 
 On first launch a guided tour walks through the game: it highlights each part of the app and
-explains the tabs, casting, steering, bumps, heads, weight, points, upgrades, Lanterns, the Dex,
+explains the tabs, casting, steering, bumps, heads, weight, points, the Shop, Lanterns, the Dex,
 milestones and battles. It can be skipped at any time; when it closes, it asks whether to show
 it again next time. The **?** button at the top of the Fish tab replays it. When new features add tour
 steps, returning players get a short "What's new" tour of just those steps
@@ -180,10 +223,14 @@ full rope about 260 (all three stats maxed around cast 290, roughly 5 hours of p
 
 - **Rope upgrades** follow `RopeStat.COST_CURVE` (200 points for the first level, 200,000 for
   the last), weighted per stat; downgrades refund in full.
-- **Tackle shop** (Upgrades): one-cast items switched on from the Fish tab, never in battles.
-  **Lantern** (lights the dark), **Lucky charm** (one extra bump on the way down) and
-  **Sparkle lure** (3× as many Sparkling fish). Their prices grow with the rope's reach
-  (`GameConfig.TACKLE_PRICE_BY_LENGTH_LEVEL`), so they stay a real decision late in the game.
+- **Tackle** (Shop): one-cast items switched on before a cast. **Lantern** (lights the dark) and
+  **Rare fish detector** (marks uncaught species nearby), both allowed in battles, **Lucky charm**
+  (one extra bump on the way down) and **Sparkle lure** (3× as many Sparkling fish), solo only.
+  Their prices grow with the rope's reach (`GameConfig.TACKLE_PRICE_BY_LENGTH_LEVEL`), so they stay
+  a real decision late in the game.
+- **The shop**: everything else in the Shop can be bought with points too (see above).
+- **Seasons**: the free track is part of the career simulation (casts at about three a day): with it
+  the Midnight Trench takes about 24 casts, the Abyssal Floor about 160 and a full rope about 300.
 - **Boat parts** cost 6× their table price.
 - **Wagers** on battles against the computer (1k to 100k points): a win pays the stake back
   ×1.2 (Easy), ×1.6 (Normal) or ×2.4 (Hard), a draw refunds it, a loss or forfeit keeps it.
@@ -196,8 +243,9 @@ full rope about 260 (all three stats maxed around cast 290, roughly 5 hours of p
 Against the computer (Easy / Normal / Hard), a friend on the same device (pass and play), or
 **online**. Both players fish **the same water** for the same cast number (or round), so skill
 decides. Offline both use the device's current rope; online both use a standard tournament
-rope (level 5 in every stat). No lanterns in battles, and battle catches don't count
-towards points or the fish log. The record against the computer is saved.
+rope (level 5 in every stat). Lanterns and rare fish detectors can be switched on for your casts
+(each uses one from your own stock); the Lucky charm and the Sparkle lure are solo only. Battle
+catches don't count towards points or the fish log. The record against the computer is saved.
 
 | Mode | Rules |
 | --- | --- |
@@ -235,7 +283,9 @@ These details weren't in the spec, so I picked values. All numbers live in
 | Ascent hit on a fish that is too heavy | Nothing is caught; a "Too heavy" notice is shown. |
 | Head zone | The front third of the fish, in the direction it faces. |
 | Depth scoring | `base × (1 + depth / 100 m)`; Sparkling = ×3, spawn chance 6 %. |
-| Lantern | Start with 1; earned from milestones, or 600 pts in the upgrades screen. |
+| Lantern | Start with 1; earned from milestones, seasons and events, or bought in the Shop. |
+| Shop exchange rate | 45 min of a good player's fishing per euro (Lantern packs 60 min), +20% at €4.99, +40% at €9.99. |
+| Gifts and cloud saves | The server trusts the app that a gift was paid for (it checks the item can be given); cloud save is a Club perk checked by the app. |
 | Online rope | Same tournament rope for both players (level 5 in every stat), since each phone has its own upgrades. |
 | Online pause | Pausing stops your own clock only; the opponent keeps fishing. |
 | Battle modes beyond the two requested | Heavy Haul, Species Hunt, Deep Dive. |
@@ -255,19 +305,29 @@ core/   Pure Kotlin game logic (no Android dependency) + unit tests
         Battle.kt          1v1 battle modes, turns, scoring
         Bot.kt             computer rival
         Persistence.kt     save/load (key=value text)
-        online/            battle protocol (JSON messages), cast validation, client-side match mirror
-server/ Ktor WebSocket battle server (room codes, quick match, authoritative battles) + tests
+        Shop.kt            the shop: items, euro and points prices, what buying gives
+        Seasons.kt         seasons, the season track and weekend events
+        Showcase.kt        title badge frames, Dex card styles, the aquarium
+        Tackle.kt          one-cast tackle (Lantern, detector, charm, lure)
+        PlayerId.kt        public id, secret and recovery code (gifts, cloud save)
+        online/            battle protocol (JSON messages), cast validation, client-side match mirror,
+                           AccountApi.kt (the gift and cloud save HTTP API)
+server/ Ktor battle server: WebSocket battles (room codes, quick match, authoritative) and the
+        account API (Accounts.kt: gifts and cloud saves in one JSON file per player) + tests
 app/    Android app (Jetpack Compose)
         GameViewModel.kt   game state, persistence via SharedPreferences, online flow
         OnlineConnection.kt WebSocket client (Ktor + OkHttp)
+        AccountClient.kt   gifts and cloud save client
+        billing/           Store: Google Play Billing (PlayStore) and the debug test store
         ui/CastScreen.kt   game loop, HUD, pause, results
         ui/render3d/       3D renderer: procedural meshes, scene builder, GL backend (gl/)
         ui/CastRenderer.kt 2D scene (fallback) and the 2D overlay drawn over the 3D view
         ui/MainScaffold.kt the four tabs (bottom navigation bar)
         ui/dex/            the Dex: species grid and pages, secrets, skins library, FishPortrait
-        ui/boat/           boat editor and the premium skins shop; ui/BoatArt.kt draws boats in 2D
+        ui/boat/           boat editor; ui/BoatArt.kt draws boats in 2D
+        ui/shop/           the Shop tab, seasons and events, the aquarium, gifts and the account
         ui/GameIcons.kt    icons drawn in code
-        ui/*Screen.kt      Fish tab (HomeScreen), upgrades, milestones, battle setup / hub
+        ui/*Screen.kt      Fish tab (HomeScreen), milestones, battle setup / hub
 ```
 
 ## Building
@@ -304,6 +364,10 @@ Requirements: JDK 17+ (JDK 21 for the app UI tests: Robolectric needs it for And
 ./gradlew :server:run            # runs on http://localhost:8080 (PORT env var to change)
 docker build -t deepline-server . && docker run -p 8080:8080 deepline-server
 ```
+
+Gifts and cloud saves are stored as one JSON file per player in `data/accounts`
+(`DEEPLINE_DATA_DIR` to change it; keep it on a persistent volume). The HTTP API is described in
+`core/.../online/AccountApi.kt`.
 
 Any host that runs a Docker container or a JVM works (for example Fly.io, Render, Railway or a
 VPS). Players connect to `ws://<host>:8080/battle`, or `wss://<host>/battle` behind HTTPS.

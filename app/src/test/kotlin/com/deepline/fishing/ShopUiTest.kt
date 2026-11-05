@@ -234,6 +234,9 @@ class SeasonUiTest : BoatUiTestBase() {
         vm.claimSeasonRewards()
         assertTrue("badge:SEASON" in vm.progress.ownedItems)
 
+        // The message about the season rewards sits above the tab bar: close it first.
+        compose.onNodeWithText("OK").performClick()
+        assertNull(vm.shopMessage)
         compose.onNodeWithTag("shop_list").performScrollToNode(hasTestTag("claim_event"))
         compose.onNodeWithTag("claim_event").performClick()
         assertTrue("free" in vm.progress.eventClaims)

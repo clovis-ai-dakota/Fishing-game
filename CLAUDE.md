@@ -42,16 +42,21 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     enforces it (`setBoatDesign` refuses locked options). Wearing the custom boat and a boat
     cosmetic are mutually exclusive (`equipCustomBoat` / `equipSkin`). Build `Skins` with
     `vm.skins`, never `Skins.of(equippedSkins)` alone.
-  - **Premium skins** (`ui/boat/ShopScreen`, `PremiumSkins`): premade boats with PLACEHOLDER
-    prices, "coming soon". They can't be bought or worn until payments are wired, and only
-    they may use premium-only options (`PartRequirement.PremiumOnly`: hidden from the editor).
+  - **Shop boats** (`PremiumSkins`, sold on the Shop's Style page): premade boats; buying one
+    unlocks every option it uses. `PartRequirement.PremiumOnly` options (shop paints, emblems,
+    prints) are bought in the Shop; `ClubOnly` ones (Aurora) last while a Captain's Club member.
+    Season boats are PremiumSkins too, granted by the season pass, never sold alone.
+  - **Title badge and Dex cards** (`core/.../Showcase.kt`): `TitleFrame` (relayed online, the
+    server only passes known names) and `CardStyle` (a frame and sheen on caught cards, never
+    the fish or the water). Owned shop gear has its own group; legendary sets stay secret-only.
   - **Atmosphere**: `Atmosphere.NIGHTMARE` unlocks when a cast reaches
     `DepthZone.ABYSS.minDepth` (`Progression.applyCast`). It only changes the mood: the player
     must see exactly as much as in FAMILY.
   - The 2D boat (classic, skins and designs) is drawn by `drawBoat` in `BoatArt.kt`; every
     `HullPattern`, `SailStyle`, `FlagStyle` and `Emblem` must also be drawn in 3D.
-- **Navigation**: four bottom tabs (`MainTab`: Fish = `Screen.HOME`, Dex, Upgrades, Battle =
-  `Screen.BATTLE_SETUP`) in `MainScaffold`; everything else is a full screen pushed on top (no
+- **Navigation**: four bottom tabs (`MainTab`: Fish = `Screen.HOME`, Dex, Shop = `Screen.SHOP`,
+  Battle = `Screen.BATTLE_SETUP`) in `MainScaffold`; the Shop's pages are `ShopPage` (tour steps
+  pick one with `shopPage`); everything else is a full screen pushed on top (no
   bar). Tab screens use `TabScreen` (title + actions), pushed ones `SubScreen` (back button). Back
   from a tab goes to Fish. Tests tap tabs by tag (`tab_fish`, `tab_dex`...). Icons are drawn in
   code in `GameIcons` (no icon library).
@@ -101,9 +106,29 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
   - `EconomyTest` (core): a good player's career (`Career`) must reach the Midnight Trench in
     ~25 casts, the Abyss in ~150 and a full rope in ~260. Knobs: `RopeStat.COST_CURVE`,
     `GameConfig.TACKLE_PRICE_BY_LENGTH_LEVEL`, `Milestones.all`.
-  - Tackle (`Tackle`: Lantern, Lucky charm, Sparkle lure) is solo-only, never in battles, so the
-    online rules (4 bumps) never change; secrets read the cast's own `touchLimit`.
+  - Tackle (`Tackle`): the Lantern and the Rare fish detector change only what the player sees,
+    so they're allowed in battles (`usableInBattles`; casts report `lanternUsed`/`detectorUsed`
+    and secrets that need the dark check `CastResult.sightAided`). The Lucky charm and the
+    Sparkle lure change the rules or the water: solo only, so online rules (4 bumps) never
+    change; secrets read the cast's own `touchLimit`.
+  - The season's free track (`Seasons.rewards`) is player income: `Career` claims it (about three
+    casts a day), so re-run `EconomyTest` when changing season XP or rewards.
   - Wagers are against the computer only; winnings go to the balance, not `pointsEarned`.
+- **Shop** (`core/.../Shop.kt`, UI in `ui/shop/`): every item has a euro price and a points
+  price (`ShopCatalog.pointsPrice`: minutes of fishing per euro × `POINTS_PER_MINUTE_BY_LENGTH_LEVEL`,
+  `MINUTES_PER_EURO` = 45, Lantern packs `LANTERN_MINUTES_PER_EURO` = 60, `tierBonus` for €4.99 and
+  €9.99). Never sell for euros anything points can't buy. Prices: mostly €0.50 to €2, sets €2.99,
+  a few at €4.99, specials at €9.99 (`ShopTest`). Bundles must be cheaper than their pieces: their
+  badge is the computed saving (`discountPercent`). Item ids are store product ids: release builds
+  use Google Play (`billing/PlayStore`), debug builds and tests the in-app `TestStore` (approve,
+  cancel, fail, pending). Purchases are granted once per token. Seasonal items and passes live in
+  `Seasons.kt`, showcase items in `Showcase.kt`; new kinds of grant go through `Grant.Feature`.
+  Bump the tour when the shop changes (`TourContentTest` checks every Shop page with items).
+- **Accounts** (`PlayerId`, `online/AccountApi.kt`, server `Accounts.kt`): a public id plus a
+  secret (the recovery code); the server keeps a hash and one JSON file per player. Gifts (to
+  online opponents, `AccountApi.isGiftable`: looks and tackle packs, never passes) are paid in the
+  app (euros as `gift_<id>` consumables, or points refunded on failure) and acknowledged after
+  they're granted. Cloud save is a Club perk.
 - All tunable numbers live in `core/.../GameConfig.kt` (plus the tables in `FishSpecies.kt`,
   `Upgrades.kt` and `Secrets.kt`). The tour and HUD read them, so don't hard-code them in UI text.
 - Run `./gradlew :core:test :server:test :app:testDebugUnitTest` before pushing. App UI tests
