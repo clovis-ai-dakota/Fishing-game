@@ -16,6 +16,7 @@ enum class TourTarget {
     NAV_BAR, TAB_DEX, TAB_UPGRADES, TAB_BATTLE,
     UPGRADES_ROPE, DEX_HEADER, DEX_FILTERS, MILESTONES_FIRST, BATTLE_MODES, BATTLE_OPPONENT,
     SKINS_CUSTOMISE, SKINS_ATMOSPHERE, SHOP_ITEMS,
+    UPGRADES_TACKLE, BATTLE_WAGER,
 }
 
 /** A small illustration shown in a tour card. */
@@ -54,8 +55,9 @@ object Tour {
      * 5: bottom tabs (Fish, Dex, Upgrades, Battle) and the Dex with seen and caught fish.
      * 6: boat customisation, the premium skins shop (coming soon) and the Atmosphere option.
      * 7: the fast reel for a full line, a deeper bump-free zone and a brighter Lantern.
+     * 8: the fast reel right after the last bump, a fairer deep, and new ways to spend points.
      */
-    const val VERSION = 7
+    const val VERSION = 8
 
     private val bumps = GameConfig.DESCENT_TOUCH_LIMIT
     private val bumpFree = GameConfig.BUMP_FREE_DEPTH.toInt()
@@ -126,12 +128,13 @@ object Tour {
         TourStep(
             id = "fast_reel",
             title = "Line full? Reel in fast",
-            body = "When nothing more can fit on your line, a Reel in fast button appears on the way up: it " +
-                "hauls the hook to the boat in ${GameConfig.FAST_REEL_MAX_SECONDS} seconds at most, wherever you are. " +
-                "Handy against the clock in timed battles.",
+            body = "As soon as you've used your $bumps bumps, or once nothing more can fit on your line, a Reel " +
+                "in fast button appears on the way up: it hauls the hook to the boat in " +
+                "${GameConfig.FAST_REEL_MAX_SECONDS} seconds at most, wherever you are. Nothing more is caught " +
+                "after that. Handy against the clock in timed battles.",
             screen = Screen.HOME,
             art = TourArt.WEIGHT,
-            sinceVersion = 7,
+            sinceVersion = 8,
         ),
         TourStep(
             id = "points",
@@ -152,6 +155,16 @@ object Tour {
             screen = Screen.UPGRADES,
             target = TourTarget.UPGRADES_ROPE,
             sinceVersion = 5,
+        ),
+        TourStep(
+            id = "tackle",
+            title = "Tackle shop",
+            body = "Also in Upgrades: one-cast tackle to switch on from the Fish tab before you cast. Lanterns " +
+                "light the dark, a Lucky charm gives one extra bump on the way down, and a Sparkle lure brings " +
+                "${GameConfig.SPARKLE_LURE_MULTIPLIER.toInt()}× as many Sparkling fish. Prices grow with your rope's reach.",
+            screen = Screen.UPGRADES,
+            target = TourTarget.UPGRADES_TACKLE,
+            sinceVersion = 8,
         ),
         TourStep(
             id = "lantern",
@@ -253,6 +266,17 @@ object Tour {
                 "(level ${OnlineProtocol.TOURNAMENT_ROPE_LEVEL} in every stat).",
             screen = Screen.BATTLE_SETUP,
             target = TourTarget.BATTLE_OPPONENT,
+        ),
+        TourStep(
+            id = "wager",
+            title = "Wager points",
+            body = "Against the computer you can stake points on the result: a win pays the stake back " +
+                "${GameConfig.wagerPayout(com.deepline.fishing.core.BotDifficulty.EASY)}× against Easy, " +
+                "${GameConfig.wagerPayout(com.deepline.fishing.core.BotDifficulty.NORMAL)}× against Normal and " +
+                "${GameConfig.wagerPayout(com.deepline.fishing.core.BotDifficulty.HARD)}× against Hard. A draw refunds it.",
+            screen = Screen.BATTLE_SETUP,
+            target = TourTarget.BATTLE_WAGER,
+            sinceVersion = 8,
         ),
         TourStep(
             id = "replay",

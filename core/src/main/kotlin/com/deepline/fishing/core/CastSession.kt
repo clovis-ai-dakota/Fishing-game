@@ -55,6 +55,8 @@ data class CastResult(
     val timeLeftAtStart: Float? = null,
     /** Species that came into view during the cast (for the Dex; not scored, not sent online). */
     val seenSpeciesIds: Set<String> = emptySet(),
+    /** Bumps allowed on the way down (more with a Lucky charm). */
+    val touchLimit: Int = GameConfig.DESCENT_TOUCH_LIMIT,
     /** Different fish the hook brushed on the way up while the line could take no more. */
     val fullLineTouches: Int = 0,
     /** When the fast reel started (cast seconds), or null if it wasn't used. */
@@ -158,8 +160,13 @@ class CastSession(
             return FishCatalog.lightestAbove(hookDepth) > room
         }
 
-    /** The fast reel can be used: on the way up, with a full line, not already reeling. */
-    val canFastReel: Boolean get() = lineIsFull && fastReelStart.isNaN()
+    /**
+     * The fast reel can be used: on the way up, from the moment all the bumps are used (or
+     * whenever the line is full), once per cast.
+     */
+    val canFastReel: Boolean
+        get() = phase == CastPhase.ASCENDING && fastReelStart.isNaN() &&
+            (reverseReason == ReverseReason.TOUCH_LIMIT || lineIsFull)
 
     /**
      * Hauls the hook up fast: it accelerates from the reeling speed and reaches the boat in at
@@ -193,7 +200,20 @@ class CastSession(
     val carriedWeightKg: Float
         get() = (_catches.sumOf { it.species.weightKg.toDouble() } + _snags.sumOf { it.kind.weightKg.toDouble() }).toFloat()
     val pointsSoFar: Int get() = _catches.sumOf { it.points } + _snags.sumOf { it.points }
-    val touchesLeft: Int get() = (GameConfig.DESCENT_TOUCH_LIMIT - touches).coerceAtLeast(0)
+    /**
+     * Extra bumps for this cast (a Lucky charm). Set before the cast starts; battles never use
+     * any, so online casts always have the standard limit.
+     */
+    var bonusBumps: Int = 0
+        set(value) {
+            require(elapsedSeconds == 0f) { "Set bonus bumps before the cast starts" }
+            field = value.coerceAtLeast(0)
+        }
+
+    /** Bumps allowed on the way down. */
+    val touchLimit: Int get() = GameConfig.DESCENT_TOUCH_LIMIT + bonusBumps
+
+    val touchesLeft: Int get() = (touchLimit - touches).coerceAtLeast(0)
 
     private val pendingEvents = ArrayList<CastEvent>()
 
@@ -265,7 +285,7 @@ class CastSession(
     }
 
     private fun descend(dt: Float) {
-        hookDepth += GameConfig.DESCENT_SPEED * dt
+        hookDepth += GameConfig.descentSpeedAt(hookDepth) * dt
         if (hookDepth >= specs.lengthM) {
             hookDepth = specs.lengthM
             maxDepthReached = hookDepth
@@ -315,7 +335,7 @@ class CastSession(
         }
     }
 
-    private fun isLastBump() = touches + 1 >= GameConfig.DESCENT_TOUCH_LIMIT
+    private fun isLastBump() = touches + 1 >= touchLimit
 
     /** The last bump hooks the fish it hit, whatever the weight limit: the line holds this one. */
     private fun hookFishWithLastBump(fish: FishEntity) {
@@ -349,7 +369,7 @@ class CastSession(
         lastTouchAtSeconds = elapsedSeconds
         _bumpTimes += elapsedSeconds
         pendingEvents += CastEvent.Touched(touches)
-        if (touches >= GameConfig.DESCENT_TOUCH_LIMIT) {
+        if (touches >= touchLimit) {
             reverse(ReverseReason.TOUCH_LIMIT)
             return true
         }
@@ -432,6 +452,7 @@ class CastSession(
             steered = steered,
             timeLeftAtStart = timeLeftAtStart,
             seenSpeciesIds = _seenSpecies.toSet() + _catches.map { it.species.id },
+            touchLimit = touchLimit,
             fullLineTouches = _fullLineTouched.size,
             fastReelAt = fastReelStart.takeUnless { it.isNaN() },
         )
@@ -439,8 +460,8 @@ class CastSession(
     }
 
     companion object {
-        fun create(specs: RopeSpecs, lanternActive: Boolean, random: Random = Random.Default): CastSession =
-            CastSession(specs, lanternActive, WorldGenerator.generate(specs.lengthM, random))
+        fun create(specs: RopeSpecs, lanternActive: Boolean, random: Random = Random.Default, sparklingChance: Float = GameConfig.SPARKLING_CHANCE): CastSession =
+            CastSession(specs, lanternActive, WorldGenerator.generate(specs.lengthM, random, sparklingChance))
 
         /** A cast on the water generated from [seed]: the same seed always gives the same fish. */
         fun seeded(specs: RopeSpecs, seed: Long, lanternActive: Boolean = false, timeLeftAtStart: Float? = null): CastSession =

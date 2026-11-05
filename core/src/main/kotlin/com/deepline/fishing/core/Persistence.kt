@@ -24,6 +24,8 @@ object ProgressCodec {
         appendLine("earned=${p.pointsEarned}")
         appendLine("claimed=${p.claimedMilestones.sorted().joinToString(",")}")
         appendLine("lanterns=${p.lanterns}")
+        appendLine("luckyCharms=${p.luckyCharms}")
+        appendLine("sparkleLures=${p.sparkleLures}")
         appendLine("casts=${p.castsMade}")
         appendLine("battle=${p.battleWins},${p.battleLosses},${p.battleDraws}")
         appendLine("secrets=${p.discoveredSecrets.sorted().joinToString(",")}")
@@ -58,6 +60,8 @@ object ProgressCodec {
                     claimedMilestones = value.split(',').mapNotNull { it.trim().toIntOrNull() }.toSet(),
                 )
                 key == "lanterns" -> value.toIntOrNull()?.let { p = p.copy(lanterns = it) }
+                key == "luckyCharms" -> value.toIntOrNull()?.let { p = p.copy(luckyCharms = it) }
+                key == "sparkleLures" -> value.toIntOrNull()?.let { p = p.copy(sparkleLures = it) }
                 key == "secrets" -> p = p.copy(discoveredSecrets = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet())
                 key == "secretsMuted" -> p = p.copy(mutedSecretPopups = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet())
                 key == "seen" -> p = p.copy(seenSpecies = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet())

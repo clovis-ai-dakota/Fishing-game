@@ -57,12 +57,19 @@ class FastReelTest {
     }
 
     @Test
-    fun itIsOnlyOfferedWhenNothingMoreCanFit() {
-        // Plenty of room left: no fast reel.
+    fun itIsOfferedOnceTheBumpsAreUsedOrTheLineIsFull() {
+        // Reversed at the end of the rope with plenty of room left: no fast reel.
         val roomy = CastSession(RopeSpecs(120f, 30f, 8f), false, World(emptyList(), emptyList()))
         reelUntil(roomy) { true }
         assertFalse(roomy.lineIsFull)
         assertFalse(roomy.startFastReel())
+        // All four bumps used: offered straight away, even with room on the line.
+        val rocks = (0 until 4).map { i -> Obstacle(i, ObstacleKind.DRIFTWOOD, center, 70f + i * 10f, 1f) }
+        val bumped = CastSession(RopeSpecs(200f, 30f, 8f), false, World(emptyList(), rocks))
+        reelUntil(bumped) { true }
+        assertEquals(ReverseReason.TOUCH_LIMIT, bumped.reverseReason)
+        assertFalse(bumped.lineIsFull)
+        assertTrue(bumped.canFastReel)
         // Not on the way down either.
         val down = fullAfterSnag(620f, ObstacleKind.ROCK.weightKg)
         down.update(1f / 60f, null)

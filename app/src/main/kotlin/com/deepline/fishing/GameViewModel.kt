@@ -33,6 +33,7 @@ import com.deepline.fishing.core.RopeSpecs
 import com.deepline.fishing.core.RopeStat
 import com.deepline.fishing.core.SecretRules
 import com.deepline.fishing.core.Secrets
+import com.deepline.fishing.core.Tackle
 import com.deepline.fishing.core.online.ClientMessage
 import com.deepline.fishing.core.online.LiveStatus
 import com.deepline.fishing.core.online.OnlineMatch
@@ -284,12 +285,41 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         useLantern = enabled && progress.lanterns > 0
     }
 
+    /** The other tackle switched on for the next cast (Lucky charm, Sparkle lure). */
+    var useCharm by mutableStateOf(false)
+        private set
+    var useLure by mutableStateOf(false)
+        private set
+
+    fun toggleCharm(enabled: Boolean) {
+        useCharm = enabled && progress.luckyCharms > 0
+    }
+
+    fun toggleLure(enabled: Boolean) {
+        useLure = enabled && progress.sparkleLures > 0
+    }
+
+    fun buyTackle(item: Tackle) {
+        Progression.buyTackle(progress, item)?.let(::update)
+    }
+
+    /** The Sparkling chance of the water about to be generated (raised by a Sparkle lure). */
+    private var nextSparklingChance = GameConfig.SPARKLING_CHANCE
+
     fun startCast() {
         var p = progress
         val lantern = useLantern && p.lanterns > 0
         if (lantern) p = Progression.consumeLantern(p) ?: p
+        val charm = useCharm && p.luckyCharms > 0
+        if (charm) p = Progression.consumeTackle(p, Tackle.LUCKY_CHARM) ?: p
+        val lure = useLure && p.sparkleLures > 0
+        if (lure) p = Progression.consumeTackle(p, Tackle.SPARKLE_LURE) ?: p
         update(p)
-        beginSession(castFactory(p.specs, lantern), turn = null)
+        nextSparklingChance = GameConfig.SPARKLING_CHANCE * if (lure) GameConfig.SPARKLE_LURE_MULTIPLIER else 1f
+        val s = castFactory(p.specs, lantern)
+        nextSparklingChance = GameConfig.SPARKLING_CHANCE
+        if (charm) s.bonusBumps = GameConfig.LUCKY_CHARM_EXTRA_BUMPS
+        beginSession(s, turn = null)
     }
 
     private fun beginSession(s: CastSession, turn: BattleTurn?) {
@@ -304,7 +334,9 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /** Builds the water for a regular cast. Tests swap it to fish hand-placed water. */
-    internal var castFactory: (RopeSpecs, Boolean) -> CastSession = { specs, lantern -> CastSession.create(specs, lantern) }
+    internal var castFactory: (RopeSpecs, Boolean) -> CastSession = { specs, lantern ->
+        CastSession.create(specs, lantern, sparklingChance = nextSparklingChance)
+    }
 
     /** Fishing secrets waiting to be explained; the first one is showing (the cast is paused). */
     private var secretQueue by mutableStateOf<List<String>>(emptyList())
@@ -465,6 +497,8 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         // Master angler: the fish log has just been completed (it can only happen once).
         (Secrets.revealedByProgress(progress) - progress.discoveredSecrets).forEach(::onSecretTriggered)
         useLantern = useLantern && progress.lanterns > 0
+        useCharm = useCharm && progress.luckyCharms > 0
+        useLure = useLure && progress.sparkleLures > 0
         screen = Screen.HOME
     }
 
@@ -494,7 +528,28 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
 
     // --- Battle flow ---------------------------------------------------------------------
 
-    fun startBattle(mode: BattleMode, opponent: Opponent) {
+    /** How the last wager went, for the battle screen. */
+    data class WagerResult(val stake: Long, val won: Boolean?, val rival: BotDifficulty) {
+        val payout: Long get() = when (won) {
+            true -> (stake * GameConfig.wagerPayout(rival)).toLong()
+            null -> stake
+            false -> 0L
+        }
+    }
+
+    var lastWagerResult by mutableStateOf<WagerResult?>(null)
+        private set
+
+    /** Points staked on the current battle against the computer (0: no wager). */
+    var battleStake by mutableStateOf(0L)
+        private set
+
+    fun startBattle(mode: BattleMode, opponent: Opponent, stake: Long = 0L) {
+        // Wagers only against the computer, and only what the player can afford.
+        val wager = if (opponent is Opponent.Computer && stake > 0) Progression.placeWager(progress, stake) else null
+        if (wager != null) update(wager)
+        battleStake = if (wager != null) stake else 0L
+        lastWagerResult = null
         val players = when (opponent) {
             is Opponent.Computer -> listOf(
                 BattlePlayer("You"),
@@ -593,7 +648,14 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         val outcome = (if (isOnlineBattle) onlineMatch?.outcome else b.outcome()) ?: return
         if (!battleRecorded && battleOpponent is Opponent.Computer) {
             battleRecorded = true
-            update(Progression.recordBattle(progress, outcome.winner?.let { it == 0 }))
+            val won = outcome.winner?.let { it == 0 }
+            update(Progression.recordBattle(progress, won))
+            if (battleStake > 0) {
+                val rival = (battleOpponent as Opponent.Computer).difficulty
+                update(Progression.settleWager(progress, battleStake, rival, if (outcome.byForfeit && won != true) false else won))
+                lastWagerResult = WagerResult(battleStake, won, rival)
+                battleStake = 0L
+            }
             // Shutout: a battle-result secret, paid into the player's points.
             val rival = (battleOpponent as Opponent.Computer).difficulty
             for (id in Secrets.revealedByBattle(b, outcome, playerIndex = 0, rival = rival)) {

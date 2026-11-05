@@ -19,6 +19,7 @@ import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -307,6 +308,25 @@ private fun CastArea(vm: GameViewModel) {
                     onCheckedChange = vm::toggleLantern,
                     enabled = p.lanterns > 0,
                 )
+            }
+            // The other tackle, once the player owns some (bought in Upgrades).
+            if (p.luckyCharms > 0 || p.sparkleLures > 0) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    if (p.luckyCharms > 0) {
+                        FilterChip(
+                            selected = vm.useCharm,
+                            onClick = { vm.toggleCharm(!vm.useCharm) },
+                            label = { Text("Lucky charm ×${p.luckyCharms}") },
+                        )
+                    }
+                    if (p.sparkleLures > 0) {
+                        FilterChip(
+                            selected = vm.useLure,
+                            onClick = { vm.toggleLure(!vm.useLure) },
+                            label = { Text("Sparkle lure ×${p.sparkleLures}") },
+                        )
+                    }
+                }
             }
             Button(
                 onClick = vm::startCast,

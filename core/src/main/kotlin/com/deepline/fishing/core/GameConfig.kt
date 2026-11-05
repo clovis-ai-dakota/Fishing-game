@@ -27,6 +27,24 @@ object GameConfig {
     const val DESCENT_SPEED = 18f
 
     /**
+     * Obstacles thin out in the dark (below [DARK_DEPTH]: meters between them, on average),
+     * where only a few meters ahead can be seen. Tuned with a human-like "good player" model
+     * (sees only the screen or the lit circle, reacts in 0.25 s, fully upgraded rope) so the end
+     * of a full rope is reached in about a third of casts without a Lantern (DifficultyTest).
+     */
+    const val DARK_OBSTACLE_SPACING = 30f
+
+    fun obstacleSpacingAt(depth: Float): Float = if (depth < DARK_DEPTH) OBSTACLE_SPACING else DARK_OBSTACLE_SPACING
+
+    /** The hook also sinks a little slower in the dark, for a fairer reaction time (same tuning). */
+    const val DARK_DESCENT_SPEED = 17f
+
+    fun descentSpeedAt(depth: Float): Float {
+        val k = ((depth - DARK_DEPTH) / 40f).coerceIn(0f, 1f)
+        return DESCENT_SPEED + (DARK_DESCENT_SPEED - DESCENT_SPEED) * k
+    }
+
+    /**
      * How eagerly the hook closes the gap to the player's finger: its sideways speed is the gap
      * times this (per second), capped by the rope's agility. It glides onto the finger and then
      * tracks it instead of moving at a fixed speed and stopping dead.
@@ -91,7 +109,29 @@ object GameConfig {
     /** Dex rarity stars: a species gets one extra star per value its spawn weight is at or below. */
     val RARITY_STAR_WEIGHTS = listOf(17, 9, 4, 0)
 
-    const val LANTERN_PRICE = 600
+    /**
+     * The reference price of tackle (Lanterns, charms, lures) by Rope Length level, about the
+     * points a good player earns per cast at that reach (measured by the career simulation in
+     * EconomyTest). Each item costs a fraction of it, see [Tackle].
+     */
+    val TACKLE_PRICE_BY_LENGTH_LEVEL = intArrayOf(700, 900, 1_400, 2_200, 4_000, 6_000, 7_500, 9_500, 13_000, 15_000, 18_000)
+
+    /** The Lucky charm's extra bump, and how many more Sparkling fish the Sparkle lure brings. */
+    const val LUCKY_CHARM_EXTRA_BUMPS = 1
+    const val SPARKLE_LURE_MULTIPLIER = 3f
+
+    /** Wagers on battles against the computer: the stakes offered, and what a win pays back. */
+    val WAGER_STAKES = listOf(1_000L, 5_000L, 25_000L, 100_000L)
+
+    /** A win pays back the stake times this (a draw refunds it, a loss or forfeit keeps it). */
+    fun wagerPayout(difficulty: BotDifficulty): Float = when (difficulty) {
+        BotDifficulty.EASY -> 1.2f
+        BotDifficulty.NORMAL -> 1.6f
+        BotDifficulty.HARD -> 2.4f
+    }
+
+    /** Boat options bought with points cost their table price times this. */
+    const val BOAT_PART_PRICE_SCALE = 6
     const val STARTING_LANTERNS = 1
 
     /** Simulation never advances more than this per frame, and sub-steps at this size. */

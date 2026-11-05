@@ -144,7 +144,7 @@ object SecretRules {
     const val PERFECT_LOAD_MULTIPLIER = 1.5
     const val MOONLIT_ANGLER_MULTIPLIER = 3.0
     /** Shutout pays into the player's points (battles score casts, not results). */
-    const val SHUTOUT_BONUS = 1_000
+    const val SHUTOUT_BONUS = 5_000
 
     const val WHILE_IT_FLEES_MULTIPLIER = 4.0
     const val BLIND_DROP_MIN_DEPTH_M = 500f
@@ -203,7 +203,7 @@ object SecretRules {
         if (!r.steered && r.catches.size >= ZEN_CAST_COUNT) add(Secrets.ZEN_CAST, ZEN_CAST_BONUS.toDouble())
 
         // Tier 2
-        if (r.bumpTimes.size == GameConfig.DESCENT_TOUCH_LIMIT && r.bumpTimes.last() - r.bumpTimes.first() <= PINBALL_SECONDS) {
+        if (r.bumpTimes.size == r.touchLimit && r.bumpTimes.last() - r.bumpTimes.first() <= PINBALL_SECONDS) {
             add(Secrets.PINBALL, PINBALL_BONUS.toDouble())
         }
         ascent.filter { it.bumpedOnDescent }.takeIf { it.isNotEmpty() }?.let { again ->
@@ -218,7 +218,7 @@ object SecretRules {
 
         // Tier 3
         if (ascent.any { it.afterWallTurn }) add(Secrets.CORNER_POCKET, CORNER_POCKET_BONUS.toDouble())
-        if (r.bumps.size == GameConfig.DESCENT_TOUCH_LIMIT && r.bumps.toSet() == BumpKind.entries.toSet()) {
+        if (r.bumps.size == r.touchLimit && r.bumps.toSet() == BumpKind.entries.toSet()) {
             add(Secrets.GRAND_TOUR, lastBumpPoints * (GRAND_TOUR_MULTIPLIER - 1.0))
         }
         if (lastBumpFish != null && lastBumpFish.sparkling) {
@@ -265,6 +265,7 @@ object SecretRewards {
     private fun set(id: String) = Cosmetic.entries.filter { it.unlockedBy == id }
 
     private val rewards: Map<String, SecretReward> = mapOf(
+        // Tiers 3 to 5 pay more: they're usually found later, when casts earn far more.
         Secrets.LAST_BUMP to SecretReward(0, 0),
         Secrets.FREE_PASS to SecretReward(250, 0),
         Secrets.SCHOOLING to SecretReward(300, 0),
@@ -275,22 +276,22 @@ object SecretRewards {
         Secrets.CLEAN_DROP to SecretReward(1_000, 1),
         Secrets.ROCK_BOTTOM to SecretReward(1_000, 1),
         Secrets.BUZZER_BEATER to SecretReward(800, 1),
-        Secrets.CORNER_POCKET to SecretReward(2_000, 2),
-        Secrets.GRAND_TOUR to SecretReward(2_500, 2),
-        Secrets.SPARKLE_SNAG to SecretReward(2_500, 2),
-        Secrets.LADDER to SecretReward(2_000, 2),
-        Secrets.PERFECT_LOAD to SecretReward(2_500, 2),
-        Secrets.MOONLIT_ANGLER to SecretReward(3_000, 3),
-        Secrets.SHUTOUT to SecretReward(3_000, 3),
-        Secrets.WHILE_IT_FLEES to SecretReward(6_000, 4),
-        Secrets.BLIND_DROP to SecretReward(7_500, 4),
-        Secrets.ZONE_SWEEP to SecretReward(8_000, 5),
-        Secrets.GRAND_SLAM to SecretReward(6_000, 4),
-        Secrets.DOUBLE_HEADER to SecretReward(7_000, 4),
-        Secrets.CROWD_SURFER to SecretReward(7_500, 5),
-        Secrets.DAVID_AND_GOLIATH to SecretReward(15_000, 6, set(Secrets.DAVID_AND_GOLIATH)),
-        Secrets.PERFECT_CAST to SecretReward(20_000, 8, set(Secrets.PERFECT_CAST)),
-        Secrets.MASTER_ANGLER to SecretReward(25_000, 10, set(Secrets.MASTER_ANGLER)),
+        Secrets.CORNER_POCKET to SecretReward(4_000, 2),
+        Secrets.GRAND_TOUR to SecretReward(5_000, 2),
+        Secrets.SPARKLE_SNAG to SecretReward(5_000, 2),
+        Secrets.LADDER to SecretReward(4_000, 2),
+        Secrets.PERFECT_LOAD to SecretReward(5_000, 2),
+        Secrets.MOONLIT_ANGLER to SecretReward(6_000, 3),
+        Secrets.SHUTOUT to SecretReward(6_000, 3),
+        Secrets.WHILE_IT_FLEES to SecretReward(18_000, 4),
+        Secrets.BLIND_DROP to SecretReward(22_500, 4),
+        Secrets.ZONE_SWEEP to SecretReward(24_000, 5),
+        Secrets.GRAND_SLAM to SecretReward(18_000, 4),
+        Secrets.DOUBLE_HEADER to SecretReward(21_000, 4),
+        Secrets.CROWD_SURFER to SecretReward(22_500, 5),
+        Secrets.DAVID_AND_GOLIATH to SecretReward(45_000, 6, set(Secrets.DAVID_AND_GOLIATH)),
+        Secrets.PERFECT_CAST to SecretReward(60_000, 8, set(Secrets.PERFECT_CAST)),
+        Secrets.MASTER_ANGLER to SecretReward(75_000, 10, set(Secrets.MASTER_ANGLER)),
     )
 
     fun of(id: String): SecretReward = rewards[id] ?: SecretReward(0, 0)

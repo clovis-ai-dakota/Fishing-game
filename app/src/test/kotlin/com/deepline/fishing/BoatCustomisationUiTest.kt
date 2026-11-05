@@ -151,7 +151,7 @@ class BoatCustomisationUiTest : BoatUiTestBase() {
         compose.click("Racing stripe")
         compose.onNodeWithText("Unlock Racing stripe?").assertExists()
         compose.shot("56_boat_editor_unlock")
-        compose.click("Unlock for $stripeCost pts")
+        compose.click("Unlock for ${com.deepline.fishing.ui.formatPoints(stripeCost.toLong())} pts")
         assertEquals(5_000L - stripeCost, vm.progress.pointsBalance)
         assertEquals(5_000L, vm.progress.pointsEarned)
         assertTrue(stripe.key in vm.progress.unlockedBoatParts)

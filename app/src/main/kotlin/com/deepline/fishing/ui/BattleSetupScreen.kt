@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.GameViewModel
 import com.deepline.fishing.Opponent
+import com.deepline.fishing.core.GameConfig
 import com.deepline.fishing.core.BattleMode
 import com.deepline.fishing.core.BotDifficulty
 import com.deepline.fishing.core.online.OnlineProtocol
@@ -42,6 +43,7 @@ fun BattleSetupScreen(vm: GameViewModel) {
     var mode by rememberSaveable { mutableStateOf(BattleMode.BEST_OF_FIVE) }
     // A BotDifficulty name, FRIEND (pass and play) or ONLINE.
     var opponentKey by rememberSaveable { mutableStateOf(BotDifficulty.NORMAL.name) }
+    var stake by rememberSaveable { mutableStateOf(0L) }
     val p = vm.progress
 
     TabScreen(title = "1v1 Battle") {
@@ -116,6 +118,35 @@ fun BattleSetupScreen(vm: GameViewModel) {
                 } + " No lanterns in battles. Battle catches don't count for your points or fish log.",
                 style = MaterialTheme.typography.bodySmall,
             )
+            // Wagers: only against the computer.
+            val rival = BotDifficulty.entries.firstOrNull { it.name == opponentKey }
+            if (rival != null) {
+                Column(Modifier.tourTarget(TourTarget.BATTLE_WAGER), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text("Wager (optional)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+                        FilterChip(selected = stake == 0L, onClick = { stake = 0L }, label = { Text("None") })
+                        for (s in GameConfig.WAGER_STAKES) {
+                            FilterChip(
+                                selected = stake == s,
+                                onClick = { stake = s },
+                                enabled = p.pointsBalance >= s,
+                                label = { Text(compactPoints(s)) },
+                            )
+                        }
+                    }
+                    val payout = GameConfig.wagerPayout(rival)
+                    Text(
+                        if (stake > 0) {
+                            "Win and get ${formatPoints((stake * payout).toLong())} pts back (×$payout against ${rival.displayName}); " +
+                                "a draw refunds the stake; losing or forfeiting loses it."
+                        } else {
+                            "Stake points on the result: a win against ${rival.displayName} pays ×$payout."
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
             Text(
                 "Record vs computer: ${p.battleWins} W · ${p.battleLosses} L · ${p.battleDraws} D",
                 style = MaterialTheme.typography.bodyMedium,
@@ -128,7 +159,7 @@ fun BattleSetupScreen(vm: GameViewModel) {
                         ONLINE -> Opponent.Online
                         else -> Opponent.Computer(BotDifficulty.valueOf(opponentKey))
                     }
-                    vm.startBattle(mode, opponent)
+                    vm.startBattle(mode, opponent, if (opponent is Opponent.Computer && p.pointsBalance >= stake) stake else 0L)
                 },
                 modifier = Modifier
                     .fillMaxWidth()

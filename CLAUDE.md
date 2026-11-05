@@ -93,6 +93,17 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
 - **Atmosphere** (`Atmosphere.NIGHTMARE`, a cosmetic): changes colours, fish menace and decor in
   the deep only; the lit radius and what's visible stay exactly the same (darkness alpha is
   unchanged, only its tint).
+- **Difficulty and economy are tuned by simulation**, so re-run and re-tune when you change
+  scoring, the water or prices:
+  - `DifficultyTest` (core): a human-like `GoodPlayer` (sees only the screen or the lit circle,
+    0.25 s reactions, full rope) must reach the bottom in about a third of casts without a
+    Lantern. Knobs: `GameConfig.DARK_OBSTACLE_SPACING`, `DARK_DESCENT_SPEED`.
+  - `EconomyTest` (core): a good player's career (`Career`) must reach the Midnight Trench in
+    ~25 casts, the Abyss in ~150 and a full rope in ~260. Knobs: `RopeStat.COST_CURVE`,
+    `GameConfig.TACKLE_PRICE_BY_LENGTH_LEVEL`, `Milestones.all`.
+  - Tackle (`Tackle`: Lantern, Lucky charm, Sparkle lure) is solo-only, never in battles, so the
+    online rules (4 bumps) never change; secrets read the cast's own `touchLimit`.
+  - Wagers are against the computer only; winnings go to the balance, not `pointsEarned`.
 - All tunable numbers live in `core/.../GameConfig.kt` (plus the tables in `FishSpecies.kt`,
   `Upgrades.kt` and `Secrets.kt`). The tour and HUD read them, so don't hard-code them in UI text.
 - Run `./gradlew :core:test :server:test :app:testDebugUnitTest` before pushing. App UI tests

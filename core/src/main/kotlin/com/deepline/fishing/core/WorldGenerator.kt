@@ -4,7 +4,7 @@ import kotlin.random.Random
 
 object WorldGenerator {
     /** Populates the water column down to slightly past [maxDepth]. */
-    fun generate(maxDepth: Float, random: Random): World {
+    fun generate(maxDepth: Float, random: Random, sparklingChance: Float = GameConfig.SPARKLING_CHANCE): World {
         val limit = maxDepth + 15f
         val fish = ArrayList<FishEntity>()
         var depth = GameConfig.FIRST_FISH_DEPTH
@@ -17,7 +17,7 @@ object WorldGenerator {
                 fish += FishEntity(
                     id = id++,
                     species = species,
-                    sparkling = random.nextFloat() < GameConfig.SPARKLING_CHANCE,
+                    sparkling = random.nextFloat() < sparklingChance,
                     x = halfLength + random.nextFloat() * (GameConfig.WORLD_WIDTH - 2 * halfLength),
                     depth = depth,
                     direction = if (random.nextBoolean()) 1 else -1,
@@ -41,7 +41,7 @@ object WorldGenerator {
                 depth = depth,
                 radius = radius,
             )
-            depth += GameConfig.OBSTACLE_SPACING * (0.6f + random.nextFloat() * 0.8f)
+            depth += GameConfig.obstacleSpacingAt(depth) * (0.6f + random.nextFloat() * 0.8f)
         }
         // The legendary fish, at the very bottom, in a few of the casts that can reach it.
         // (Drawn last so it doesn't change the rest of the water for a given seed.)

@@ -99,3 +99,10 @@ fun SubScreen(title: String, onBack: () -> Unit, content: @Composable ColumnScop
 fun formatPoints(value: Long): String = "%,d".format(value)
 
 fun formatPoints(value: Int): String = formatPoints(value.toLong())
+
+/** "950", "5k", "25k", "1.5M": for tight spots such as chips. */
+fun compactPoints(value: Long): String = when {
+    value >= 1_000_000 -> "%.1fM".format(value / 1_000_000.0).replace(".0M", "M")
+    value >= 1_000 -> "%.1fk".format(value / 1_000.0).replace(".0k", "k")
+    else -> value.toString()
+}

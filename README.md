@@ -20,11 +20,17 @@ ES 3.0, in a cel-shaded anime style, with a 2D renderer as the fallback.
 - **Lantern.** Below 300 m the water goes dark and you only see a small circle around the hook.
   A Lantern (toggle it on before casting; one is used per cast) widens the lit circle from
   6 m to 18.2 m around the hook.
-- **Fast reel.** On the way up, once nothing more can fit on the line (the room left is
-  smaller than the lightest species living above the hook, from the catalogue, so it reveals
-  nothing about the water), a **Reel in fast** button hauls the hook to the boat in at most
-  1.5 s wherever it is (less when shallow). Nothing more is caught or counted after that.
-  Normal and Hard rivals use it too.
+- **Fast reel.** On the way up, from the moment all the bumps are used (or once nothing more
+  can fit on the line: the room left is smaller than the lightest species living above the
+  hook, from the catalogue, so it reveals nothing about the water), a **Reel in fast** button
+  hauls the hook to the boat in at most 1.5 s wherever it is (less when shallow). Nothing more
+  is caught or counted after that. Normal and Hard rivals use it when their line is full.
+- **The deep is fair.** In the dark (below 300 m) obstacles thin out (one every 30 m on average
+  instead of 22 m) and the hook sinks a little slower (17 m/s instead of 18 m/s). Tuned with a
+  human-like "good player" model (it only sees the screen, or the lit circle in the dark, and
+  reacts in 0.25 s): with a full rope it reaches the bottom in about **a third of casts
+  without a Lantern** (a casual player about 1 in 6, anyone with a Lantern about 95%).
+  `DifficultyTest` keeps it there.
 
 ### Navigation
 
@@ -81,22 +87,22 @@ discovery reward**. Cast-wide multipliers add up rather than compound. Numbers l
 | 2 | Clean drop | Reach the end of a rope of 300 m+ with no bumps | cast ×1.5 | 1,000 + 1 Lantern |
 | 2 | Rock bottom | The last bump snags an object within 2 m of the rope's end | the snag ×2 | 1,000 + 1 Lantern |
 | 2 | Buzzer beater | Timed battle: start a cast with under 15 s on the clock and land something | +300 | 800 + 1 Lantern |
-| 3 | Corner pocket | On the way up, hook a fish within 0.3 s of it turning at the edge | +300 | 2,000 + 2 Lanterns |
-| 3 | Grand tour | The 4 bumps hit a fish head, a rock, driftwood and a jelly | last bump's catch ×2 | 2,500 + 2 Lanterns |
-| 3 | Sparkle snag | The last bump hooks a Sparkling fish | that fish ×2 (×6 with Sparkling) | 2,500 + 2 Lanterns |
-| 3 | Ladder | 4+ fish caught on the way up in strictly increasing weight | cast ×1.5 | 2,000 + 2 Lanterns |
-| 3 | Perfect load | Surface exactly at the weight limit (±0.05 kg), 5+ catches, the last one 1.5 kg+ | cast ×1.5 | 2,500 + 2 Lanterns |
-| 3 | Moonlit angler | Without a Lantern, catch a glowing fish below 300 m on the way up | that fish ×3 | 3,000 + 3 Lanterns |
-| 3 | Shutout | Win Best of 5 against the Hard rival 3-0 | +1,000 (profile points, each time) | 3,000 + 3 Lanterns |
-| 4 | While it flees | On the way up, catch a fish you bumped while it is still fleeing | that fish ×4 | 6,000 + 4 Lanterns |
-| 4 | Blind drop | Without a Lantern, reach the end of a 500 m+ rope with no bumps | cast ×2 | 7,500 + 4 Lanterns |
-| 4 | Zone sweep | A fish from each of the 4 depth zones in one cast | cast ×2 | 8,000 + 5 Lanterns |
-| 4 | Grand slam | Snag an object with the last bump and catch 8+ fish on the way up | cast ×1.5 | 6,000 + 4 Lanterns |
-| 4 | Double header | Two fish hooked at the very same instant | both ×3 | 7,000 + 4 Lanterns |
-| 4 | Crowd surfer | With a full line (instead of the fast reel), brush 50 different fish on the way up | cast ×2 | 7,500 + 5 Lanterns |
-| 5 | David and Goliath | The last bump hooks the Pale Leviathan (24 kg) on a rope weaker than it | leviathan ×3 | 15,000 + 6 Lanterns + Giant-slayer set |
-| 5 | Perfect cast | Rock bottom + Perfect load + a Sparkling catch on the way up, in one cast | cast ×3 | 20,000 + 8 Lanterns + Prismatic set |
-| 5 | Master angler | Every species in the fish log, including the Deep Sovereign | — | 25,000 + 10 Lanterns + Sovereign set |
+| 3 | Corner pocket | On the way up, hook a fish within 0.3 s of it turning at the edge | +300 | 4,000 + 2 Lanterns |
+| 3 | Grand tour | The 4 bumps hit a fish head, a rock, driftwood and a jelly | last bump's catch ×2 | 5,000 + 2 Lanterns |
+| 3 | Sparkle snag | The last bump hooks a Sparkling fish | that fish ×2 (×6 with Sparkling) | 5,000 + 2 Lanterns |
+| 3 | Ladder | 4+ fish caught on the way up in strictly increasing weight | cast ×1.5 | 4,000 + 2 Lanterns |
+| 3 | Perfect load | Surface exactly at the weight limit (±0.05 kg), 5+ catches, the last one 1.5 kg+ | cast ×1.5 | 5,000 + 2 Lanterns |
+| 3 | Moonlit angler | Without a Lantern, catch a glowing fish below 300 m on the way up | that fish ×3 | 6,000 + 3 Lanterns |
+| 3 | Shutout | Win Best of 5 against the Hard rival 3-0 | +5,000 (profile points, each time) | 6,000 + 3 Lanterns |
+| 4 | While it flees | On the way up, catch a fish you bumped while it is still fleeing | that fish ×4 | 18,000 + 4 Lanterns |
+| 4 | Blind drop | Without a Lantern, reach the end of a 500 m+ rope with no bumps | cast ×2 | 22,500 + 4 Lanterns |
+| 4 | Zone sweep | A fish from each of the 4 depth zones in one cast | cast ×2 | 24,000 + 5 Lanterns |
+| 4 | Grand slam | Snag an object with the last bump and catch 8+ fish on the way up | cast ×1.5 | 18,000 + 4 Lanterns |
+| 4 | Double header | Two fish hooked at the very same instant | both ×3 | 21,000 + 4 Lanterns |
+| 4 | Crowd surfer | With a full line (instead of the fast reel), brush 50 different fish on the way up | cast ×2 | 22,500 + 5 Lanterns |
+| 5 | David and Goliath | The last bump hooks the Pale Leviathan (24 kg) on a rope weaker than it | leviathan ×3 | 45,000 + 6 Lanterns + Giant-slayer set |
+| 5 | Perfect cast | Rock bottom + Perfect load + a Sparkling catch on the way up, in one cast | cast ×3 | 60,000 + 8 Lanterns + Prismatic set |
+| 5 | Master angler | Every species in the fish log, including the Deep Sovereign | — | 75,000 + 10 Lanterns + Sovereign set |
 
 **The Deep Sovereign** (species #200) lives only at 600 to 620 m, appears in 5% of casts that
 reach that deep, and can only be landed by the last bump (a normal head nudge on the way up does
@@ -164,6 +170,26 @@ improves and try to fill the Dex.
   Strength (max weight) and Agility (steering speed), 10 levels each. Any level can be
   **downgraded** for a full refund of what it cost (lifetime points earned, and so milestones,
   are unaffected). The Deep Sovereign's water needs the maximum rope (620 m).
+
+### Points: earning and spending
+
+Deeper casts earn far more (about 140 points per cast with the starting rope, 18,000 with a
+full one), so prices follow income. Tuned with a career simulation of a good player
+(`EconomyTest`): the Midnight Trench takes about 25 casts, the Abyssal Floor about 150 and a
+full rope about 260 (all three stats maxed around cast 290, roughly 5 hours of play).
+
+- **Rope upgrades** follow `RopeStat.COST_CURVE` (200 points for the first level, 200,000 for
+  the last), weighted per stat; downgrades refund in full.
+- **Tackle shop** (Upgrades): one-cast items switched on from the Fish tab, never in battles.
+  **Lantern** (lights the dark), **Lucky charm** (one extra bump on the way down) and
+  **Sparkle lure** (3× as many Sparkling fish). Their prices grow with the rope's reach
+  (`GameConfig.TACKLE_PRICE_BY_LENGTH_LEVEL`), so they stay a real decision late in the game.
+- **Boat parts** cost 6× their table price.
+- **Wagers** on battles against the computer (1k to 100k points): a win pays the stake back
+  ×1.2 (Easy), ×1.6 (Normal) or ×2.4 (Hard), a draw refunds it, a loss or forfeit keeps it.
+- **Milestones** are spread over a whole career (15 of them, up to 4 million points earned).
+- Discovery rewards of tier 3 to 5 secrets were raised (×2 to ×3): they're usually found
+  later, when casts earn much more.
 
 ### 1v1 battles
 

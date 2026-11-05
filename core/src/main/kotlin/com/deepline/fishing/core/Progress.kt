@@ -21,6 +21,8 @@ data class PlayerProgress(
     val claimedMilestones: Set<Int> = emptySet(),
     val ropeLevels: Map<RopeStat, Int> = emptyMap(),
     val lanterns: Int = GameConfig.STARTING_LANTERNS,
+    val luckyCharms: Int = 0,
+    val sparkleLures: Int = 0,
     val collection: Map<String, CollectionEntry> = emptyMap(),
     val castsMade: Int = 0,
     /** Record against the computer rival. */
@@ -195,9 +197,47 @@ object Progression {
         )
     }
 
-    fun buyLantern(p: PlayerProgress): PlayerProgress? {
-        if (p.pointsBalance < GameConfig.LANTERN_PRICE) return null
-        return p.copy(pointsBalance = p.pointsBalance - GameConfig.LANTERN_PRICE, lanterns = p.lanterns + 1)
+    fun buyLantern(p: PlayerProgress): PlayerProgress? = buyTackle(p, Tackle.LANTERN)
+
+    /** The price of [item] for this player's rope. */
+    fun tacklePrice(p: PlayerProgress, item: Tackle): Int = item.price(p.level(RopeStat.LENGTH))
+
+    fun tackleCount(p: PlayerProgress, item: Tackle): Int = when (item) {
+        Tackle.LANTERN -> p.lanterns
+        Tackle.LUCKY_CHARM -> p.luckyCharms
+        Tackle.SPARKLE_LURE -> p.sparkleLures
+    }
+
+    private fun withTackle(p: PlayerProgress, item: Tackle, count: Int) = when (item) {
+        Tackle.LANTERN -> p.copy(lanterns = count)
+        Tackle.LUCKY_CHARM -> p.copy(luckyCharms = count)
+        Tackle.SPARKLE_LURE -> p.copy(sparkleLures = count)
+    }
+
+    fun buyTackle(p: PlayerProgress, item: Tackle): PlayerProgress? {
+        val price = tacklePrice(p, item)
+        if (p.pointsBalance < price) return null
+        return withTackle(p.copy(pointsBalance = p.pointsBalance - price), item, tackleCount(p, item) + 1)
+    }
+
+    /** Uses one [item] (for the cast about to start); null when the player has none. */
+    fun consumeTackle(p: PlayerProgress, item: Tackle): PlayerProgress? {
+        val n = tackleCount(p, item)
+        return if (n <= 0) null else withTackle(p, item, n - 1)
+    }
+
+    /** Puts [stake] points on a battle against the computer; null when they can't afford it. */
+    fun placeWager(p: PlayerProgress, stake: Long): PlayerProgress? =
+        if (stake <= 0 || p.pointsBalance < stake) null else p.copy(pointsBalance = p.pointsBalance - stake)
+
+    /**
+     * Settles a wager: a win pays the stake back times [GameConfig.wagerPayout], a draw refunds
+     * it, a loss keeps it. Winnings are spendable but don't count towards milestones.
+     */
+    fun settleWager(p: PlayerProgress, stake: Long, rival: BotDifficulty, won: Boolean?): PlayerProgress = when (won) {
+        true -> p.copy(pointsBalance = p.pointsBalance + (stake * GameConfig.wagerPayout(rival)).toLong())
+        null -> p.copy(pointsBalance = p.pointsBalance + stake)
+        false -> p
     }
 
     fun consumeLantern(p: PlayerProgress): PlayerProgress? =

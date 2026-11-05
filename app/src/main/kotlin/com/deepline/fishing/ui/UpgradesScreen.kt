@@ -23,6 +23,7 @@ import com.deepline.fishing.GameViewModel
 import com.deepline.fishing.core.GameConfig
 import com.deepline.fishing.core.Progression
 import com.deepline.fishing.core.RopeStat
+import com.deepline.fishing.core.Tackle
 import com.deepline.fishing.ui.tour.TourTarget
 import com.deepline.fishing.ui.tour.tourTarget
 
@@ -89,20 +90,31 @@ fun UpgradesScreen(vm: GameViewModel) {
                 }
             }
             item {
-                Card(Modifier.fillMaxWidth()) {
-                    Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Column(Modifier.weight(1f)) {
-                            Text("Lantern", style = MaterialTheme.typography.titleMedium)
-                            Text(
-                                "Lights up more of the dark water below ${GameConfig.DARK_DEPTH.toInt()} m for one cast. " +
-                                    "You have ${p.lanterns}.",
-                                style = MaterialTheme.typography.bodySmall,
-                            )
+                Column(Modifier.tourTarget(TourTarget.UPGRADES_TACKLE), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Tackle shop", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 8.dp))
+                    Text(
+                        "One-cast items, switched on from the Fish tab before you cast (never in battles). " +
+                            "Prices grow with your rope's reach.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    for (item in Tackle.entries) {
+                        val price = Progression.tacklePrice(p, item)
+                        Card(Modifier.fillMaxWidth()) {
+                            Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Column(Modifier.weight(1f)) {
+                                    Text(item.displayName, style = MaterialTheme.typography.titleMedium)
+                                    Text(
+                                        "${item.description} You have ${Progression.tackleCount(p, item)}.",
+                                        style = MaterialTheme.typography.bodySmall,
+                                    )
+                                }
+                                Button(
+                                    onClick = { vm.buyTackle(item) },
+                                    enabled = p.pointsBalance >= price,
+                                ) { Text("${formatPoints(price)} pts") }
+                            }
                         }
-                        Button(
-                            onClick = vm::buyLantern,
-                            enabled = p.pointsBalance >= GameConfig.LANTERN_PRICE,
-                        ) { Text("${formatPoints(GameConfig.LANTERN_PRICE)} pts") }
                     }
                 }
             }

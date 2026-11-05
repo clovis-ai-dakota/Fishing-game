@@ -50,7 +50,7 @@ class BotBrain(private val difficulty: BotDifficulty, private val random: Random
             if (f.depth < GameConfig.BUMP_FREE_DEPTH) continue
             val dy = f.depth - s.hookDepth
             if (dy < -f.halfHeight || dy > difficulty.lookaheadM) continue
-            val eta = dy.coerceAtLeast(0f) / GameConfig.DESCENT_SPEED
+            val eta = dy.coerceAtLeast(0f) / GameConfig.descentSpeedAt(s.hookDepth)
             // Only the head counts as a bump: it spans from a third of the way forward to the nose.
             val fishX = predictX(f, eta)
             val back = f.halfLength / 3f
@@ -62,7 +62,7 @@ class BotBrain(private val difficulty: BotDifficulty, private val random: Random
             if (o.depth < GameConfig.BUMP_FREE_DEPTH) continue
             val dy = o.depth - s.hookDepth
             if (dy < -o.radius || dy > difficulty.lookaheadM) continue
-            hazards += Hazard(o.x, o.radius + r + margin, dy.coerceAtLeast(0f) / GameConfig.DESCENT_SPEED)
+            hazards += Hazard(o.x, o.radius + r + margin, dy.coerceAtLeast(0f) / GameConfig.descentSpeedAt(s.hookDepth))
         }
         if (hazards.isEmpty()) return null
 
@@ -93,7 +93,7 @@ class BotBrain(private val difficulty: BotDifficulty, private val random: Random
             if (o.touched || o.passedInBumpFreeZone || o.depth < GameConfig.BUMP_FREE_DEPTH) continue
             val dy = o.depth - s.hookDepth
             if (dy < 0.5f || dy > difficulty.lookaheadM) continue
-            val eta = dy / GameConfig.DESCENT_SPEED
+            val eta = dy / GameConfig.descentSpeedAt(s.hookDepth)
             if (abs(o.x - s.hookX) > s.specs.steerSpeed * eta) continue
             val value = Scoring.snagPoints(o.kind, o.depth).toFloat()
             if (value > bestValue) {
@@ -151,7 +151,7 @@ object BotPlayer {
             if (session.elapsedSeconds >= MAX_SIM_SECONDS) break
             session.update(DT, brain.steer(session, DT))
             // Normal and Hard rivals haul a full line straight up (it saves clock in timed modes).
-            if (difficulty != BotDifficulty.EASY && session.canFastReel) session.startFastReel()
+            if (difficulty != BotDifficulty.EASY && session.lineIsFull && session.canFastReel) session.startFastReel()
         }
         session.endNow()
         val duration = timeLimitSec?.let { minOf(it, session.elapsedSeconds) } ?: session.elapsedSeconds

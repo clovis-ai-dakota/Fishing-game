@@ -174,7 +174,7 @@ fun CastScreen(vm: GameViewModel) {
             opponentLive = if (vm.isOnlineBattle) opponentLiveText(vm) else null,
             onPause = vm::pause,
         )
-        // The line is full: offer to haul it straight up (thumb zone, bottom centre).
+        // All bumps used, or the line is full: offer to haul it straight up (thumb zone).
         if (hud.canFastReel && !vm.paused && vm.pendingResult == null) {
             Button(
                 onClick = vm::fastReel,
@@ -185,7 +185,7 @@ fun CastScreen(vm: GameViewModel) {
                     .height(56.dp),
                 shape = RoundedCornerShape(28.dp),
             ) {
-                Text("Line full · Reel in fast", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text(if (hud.lineFull) "Line full · Reel in fast" else "Reel in fast", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             }
         }
 
@@ -245,8 +245,11 @@ private data class HudState(
     val elapsedSeconds: Float,
     val nothingCaughtYet: Boolean,
     val bumpFree: Boolean,
-    /** The line can take no more fish: the fast reel button shows. */
+    /** The fast reel button shows (all bumps used, or the line can take no more fish). */
     val canFastReel: Boolean,
+    val lineFull: Boolean,
+    /** Bumps allowed this cast (more with a Lucky charm). */
+    val touchLimit: Int,
 ) {
     companion object {
         fun of(s: CastSession) = HudState(
@@ -261,6 +264,8 @@ private data class HudState(
             nothingCaughtYet = s.catches.isEmpty(),
             bumpFree = s.isBumpFree,
             canFastReel = s.canFastReel,
+            lineFull = s.lineIsFull,
+            touchLimit = s.touchLimit,
         )
     }
 }
@@ -302,7 +307,7 @@ private fun CastHud(
             horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             Text("Bumps", color = Color.White, style = MaterialTheme.typography.labelMedium)
-            repeat(GameConfig.DESCENT_TOUCH_LIMIT) { i ->
+            repeat(hud.touchLimit) { i ->
                 Box(
                     Modifier
                         .size(12.dp)

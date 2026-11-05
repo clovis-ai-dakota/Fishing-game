@@ -78,9 +78,15 @@ class TourContentTest {
         val v6 = Tour.steps.filter { it.sinceVersion == 6 }.map { it.id }
         assertTrue(v6.containsAll(listOf("boat", "shop", "atmosphere")))
         // Version 7: the fast reel, the deeper bump-free zone and the brighter Lantern.
-        assertEquals(7, Tour.VERSION)
         val v7 = Tour.steps.filter { it.sinceVersion == 7 }.map { it.id }
-        assertTrue(v7.containsAll(listOf("fast_reel", "descent", "lantern")))
+        assertTrue(v7.containsAll(listOf("descent", "lantern")))
+        // Version 8: the fast reel right after the last bump.
+        assertTrue(Tour.VERSION >= 8)
+        assertTrue(Tour.steps.single { it.id == "fast_reel" }.sinceVersion == 8)
+        // ...and the new ways to spend points.
+        for (item in com.deepline.fishing.core.Tackle.entries) assertTrue("Tour doesn't mention ${item.displayName}", item.displayName in text)
+        assertTrue("wager" in text.lowercase())
+        assertTrue(Tour.steps.filter { it.sinceVersion == 8 }.map { it.id }.containsAll(listOf("tackle", "wager")))
         for (t in listOf(TourTarget.HOME_BOAT, TourTarget.SHOP_ITEMS, TourTarget.SKINS_ATMOSPHERE)) {
             assertTrue("No step points at $t", t in targets)
         }

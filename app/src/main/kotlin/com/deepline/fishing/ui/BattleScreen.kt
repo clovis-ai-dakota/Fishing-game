@@ -115,6 +115,18 @@ fun BattleScreen(vm: GameViewModel) {
                             if (outcome.byForfeit) {
                                 Text(online?.overReason ?: "by forfeit", style = MaterialTheme.typography.bodyMedium)
                             }
+                            vm.lastWagerResult?.let { w ->
+                                Text(
+                                    when (w.won) {
+                                        true -> "Wager won: +${formatPoints(w.payout)} pts"
+                                        null -> "Wager refunded: ${formatPoints(w.stake)} pts"
+                                        false -> "Wager lost: ${formatPoints(w.stake)} pts"
+                                    },
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.tertiary,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                            }
                             Button(onClick = vm::rematch, modifier = Modifier.fillMaxWidth()) {
                                 Text(if (online != null) "New online battle" else "Rematch")
                             }

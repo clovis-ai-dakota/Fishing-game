@@ -51,7 +51,7 @@ sealed interface PartRequirement {
 object BoatParts {
     private val free = PartRequirement.Free
 
-    private fun pts(cost: Int) = PartRequirement.Points(cost)
+    private fun pts(cost: Int) = PartRequirement.Points(cost * GameConfig.BOAT_PART_PRICE_SCALE)
 
     private val colors: Map<String, PartRequirement> = mapOf(
         "Cream" to free,
