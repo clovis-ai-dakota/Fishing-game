@@ -92,6 +92,27 @@ object GameIcons {
         }
     }
 
+    /** Themes: a painter's palette with four dabs of colour (drawn as holes). */
+    val Palette: ImageVector = icon("Palette") {
+        filled(evenOdd = true) {
+            // The palette's outline: a rounded blob with a thumb hole.
+            moveTo(12f, 3f)
+            curveTo(17f, 3f, 21f, 6.6f, 21f, 11f)
+            curveTo(21f, 14f, 18.8f, 15.5f, 16.5f, 15.2f)
+            curveTo(15f, 15f, 14.2f, 16.2f, 14.8f, 17.6f)
+            curveTo(15.5f, 19.4f, 14.4f, 21f, 12f, 21f)
+            curveTo(7f, 21f, 3f, 17f, 3f, 12f)
+            curveTo(3f, 7f, 7f, 3f, 12f, 3f)
+            close()
+            for ((x, y) in listOf(7.5f to 11.5f, 9.5f to 7.5f, 14f to 6.8f, 17.3f to 9.8f)) {
+                moveTo(x + 1.4f, y)
+                arcTo(1.4f, 1.4f, 0f, true, false, x - 1.4f, y)
+                arcTo(1.4f, 1.4f, 0f, true, false, x + 1.4f, y)
+                close()
+            }
+        }
+    }
+
     /** The Shop tab: a bag with two handles. */
     val Shop: ImageVector = icon("Shop") {
         filled {

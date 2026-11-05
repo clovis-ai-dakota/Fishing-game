@@ -15,6 +15,13 @@ import com.deepline.fishing.core.DepthZone
 /** Each depth zone's colour (card frames, chips, the depth gauge), from the colour script. */
 fun zoneColor(zone: DepthZone): Color = Color(com.deepline.fishing.ui.ColorScript.zoneAccent(zone))
 
+/** A zone's colour for text on the theme's cards: deeper on light themes so it stays readable. */
+@androidx.compose.runtime.Composable
+fun zoneTextColor(zone: DepthZone): Color {
+    val c = zoneColor(zone)
+    return if (com.deepline.fishing.ui.theme.LocalMenuPalette.current.light) androidx.compose.ui.graphics.lerp(c, Color.Black, 0.5f) else c
+}
+
 /** The water behind a species' card: its zone's water, from the colour script. */
 fun zoneBackground(zone: DepthZone): Brush {
     val (top, bottom) = com.deepline.fishing.ui.ColorScript.zoneGradient(zone)

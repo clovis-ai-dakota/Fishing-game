@@ -165,7 +165,7 @@ private fun LockedSecretCard(number: Int, id: String) {
     Card(
         shape = RoundedCornerShape(14.dp),
         border = BorderStroke(1.dp, tierColor(tier).copy(alpha = 0.5f)),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF071726)),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF071726), contentColor = Color(0xFFE3EAF2)),
     ) {
         Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             CardTop(number, tier, locked = true)

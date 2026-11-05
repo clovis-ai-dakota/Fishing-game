@@ -57,7 +57,7 @@ fun SeasonCard(vm: GameViewModel, modifier: Modifier = Modifier) {
                     Text(
                         "Ends in ${ShopText.timeLeft(season.msLeft(now))}" + if (pass) " · Pass active" else "",
                         style = MaterialTheme.typography.labelMedium,
-                        color = if (pass) SparkleGold else MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = if (pass) com.deepline.fishing.ui.rewardTextColor() else MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
                 Text("Tier $tier / ${GameConfig.SEASON_TIERS}", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Bold)
@@ -84,7 +84,7 @@ fun SeasonCard(vm: GameViewModel, modifier: Modifier = Modifier) {
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text("Top row: the pass's premium track", style = MaterialTheme.typography.labelSmall, color = SparkleGold, modifier = Modifier.weight(1f))
+                Text("Top row: the pass's premium track", style = MaterialTheme.typography.labelSmall, color = com.deepline.fishing.ui.rewardTextColor(), modifier = Modifier.weight(1f))
                 if (open.isNotEmpty()) {
                     Button(onClick = vm::claimSeasonRewards, modifier = Modifier.testTag("claim_season")) { Text("Claim ${open.size}") }
                 }
@@ -118,7 +118,7 @@ private fun TierCell(vm: GameViewModel, reward: SeasonReward, reached: Boolean, 
             style = MaterialTheme.typography.labelSmall,
             color = when {
                 !reached || (reward.premium && !unlocked) -> Color.White.copy(alpha = 0.55f)
-                reward.premium -> SparkleGold
+                reward.premium -> Color(0xFFFFE082)
                 else -> Color.White
             },
             textAlign = TextAlign.Center,

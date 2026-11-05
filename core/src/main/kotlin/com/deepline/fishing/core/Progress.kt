@@ -37,6 +37,9 @@ data class PlayerProgress(
     val seasonClaims: Set<String> = emptySet(),
     /** Looks for showing off (see `Showcase`): the title badge's frame and the Dex's card style. */
     val titleFrame: String = TitleFrame.GOLD.name,
+    /** The menus' theme and day or night (see `Themes`). */
+    val menuTheme: String = MenuTheme.LAGOON.name,
+    val nightMode: String = NightMode.DAY.name,
     val cardStyle: String = CardStyle.CLASSIC.name,
     /** Species picked for the aquarium (empty: the best catches), and decor put away. */
     val tankFish: List<String> = emptyList(),

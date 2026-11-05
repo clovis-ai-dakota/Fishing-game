@@ -5,6 +5,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 import com.deepline.fishing.ui.AppRoot
 import com.deepline.fishing.ui.DeepLineTheme
 
@@ -15,7 +19,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            DeepLineTheme {
+            val night = viewModel.nightMode.isNight(phoneIsDark = isSystemInDarkTheme())
+            DeepLineTheme(viewModel.menuTheme, night) {
+                // Dark status bar icons over a light theme's sky (casts keep light ones).
+                val light = com.deepline.fishing.ui.theme.LocalMenuPalette.current.light && viewModel.screen != Screen.CAST
+                val view = LocalView.current
+                SideEffect { WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = light }
                 AppRoot(viewModel)
             }
         }

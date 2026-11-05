@@ -65,7 +65,7 @@ import kotlin.random.Random
  * Where the player is. [HOME] (the Fish tab), [DEX], [SHOP] and [BATTLE_SETUP] are the four
  * bottom-bar tabs; the others are full screens pushed on top of them (no tab bar).
  */
-enum class Screen { HOME, DEX, SHOP, BATTLE_SETUP, CAST, FISH_DETAIL, MILESTONES, BATTLE, ONLINE_LOBBY, BOAT_EDITOR, AQUARIUM }
+enum class Screen { HOME, DEX, SHOP, BATTLE_SETUP, CAST, FISH_DETAIL, MILESTONES, BATTLE, ONLINE_LOBBY, BOAT_EDITOR, AQUARIUM, THEMES }
 
 /** The four top-level destinations of the bottom navigation bar, in order. */
 enum class MainTab(val label: String, val screen: Screen) {
@@ -959,6 +959,26 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         screen = Screen.AQUARIUM
     }
 
+    // --- Menu themes ------------------------------------------------------------------------
+
+    /** The theme of the menus (Lagoon unless another is chosen and available). */
+    val menuTheme: com.deepline.fishing.core.MenuTheme
+        get() = com.deepline.fishing.core.Themes.theme(progress, ShopClock.now())
+
+    val nightMode: com.deepline.fishing.core.NightMode get() = com.deepline.fishing.core.Themes.nightMode(progress)
+
+    fun setMenuTheme(theme: com.deepline.fishing.core.MenuTheme) {
+        com.deepline.fishing.core.Themes.setTheme(progress, theme, ShopClock.now())?.let(::update)
+    }
+
+    fun setNightMode(mode: com.deepline.fishing.core.NightMode) {
+        update(com.deepline.fishing.core.Themes.setNightMode(progress, mode))
+    }
+
+    fun openThemes() {
+        screen = Screen.THEMES
+    }
+
     fun buyUpgrade(stat: RopeStat) {
         Progression.upgrade(progress, stat)?.let(::update)
     }
@@ -1133,6 +1153,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             Screen.FISH_DETAIL -> screen = Screen.DEX
             Screen.BOAT_EDITOR -> openDex(DexSection.SKINS)
             Screen.AQUARIUM -> openDex(DexSection.FISH)
+            Screen.THEMES -> screen = Screen.HOME
             Screen.DEX, Screen.SHOP, Screen.BATTLE_SETUP, Screen.MILESTONES -> screen = Screen.HOME
         }
     }

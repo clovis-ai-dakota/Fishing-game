@@ -20,6 +20,7 @@ enum class TourTarget {
     SHOP_TACKLE, BATTLE_WAGER,
     SHOP_PRICES, SHOP_PASSES, BATTLE_TACKLE, SHOP_SEASON,
     DEX_AQUARIUM, SHOP_AQUARIUM, SKINS_BADGE,
+    HOME_THEMES, THEMES_MODE, SHOP_THEMES,
 }
 
 /** A small illustration shown in a tour card. */
@@ -63,8 +64,9 @@ object Tour {
      * 8: the fast reel right after the last bump, a fairer deep, and new ways to spend points.
      * 9: the Shop tab (two prices for everything), the rare fish detector, sight tackle in
      *    battles, and passes.
+     * 10: themes for the menus (a sea scene behind them) and a night mode.
      */
-    const val VERSION = 9
+    const val VERSION = 10
 
     private val bumps = GameConfig.DESCENT_TOUCH_LIMIT
     private val bumpFree = GameConfig.BUMP_FREE_DEPTH.toInt()
@@ -143,6 +145,24 @@ object Tour {
             screen = Screen.HOME,
             art = TourArt.WEIGHT,
             sinceVersion = 8,
+        ),
+        TourStep(
+            id = "themes",
+            title = "Themes",
+            body = "The palette button at the top changes how the menus look: the Lagoon by default, with a sea scene " +
+                "behind every tab. More themes are in the Shop for euros or points, and the richer ones cost more. " +
+                "The water you fish in never changes.",
+            screen = Screen.HOME,
+            target = TourTarget.HOME_THEMES,
+            sinceVersion = 10,
+        ),
+        TourStep(
+            id = "night_mode",
+            title = "Night mode",
+            body = "Every theme has a night version: choose Day, Night, or follow your phone's dark mode.",
+            screen = Screen.THEMES,
+            target = TourTarget.THEMES_MODE,
+            sinceVersion = 10,
         ),
         TourStep(
             id = "points",

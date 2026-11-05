@@ -65,7 +65,11 @@ fun MainScaffold(vm: GameViewModel) {
                 MainTab.BATTLE -> BattleSetupScreen(vm)
             }
         }
-        NavigationBar(Modifier.tourTarget(TourTarget.NAV_BAR)) {
+        NavigationBar(
+            Modifier.tourTarget(TourTarget.NAV_BAR),
+            containerColor = com.deepline.fishing.ui.theme.LocalMenuPalette.current.bar,
+            tonalElevation = 0.dp,
+        ) {
             for (tab in MainTab.entries) {
                 val target = tab.tourTarget
                 // A dot on the Shop tab when there's something for the player there (the Club's
@@ -80,8 +84,11 @@ fun MainScaffold(vm: GameViewModel) {
                     label = { Text(tab.label, maxLines = 1) },
                     alwaysShowLabel = true,
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = MaterialTheme.colorScheme.onSecondary,
-                        indicatorColor = MaterialTheme.colorScheme.secondary,
+                        selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        indicatorColor = MaterialTheme.colorScheme.primary,
+                        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     ),
                     modifier = Modifier
                         .testTag("tab_${tab.name.lowercase()}")
@@ -112,7 +119,12 @@ fun TabScreen(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             Column(Modifier.weight(1f)) {
-                Text(title, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
+                Text(
+                    title,
+                    style = MaterialTheme.typography.headlineSmall.copy(brush = headlineBrush()),
+                    fontWeight = FontWeight.Black,
+                    maxLines = 1,
+                )
                 subtitle?.invoke()
             }
             actions()

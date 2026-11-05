@@ -119,6 +119,19 @@ class TourContentTest {
     }
 
     @Test
+    fun themesAndNightModeAreExplained() {
+        // Version 10: menu themes and the night mode.
+        val v10 = Tour.steps.filter { it.sinceVersion == 10 }.map { it.id }
+        assertTrue(v10.containsAll(listOf("themes", "night_mode")))
+        val targets = Tour.steps.mapNotNull { it.target }.toSet()
+        assertTrue(TourTarget.HOME_THEMES in targets && TourTarget.THEMES_MODE in targets)
+        for (mode in com.deepline.fishing.core.NightMode.entries) {
+            assertTrue("Tour doesn't mention ${mode.displayName}", text.contains(mode.displayName.removePrefix("Like my "), ignoreCase = true))
+        }
+        for (topic in listOf("theme", "Shop", "euros or points")) assertTrue("Tour doesn't mention $topic", text.contains(topic, ignoreCase = true))
+    }
+
+    @Test
     fun theTourNeverGivesAwayASecret() {
         // Secrets are discovered by playing and explained then (see FishingSecrets), not in the tour.
         val secretNames = com.deepline.fishing.ui.secrets.FishingSecrets.all.map { it.title }

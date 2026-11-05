@@ -203,3 +203,44 @@ class ShowcaseTest {
         assertEquals(setOf("PLANTS"), back.hiddenDecor)
     }
 }
+
+class ThemesTest {
+    private val now = 1_800_000_000_000L
+
+    @Test
+    fun richerThemesCostMore() {
+        val sale = Themes.forSale
+        assertTrue(sale.size >= 6)
+        // Each richer tier costs at least as much as the one before.
+        for ((a, b) in sale.sortedBy { it.tier }.zipWithNext()) assertTrue(a.euroCents <= b.euroCents, "$a then $b")
+        assertTrue(sale.map { it.tier }.toSet().size >= 3, "several levels of richness")
+        // Every theme is sold for points too, and the collection is cheaper than buying them one by one.
+        val collection = ShopCatalog.byId("theme_collection")!!
+        assertNotNull(ShopCatalog.discountPercent(collection, PlayerProgress()))
+    }
+
+    @Test
+    fun choosingAThemeAndNightMode() {
+        val p = PlayerProgress()
+        assertEquals(MenuTheme.LAGOON, Themes.theme(p, now))
+        assertEquals(NightMode.DAY, Themes.nightMode(p), "day by default")
+        assertNull(Themes.setTheme(p, MenuTheme.KOI_POND, now), "not owned")
+        val owner = ShopCatalog.grant(p, ShopCatalog.byId("theme_koi_pond")!!, now)
+        val koi = Themes.setTheme(owner, MenuTheme.KOI_POND, now)!!
+        assertEquals(MenuTheme.KOI_POND, Themes.theme(koi, now))
+        val night = Themes.setNightMode(koi, NightMode.NIGHT)
+        assertTrue(Themes.nightMode(night).isNight(phoneIsDark = false))
+        assertTrue(NightMode.AUTO.isNight(phoneIsDark = true) && !NightMode.AUTO.isNight(phoneIsDark = false))
+        val back = ProgressCodec.decode(ProgressCodec.encode(night))
+        assertEquals("KOI_POND", back.menuTheme)
+        assertEquals("NIGHT", back.nightMode)
+        // The Club's theme lasts as long as the membership.
+        val member = ShopCatalog.grant(p, ShopCatalog.byId("captains_club")!!, now)
+        val aurora = Themes.setTheme(member, MenuTheme.AURORA, now)!!
+        assertEquals(MenuTheme.AURORA, Themes.theme(aurora, now))
+        assertEquals(MenuTheme.LAGOON, Themes.theme(aurora, now + 40 * 86_400_000L))
+        // Everything in the collection becomes available.
+        val all = ShopCatalog.grant(p, ShopCatalog.byId("theme_collection")!!, now)
+        assertTrue(Themes.forSale.all { it.isAvailable(all, now) })
+    }
+}

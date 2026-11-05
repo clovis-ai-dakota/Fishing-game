@@ -35,6 +35,8 @@ object ProgressCodec {
         appendLine("event=${p.eventKey},${p.eventProgress}")
         appendLine("eventClaims=${p.eventClaims.sorted().joinToString(",")}")
         appendLine("titleFrame=${p.titleFrame}")
+        appendLine("menuTheme=${p.menuTheme}")
+        appendLine("nightMode=${p.nightMode}")
         appendLine("cardStyle=${p.cardStyle}")
         appendLine("tankFish=${p.tankFish.joinToString(",")}")
         appendLine("hiddenDecor=${p.hiddenDecor.sorted().joinToString(",")}")
@@ -92,6 +94,8 @@ object ProgressCodec {
                 }
                 key == "eventClaims" -> p = p.copy(eventClaims = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet())
                 key == "titleFrame" -> p = p.copy(titleFrame = TitleFrame.of(value.trim()).name)
+                key == "menuTheme" -> p = p.copy(menuTheme = MenuTheme.of(value.trim()).name)
+                key == "nightMode" -> p = p.copy(nightMode = NightMode.of(value.trim()).name)
                 key == "cardStyle" -> p = p.copy(cardStyle = CardStyle.of(value.trim()).name)
                 key == "tankFish" -> p = p.copy(tankFish = value.split(',').map { it.trim() }.filter { FishCatalog.byId(it) != null })
                 key == "hiddenDecor" -> p = p.copy(hiddenDecor = value.split(',').map { it.trim() }.filter { n -> Decor.entries.any { it.name == n } }.toSet())

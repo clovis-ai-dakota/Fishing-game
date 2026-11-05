@@ -151,33 +151,38 @@ fun ShopScreen(vm: GameViewModel) {
         }
     }
 
-    confirm?.let { item ->
-        val price = vm.shopPointsPrice(item)
-        AlertDialog(
-            onDismissRequest = { confirm = null },
-            title = { Text("Buy ${item.name}?") },
-            text = {
-                Text(
-                    "You get: ${ShopText.contents(item, p)}.\n\nIt costs ${formatPoints(price)} pts; you'll have " +
-                        "${formatPoints(p.pointsBalance - price)} pts left.",
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = { vm.buyWithPoints(item); confirm = null }, modifier = Modifier.testTag("confirm_points")) {
-                    Text("Buy for ${formatPoints(price)} pts")
-                }
-            },
-            dismissButton = { TextButton(onClick = { confirm = null }) { Text("Cancel") } },
-        )
-    }
+    confirm?.let { item -> PointsConfirmDialog(vm, item, onDone = { confirm = null }) }
+}
+
+/** Buying with points asks first: what you get, the price, and what's left. */
+@Composable
+internal fun PointsConfirmDialog(vm: GameViewModel, item: ShopItem, onDone: () -> Unit) {
+    val p = vm.progress
+    val price = vm.shopPointsPrice(item)
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text("Buy ${item.name}?") },
+        text = {
+            Text(
+                "You get: ${ShopText.contents(item, p)}.\n\nIt costs ${formatPoints(price)} pts; you'll have " +
+                    "${formatPoints(p.pointsBalance - price)} pts left.",
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = { vm.buyWithPoints(item); onDone() }, modifier = Modifier.testTag("confirm_points")) {
+                Text("Buy for ${formatPoints(price)} pts")
+            }
+        },
+        dismissButton = { TextButton(onClick = onDone) { Text("Cancel") } },
+    )
 }
 
 /** What a price button does (kept together so cards stay small). */
-private class ShopActions(val vm: GameViewModel, val activity: Activity?, val onPoints: (ShopItem) -> Unit) {
+internal class ShopActions(val vm: GameViewModel, val activity: Activity?, val onPoints: (ShopItem) -> Unit) {
     fun buyWithMoney(item: ShopItem) = vm.buyWithMoney(item, activity)
 }
 
-private fun Context.findActivity(): Activity? = when (this) {
+internal fun Context.findActivity(): Activity? = when (this) {
     is Activity -> this
     is ContextWrapper -> baseContext.findActivity()
     else -> null
@@ -232,7 +237,7 @@ private fun Banner(title: String, text: String, action: @Composable () -> Unit) 
         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(GameIcons.Trophy, contentDescription = null, tint = SparkleGold, modifier = Modifier.size(22.dp))
             Column(Modifier.weight(1f).padding(horizontal = 10.dp)) {
-                Text(title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = SparkleGold)
+                Text(title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = com.deepline.fishing.ui.rewardTextColor())
                 Text(text, style = MaterialTheme.typography.bodySmall)
             }
             action()
@@ -262,7 +267,7 @@ private fun ClubChip() {
  * greyed out when the balance is too low). [wide] cards spell points out in full.
  */
 @Composable
-private fun PriceButtons(item: ShopItem, actions: ShopActions, wide: Boolean = false, modifier: Modifier = Modifier) {
+internal fun PriceButtons(item: ShopItem, actions: ShopActions, wide: Boolean = false, modifier: Modifier = Modifier) {
     val vm = actions.vm
     val points = vm.shopPointsPrice(item)
     Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = modifier.fillMaxWidth()) {
@@ -284,7 +289,7 @@ private fun euros(cents: Int) = "€" + "%d.%02d".format(cents / 100, cents % 10
 
 /** Shown instead of the prices once a permanent item is owned. */
 @Composable
-private fun OwnedRow(label: String = "Owned ✓", action: (@Composable () -> Unit)? = null) {
+internal fun OwnedRow(label: String = "Owned ✓", action: (@Composable () -> Unit)? = null) {
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
         Text(
             label,
@@ -298,7 +303,7 @@ private fun OwnedRow(label: String = "Owned ✓", action: (@Composable () -> Uni
 }
 
 @Composable
-private fun Badge(text: String) {
+internal fun Badge(text: String) {
     Text(
         text,
         modifier = Modifier
@@ -428,7 +433,7 @@ private fun LazyGridScope.stylePage(vm: GameViewModel, actions: ShopActions, tim
     val gear = style.filter { it.grants.singleOrNull() is Grant.Cosmetics }
     val badges = style.filter { (it.grants.singleOrNull() as? Grant.Unlock)?.key?.startsWith("badge:") == true }
     val cards = style.filter { (it.grants.singleOrNull() as? Grant.Unlock)?.key?.startsWith("card:") == true }
-    val known = (boats + sets + parts + gear + badges + cards).toSet()
+    val known = (boats + sets + parts + gear + badges + cards + style.filter { it.id.startsWith("theme_") }).toSet()
     header(
         "boats_header",
         "Premade boats",
@@ -444,6 +449,10 @@ private fun LazyGridScope.stylePage(vm: GameViewModel, actions: ShopActions, tim
     items(parts, key = { it.id }) { PartTile(vm, it, actions, time) }
     header("gear_header", "Hooks, lines and trails", "Same size and hitbox as the classic gear: they only change the look.")
     items(gear, key = { it.id }) { GearTile(vm, it, actions, time) }
+    val themeItems = style.filter { it.id.startsWith("theme_") }
+    header("themes_header", "App themes", "The scene and colours of the menus, by day and at night. Richer themes cost more.", Modifier.tourTarget(TourTarget.SHOP_THEMES))
+    items(themeItems.filter { it.grants.size == 1 }, key = { it.id }) { ThemeTile(vm, it, actions) }
+    for (bundle in themeItems.filter { it.grants.size > 1 }) full(bundle.id) { ItemCard(vm, bundle, actions) }
     header("badges_header", "Title badges", "The frame around your title (or your name), shown online too. Season passes, events and the Club add more.")
     items(badges, key = { it.id }) { BadgeTile(vm, it, actions) }
     header("cards_header", "Dex card styles", "How the Dex shows the species you've caught.")
@@ -456,7 +465,7 @@ private fun LazyGridScope.stylePage(vm: GameViewModel, actions: ShopActions, tim
 }
 
 @Composable
-private fun Tile(name: String, badge: String?, preview: @Composable () -> Unit, bottom: @Composable () -> Unit) {
+internal fun Tile(name: String, badge: String?, preview: @Composable () -> Unit, bottom: @Composable () -> Unit) {
     Card(shape = RoundedCornerShape(14.dp)) {
         Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Box(
@@ -548,6 +557,19 @@ private fun GearTile(vm: GameViewModel, item: ShopItem, actions: ShopActions, ti
 }
 
 @Composable
+private fun ThemeTile(vm: GameViewModel, item: ShopItem, actions: ShopActions) {
+    val theme = com.deepline.fishing.core.MenuTheme.entries.first { it.unlockKey == (item.grants.first() as Grant.Unlock).key }
+    val night = vm.nightMode.isNight(androidx.compose.foundation.isSystemInDarkTheme())
+    Tile(item.name.removeSuffix(" theme"), "★".repeat(theme.tier), preview = { ThemePreview(theme, night, Modifier.fillMaxSize()) }) {
+        when {
+            vm.menuTheme == theme -> OwnedRow("In use ✓")
+            ShopCatalog.owns(vm.progress, theme.unlockKey) -> OwnedRow { TextButton(onClick = { vm.setMenuTheme(theme) }) { Text("Use") } }
+            else -> PriceButtons(item, actions)
+        }
+    }
+}
+
+@Composable
 private fun BadgeTile(vm: GameViewModel, item: ShopItem, actions: ShopActions) {
     val key = (item.grants.first() as Grant.Unlock).key
     val frame = com.deepline.fishing.core.TitleFrame.entries.first { it.unlockKey == key }
@@ -630,7 +652,7 @@ private fun LazyGridScope.genericPage(vm: GameViewModel, section: ShopSection, a
 
 /** A full-width card for any item: name, badge, what it gives, status, and the two prices. */
 @Composable
-private fun ItemCard(vm: GameViewModel, item: ShopItem, actions: ShopActions, modifier: Modifier = Modifier) {
+internal fun ItemCard(vm: GameViewModel, item: ShopItem, actions: ShopActions, modifier: Modifier = Modifier) {
     val p = vm.progress
     val now = ShopClock.now()
     val owned = item.kind == ItemKind.PERMANENT && ShopCatalog.owns(p, item.id)
@@ -658,7 +680,7 @@ private fun ItemCard(vm: GameViewModel, item: ShopItem, actions: ShopActions, mo
                 Text(
                     "One time only: ends in ${ShopText.timeLeft(p.starterOfferEndsMs - now)}.",
                     style = MaterialTheme.typography.labelMedium,
-                    color = SparkleGold,
+                    color = com.deepline.fishing.ui.rewardTextColor(),
                 )
             }
             if (item.kind == ItemKind.SUBSCRIPTION) {

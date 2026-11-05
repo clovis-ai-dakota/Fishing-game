@@ -43,6 +43,10 @@ fun AppRoot(vm: GameViewModel) {
         BackHandler(enabled = vm.screen != Screen.HOME) { vm.onBack() }
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             Box(Modifier.fillMaxSize()) {
+                // The theme's sea scene behind every menu (a cast draws its own water).
+                if (vm.screen != Screen.CAST) {
+                    com.deepline.fishing.ui.theme.ThemeBackdrop(com.deepline.fishing.ui.theme.LocalMenuPalette.current, Modifier.fillMaxSize())
+                }
                 when (vm.screen) {
                     // The four tabs share the bottom navigation bar.
                     Screen.HOME, Screen.DEX, Screen.SHOP, Screen.BATTLE_SETUP -> MainScaffold(vm)
@@ -54,6 +58,7 @@ fun AppRoot(vm: GameViewModel) {
                     Screen.ONLINE_LOBBY -> OnlineLobbyScreen(vm)
                     Screen.BOAT_EDITOR -> com.deepline.fishing.ui.boat.BoatEditorScreen(vm)
                     Screen.AQUARIUM -> com.deepline.fishing.ui.shop.AquariumScreen(vm)
+                    Screen.THEMES -> com.deepline.fishing.ui.shop.ThemesScreen(vm)
                 }
                 vm.tour?.let { TourOverlay(it, onNext = vm::tourNext, onBack = vm::tourBack, onSkip = vm::skipTour) }
                 // What just happened in the shop (a purchase, a pending payment), above the tab bar.
@@ -132,10 +137,21 @@ fun SubScreen(title: String, onBack: () -> Unit, content: @Composable ColumnScop
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             TextButton(onClick = onBack) { Text("‹ Back") }
-            Text(title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            Text(
+                title,
+                style = MaterialTheme.typography.titleLarge.copy(brush = headlineBrush()),
+                fontWeight = FontWeight.Black,
+            )
         }
         content()
     }
+}
+
+/** The theme's gradient for big titles. */
+@Composable
+fun headlineBrush(): androidx.compose.ui.graphics.Brush {
+    val colors = com.deepline.fishing.ui.theme.LocalMenuPalette.current.headline
+    return androidx.compose.ui.graphics.Brush.horizontalGradient(if (colors.size > 1) colors else colors + colors)
 }
 
 fun formatPoints(value: Long): String = "%,d".format(value)

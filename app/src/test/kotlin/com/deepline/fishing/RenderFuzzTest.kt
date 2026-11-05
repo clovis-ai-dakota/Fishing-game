@@ -94,6 +94,29 @@ class RenderFuzzTest {
         }
     }
 
+    /** Every menu theme's scene, by day and at night, on several screens and over time. */
+    @Test
+    fun everyThemeBackdropDraws() {
+        val d = Density(2f)
+        for ((w, h) in listOf(1080 to 2400, 360 to 800, 200 to 150, 2 to 2)) {
+            val bitmap = ImageBitmap(w, h)
+            val canvas = Canvas(bitmap)
+            val scope = CanvasDrawScope()
+            for (theme in com.deepline.fishing.core.MenuTheme.entries) for (night in listOf(false, true)) {
+                val palette = com.deepline.fishing.ui.theme.MenuPalettes.of(theme, night)
+                for (t in listOf(0f, 3.7f, 59.9f, 599f)) {
+                    try {
+                        scope.draw(d, LayoutDirection.Ltr, canvas, Size(w.toFloat(), h.toFloat())) {
+                            com.deepline.fishing.ui.theme.drawBackdropForTest(this, palette, t)
+                        }
+                    } catch (e: Throwable) {
+                        throw AssertionError("Backdrop crash: $theme night=$night ${w}x$h t=$t: $e", e)
+                    }
+                }
+            }
+        }
+    }
+
     /** The rare fish detector's markers, deep in the dark (every species counts as uncaught). */
     @Test
     fun detectorMarksInTheDark() {

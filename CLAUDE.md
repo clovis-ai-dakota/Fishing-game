@@ -92,9 +92,19 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
   depth: round, big-eyed, blushing fish near the surface; spines, teeth, glowing/slit eyes and
   photophores deeper). Don't hard-code fish or water colours elsewhere. Glowing eyes and
   photophores are drawn before the darkness (only lures shine through it), so deep fish are no
-  easier to see. The app theme (`Theme.kt`) follows Material's dark-theme guidance: navy surfaces,
-  desaturated accents with 4.5:1 text contrast, aqua for actions, blue for selection, gold for
-  rewards.
+  easier to see.
+- **Menu themes** (`core/.../Themes.kt`, `ui/theme/`): the menus sit on a sea scene
+  (`ThemeBackdrop`, drawn in the draw phase only, never behind a cast) in the theme's
+  `MenuPalette`, which also builds the Material colour scheme (`colorSchemeOf` in `Theme.kt`).
+  Lagoon is the default and free; every theme has a day and a night version (`NightMode`: Day by
+  default, Night, or like the phone); shop themes cost more the richer their scene (`tier`), and
+  Aurora is a Club perk. Roles are the same in every theme: `primary` for actions,
+  `secondaryContainer` for selection, `secondary` for highlighted text, gold for rewards (use
+  `rewardTextColor()` for gold text, `zoneTextColor()` for a zone's name: plain `SparkleGold` and
+  `zoneColor` are too pale on light cards). Cards are glass (`surfaceContainer*` roles); text keeps
+  4.5:1 contrast on cards and on the scene, so check new screens in a light and a dark theme
+  (`ThemesUiTest` screenshots every theme). Don't hard-code UI colours: take them from
+  `MaterialTheme.colorScheme` or `LocalMenuPalette`. Themes never change a cast's water.
 - **Atmosphere** (`Atmosphere.NIGHTMARE`, a cosmetic): changes colours, fish menace and decor in
   the deep only; the lit radius and what's visible stay exactly the same (darkness alpha is
   unchanged, only its tint).
@@ -114,7 +124,8 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
   - The season's free track (`Seasons.rewards`) is player income: `Career` claims it (about three
     casts a day), so re-run `EconomyTest` when changing season XP or rewards.
   - Wagers are against the computer only; winnings go to the balance, not `pointsEarned`.
-- **Shop** (`core/.../Shop.kt`, UI in `ui/shop/`): every item has a euro price and a points
+- **Shop** (`core/.../Shop.kt`, UI in `ui/shop/`; themes are on the Style page and in the Themes
+  screen): every item has a euro price and a points
   price (`ShopCatalog.pointsPrice`: minutes of fishing per euro × `POINTS_PER_MINUTE_BY_LENGTH_LEVEL`,
   `MINUTES_PER_EURO` = 45, Lantern packs `LANTERN_MINUTES_PER_EURO` = 60, `tierBonus` for €4.99 and
   €9.99). Never sell for euros anything points can't buy. Prices: mostly €0.50 to €2, sets €2.99,

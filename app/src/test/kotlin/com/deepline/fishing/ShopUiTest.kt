@@ -1,6 +1,7 @@
 package com.deepline.fishing
 
 import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -304,5 +305,50 @@ class GiftUiTest : BoatUiTestBase() {
         // The player's id and recovery code are ready for gifts and cloud saves.
         assertTrue(com.deepline.fishing.core.PlayerId.isValid(vm.playerIdentity.id))
         assertEquals(vm.playerIdentity, com.deepline.fishing.core.PlayerId.fromRecoveryCode(vm.playerIdentity.recoveryCode))
+    }
+}
+
+/** Themes: day or night, and every theme, on the Fish tab (screenshots for review). */
+@RunWith(RobolectricTestRunner::class)
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+@Config(sdk = [36], qualifiers = "w400dp-h860dp-xxhdpi")
+class ThemesUiTest : BoatUiTestBase() {
+    @Test
+    fun everyThemeByDayAndAtNight() {
+        val vm = launch(
+            midGamePlayer().copy(
+                ownedItems = com.deepline.fishing.core.Themes.forSale.map { it.unlockKey }.toSet(),
+                clubUntilMs = ShopClock.now() + 10 * 86_400_000L,
+            ),
+        )
+        assertEquals(com.deepline.fishing.core.MenuTheme.LAGOON, vm.menuTheme)
+        assertEquals(com.deepline.fishing.core.NightMode.DAY, vm.nightMode)
+        compose.onNodeWithContentDescription("Themes").performClick()
+        assertEquals(Screen.THEMES, vm.screen)
+        compose.shot("80_themes_screen")
+        compose.onNodeWithTag("mode_night").performClick()
+        assertEquals(com.deepline.fishing.core.NightMode.NIGHT, vm.nightMode)
+        compose.shot("80b_themes_screen_night")
+        compose.onNodeWithTag("mode_day").performClick()
+        vm.onBack()
+        for (theme in com.deepline.fishing.core.MenuTheme.entries) {
+            vm.setMenuTheme(theme)
+            assertEquals(theme, vm.menuTheme)
+            for (mode in listOf(com.deepline.fishing.core.NightMode.DAY, com.deepline.fishing.core.NightMode.NIGHT)) {
+                vm.setNightMode(mode)
+                compose.waitForIdle()
+                compose.shot("81_${theme.name.lowercase()}_${mode.name.lowercase()}")
+            }
+        }
+        // A few other screens in the default theme, by day.
+        vm.setMenuTheme(com.deepline.fishing.core.MenuTheme.LAGOON)
+        vm.setNightMode(com.deepline.fishing.core.NightMode.DAY)
+        compose.onNodeWithTag("tab_shop").performClick()
+        compose.onNodeWithTag("shop_page_style").performClick()
+        compose.shot("82_shop_style_day")
+        compose.onNodeWithTag("tab_dex").performClick()
+        compose.shot("83_dex_day")
+        compose.onNodeWithTag("tab_battle").performClick()
+        compose.shot("84_battle_day")
     }
 }

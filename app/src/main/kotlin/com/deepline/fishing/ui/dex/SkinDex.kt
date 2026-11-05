@@ -215,7 +215,7 @@ private fun SkinTile(c: Cosmetic, unlocked: Boolean, equipped: Boolean, time: Fl
         Card(
             shape = RoundedCornerShape(14.dp),
             border = border,
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF071726)),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF071726), contentColor = Color(0xFFE3EAF2)),
         ) { content() }
     }
 }

@@ -95,6 +95,9 @@ fun HomeScreen(vm: GameViewModel) {
                     Icon(GameIcons.Trophy, contentDescription = "Milestones", tint = MaterialTheme.colorScheme.secondary)
                 }
             }
+            IconButton(onClick = vm::openThemes, modifier = Modifier.tourTarget(TourTarget.HOME_THEMES)) {
+                Icon(GameIcons.Palette, contentDescription = "Themes", tint = MaterialTheme.colorScheme.primary)
+            }
             IconButton(onClick = vm::startTour, modifier = Modifier.tourTarget(TourTarget.HOME_TOUR)) {
                 Icon(GameIcons.Help, contentDescription = "Take the tour")
             }
@@ -165,7 +168,7 @@ private fun DepthCard(vm: GameViewModel) {
                 Text(
                     "Reaches ${specs.lengthM.roundToInt()} m · ${reachZone.displayName}",
                     style = MaterialTheme.typography.labelLarge,
-                    color = zoneColor(reachZone),
+                    color = com.deepline.fishing.ui.dex.zoneTextColor(reachZone),
                     fontWeight = FontWeight.Bold,
                 )
             }
@@ -288,7 +291,8 @@ private fun MilestoneStrip(vm: GameViewModel) {
 @Composable
 private fun CastArea(vm: GameViewModel) {
     val p = vm.progress
-    Surface(color = MaterialTheme.colorScheme.surface, tonalElevation = 3.dp, modifier = Modifier.fillMaxWidth()) {
+    // The cast area sits on the same frosted bar as the tabs below it.
+    Surface(color = com.deepline.fishing.ui.theme.LocalMenuPalette.current.bar, modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,

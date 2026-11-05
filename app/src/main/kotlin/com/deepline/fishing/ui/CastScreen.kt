@@ -440,13 +440,13 @@ private fun ResultsPanel(result: CastResult, collectLabel: String, onCollect: ()
                                 }
                                 Spacer(Modifier.width(10.dp))
                                 Column(Modifier.weight(1f)) {
-                                    Text(sn.kind.displayName, color = SparkleGold, fontWeight = FontWeight.SemiBold)
+                                    Text(sn.kind.displayName, color = com.deepline.fishing.ui.rewardTextColor(), fontWeight = FontWeight.SemiBold)
                                     Text(
                                         "${sn.depth.roundToInt()} m · hooked by the last bump",
                                         style = MaterialTheme.typography.bodySmall,
                                     )
                                 }
-                                Text("+${formatPoints(sn.points)}", fontWeight = FontWeight.Bold, color = SparkleGold)
+                                Text("+${formatPoints(sn.points)}", fontWeight = FontWeight.Bold, color = com.deepline.fishing.ui.rewardTextColor())
                             }
                         }
                         items(result.catches) { c ->
@@ -465,7 +465,7 @@ private fun ResultsPanel(result: CastResult, collectLabel: String, onCollect: ()
                                 Column(Modifier.weight(1f)) {
                                     Text(
                                         (if (c.sparkling) "✦ Sparkling " else "") + c.species.name,
-                                        color = if (c.sparkling) SparkleGold else MaterialTheme.colorScheme.onSurface,
+                                        color = if (c.sparkling) rewardTextColor() else MaterialTheme.colorScheme.onSurface,
                                         fontWeight = FontWeight.SemiBold,
                                     )
                                     Text(
@@ -483,11 +483,11 @@ private fun ResultsPanel(result: CastResult, collectLabel: String, onCollect: ()
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             "✦ Secret: " + (FishingSecrets.byId(b.secretId)?.title ?: b.secretId),
-                            color = SparkleGold,
+                            color = com.deepline.fishing.ui.rewardTextColor(),
                             fontWeight = FontWeight.SemiBold,
                             modifier = Modifier.weight(1f),
                         )
-                        Text("+${formatPoints(b.points)}", fontWeight = FontWeight.Bold, color = SparkleGold)
+                        Text("+${formatPoints(b.points)}", fontWeight = FontWeight.Bold, color = com.deepline.fishing.ui.rewardTextColor())
                     }
                 }
                 Text(

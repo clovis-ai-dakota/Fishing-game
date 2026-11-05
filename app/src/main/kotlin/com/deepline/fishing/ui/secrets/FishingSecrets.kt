@@ -425,7 +425,7 @@ internal fun SecretDetails(secret: FishingSecret) {
     Text(secret.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
     SecretArt(secret)
     Text(secret.body, style = MaterialTheme.typography.bodyMedium)
-    Text("Each time: ${secret.bonus}", style = MaterialTheme.typography.bodyMedium, color = SparkleGold, fontWeight = FontWeight.SemiBold)
+    Text("Each time: ${secret.bonus}", style = MaterialTheme.typography.bodyMedium, color = com.deepline.fishing.ui.rewardTextColor(), fontWeight = FontWeight.SemiBold)
 }
 
 /** Shown the first time a secret happens (during the cast, or with the results). */

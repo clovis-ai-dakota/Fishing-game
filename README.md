@@ -149,6 +149,27 @@ The title shows under your name on the Fish tab and in battles (online opponents
 Skins are purely visual: same hook size and hitbox, and all the effects are drawn under the
 darkness layer and only around your own gear, so they never light up dark water or reveal fish.
 
+### Themes
+
+The menus sit on a living sea scene, drawn in the game's style: a sky band with the sun or the
+moon, a moving waterline, light rays or moonlight, bubbles or plankton, a far shoal, and each
+theme's own decor. **Lagoon** is the default (free); every theme has a **day and a night version**
+(Day by default, Night, or like the phone's dark mode), chosen with the palette button at the top
+of the Fish tab. More themes are in the Shop (Style page, or the Themes screen), for euros or
+points, priced by how rich their scene is:
+
+| Theme | Scene | Price |
+| --- | --- | --- |
+| Lagoon | Turquoise water, rays, bubbles, seagrass and starfish | free |
+| Kelp Forest, Sandbar | A palette with one simple scene (swaying kelp; sandy shallows with caustics) | €0.50 |
+| Coral Reef, Polar Waters | A scene with its own decor (corals and reef fish; ice floes and snow) | €0.99 |
+| Sunset Harbor, Koi Pond, Treasure Cove | Fully animated scenes (sunset, boats and gulls; koi and lily pads; coins glinting by a chest) | €1.99 |
+| Glow Tide | The most elaborate: glowing jellyfish, plankton and a deep glow | €4.99 |
+| Aurora | Northern lights, for Captain's Club members | Club |
+| Every theme | All the themes for sale | €9.99 |
+
+Themes only change the menus: a cast's water always looks the same.
+
 ### Shop
 
 Every item can be bought **with euros or with points**. A points price is fishing time: about
@@ -162,7 +183,7 @@ for a confirmation. All prices and contents are in `core/.../Shop.kt`.
 | --- | --- | --- |
 | Rope | Length, Strength and Agility upgrades and downgrades | points only |
 | Tackle | Lantern, Rare fish detector, Lucky charm, Sparkle lure: one with points, or packs sized to their price | €0.50 to €4.99 |
-| Style | Premade boats, complete sets (cheaper than their pieces), paints, emblems, sail prints, hooks, lines, trails, title badges, Dex card styles | €0.50 to €2.99 |
+| Style | Premade boats, complete sets (cheaper than their pieces), paints, emblems, sail prints, hooks, lines, trails, title badges, Dex card styles, app themes | €0.50 to €9.99 |
 | Passes | Season pass, collector's edition, weekend event pass, Captain's Club (monthly), starter pack (one time, from the 3rd session, 72 h), founder's pack | €1.99 to €9.99 |
 | Aquarium | Decor and a bigger tank for the aquarium of caught fish | €0.50 to €4.99 |
 
@@ -308,6 +329,7 @@ core/   Pure Kotlin game logic (no Android dependency) + unit tests
         Shop.kt            the shop: items, euro and points prices, what buying gives
         Seasons.kt         seasons, the season track and weekend events
         Showcase.kt        title badge frames, Dex card styles, the aquarium
+        Themes.kt          menu themes and the night mode
         Tackle.kt          one-cast tackle (Lantern, detector, charm, lure)
         PlayerId.kt        public id, secret and recovery code (gifts, cloud save)
         online/            battle protocol (JSON messages), cast validation, client-side match mirror,
@@ -325,7 +347,8 @@ app/    Android app (Jetpack Compose)
         ui/MainScaffold.kt the four tabs (bottom navigation bar)
         ui/dex/            the Dex: species grid and pages, secrets, skins library, FishPortrait
         ui/boat/           boat editor; ui/BoatArt.kt draws boats in 2D
-        ui/shop/           the Shop tab, seasons and events, the aquarium, gifts and the account
+        ui/shop/           the Shop tab, seasons and events, the aquarium, themes, gifts and the account
+        ui/theme/          menu themes: palettes (day and night) and the animated sea scene
         ui/GameIcons.kt    icons drawn in code
         ui/*Screen.kt      Fish tab (HomeScreen), milestones, battle setup / hub
 ```
