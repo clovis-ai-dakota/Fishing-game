@@ -145,7 +145,7 @@ class BoatCustomisationTest {
 
     @Test
     fun premiumSkinsAreValidDesignsAndShowOffPremiumOptions() {
-        assertTrue(PremiumSkins.all.size in 6..10)
+        assertTrue(PremiumSkins.all.size in 6..16)
         assertEquals(PremiumSkins.all.size, PremiumSkins.all.map { it.id }.toSet().size)
         for (s in PremiumSkins.all) {
             assertTrue(BoatParts.partsOf(s.design).all { it in BoatParts.all }, s.id)

@@ -162,6 +162,16 @@ object GameConfig {
     const val STARTER_OFFER_HOURS = 72
     const val STARTER_PACK_LANTERNS = 20
 
+    /** Seasons: their length, the XP a solo cast earns, and the track. */
+    const val SEASON_WEEKS = 6
+    const val SEASON_XP_PER_CAST = 6
+    const val SEASON_XP_PER_FISH = 1
+    const val SEASON_XP_PER_SECRET = 10
+    const val SEASON_XP_PER_TIER = 100
+    const val SEASON_TIERS = 20
+    /** Tiers the collector's edition opens straight away. */
+    const val COLLECTOR_TIER_SKIP = 10
+
     /** One Captain's Club month. */
     const val CLUB_DAYS = 30
 

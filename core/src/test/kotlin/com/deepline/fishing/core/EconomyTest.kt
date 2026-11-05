@@ -18,6 +18,9 @@ object Career {
         val recent = ArrayList<Int>()
         var seconds = 0f
         for (c in 1..casts) {
+            // About three casts a day, so a long career spans several seasons (free track only).
+            val now = Seasons.EPOCH_MS + c * 8 * 3_600_000L
+            ShopClock.override = now
             val lantern = p.specs.lengthM > GameConfig.DARK_DEPTH && p.lanterns > 0
             if (lantern) p = Progression.consumeLantern(p) ?: p
             val s = CastSession(p.specs, lantern, WorldGenerator.generate(p.specs.lengthM, rnd))
@@ -35,6 +38,7 @@ object Career {
             p = Progression.applyCast(p, r)
             for (id in Secrets.revealedBy(r) - p.discoveredSecrets) p = Progression.discoverSecret(p, id)
             for (m in Milestones.all) Progression.claimMilestone(p, m)?.let { p = it }
+            p = Seasons.claimAll(p, now)
             // Spend: cheapest upgrade first (balanced rope), then a spare Lantern for the dark.
             while (true) {
                 val stat = RopeStat.entries.filter { Progression.canUpgrade(p, it) }.minByOrNull { Progression.upgradeCost(p, it)!! } ?: break
@@ -51,6 +55,7 @@ object Career {
             recent += r.totalPoints
             if (recent.size > 20) recent.removeAt(0)
         }
+        ShopClock.override = null
         return Report(castsToLevel, maxAll, p.pointsEarned, recent, lanternsBought, seconds, secondsToLevel)
     }
 }

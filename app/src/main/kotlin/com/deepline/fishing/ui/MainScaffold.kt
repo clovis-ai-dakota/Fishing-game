@@ -70,7 +70,7 @@ fun MainScaffold(vm: GameViewModel) {
                 val target = tab.tourTarget
                 // A dot on the Shop tab when there's something for the player there (the Club's
                 // monthly pouch, or the starter pack offer while it's open).
-                val dot = tab == MainTab.SHOP && (vm.clubPouchReady || vm.starterOfferOpen)
+                val dot = tab == MainTab.SHOP && (vm.clubPouchReady || vm.starterOfferOpen || vm.seasonRewardsReady)
                 NavigationBarItem(
                     selected = tab == current,
                     onClick = { vm.selectTab(tab) },

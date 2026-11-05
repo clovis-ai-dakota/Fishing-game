@@ -141,8 +141,8 @@ class ProgressedPlayerUiTest {
         compose.onNodeWithText("Seen 9 · Caught 9 / ${FishCatalog.all.size}").assertExists()
         compose.shot("05_fish_log")
 
-        compose.tab("upgrades")
-        compose.shot("06_upgrades")
+        compose.tab("shop")
+        compose.shot("06_shop_rope")
 
         compose.tab("fish")
         compose.click("Milestones")

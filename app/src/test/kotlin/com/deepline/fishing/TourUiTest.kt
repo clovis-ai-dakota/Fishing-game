@@ -91,6 +91,9 @@ class TourUiTest {
             "upgrades" to "24_tour_upgrades",
             "dex" to "24b_tour_dex",
             "opponents" to "25_tour_opponents",
+            "two_prices" to "24c_tour_two_prices",
+            "passes" to "24d_tour_passes",
+            "battle_tackle" to "25b_tour_battle_tackle",
         )
         Tour.steps.forEachIndexed { i, step ->
             assertEquals("step ${step.id} is showing", true, isShowing(step.title))

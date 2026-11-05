@@ -30,6 +30,10 @@ object ProgressCodec {
         appendLine("ownedItems=${p.ownedItems.joinToString(",")}")
         appendLine("clubUntil=${p.clubUntilMs}")
         appendLine("clubPouchNext=${p.clubPouchNextMs}")
+        appendLine("season=${p.seasonNumber},${p.seasonXp}")
+        appendLine("seasonClaims=${p.seasonClaims.sorted().joinToString(",")}")
+        appendLine("event=${p.eventKey},${p.eventProgress}")
+        appendLine("eventClaims=${p.eventClaims.sorted().joinToString(",")}")
         appendLine("sessions=${p.sessions}")
         appendLine("starterOfferEnds=${p.starterOfferEndsMs}")
         appendLine("casts=${p.castsMade}")
@@ -72,6 +76,17 @@ object ProgressCodec {
                 key == "ownedItems" -> p = p.copy(ownedItems = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet())
                 key == "clubUntil" -> value.toLongOrNull()?.let { p = p.copy(clubUntilMs = it) }
                 key == "clubPouchNext" -> value.toLongOrNull()?.let { p = p.copy(clubPouchNextMs = it) }
+                key == "season" -> value.split(',').let { v ->
+                    val n = v.getOrNull(0)?.toIntOrNull()
+                    val xp = v.getOrNull(1)?.toIntOrNull()
+                    if (n != null && xp != null) p = p.copy(seasonNumber = n, seasonXp = xp)
+                }
+                key == "seasonClaims" -> p = p.copy(seasonClaims = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet())
+                key == "event" -> value.split(',').let { v ->
+                    val progress = v.getOrNull(1)?.toIntOrNull()
+                    if (v.size == 2 && progress != null) p = p.copy(eventKey = v[0], eventProgress = progress)
+                }
+                key == "eventClaims" -> p = p.copy(eventClaims = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet())
                 key == "sessions" -> value.toIntOrNull()?.let { p = p.copy(sessions = it) }
                 key == "starterOfferEnds" -> value.toLongOrNull()?.let { p = p.copy(starterOfferEndsMs = it) }
                 key == "secrets" -> p = p.copy(discoveredSecrets = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet())

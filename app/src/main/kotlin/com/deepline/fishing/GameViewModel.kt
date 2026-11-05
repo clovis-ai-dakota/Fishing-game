@@ -385,6 +385,28 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
 
     val starterOfferOpen: Boolean get() = ShopCatalog.starterOfferOpen(progress, ShopClock.now())
 
+    /** Season and weekend event rewards waiting to be claimed (the Shop tab shows a dot). */
+    val seasonRewardsReady: Boolean
+        get() = com.deepline.fishing.core.Seasons.claimable(progress, ShopClock.now()).isNotEmpty() ||
+            com.deepline.fishing.core.Seasons.eventClaimable(progress, ShopClock.now()).isNotEmpty()
+
+    fun claimSeasonRewards() {
+        val now = ShopClock.now()
+        val open = com.deepline.fishing.core.Seasons.claimable(progress, now)
+        if (open.isEmpty()) return
+        val what = open.flatMap { it.grants }.joinToString(", ") { ShopText.seasonGrant(it, progress) }
+        update(com.deepline.fishing.core.Seasons.claimAll(progress, now))
+        shopMessage = "Season rewards: $what."
+    }
+
+    fun claimEventReward() {
+        val now = ShopClock.now()
+        com.deepline.fishing.core.Seasons.claimEvent(progress, now)?.let {
+            update(it)
+            shopMessage = "Weekend event reward claimed!"
+        }
+    }
+
     /** Wears a premade boat the player owns. */
     fun wearPreset(presetId: String) {
         ShopCatalog.wearPreset(progress, presetId)?.let(::update)

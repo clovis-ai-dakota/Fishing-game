@@ -97,9 +97,9 @@ class TourContentTest {
         // Version 9: the Shop tab replaced Upgrades, with two prices for everything, passes, the
         // detector and sight tackle in battles. Returning players see these as "What's new".
         val v9 = Tour.steps.filter { it.sinceVersion == 9 }.map { it.id }
-        assertTrue(v9.containsAll(listOf("tabs", "upgrades", "tackle", "two_prices", "shop_style", "passes", "battle_tackle")))
+        assertTrue(v9.containsAll(listOf("tabs", "upgrades", "tackle", "two_prices", "shop_style", "season", "passes", "battle_tackle")))
         val targets = Tour.steps.mapNotNull { it.target }.toSet()
-        for (t in listOf(TourTarget.SHOP_ROPE, TourTarget.SHOP_TACKLE, TourTarget.SHOP_PRICES, TourTarget.SHOP_STYLE, TourTarget.SHOP_PASSES, TourTarget.BATTLE_TACKLE)) {
+        for (t in listOf(TourTarget.SHOP_ROPE, TourTarget.SHOP_TACKLE, TourTarget.SHOP_PRICES, TourTarget.SHOP_STYLE, TourTarget.SHOP_SEASON, TourTarget.SHOP_PASSES, TourTarget.BATTLE_TACKLE)) {
             assertTrue("No step points at $t", t in targets)
         }
         // Every Shop page with something on sale is shown by a step.

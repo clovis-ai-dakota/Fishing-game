@@ -41,6 +41,9 @@ sealed interface Grant {
 
     /** Captain's Club time. */
     data class ClubDays(val days: Int) : Grant
+
+    /** Something a feature works out when bought (this season's pass...): see [ShopCatalog.grant]. */
+    data class Feature(val key: String) : Grant
 }
 
 /**
@@ -181,7 +184,7 @@ object ShopCatalog {
     }
 
     val all: List<ShopItem>
-        get() = tackle + style + passes + synchronized(extensions) { extensions.flatMap { it() } }
+        get() = tackle + style + passes + Seasons.shopItems + synchronized(extensions) { extensions.flatMap { it() } }
 
     fun byId(id: String): ShopItem? = all.firstOrNull { it.id == id }
 
@@ -265,7 +268,9 @@ object ShopCatalog {
     }
 
     private fun availability(item: ShopItem, p: PlayerProgress, now: Long): Boolean =
-        synchronized(availabilityRules) { availabilityRules.firstNotNullOfOrNull { it(item, p, now) } } ?: true
+        Seasons.availability(item, p, now)
+            ?: synchronized(availabilityRules) { availabilityRules.firstNotNullOfOrNull { it(item, p, now) } }
+            ?: true
 
     fun starterOfferOpen(p: PlayerProgress, now: Long) =
         !owns(p, "starter_pack") && p.starterOfferEndsMs > 0 && now < p.starterOfferEndsMs
@@ -332,6 +337,16 @@ object ShopCatalog {
         is Grant.Cosmetics -> p.copy(ownedItems = p.ownedItems + g.items.map { "cosmetic:${it.name}" })
         is Grant.Unlock -> p.copy(ownedItems = p.ownedItems + g.key)
         is Grant.ClubDays -> p.copy(clubUntilMs = maxOf(p.clubUntilMs, now) + g.days * 86_400_000L)
+        is Grant.Feature -> Seasons.grantFeature(g.key, p, now)
+            ?: synchronized(featureGrants) { featureGrants[g.key] }?.invoke(p, now)
+            ?: p
+    }
+
+    private val featureGrants = HashMap<String, (PlayerProgress, Long) -> PlayerProgress>()
+
+    /** Lets a feature say what buying one of its items does ([Grant.Feature] with [key]). */
+    fun registerFeature(key: String, grant: (PlayerProgress, Long) -> PlayerProgress) {
+        synchronized(featureGrants) { featureGrants[key] = grant }
     }
 
     /** Wears a premade boat the player owns (as their custom boat). */

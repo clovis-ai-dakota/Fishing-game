@@ -30,6 +30,15 @@ data class PlayerProgress(
     val clubUntilMs: Long = 0L,
     /** When a Club member can next claim their free Lantern pouch (epoch ms; 0: right away). */
     val clubPouchNextMs: Long = 0L,
+    /** The season [seasonXp] and [seasonClaims] belong to (see `Seasons`). */
+    val seasonNumber: Int = 0,
+    val seasonXp: Int = 0,
+    /** Season rewards claimed ("f3": free tier 3, "p3": premium tier 3). */
+    val seasonClaims: Set<String> = emptySet(),
+    /** The weekend event [eventProgress] and [eventClaims] belong to. */
+    val eventKey: String = "",
+    val eventProgress: Int = 0,
+    val eventClaims: Set<String> = emptySet(),
     /** How many times the app was opened (for the starter pack's timing). */
     val sessions: Int = 0,
     /** When the starter pack offer ends (epoch ms; 0: not offered yet). */
@@ -102,7 +111,8 @@ object Progression {
             )
         }
         val gained = result.totalPoints.toLong()
-        return p.copy(
+        // Solo casts also climb the season's track and count for a weekend event.
+        return Seasons.onCast(p, result, ShopClock.now()).copy(
             pointsBalance = p.pointsBalance + gained,
             pointsEarned = p.pointsEarned + gained,
             collection = collection,

@@ -65,6 +65,28 @@ private val CyanPale = Color(0xFFE0F7FA)
 private val RoyalPurple = Color(0xFF6A1B9A)
 private val BoneColors = listOf(Color(0xFFFFF8E1), Color(0xFFD7CCC8), Color(0xFFFFFDE7))
 
+// Shop gear colours (looks only, like every skin).
+private val CoralPink = Color(0xFFFF8A80)
+private val CoralPale = Color(0xFFFFCDD2)
+private val Pearl = Color(0xFFFAF6F0)
+private val NeonPink = Color(0xFFFF4FD8)
+private val NeonCyan = Color(0xFF40F4FF)
+private val Obsidian = Color(0xFF15111C)
+private val ObsidianSheen = Color(0xFFB388FF)
+private val Silver = Color(0xFFCFD8DC)
+private val OceanTop = Color(0xFF64FFDA)
+private val OceanDeep = Color(0xFF1565C0)
+private val HeartRed = Color(0xFFFF5C8A)
+private val Petal = Color(0xFFFFC1E3)
+
+/** A small heart centred on [c], [r] across. */
+private fun heartPath(c: Offset, r: Float) = Path().apply {
+    moveTo(c.x, c.y + r * 0.8f)
+    cubicTo(c.x - r * 1.2f, c.y, c.x - r * 0.6f, c.y - r * 0.9f, c.x, c.y - r * 0.35f)
+    cubicTo(c.x + r * 0.6f, c.y - r * 0.9f, c.x + r * 1.2f, c.y, c.x, c.y + r * 0.8f)
+    close()
+}
+
 /** A colour of the rainbow, [hue] in degrees (any value). */
 private fun rainbow(hue: Float, alpha: Float = 1f, saturation: Float = 0.75f, value: Float = 1f) =
     Color.hsv(((hue % 360f) + 360f) % 360f, saturation, value, alpha.coerceIn(0f, 1f))
@@ -79,6 +101,9 @@ internal fun hookMetal(skin: Cosmetic?, bend: Offset, s: Float, timeSeconds: Flo
         Cosmetic.LEVIATHAN_BONE_HOOK -> Brush.linearGradient(BoneColors, start, end)
         Cosmetic.PRISM_HOOK -> Brush.linearGradient(prismColors(timeSeconds), start, end)
         Cosmetic.CROWN_HOOK -> Brush.linearGradient(listOf(GoldPale, Gold, GoldDeep, Gold), start, end)
+        Cosmetic.CORAL_HOOK -> Brush.linearGradient(listOf(CoralPale, CoralPink, Color(0xFFE57373), CoralPink), start, end)
+        Cosmetic.NEON_HOOK -> Brush.linearGradient(listOf(Color(0xFFFFB3F0), NeonPink, Color(0xFFFFB3F0)), start, end)
+        Cosmetic.OBSIDIAN_HOOK -> Brush.linearGradient(listOf(Obsidian, Color(0xFF4A3B66), Obsidian, Color(0xFF2A2140)), start, end)
         else -> Brush.linearGradient(listOf(Color(0xFFF5F7F8), Color(0xFF90A4AE), Color(0xFFECEFF1)), start, end)
     }
 }
@@ -142,6 +167,11 @@ fun DrawScope.drawHookAura(bend: Offset, s: Float, timeSeconds: Float, skin: Cos
                 drawLine(Gold.copy(alpha = 0.35f), center + d * (1.15f * s), center + d * (1.8f * s), strokeWidth = max(1.5f, 0.1f * s), cap = StrokeCap.Round)
             }
         }
+        Cosmetic.NEON_HOOK -> {
+            // A pulsing neon outline, close around the hook (it never lights the water).
+            val pulse = 0.5f + 0.5f * sin(timeSeconds * 4f)
+            drawCircle(NeonPink.copy(alpha = 0.18f + 0.14f * pulse), radius = 1.5f * s, center = center, style = Stroke(width = max(2f, 0.18f * s)))
+        }
         else -> Unit
     }
 }
@@ -180,6 +210,17 @@ internal fun DrawScope.drawHookOrnament(bend: Offset, s: Float, w: Float, timeSe
             drawCircle(Color(0xFFE53935), radius = max(1.2f, 0.07f * s), center = Offset(eye.x, base - 0.12f * s))
             val g = (timeSeconds * 0.7f) % 1f
             twinkle(Offset(bend.x + 0.5f * s, bend.y + 0.5f * s), max(2f, 0.3f * s) * sin(g * PI.toFloat()), Color.White)
+        }
+        Cosmetic.CORAL_HOOK -> {
+            // A pearl at the eye.
+            val eye = Offset(bend.x, bend.y - 1.4f * s)
+            drawCircle(Pearl, radius = max(2f, 0.2f * s), center = eye + Offset(0f, -0.3f * s))
+            drawCircle(Color.White, radius = max(1f, 0.07f * s), center = eye + Offset(-0.06f * s, -0.36f * s))
+        }
+        Cosmetic.OBSIDIAN_HOOK -> {
+            // A violet sheen sliding along the bend.
+            val g = (timeSeconds * 0.5f) % 1f
+            twinkle(Offset(bend.x + (0.1f + 0.5f * g) * s, bend.y + 0.55f * s), max(2f, 0.28f * s) * sin(g * PI.toFloat()), ObsidianSheen)
         }
         else -> Unit
     }
@@ -227,6 +268,28 @@ fun DrawScope.drawSkinnedLine(points: List<Offset>, timeSeconds: Float, bumpFlas
                 style = Stroke(width = 1.5f * u, cap = StrokeCap.Round, pathEffect = PathEffect.dashPathEffect(floatArrayOf(1.5f * u, 28f * u), -timeSeconds * 45f * u)),
             )
         }
+        Cosmetic.OCEAN_LINE -> {
+            drawPath(path, Color.Black.copy(alpha = 0.25f), style = Stroke(width = 3f * u, cap = StrokeCap.Round))
+            // Turquoise at the rod, deep blue at the hook.
+            for (i in 1 until points.size) {
+                drawLine(flash(lerp(OceanTop, OceanDeep, i / points.size.toFloat())), points[i - 1], points[i], strokeWidth = 2f * u, cap = StrokeCap.Round)
+            }
+        }
+        Cosmetic.NEON_LINE -> {
+            val pulse = 0.5f + 0.5f * sin(timeSeconds * 4f)
+            drawPath(path, NeonPink.copy(alpha = 0.25f + 0.15f * pulse), style = Stroke(width = 4f * u, cap = StrokeCap.Round))
+            drawPath(path, flash(NeonPink), style = Stroke(width = 1.8f * u, cap = StrokeCap.Round))
+            drawPath(path, flash(NeonCyan), style = Stroke(width = 1.8f * u, pathEffect = PathEffect.dashPathEffect(floatArrayOf(6f * u, 6f * u), -timeSeconds * 25f * u)))
+        }
+        Cosmetic.SILVER_LINE -> {
+            drawPath(path, Color.Black.copy(alpha = 0.25f), style = Stroke(width = 3f * u, cap = StrokeCap.Round))
+            drawPath(path, flash(Silver), style = Stroke(width = 1.8f * u, cap = StrokeCap.Round))
+            drawPath(
+                path,
+                Color.White.copy(alpha = 0.95f * (1f - bumpFlash)),
+                style = Stroke(width = 1.6f * u, cap = StrokeCap.Round, pathEffect = PathEffect.dashPathEffect(floatArrayOf(4f * u, 40f * u), -timeSeconds * 55f * u)),
+            )
+        }
         else -> {
             drawPath(path, Color.Black.copy(alpha = 0.22f), style = Stroke(width = 3.5f, cap = StrokeCap.Round))
             drawPath(path, flash(Color(0xFFE8F4FA)).copy(alpha = 0.9f), style = Stroke(width = 1.7f, cap = StrokeCap.Round))
@@ -270,6 +333,29 @@ fun DrawScope.drawHookTrail(hookX: Float, eyeY: Float, scale: Float, timeSeconds
                 } else {
                     twinkle(b, br * 1.6f, Gold.copy(alpha = 0.95f * fade))
                 }
+            }
+            Cosmetic.HEART_TRAIL -> {
+                drawPath(heartPath(b, br * 1.6f), HeartRed.copy(alpha = 0.9f * fade))
+                drawCircle(Color.White.copy(alpha = 0.6f * fade), radius = br * 0.25f, center = b - Offset(br * 0.45f, br * 0.35f))
+            }
+            Cosmetic.STAR_TRAIL -> {
+                val c = if (i % 2 == 0) NeonPink else NeonCyan
+                twinkle(b, br * 1.9f, c.copy(alpha = 0.95f * fade))
+            }
+            Cosmetic.PETAL_TRAIL -> {
+                // Petals drift and turn as they rise.
+                val tilt = sin(timeSeconds * 2f + i) * 0.6f
+                val w = br * 1.6f
+                val h = br * 0.8f
+                val dx = cos(tilt) * w
+                val dy = sin(tilt) * w
+                val petal = Path().apply {
+                    moveTo(b.x - dx, b.y - dy)
+                    quadraticTo(b.x - dy * 0.5f + 0f, b.y + h, b.x + dx, b.y + dy)
+                    quadraticTo(b.x + dy * 0.5f, b.y - h, b.x - dx, b.y - dy)
+                    close()
+                }
+                drawPath(petal, Petal.copy(alpha = 0.9f * fade))
             }
             else -> {
                 drawCircle(Color.White.copy(alpha = 0.45f * fade), radius = br, center = b, style = Stroke(width = 1.2f))

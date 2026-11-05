@@ -18,7 +18,7 @@ enum class TourTarget {
     SHOP_ROPE, DEX_HEADER, DEX_FILTERS, MILESTONES_FIRST, BATTLE_MODES, BATTLE_OPPONENT,
     SKINS_CUSTOMISE, SKINS_ATMOSPHERE, SHOP_STYLE,
     SHOP_TACKLE, BATTLE_WAGER,
-    SHOP_PRICES, SHOP_PASSES, BATTLE_TACKLE,
+    SHOP_PRICES, SHOP_PASSES, BATTLE_TACKLE, SHOP_SEASON,
 }
 
 /** A small illustration shown in a tour card. */
@@ -262,6 +262,17 @@ object Tour {
             target = TourTarget.SHOP_STYLE,
             sinceVersion = 9,
             shopPage = com.deepline.fishing.ShopPage.STYLE,
+        ),
+        TourStep(
+            id = "season",
+            title = "Seasons and weekend events",
+            body = "Each season lasts ${GameConfig.SEASON_WEEKS} weeks. Every solo cast earns season XP and opens tiers " +
+                "of rewards: tackle and points for everyone, and more (a season boat, a badge) with the season pass. " +
+                "Every weekend also brings a fishing goal with its own reward. None of it changes battles.",
+            screen = Screen.SHOP,
+            target = TourTarget.SHOP_SEASON,
+            sinceVersion = 9,
+            shopPage = com.deepline.fishing.ShopPage.PASSES,
         ),
         TourStep(
             id = "passes",

@@ -2,6 +2,7 @@ package com.deepline.fishing.render3d
 
 import com.deepline.fishing.core.CastPhase
 import com.deepline.fishing.core.CastSession
+import com.deepline.fishing.core.Cosmetic
 import com.deepline.fishing.core.FishCatalog
 import com.deepline.fishing.core.FishEntity
 import com.deepline.fishing.core.GameConfig
@@ -119,6 +120,30 @@ class Render3dExportTest {
     fun skinSets() {
         for (set in listOf("Giant-slayer", "Prismatic", "Sovereign")) {
             export("skins_${set.lowercase()}", SceneBuilder().build(surfaceSession(), 1.3f, w, h, Skins.ofSet(set), cameraTop = -7f))
+        }
+    }
+
+    /** The shop's gear: hooks, lines and trails, each with a matching boat. */
+    @Test
+    fun shopGear() {
+        val looks = mapOf(
+            "coral" to (listOf(Cosmetic.CORAL_HOOK, Cosmetic.OCEAN_LINE, Cosmetic.HEART_TRAIL) to "coral_cruiser"),
+            "neon" to (listOf(Cosmetic.NEON_HOOK, Cosmetic.NEON_LINE, Cosmetic.STAR_TRAIL) to "neon_nights"),
+            "obsidian" to (listOf(Cosmetic.OBSIDIAN_HOOK, Cosmetic.SILVER_LINE, Cosmetic.PETAL_TRAIL) to "founders_flagship"),
+        )
+        for ((name, look) in looks) {
+            val skins = Skins.of(look.first.associateBy { it.slot }, customBoat = com.deepline.fishing.core.PremiumSkins.byId(look.second)!!.design)
+            export("shop_$name", SceneBuilder().build(surfaceSession(), 1.3f, w, h, skins, cameraTop = -7f))
+        }
+        // The new paints, emblems and sail prints.
+        val B = com.deepline.fishing.core.BoatDesign()
+        val boats = listOf(
+            B.copy(trim = 17, pattern = com.deepline.fishing.core.HullPattern.METALLIC, sailStyle = com.deepline.fishing.core.SailStyle.TRIANGLE, emblem = com.deepline.fishing.core.Emblem.SHELL, cloth = com.deepline.fishing.core.ClothPattern.STRIPES),
+            B.copy(hull = 10, pattern = com.deepline.fishing.core.HullPattern.NEON, trim = 20, sailStyle = com.deepline.fishing.core.SailStyle.SQUARE, flagStyle = com.deepline.fishing.core.FlagStyle.PENNANT, emblem = com.deepline.fishing.core.Emblem.TRIDENT, cloth = com.deepline.fishing.core.ClothPattern.STARS),
+            B.copy(hull = 23, pattern = com.deepline.fishing.core.HullPattern.AURORA, sailStyle = com.deepline.fishing.core.SailStyle.TWIN, flagStyle = com.deepline.fishing.core.FlagStyle.BANNER, cloth = com.deepline.fishing.core.ClothPattern.WAVES),
+        )
+        boats.forEachIndexed { i, d ->
+            export("shop_boat_$i", SceneBuilder().build(surfaceSession(), 1.3f, w, h, Skins(customBoat = d), cameraTop = -7f))
         }
     }
 

@@ -24,6 +24,15 @@ object ShopText {
         is Grant.Cosmetics -> g.items.joinToString(", ") { if (it.slot == CosmeticSlot.TITLE) "the ${it.displayName} title" else it.displayName }
         is Grant.Unlock -> unlockName(g.key)
         is Grant.ClubDays -> "${g.days} days of Captain's Club"
+        is Grant.Feature -> item.description.removeSuffix(".").replaceFirstChar { it.lowercase() }
+    }
+
+    /** What a season tier or an event reward gives, e.g. "3 Lanterns" or "2,400 pts". */
+    fun seasonGrant(g: com.deepline.fishing.core.SeasonGrant, p: PlayerProgress): String = when (g) {
+        is com.deepline.fishing.core.SeasonGrant.Points -> com.deepline.fishing.ui.formatPoints(com.deepline.fishing.core.Seasons.pointsFor(p, g.minutes)) + " pts"
+        is com.deepline.fishing.core.SeasonGrant.Tackle -> "${g.count} ${tackleName(g.tackle, g.count)}"
+        is com.deepline.fishing.core.SeasonGrant.Boat -> (PremiumSkins.byId(g.presetId)?.name ?: "A") + " boat"
+        is com.deepline.fishing.core.SeasonGrant.Unlock -> unlockName(g.key)
     }
 
     fun tackleName(t: Tackle, count: Int): String {
@@ -54,6 +63,9 @@ object ShopText {
     fun unlockName(key: String): String = synchronized(unlockNames) { unlockNames.firstNotNullOfOrNull { it(key) } } ?: when (key) {
         "badge:RAINBOW" -> "a rainbow title badge"
         "badge:CLUB_FOREVER" -> "a Club badge that never expires"
+        "badge:SEASON" -> "a season badge"
+        "badge:COLLECTOR" -> "a collector's badge"
+        "badge:EVENT" -> "an event badge"
         else -> key.substringAfter(':').lowercase().replace('_', ' ')
     }
 

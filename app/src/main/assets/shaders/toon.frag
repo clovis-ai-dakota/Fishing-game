@@ -174,7 +174,7 @@ Surface fishSurface() {
 // ---- Hook and bait -------------------------------------------------------------------------
 
 Surface hookSurface() {
-    float mode = uFlags.w; // 0 classic steel, 1 bone, 2 prism, 3 gold
+    float mode = uFlags.w; // 0 classic steel, 1 bone, 2 prism, 3 gold, 4 coral, 5 neon, 6 obsidian
     if (isPart(vPart, 11.0) || isPart(vPart, 12.0)) {
         vec3 pink = vec3(0.90, 0.45, 0.45);
         pink *= 0.88 + 0.12 * step(0.5, fract(vUv.x * 9.0));
@@ -188,6 +188,12 @@ Surface hookSurface() {
             float pulse = 0.5 + 0.5 * sin(uTime * 3.0);
             s = surface(mix(vec3(0.55, 0.43, 0.39), vec3(0.30, 0.82, 0.88), pulse));
             s.emissive = 0.4 + 0.6 * pulse;
+        } else if (mode > 3.5 && mode < 4.5) {
+            // The coral hook's pearl.
+            s = surface(vec3(0.98, 0.97, 0.95));
+            s.spec = 1.0;
+            s.rim = 0.6;
+            s.rimColor = vec3(1.0);
         } else {
             s = surface(vec3(1.0, 0.80, 0.25));
             s.spec = 1.0;
@@ -206,10 +212,28 @@ Surface hookSurface() {
         s.rimColor = vec3(1.0);
         s.rim = 1.0;
         s.emissive = 0.25;
-    } else if (mode > 2.5) {
+    } else if (mode > 2.5 && mode < 3.5) {
         s = surface(mix(vec3(1.0, 0.63, 0.0), vec3(1.0, 0.92, 0.55), 0.5 + 0.5 * n.y));
         s.spec = 1.0;
         s.rimColor = vec3(1.0, 0.95, 0.7);
+    } else if (mode > 3.5 && mode < 4.5) {
+        // Coral: pink with paler pores.
+        float pore = step(0.72, noise2(vLocal.xy * 40.0));
+        s = surface(mix(vec3(1.0, 0.54, 0.50), vec3(1.0, 0.80, 0.82), pore));
+        s.spec = 0.3;
+    } else if (mode > 4.5 && mode < 5.5) {
+        // Neon tubing: glows its own colour (it doesn't light the water around it).
+        float pulse = 0.5 + 0.5 * sin(uTime * 4.0);
+        s = surface(mix(vec3(1.0, 0.31, 0.85), vec3(1.0, 0.75, 0.95), 0.5 + 0.5 * n.y));
+        s.emissive = 0.45 + 0.2 * pulse;
+        s.rim = 1.0;
+        s.rimColor = vec3(1.0, 0.8, 0.98);
+    } else if (mode > 5.5) {
+        // Obsidian: black glass with a violet sheen at the edges.
+        s = surface(mix(vec3(0.06, 0.05, 0.09), vec3(0.22, 0.17, 0.32), 0.5 + 0.5 * n.y));
+        s.spec = 1.0;
+        s.rim = 1.0;
+        s.rimColor = vec3(0.70, 0.53, 1.0);
     } else {
         // Polished steel: a dark band and a bright band, like a chrome reflection.
         float env = smoothstep(-0.2, 0.2, n.y);

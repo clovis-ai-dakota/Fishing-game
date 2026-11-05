@@ -237,6 +237,23 @@ object PremiumSkins {
             "founders_flagship", "Founder's Flagship", "Navy and gold, a trident on a starry sail.",
             BoatDesign(c("Navy"), c("Midnight"), c("Gold"), c("Pearl"), c("Navy"), c("Gold"), HullPattern.METALLIC, SailStyle.SQUARE, FlagStyle.BANNER, Emblem.TRIDENT, ClothPattern.STARS),
         ),
+        // Season boats: tier 10 of a season pass (see Seasons.boats), never sold on their own.
+        PremiumSkin(
+            "season_tidecaller", "Tidecaller", "Season boat: sea-green waves and a shell on the sail.",
+            BoatDesign(c("Teal"), c("Navy"), c("Seafoam"), c("Pearl"), c("Seafoam"), c("Lagoon"), HullPattern.WAVES, SailStyle.TRIANGLE, FlagStyle.SWALLOWTAIL, Emblem.SHELL, ClothPattern.WAVES),
+        ),
+        PremiumSkin(
+            "season_moonbloom", "Moonbloom", "Season boat: lilac aurora under a crescent moon.",
+            BoatDesign(c("Lilac"), c("Violet"), c("Pearl"), c("Cream"), c("Lilac"), c("Rose"), HullPattern.AURORA, SailStyle.TWIN, FlagStyle.PENNANT, Emblem.MOON, ClothPattern.STARS),
+        ),
+        PremiumSkin(
+            "season_frostfin", "Frostfin", "Season boat: polished ice with a lightning flag.",
+            BoatDesign(c("Pearl"), c("Ocean"), c("Lagoon"), c("Pearl"), c("Pearl"), c("Ocean"), HullPattern.METALLIC, SailStyle.SQUARE, FlagStyle.BANNER, Emblem.LIGHTNING, ClothPattern.STRIPES),
+        ),
+        PremiumSkin(
+            "season_goldwake", "Goldwake", "Season boat: gold neon on midnight, crowned.",
+            BoatDesign(c("Midnight"), c("Charcoal"), c("Gold"), c("Sand"), c("Midnight"), c("Gold"), HullPattern.NEON, SailStyle.TRIANGLE, FlagStyle.PENNANT, Emblem.CROWN, ClothPattern.STARS),
+        ),
     )
 
     fun byId(id: String) = all.firstOrNull { it.id == id }

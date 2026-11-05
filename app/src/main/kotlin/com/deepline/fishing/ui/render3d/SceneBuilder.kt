@@ -241,6 +241,9 @@ class SceneBuilder {
         Cosmetic.LEVIATHAN_BONE_HOOK -> 1f
         Cosmetic.PRISM_HOOK -> 2f
         Cosmetic.CROWN_HOOK -> 3f
+        Cosmetic.CORAL_HOOK -> 4f
+        Cosmetic.NEON_HOOK -> 5f
+        Cosmetic.OBSIDIAN_HOOK -> 6f
         else -> 0f
     }
 
@@ -348,6 +351,9 @@ class SceneBuilder {
             Cosmetic.GIANTS_BRAID_LINE -> 1f
             Cosmetic.RAINBOW_LINE -> 2f
             Cosmetic.GOLDEN_LINE -> 3f
+            Cosmetic.OCEAN_LINE -> 4f
+            Cosmetic.NEON_LINE -> 5f
+            Cosmetic.SILVER_LINE -> 6f
             else -> 0f
         }
         val b = MeshBuilder()
@@ -361,6 +367,11 @@ class SceneBuilder {
                 2f -> {
                     val c = hsvToRgb(((i / points.size.toFloat()) * 540f) % 360f, 0.8f, 1f)
                     floatArrayOf(c[0], c[1], c[2], 1f)
+                }
+                4f -> {
+                    // Ocean: turquoise at the rod, deep blue at the hook.
+                    val u = i / (points.size - 1f).coerceAtLeast(1f)
+                    floatArrayOf(0.39f + (0.08f - 0.39f) * u, 1f + (0.40f - 1f) * u, 0.85f + (0.75f - 0.85f) * u, 1f)
                 }
                 else -> floatArrayOf(0.91f, 0.96f, 0.98f, 0.95f)
             }
@@ -503,6 +514,10 @@ class SceneBuilder {
                 }
                 sprites.quad(c, 3.4f * s, floatArrayOf(1f, 1f, 1f, 0.22f), SHAPE_HALO)
             }
+            Cosmetic.NEON_HOOK -> {
+                val pulse = 0.5f + 0.5f * sin(t * 4f)
+                sprites.quad(c, 3.0f * s, floatArrayOf(1f, 0.31f, 0.85f, 0.18f + 0.14f * pulse), SHAPE_RING)
+            }
             Cosmetic.CROWN_HOOK -> {
                 sprites.quad(c, 3.8f * s, floatArrayOf(1f, 0.84f, 0.31f, 0.45f), SHAPE_HALO)
                 for (k in 0 until 8) {
@@ -535,6 +550,12 @@ class SceneBuilder {
                 Cosmetic.GOLDEN_TRAIL -> {
                     sprites.quad(b, r * 2.4f, floatArrayOf(1f, 0.84f, 0.31f, fade), if (i % 3 == 0) SHAPE_COIN else SHAPE_STAR)
                 }
+                Cosmetic.HEART_TRAIL -> sprites.quad(b, r * 2.8f, floatArrayOf(1f, 0.36f, 0.54f, 0.9f * fade), SHAPE_HEART)
+                Cosmetic.STAR_TRAIL -> {
+                    val c = if (i % 2 == 0) floatArrayOf(1f, 0.31f, 0.85f, 0.95f * fade) else floatArrayOf(0.25f, 0.96f, 1f, 0.95f * fade)
+                    sprites.quad(b, r * 2.8f, c, SHAPE_STAR)
+                }
+                Cosmetic.PETAL_TRAIL -> sprites.quad(b, r * 2.6f, floatArrayOf(1f, 0.76f, 0.89f, 0.9f * fade), SHAPE_PETAL)
                 else -> sprites.quad(b, r * 2f, floatArrayOf(1f, 1f, 1f, 0.6f * fade), SHAPE_RING)
             }
         }
@@ -554,6 +575,8 @@ class SceneBuilder {
         const val SHAPE_STAR = 2f
         const val SHAPE_COIN = 3f
         const val SHAPE_HALO = 4f
+        const val SHAPE_HEART = 5f
+        const val SHAPE_PETAL = 6f
 
         /** The uniforms that paint [species]: colours, pattern, swimming. */
         fun fishUniforms(

@@ -89,6 +89,16 @@ class Render3dTest {
         for (sp in FishCatalog.all) assertWindingMatchesNormals("${sp.id} nightmare", Meshes.get("fish:${sp.id}:NIGHTMARE"))
     }
 
+    /** Every emblem is really drawn (an outline the triangulator can't fill would vanish). */
+    @Test
+    fun everyEmblemAddsTriangles() {
+        val bare = Meshes.get("boatd:TRIANGLE:PENNANT:NONE").indices.size
+        for (emblem in com.deepline.fishing.core.Emblem.entries - com.deepline.fishing.core.Emblem.NONE) {
+            val n = Meshes.get("boatd:TRIANGLE:PENNANT:${emblem.name}").indices.size
+            assertTrue("$emblem draws nothing", n > bare + 3 * 8)
+        }
+    }
+
     /** The drawn body matches the collision shape: 1 long and heightRatio tall, nose at +0.5. */
     @Test
     fun fishBodiesMatchTheirHitbox() {

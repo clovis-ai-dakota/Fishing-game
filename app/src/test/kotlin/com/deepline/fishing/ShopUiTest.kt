@@ -117,6 +117,11 @@ class PremadeBoatUiTest : BoatUiTestBase() {
         vm.wearPreset("lagoon_explorer")
         assertTrue(vm.isWearingPreset("lagoon_explorer"))
         assertTrue(vm.progress.customBoatEquipped)
+        // Paints are previewed on the player's boat; gear tiles show the piece itself.
+        compose.onNodeWithTag("shop_list").performScrollToNode(androidx.compose.ui.test.hasText("Paints, emblems and prints"))
+        compose.shot("65b_shop_paints")
+        compose.onNodeWithTag("shop_list").performScrollToNode(androidx.compose.ui.test.hasText("Hooks, lines and trails"))
+        compose.shot("65c_shop_gear")
     }
 }
 
@@ -186,5 +191,52 @@ class BattleTackleUiTest : BoatUiTestBase() {
         assertNotNull(vm.detectorTargets)
         vm.abandonCast()
         assertNull(vm.session)
+    }
+}
+
+/** The season track and a weekend event, on the Passes page (the clock is set to a Friday evening). */
+@RunWith(RobolectricTestRunner::class)
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+@Config(sdk = [36], qualifiers = "w400dp-h860dp-xxhdpi")
+class SeasonUiTest : BoatUiTestBase() {
+    @org.junit.After
+    fun resetClock() {
+        ShopClock.override = null
+    }
+
+    @Test
+    fun claimingSeasonTiersAndAnEventReward() {
+        // Season 2's first Friday, 20:00 UTC: a weekend event is on.
+        val now = com.deepline.fishing.core.Seasons.EPOCH_MS + com.deepline.fishing.core.GameConfig.SEASON_WEEKS * 7 * 86_400_000L + 4 * 86_400_000L + 20 * 3_600_000L
+        ShopClock.override = now
+        val season = com.deepline.fishing.core.Seasons.at(now)
+        val event = com.deepline.fishing.core.Seasons.eventAt(now)!!
+        val vm = launch(
+            midGamePlayer(points = 0).copy(
+                seasonNumber = season.number, seasonXp = 4 * com.deepline.fishing.core.GameConfig.SEASON_XP_PER_TIER + 30,
+                eventKey = event.key, eventProgress = event.goal.target,
+            ),
+        )
+        assertTrue(vm.seasonRewardsReady)
+        vm.openShop(ShopPage.PASSES)
+        compose.waitForIdle()
+        compose.shot("69_season")
+        val before = vm.progress.lanterns + vm.progress.detectors + vm.progress.luckyCharms + vm.progress.sparkleLures + vm.progress.pointsBalance
+        compose.onNodeWithTag("claim_season").performClick()
+        assertTrue(com.deepline.fishing.core.Seasons.claimable(vm.progress, now).isEmpty())
+        assertTrue(vm.progress.lanterns + vm.progress.detectors + vm.progress.luckyCharms + vm.progress.sparkleLures + vm.progress.pointsBalance > before)
+
+        // The pass opens the premium track for the tiers already reached.
+        vm.buyWithMoney(ShopCatalog.byId("season_pass")!!, null)
+        vm.testStore!!.answer(TestStore.TestOutcome.APPROVE)
+        compose.waitForIdle()
+        assertTrue(com.deepline.fishing.core.Seasons.claimable(vm.progress, now).all { it.premium })
+        vm.claimSeasonRewards()
+        assertTrue("badge:SEASON" in vm.progress.ownedItems)
+
+        compose.onNodeWithTag("shop_list").performScrollToNode(hasTestTag("claim_event"))
+        compose.onNodeWithTag("claim_event").performClick()
+        assertTrue("free" in vm.progress.eventClaims)
+        assertFalse(vm.seasonRewardsReady)
     }
 }

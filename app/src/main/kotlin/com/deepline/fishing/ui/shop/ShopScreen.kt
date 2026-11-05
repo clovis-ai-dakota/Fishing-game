@@ -547,16 +547,24 @@ private fun LazyGridScope.passesPage(vm: GameViewModel, actions: ShopActions) {
     val p = vm.progress
     val now = ShopClock.now()
     val passes = ShopCatalog.inSection(ShopSection.PASSES)
-    header("passes_header", "Passes and packs", "Memberships, seasonal passes and one-time packs.")
-    for (item in passes) {
+    fun card(item: ShopItem) {
+        // Seasonal items show while they can be bought (once bought, their track says so).
+        if (item.kind == ItemKind.SEASONAL && !ShopCatalog.canBuy(item, p, now)) return
         // The starter pack shows during its offer (and once bought), never before.
-        if (item.id == "starter_pack" && !vm.starterOfferOpen && !ShopCatalog.owns(p, item.id)) continue
-        if (!ShopCatalog.canBuy(item, p, now) && item.kind != ItemKind.PERMANENT && item.kind != ItemKind.SUBSCRIPTION) continue
+        if (item.id == "starter_pack" && !vm.starterOfferOpen && !ShopCatalog.owns(p, item.id)) return
         full(item.id) {
             val tagged = if (item.id == "captains_club") Modifier.tourTarget(TourTarget.SHOP_PASSES) else Modifier
             ItemCard(vm, item, actions, tagged)
         }
     }
+    header("passes_header", "Passes and packs", "Seasons, weekend events, the Captain's Club and one-time packs.")
+    // A one-time offer first, then each pass right under what it unlocks.
+    passes.filter { it.id == "starter_pack" }.forEach(::card)
+    full("season") { SeasonCard(vm, Modifier.tourTarget(TourTarget.SHOP_SEASON)) }
+    passes.filter { it.id == "season_pass" || it.id == "collector_edition" }.forEach(::card)
+    full("event") { EventCard(vm) }
+    passes.filter { it.id == "event_pass" }.forEach(::card)
+    passes.filter { it.id !in setOf("starter_pack", "season_pass", "collector_edition", "event_pass") }.forEach(::card)
 }
 
 private fun LazyGridScope.genericPage(vm: GameViewModel, section: ShopSection, actions: ShopActions) {

@@ -64,6 +64,10 @@ object PropModels {
                     )
                 }
             }
+            Cosmetic.CORAL_HOOK -> {
+                // A pearl on top of the eye.
+                b.sphere(Vec3(0f, 1.4f * s + 0.3f * s, 0f), 0.14f * s, Part.RUNE, 8, 12)
+            }
             else -> Unit
         }
         b.build()
@@ -239,7 +243,8 @@ object PropModels {
             SailStyle.TRIANGLE -> {
                 b.tube(listOf(Vec3(-0.2f, 1.0f, 0f), Vec3(-0.2f, 5.2f, 0f)), { 0.06f }, 8, Part.MAST)
                 b.extrude(quadratic(-0.3f to 5.0f, -1.8f to 3.2f, -2.4f to 1.5f, 10) + listOf(-0.3f to 1.5f), 0.04f, Part.SAIL, z = 0.1f)
-                emblemAt = Vec3(-0.95f, 2.5f, 0.16f); emblemSize = 0.6f
+                // High on the sail: lower down, the cabin's roof hides it from the raised camera.
+                emblemAt = Vec3(-0.95f, 3.3f, 0.16f); emblemSize = 0.6f
             }
             SailStyle.SQUARE -> {
                 b.tube(listOf(Vec3(-0.2f, 1.0f, 0f), Vec3(-0.2f, 5.3f, 0f)), { 0.07f }, 8, Part.MAST)
@@ -332,11 +337,12 @@ object PropModels {
         } + listOf(-0.28f to -0.28f, -0.2f to -0.46f, 0.2f to -0.46f, 0.28f to -0.28f)
         Emblem.LIGHTNING -> listOf(0.12f to 0.5f, -0.28f to -0.04f, -0.02f to -0.04f, -0.14f to -0.5f, 0.3f to 0.08f, 0.04f to 0.08f)
         // A scallop: a fan of rounded lobes over a small hinge.
+        // Counter-clockwise, like every outline here: the fan's rim from right to left, then the hinge.
         Emblem.SHELL -> (0..20).map { k ->
             val a = k / 20f * PI.toFloat()
             val r = 0.42f + 0.05f * cos(k * PI.toFloat())
             cos(a) * r to -0.12f + sin(a) * r
-        }.reversed() + listOf(-0.12f to -0.2f, -0.1f to -0.4f, 0.1f to -0.4f, 0.12f to -0.2f).reversed()
+        } + listOf(-0.12f to -0.2f, -0.1f to -0.4f, 0.1f to -0.4f, 0.12f to -0.2f)
         Emblem.TRIDENT -> listOf(
             -0.05f to -0.5f, 0.05f to -0.5f, 0.05f to 0.02f, 0.27f to 0.02f, 0.27f to 0.28f, 0.35f to 0.28f, 0.31f to 0.5f,
             0.19f to 0.28f, 0.19f to 0.1f, 0.05f to 0.1f, 0.05f to 0.32f, 0.1f to 0.32f, 0f to 0.52f, -0.1f to 0.32f,
