@@ -34,8 +34,10 @@ object OnlineProtocol {
      * 2: bumps only on fish heads, and the last bump hooks what it hit (snags).
      * 3: fishing-secret bonuses (casts report what each bump hit and which fish were re-caught).
      * 4: all 24 secrets (more cast facts), the 200th fish, and player titles.
+     * 5: full-line touches (the Crowd surfer secret).
+     * 6: Lanterns and rare fish detectors in battles (casts say whether they were used).
      */
-    const val VERSION = 5
+    const val VERSION = 6
 
     /** Online battles use the same standard rope for both players. */
     const val TOURNAMENT_ROPE_LEVEL = 5
@@ -176,6 +178,9 @@ data class CastDto(
     val steered: Boolean = true,
     /** Different fish brushed on the way up with a full line (the Crowd surfer secret). */
     val fullLineTouches: Int = 0,
+    /** Tackle the player used (both change only what they see, so both are allowed). */
+    val lanternUsed: Boolean = false,
+    val detectorUsed: Boolean = false,
 )
 
 fun BattleCast.toDto(): CastDto = CastDto(
@@ -195,6 +200,8 @@ fun BattleCast.toDto(): CastDto = CastDto(
     freePasses = result.freePasses,
     steered = result.steered,
     fullLineTouches = result.fullLineTouches,
+    lanternUsed = result.lanternUsed,
+    detectorUsed = result.detectorUsed,
 )
 
 object CastValidation {
@@ -281,7 +288,9 @@ object CastValidation {
             maxDepth = if (dto.maxDepth.isFinite()) dto.maxDepth.coerceIn(0f, specs.lengthM) else 0f,
             touchesUsed = dto.touchesUsed.coerceIn(0, GameConfig.DESCENT_TOUCH_LIMIT),
             reverseReason = dto.reverseReason,
-            lanternUsed = false,
+            // Lanterns and detectors are allowed in battles; secrets that need the dark check them.
+            lanternUsed = dto.lanternUsed,
+            detectorUsed = dto.detectorUsed,
             snags = snags,
             bumps = dto.bumps,
             lineStrengthKg = specs.maxWeightKg,

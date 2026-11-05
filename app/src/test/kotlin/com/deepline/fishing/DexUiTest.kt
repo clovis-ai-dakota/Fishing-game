@@ -123,8 +123,8 @@ class DexUiTest {
         compose.onNodeWithText("Cast line").assertExists()
         compose.onNodeWithContentDescription("Milestones").assertExists()
         compose.shot("49_fish_tab")
-        compose.tab("upgrades")
-        assertEquals(Screen.UPGRADES, vm.screen)
+        compose.tab("shop")
+        assertEquals(Screen.SHOP, vm.screen)
         // System back from any tab goes to the Fish tab.
         compose.waitForIdle()
         scenario!!.onActivity { it.onBackPressedDispatcher.onBackPressed() }

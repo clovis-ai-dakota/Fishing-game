@@ -24,8 +24,15 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Debug builds pay through the in-app test store (approve, decline, fail or leave
+            // pending). Build with -PdeeplinePlayBilling=true to test real Google Play billing.
+            val play = (project.findProperty("deeplinePlayBilling") as String?)?.toBoolean() ?: false
+            buildConfigField("boolean", "USE_PLAY_BILLING", play.toString())
+        }
         release {
             isMinifyEnabled = false
+            buildConfigField("boolean", "USE_PLAY_BILLING", "true")
         }
     }
 
@@ -85,6 +92,9 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.10.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.0")
+
+    // Google Play Billing (euro purchases; see billing/PlayStore.kt).
+    implementation("com.android.billingclient:billing-ktx:7.1.1")
 
     val ktorVersion = "3.3.3"
     implementation("io.ktor:ktor-client-okhttp:$ktorVersion")

@@ -238,7 +238,7 @@ private fun YourBoatCard(vm: GameViewModel, time: Float) {
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = vm::openBoatEditor, modifier = Modifier.weight(1f).tourTarget(TourTarget.SKINS_CUSTOMISE)) { Text("Customise boat") }
-                OutlinedButton(onClick = vm::openShop, modifier = Modifier.weight(1f)) { Text("Premium skins") }
+                OutlinedButton(onClick = { vm.openShop(com.deepline.fishing.ShopPage.STYLE) }, modifier = Modifier.weight(1f)) { Text("Shop boats") }
             }
         }
     }
@@ -296,7 +296,7 @@ private fun DrawScope.drawSilhouette(block: DrawScope.() -> Unit) {
 }
 
 /** A small picture of [slot] wearing [c] (null = the classic look). */
-private fun DrawScope.drawSlotArt(slot: CosmeticSlot, c: Cosmetic?, time: Float) {
+internal fun DrawScope.drawSlotArt(slot: CosmeticSlot, c: Cosmetic?, time: Float) {
     val w = size.width
     val h = size.height
     when (slot) {

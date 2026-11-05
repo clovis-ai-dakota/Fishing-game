@@ -8,15 +8,17 @@ import com.deepline.fishing.core.CosmeticSlot
 import com.deepline.fishing.core.DepthZone
 import com.deepline.fishing.core.FishCatalog
 import com.deepline.fishing.core.GameConfig
+import com.deepline.fishing.core.Tackle
 import com.deepline.fishing.core.online.OnlineProtocol
 
 /** A UI element a tour step can point at (see `Modifier.tourTarget`). */
 enum class TourTarget {
     HOME_CAST, HOME_POINTS, HOME_LANTERN, HOME_MILESTONES, HOME_TOUR, HOME_BOAT,
-    NAV_BAR, TAB_DEX, TAB_UPGRADES, TAB_BATTLE,
-    UPGRADES_ROPE, DEX_HEADER, DEX_FILTERS, MILESTONES_FIRST, BATTLE_MODES, BATTLE_OPPONENT,
-    SKINS_CUSTOMISE, SKINS_ATMOSPHERE, SHOP_ITEMS,
-    UPGRADES_TACKLE, BATTLE_WAGER,
+    NAV_BAR, TAB_DEX, TAB_SHOP, TAB_BATTLE,
+    SHOP_ROPE, DEX_HEADER, DEX_FILTERS, MILESTONES_FIRST, BATTLE_MODES, BATTLE_OPPONENT,
+    SKINS_CUSTOMISE, SKINS_ATMOSPHERE, SHOP_STYLE,
+    SHOP_TACKLE, BATTLE_WAGER,
+    SHOP_PRICES, SHOP_PASSES, BATTLE_TACKLE,
 }
 
 /** A small illustration shown in a tour card. */
@@ -37,6 +39,8 @@ data class TourStep(
     val sinceVersion: Int = 1,
     /** For a Dex step: which section to show (Species when null). */
     val dexSection: com.deepline.fishing.DexSection? = null,
+    /** For a Shop step: which page to show (Rope when null). */
+    val shopPage: com.deepline.fishing.ShopPage? = null,
 )
 
 /**
@@ -56,8 +60,10 @@ object Tour {
      * 6: boat customisation, the premium skins shop (coming soon) and the Atmosphere option.
      * 7: the fast reel for a full line, a deeper bump-free zone and a brighter Lantern.
      * 8: the fast reel right after the last bump, a fairer deep, and new ways to spend points.
+     * 9: the Shop tab (two prices for everything), the rare fish detector, sight tackle in
+     *    battles, and passes.
      */
-    const val VERSION = 8
+    const val VERSION = 9
 
     private val bumps = GameConfig.DESCENT_TOUCH_LIMIT
     private val bumpFree = GameConfig.BUMP_FREE_DEPTH.toInt()
@@ -77,10 +83,11 @@ object Tour {
             id = "tabs",
             title = "Four tabs",
             body = "The bar at the bottom takes you everywhere: Fish is where you cast, the Dex collects every " +
-                "species you meet, Upgrades improves your rope, and Battle is for 1v1 matches.",
+                "species you meet, the Shop has rope upgrades, tackle and looks for your boat, and Battle is " +
+                "for 1v1 matches.",
             screen = Screen.HOME,
             target = TourTarget.NAV_BAR,
-            sinceVersion = 5,
+            sinceVersion = 9,
         ),
         TourStep(
             id = "cast",
@@ -149,22 +156,38 @@ object Tour {
         TourStep(
             id = "upgrades",
             title = "Upgrade your rope",
-            body = "Spend points in the Upgrades tab. Rope Length lets you reach deeper zones and new fish, Rope " +
-                "Strength carries more weight, and Rope Agility steers faster. Changed your mind? Downgrade a " +
-                "level and get back every point it cost.",
-            screen = Screen.UPGRADES,
-            target = TourTarget.UPGRADES_ROPE,
-            sinceVersion = 5,
+            body = "Spend points in the Shop tab, on its Rope page. Rope Length lets you reach deeper zones and " +
+                "new fish, Rope Strength carries more weight, and Rope Agility steers faster. Changed your mind? " +
+                "Downgrade a level and get back every point it cost.",
+            screen = Screen.SHOP,
+            target = TourTarget.SHOP_ROPE,
+            sinceVersion = 9,
+            shopPage = com.deepline.fishing.ShopPage.ROPE,
         ),
         TourStep(
             id = "tackle",
-            title = "Tackle shop",
-            body = "Also in Upgrades: one-cast tackle to switch on from the Fish tab before you cast. Lanterns " +
-                "light the dark, a Lucky charm gives one extra bump on the way down, and a Sparkle lure brings " +
+            title = "Tackle",
+            body = "The Tackle page sells one-cast items to switch on before you cast. Lanterns light the dark, a " +
+                "${Tackle.DETECTOR.displayName} marks species you haven't caught yet within " +
+                "${GameConfig.DETECTOR_RADIUS_M.toInt()} m of the hook, a ${Tackle.LUCKY_CHARM.displayName} gives one " +
+                "extra bump on the way down, and a ${Tackle.SPARKLE_LURE.displayName} brings " +
                 "${GameConfig.SPARKLE_LURE_MULTIPLIER.toInt()}× as many Sparkling fish. Prices grow with your rope's reach.",
-            screen = Screen.UPGRADES,
-            target = TourTarget.UPGRADES_TACKLE,
-            sinceVersion = 8,
+            screen = Screen.SHOP,
+            target = TourTarget.SHOP_TACKLE,
+            sinceVersion = 9,
+            shopPage = com.deepline.fishing.ShopPage.TACKLE,
+        ),
+        TourStep(
+            id = "two_prices",
+            title = "Two ways to pay",
+            body = "Everything in the shop has two prices: euros, or points. A points price is about " +
+                "${GameConfig.MINUTES_PER_EURO.toInt()} minutes of fishing per euro at your rope's reach " +
+                "(${(GameConfig.LANTERN_MINUTES_PER_EURO / 60f).toInt()} hour for Lantern packs), so paying only saves " +
+                "time: everything can be earned by playing. Paying with points asks you to confirm first.",
+            screen = Screen.SHOP,
+            target = TourTarget.SHOP_PRICES,
+            sinceVersion = 9,
+            shopPage = com.deepline.fishing.ShopPage.TACKLE,
         ),
         TourStep(
             id = "lantern",
@@ -172,7 +195,7 @@ object Tour {
             body = "Below $dark m the water is dark. Switch this on before a cast to light up much more water " +
                 "around the hook (${GameConfig.VISIBLE_RADIUS_LANTERN.roundToInt()} m instead of " +
                 "${GameConfig.VISIBLE_RADIUS_DARK.roundToInt()} m). One Lantern is used per cast; earn more from " +
-                "milestones or buy them in Upgrades.",
+                "milestones or buy them in the Shop.",
             screen = Screen.HOME,
             target = TourTarget.HOME_LANTERN,
             art = TourArt.DARKNESS,
@@ -231,13 +254,25 @@ object Tour {
             sinceVersion = 6,
         ),
         TourStep(
-            id = "shop",
-            title = "Premium skins",
-            body = "Premade boats will be sold here, a shortcut to a great-looking boat. Coming soon: they can't " +
-                "be bought yet. Like every skin, they only change how your boat looks.",
+            id = "shop_style",
+            title = "Style",
+            body = "The Style page has premade boats, paints, emblems and sail prints (previewed on your own boat), " +
+                "and new hooks, lines and trails. Like every skin, they only change the look, never the game.",
             screen = Screen.SHOP,
-            target = TourTarget.SHOP_ITEMS,
-            sinceVersion = 6,
+            target = TourTarget.SHOP_STYLE,
+            sinceVersion = 9,
+            shopPage = com.deepline.fishing.ShopPage.STYLE,
+        ),
+        TourStep(
+            id = "passes",
+            title = "Passes",
+            body = "The Captain's Club is a monthly membership: a members-only paint, a club title badge, cloud save " +
+                "and a free Lantern pouch every month. New anglers also get a one-time Starter pack offer for a " +
+                "few days. A dot on the Shop tab means something is waiting for you there.",
+            screen = Screen.SHOP,
+            target = TourTarget.SHOP_PASSES,
+            sinceVersion = 9,
+            shopPage = com.deepline.fishing.ShopPage.PASSES,
         ),
         TourStep(
             id = "atmosphere",
@@ -266,6 +301,16 @@ object Tour {
                 "(level ${OnlineProtocol.TOURNAMENT_ROPE_LEVEL} in every stat).",
             screen = Screen.BATTLE_SETUP,
             target = TourTarget.BATTLE_OPPONENT,
+        ),
+        TourStep(
+            id = "battle_tackle",
+            title = "Tackle in battles",
+            body = "Lanterns and ${Tackle.DETECTOR.displayName}s work in battles too: switch them on here, and each of " +
+                "your casts uses one. Anyone can get them, so they're part of the game. The Lucky charm and the " +
+                "Sparkle lure are for solo casts only.",
+            screen = Screen.BATTLE_SETUP,
+            target = TourTarget.BATTLE_TACKLE,
+            sinceVersion = 9,
         ),
         TourStep(
             id = "wager",

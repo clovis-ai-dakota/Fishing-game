@@ -69,6 +69,8 @@ fun DrawScope.drawCastScene(
     skins: Skins = Skins.CLASSIC,
     /** Overrides the camera: the depth (m) at the top of the screen. Used by the skins preview. */
     cameraTop: Float? = null,
+    /** Species a rare fish detector marks (not caught yet), or null when it's off. */
+    detect: Set<String>? = null,
 ) {
     val scale = size.width / GameConfig.WORLD_WIDTH
     val viewHeight = size.height / scale
@@ -367,7 +369,39 @@ fun DrawScope.drawCastScene(
         if (f.caught || f.depth < top - 5f || f.depth > bottom + 5f) continue
         drawFishGlow(f.species, Offset(sx(f.x), sy(f.depth)), f.species.bodyLengthM * scale, f.direction, 0.35f + 0.65f * darkness)
     }
+    if (detect != null) drawDetectorMarks(session, detect, top, scale, timeSeconds)
 }
+
+/**
+ * The rare fish detector: a pulsing ring and a marker over every species not caught yet within
+ * [GameConfig.DETECTOR_RADIUS_M] of the hook, drawn over the darkness (that's what it's for).
+ * It only marks: the fish themselves stay as dark as ever.
+ */
+internal fun DrawScope.drawDetectorMarks(session: CastSession, detect: Set<String>, top: Float, scale: Float, timeSeconds: Float) {
+    val r2 = GameConfig.DETECTOR_RADIUS_M * GameConfig.DETECTOR_RADIUS_M
+    val hook = Offset(session.hookX * scale, (session.hookDepth - top) * scale)
+    // The detector's range, faint around the hook.
+    drawCircle(DetectorCyan.copy(alpha = 0.12f), radius = GameConfig.DETECTOR_RADIUS_M * scale, center = hook, style = Stroke(width = 2f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(6f, 10f))))
+    val pulse = 0.5f + 0.5f * sin(timeSeconds * 5f)
+    for (f in session.world.fish) {
+        if (f.caught || f.species.id !in detect) continue
+        val dx = f.x - session.hookX
+        val dy = f.depth - session.hookDepth
+        if (dx * dx + dy * dy > r2) continue
+        val c = Offset(f.x * scale, (f.depth - top) * scale)
+        val r = (f.halfLength + 0.4f) * scale
+        drawCircle(DetectorCyan.copy(alpha = 0.35f + 0.4f * pulse), radius = r * (1f + 0.12f * pulse), center = c, style = Stroke(width = 3f))
+        // A small diamond above the fish.
+        val m = c + Offset(0f, -r - 10f)
+        val d = 7f
+        val diamond = Path().apply {
+            moveTo(m.x, m.y - d); lineTo(m.x + d, m.y); lineTo(m.x, m.y + d); lineTo(m.x - d, m.y); close()
+        }
+        drawPath(diamond, DetectorCyan)
+    }
+}
+
+private val DetectorCyan = Color(0xFF4DD0E1)
 
 private fun DrawScope.drawBoatAndRod(
     cx: Float,
@@ -517,6 +551,8 @@ fun DrawScope.drawCastOverlay(
     textMeasurer: TextMeasurer,
     aimX: Float? = null,
     cameraTop: Float? = null,
+    /** Species a rare fish detector marks, or null when it's off (see [drawDetectorMarks]). */
+    detect: Set<String>? = null,
 ) {
     val scale = size.width / GameConfig.WORLD_WIDTH
     val viewHeight = size.height / scale
@@ -525,6 +561,7 @@ fun DrawScope.drawCastOverlay(
     fun sx(x: Float) = x * scale
     fun sy(depth: Float) = (depth - top) * scale
     val elapsed = session.elapsedSeconds
+    if (detect != null) drawDetectorMarks(session, detect, top, scale, timeSeconds)
 
     val labelStyle = TextStyle(color = Color.White.copy(alpha = 0.6f), fontSize = 11.sp)
     var marker = ceil(max(top, 1f) / 50f) * 50f

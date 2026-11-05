@@ -61,7 +61,12 @@ data class CastResult(
     val fullLineTouches: Int = 0,
     /** When the fast reel started (cast seconds), or null if it wasn't used. */
     val fastReelAt: Float? = null,
+    /** A rare fish detector marked uncaught species during the cast. */
+    val detectorUsed: Boolean = false,
 ) {
+    /** The player had help seeing in the dark (a Lantern or a detector). */
+    val sightAided: Boolean get() = lanternUsed || detectorUsed
+
     /** Points from catches and snags, before fishing-secret bonuses. */
     val basePoints: Int get() = catches.sumOf { it.points } + snags.sumOf { it.points }
 
@@ -204,6 +209,16 @@ class CastSession(
      * Extra bumps for this cast (a Lucky charm). Set before the cast starts; battles never use
      * any, so online casts always have the standard limit.
      */
+    /**
+     * A rare fish detector is on for this cast: the screen marks species the player hasn't caught
+     * yet (the app knows which). It changes nothing in the water. Set before the cast starts.
+     */
+    var detectorActive: Boolean = false
+        set(value) {
+            require(elapsedSeconds == 0f) { "Switch the detector on before the cast starts" }
+            field = value
+        }
+
     var bonusBumps: Int = 0
         set(value) {
             require(elapsedSeconds == 0f) { "Set bonus bumps before the cast starts" }
@@ -455,6 +470,7 @@ class CastSession(
             touchLimit = touchLimit,
             fullLineTouches = _fullLineTouched.size,
             fastReelAt = fastReelStart.takeUnless { it.isNaN() },
+            detectorUsed = detectorActive,
         )
         pendingEvents += CastEvent.Surfaced
     }

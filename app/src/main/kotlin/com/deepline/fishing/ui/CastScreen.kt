@@ -146,8 +146,9 @@ fun CastScreen(vm: GameViewModel) {
                 },
         ) {
             // Until the 3D view has drawn its first frame, the 2D scene covers it (no black flash).
-            if (use3d && scene3d.ready) drawCastOverlay(session, time, textMeasurer, aimX = steer.targetX())
-            else drawCastScene(session, time, textMeasurer, aimX = steer.targetX(), skins = skins)
+            val detect = vm.detectorTargets
+            if (use3d && scene3d.ready) drawCastOverlay(session, time, textMeasurer, aimX = steer.targetX(), detect = detect)
+            else drawCastScene(session, time, textMeasurer, aimX = steer.targetX(), skins = skins, detect = detect)
         }
 
         val turn = vm.battleTurn

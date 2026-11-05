@@ -228,7 +228,7 @@ object SecretRules {
             add(Secrets.LADDER, base * (LADDER_MULTIPLIER - 1.0))
         }
         if (isPerfectLoad(r)) add(Secrets.PERFECT_LOAD, base * (PERFECT_LOAD_MULTIPLIER - 1.0))
-        if (!r.lanternUsed) {
+        if (!r.sightAided) {
             ascent.filter { it.species.glowing && it.depth > GameConfig.DARK_DEPTH }.takeIf { it.isNotEmpty() }?.let { lit ->
                 add(Secrets.MOONLIT_ANGLER, lit.sumOf { it.points * (MOONLIT_ANGLER_MULTIPLIER - 1.0) })
             }
@@ -238,7 +238,7 @@ object SecretRules {
         ascent.filter { it.whileFleeing }.takeIf { it.isNotEmpty() }?.let { fleeing ->
             add(Secrets.WHILE_IT_FLEES, fleeing.sumOf { it.points * (WHILE_IT_FLEES_MULTIPLIER - 1.0) })
         }
-        if (isCleanDrop(r, BLIND_DROP_MIN_DEPTH_M) && !r.lanternUsed) add(Secrets.BLIND_DROP, base * (BLIND_DROP_MULTIPLIER - 1.0))
+        if (isCleanDrop(r, BLIND_DROP_MIN_DEPTH_M) && !r.sightAided) add(Secrets.BLIND_DROP, base * (BLIND_DROP_MULTIPLIER - 1.0))
         if (r.catches.map { it.species.zone }.toSet() == DepthZone.entries.toSet()) {
             add(Secrets.ZONE_SWEEP, base * (ZONE_SWEEP_MULTIPLIER - 1.0))
         }

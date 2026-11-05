@@ -29,6 +29,7 @@ object ProgressCodec {
         appendLine("detectors=${p.detectors}")
         appendLine("ownedItems=${p.ownedItems.joinToString(",")}")
         appendLine("clubUntil=${p.clubUntilMs}")
+        appendLine("clubPouchNext=${p.clubPouchNextMs}")
         appendLine("sessions=${p.sessions}")
         appendLine("starterOfferEnds=${p.starterOfferEndsMs}")
         appendLine("casts=${p.castsMade}")
@@ -70,6 +71,7 @@ object ProgressCodec {
                 key == "detectors" -> value.toIntOrNull()?.let { p = p.copy(detectors = it) }
                 key == "ownedItems" -> p = p.copy(ownedItems = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet())
                 key == "clubUntil" -> value.toLongOrNull()?.let { p = p.copy(clubUntilMs = it) }
+                key == "clubPouchNext" -> value.toLongOrNull()?.let { p = p.copy(clubPouchNextMs = it) }
                 key == "sessions" -> value.toIntOrNull()?.let { p = p.copy(sessions = it) }
                 key == "starterOfferEnds" -> value.toLongOrNull()?.let { p = p.copy(starterOfferEndsMs = it) }
                 key == "secrets" -> p = p.copy(discoveredSecrets = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet())

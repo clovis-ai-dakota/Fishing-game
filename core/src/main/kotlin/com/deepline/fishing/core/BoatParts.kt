@@ -162,6 +162,28 @@ object BoatParts {
         PartRequirement.ClubOnly -> ShopCatalog.isClubMember(p, ShopClock.now())
     }
 
+    /**
+     * [design] wearing [part] (a paint, an emblem or a print), for the shop's "try it on your
+     * boat" previews and its Apply button. Emblems and prints need a sail or a flag to show on:
+     * when the boat has neither, a sail (or else a flag) the player can use is added.
+     */
+    fun applyTo(design: BoatDesign, part: BoatPart, p: PlayerProgress): BoatDesign {
+        fun withCanvas(d: BoatDesign): BoatDesign {
+            if (d.sailStyle != SailStyle.NONE || d.flagStyle != FlagStyle.NONE) return d
+            SailStyle.entries.firstOrNull { it != SailStyle.NONE && isAvailable(p, BoatPart.of(it)) }?.let { return d.copy(sailStyle = it) }
+            FlagStyle.entries.firstOrNull { it != FlagStyle.NONE && isAvailable(p, BoatPart.of(it)) }?.let { return d.copy(flagStyle = it) }
+            return d.copy(sailStyle = SailStyle.TRIANGLE)
+        }
+        return when (part.kind) {
+            BoatPartKind.PATTERN -> HullPattern.entries.firstOrNull { it.name == part.id }?.let { design.copy(pattern = it) } ?: design
+            BoatPartKind.EMBLEM -> Emblem.entries.firstOrNull { it.name == part.id }?.let { withCanvas(design.copy(emblem = it)) } ?: design
+            BoatPartKind.CLOTH -> ClothPattern.entries.firstOrNull { it.name == part.id }?.let { withCanvas(design.copy(cloth = it)) } ?: design
+            BoatPartKind.SAIL -> SailStyle.entries.firstOrNull { it.name == part.id }?.let { design.copy(sailStyle = it) } ?: design
+            BoatPartKind.FLAG -> FlagStyle.entries.firstOrNull { it.name == part.id }?.let { design.copy(flagStyle = it) } ?: design
+            BoatPartKind.COLOR -> design
+        }
+    }
+
     /** The options [design] uses (each colour once). */
     fun partsOf(design: BoatDesign): Set<BoatPart> = setOf(
         BoatPart.color(design.hull), BoatPart.color(design.hullBottom), BoatPart.color(design.trim),

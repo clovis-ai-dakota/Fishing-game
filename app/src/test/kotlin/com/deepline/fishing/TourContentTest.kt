@@ -47,8 +47,8 @@ class TourContentTest {
         assertTrue("downgrade" in text.lowercase())
         assertTrue("${com.deepline.fishing.core.FishCatalog.all.size} species" in text)
         assertTrue("title" in text.lowercase())
-        // Version 6: boat customisation, the shop (coming soon) and the atmosphere.
-        for (topic in listOf("Customise", "Premium", "Coming soon", "Atmosphere", com.deepline.fishing.core.Atmosphere.NIGHTMARE.displayName)) {
+        // Version 6: boat customisation and the atmosphere.
+        for (topic in listOf("Customise", "Atmosphere", com.deepline.fishing.core.Atmosphere.NIGHTMARE.displayName)) {
             assertTrue("Tour doesn't mention $topic", text.contains(topic, ignoreCase = true))
         }
         val boatStep = Tour.steps.first { it.id == "boat" }
@@ -73,10 +73,10 @@ class TourContentTest {
         }
         // Changed in version 5, so returning players saw them in "What's new".
         val v5 = Tour.steps.filter { it.sinceVersion == 5 }.map { it.id }
-        assertTrue(v5.containsAll(listOf("tabs", "cast", "upgrades", "dex", "dex_filters", "milestones", "secrets", "replay")))
-        // Version 6: customising the boat, the shop and the atmosphere.
+        assertTrue(v5.containsAll(listOf("cast", "dex", "dex_filters", "milestones", "secrets", "replay")))
+        // Version 6: customising the boat and the atmosphere.
         val v6 = Tour.steps.filter { it.sinceVersion == 6 }.map { it.id }
-        assertTrue(v6.containsAll(listOf("boat", "shop", "atmosphere")))
+        assertTrue(v6.containsAll(listOf("boat", "atmosphere")))
         // Version 7: the fast reel, the deeper bump-free zone and the brighter Lantern.
         val v7 = Tour.steps.filter { it.sinceVersion == 7 }.map { it.id }
         assertTrue(v7.containsAll(listOf("descent", "lantern")))
@@ -86,9 +86,34 @@ class TourContentTest {
         // ...and the new ways to spend points.
         for (item in com.deepline.fishing.core.Tackle.entries) assertTrue("Tour doesn't mention ${item.displayName}", item.displayName in text)
         assertTrue("wager" in text.lowercase())
-        assertTrue(Tour.steps.filter { it.sinceVersion == 8 }.map { it.id }.containsAll(listOf("tackle", "wager")))
-        for (t in listOf(TourTarget.HOME_BOAT, TourTarget.SHOP_ITEMS, TourTarget.SKINS_ATMOSPHERE)) {
+        assertTrue(Tour.steps.filter { it.sinceVersion == 8 }.map { it.id }.containsAll(listOf("wager")))
+        for (t in listOf(TourTarget.HOME_BOAT, TourTarget.SHOP_STYLE, TourTarget.SKINS_ATMOSPHERE)) {
             assertTrue("No step points at $t", t in targets)
+        }
+    }
+
+    @Test
+    fun theShopIsExplained() {
+        // Version 9: the Shop tab replaced Upgrades, with two prices for everything, passes, the
+        // detector and sight tackle in battles. Returning players see these as "What's new".
+        val v9 = Tour.steps.filter { it.sinceVersion == 9 }.map { it.id }
+        assertTrue(v9.containsAll(listOf("tabs", "upgrades", "tackle", "two_prices", "shop_style", "passes", "battle_tackle")))
+        val targets = Tour.steps.mapNotNull { it.target }.toSet()
+        for (t in listOf(TourTarget.SHOP_ROPE, TourTarget.SHOP_TACKLE, TourTarget.SHOP_PRICES, TourTarget.SHOP_STYLE, TourTarget.SHOP_PASSES, TourTarget.BATTLE_TACKLE)) {
+            assertTrue("No step points at $t", t in targets)
+        }
+        // Every Shop page with something on sale is shown by a step.
+        val shown = Tour.steps.filter { it.screen == Screen.SHOP }.map { it.shopPage ?: ShopPage.ROPE }.toSet()
+        for (page in ShopPage.entries) {
+            val hasItems = page.section == null || com.deepline.fishing.core.ShopCatalog.inSection(page.section).isNotEmpty()
+            if (hasItems) assertTrue("The tour never shows the Shop's ${page.label} page", page in shown)
+        }
+        for (topic in listOf("euros", "points", "Captain's Club", "Starter pack", "battles", "${GameConfig.MINUTES_PER_EURO.toInt()} minutes")) {
+            assertTrue("Tour doesn't mention $topic", text.contains(topic, ignoreCase = true))
+        }
+        // Battles: which tackle is allowed.
+        for (t in com.deepline.fishing.core.Tackle.entries.filter { it.usableInBattles }) {
+            assertTrue(Tour.steps.single { it.id == "battle_tackle" }.body.contains(t.displayName))
         }
     }
 
@@ -97,7 +122,7 @@ class TourContentTest {
         // Secrets are discovered by playing and explained then (see FishingSecrets), not in the tour.
         val secretNames = com.deepline.fishing.ui.secrets.FishingSecrets.all.map { it.title }
         // Cosmetics are named after the secret that unlocks them, and the legendary fish is a surprise.
-        val rewards = com.deepline.fishing.core.Cosmetic.entries.flatMap { listOf(it.displayName, it.setName) }
+        val rewards = com.deepline.fishing.core.Cosmetic.entries.filterNot { it.fromShop }.flatMap { listOf(it.displayName, it.setName) }
         val legendary = listOf(com.deepline.fishing.core.FishCatalog.sovereign.name, "sovereign", "only be caught")
         for (giveaway in listOf("last bump", "snag", "hooks what", "hooks whatever", "leviathan") + secretNames + rewards + legendary) {
             assertTrue("The tour reveals a secret: '$giveaway'", !text.contains(giveaway, ignoreCase = true))

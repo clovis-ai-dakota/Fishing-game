@@ -28,6 +28,8 @@ data class PlayerProgress(
     val ownedItems: Set<String> = emptySet(),
     /** Captain's Club membership ends at this time (epoch ms; 0: never a member). */
     val clubUntilMs: Long = 0L,
+    /** When a Club member can next claim their free Lantern pouch (epoch ms; 0: right away). */
+    val clubPouchNextMs: Long = 0L,
     /** How many times the app was opened (for the starter pack's timing). */
     val sessions: Int = 0,
     /** When the starter pack offer ends (epoch ms; 0: not offered yet). */

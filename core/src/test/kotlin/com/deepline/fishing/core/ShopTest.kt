@@ -1,5 +1,6 @@
 package com.deepline.fishing.core
 
+import com.deepline.fishing.core.online.toDto
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -13,7 +14,8 @@ class ShopTest {
     @Test
     fun pricesAreMostlyLowWithAFewAtFiveAndSpecialsAtTen() {
         val cents = ShopCatalog.all.map { it.euroCents }
-        assertTrue(cents.all { it in 50..199 || it == 499 || it == 999 }, "prices: ${cents.toSortedSet()}")
+        // Mostly €0.50 to €2; complete sets at €2.99 (cheaper than their pieces); a few at €5, specials at €10.
+        assertTrue(cents.all { it in 50..199 || it == 299 || it == 499 || it == 999 }, "prices: ${cents.toSortedSet()}")
         assertTrue(cents.count { it <= 199 } > cents.size * 0.7)
         assertTrue(ShopCatalog.all.map { it.id }.toSet().size == ShopCatalog.all.size, "unique product ids")
     }
@@ -104,5 +106,61 @@ class ShopTest {
         assertEquals(4, back.sessions)
         assertEquals(7, back.detectors)
         assertEquals(ClothPattern.WAVES, back.boatDesign.cloth)
+    }
+
+    @Test
+    fun bundlesAreAlwaysCheaperThanTheirPieces() {
+        val p = PlayerProgress(ropeLevels = mapOf(RopeStat.LENGTH to 4))
+        // Bundles of things also sold one by one (the founder's pack is exclusive, not a discount).
+        for (item in listOf("starter_pack", "set_coral_reef", "set_neon_nights").map { ShopCatalog.byId(it)!! }) {
+            val discount = ShopCatalog.discountPercent(item, p)
+            assertNotNull(discount, "${item.id} costs ${item.euroCents} but its pieces only ${ShopCatalog.separateCents(item, p)}")
+            assertTrue(discount in 1..90)
+        }
+    }
+
+    @Test
+    fun clubMembersGetAMonthlyPouch() {
+        val member = ShopCatalog.grant(PlayerProgress(lanterns = 0), ShopCatalog.byId("captains_club")!!, now)
+        assertTrue(ShopCatalog.clubPouchReady(member, now))
+        val claimed = ShopCatalog.claimClubPouch(member, now)!!
+        assertTrue(claimed.lanterns > 0)
+        assertNull(ShopCatalog.claimClubPouch(claimed, now + 86_400_000L), "once a month")
+        assertNotNull(ShopCatalog.claimClubPouch(claimed.copy(clubUntilMs = now + 60 * 86_400_000L), now + 31 * 86_400_000L))
+        assertNull(ShopCatalog.claimClubPouch(PlayerProgress(), now), "members only")
+        assertEquals(claimed.clubPouchNextMs, ProgressCodec.decode(ProgressCodec.encode(claimed)).clubPouchNextMs)
+        // A store subscription that keeps renewing keeps the Club on a few days at a time.
+        val renewed = ShopCatalog.onClubSubscriptionActive(PlayerProgress(), now)
+        assertTrue(ShopCatalog.isClubMember(renewed, now + (GameConfig.CLUB_RENEWAL_GRACE_DAYS - 1) * 86_400_000L))
+        assertFalse(ShopCatalog.isClubMember(renewed, now + (GameConfig.CLUB_RENEWAL_GRACE_DAYS + 1) * 86_400_000L))
+    }
+
+    @Test
+    fun tryingAPartOnTheBoat() {
+        val p = PlayerProgress()
+        val bare = BoatDesign.DEFAULT
+        assertEquals(HullPattern.NEON, BoatParts.applyTo(bare, BoatPart.of(HullPattern.NEON), p).pattern)
+        // An emblem or a print needs a sail or a flag to show on.
+        val withEmblem = BoatParts.applyTo(bare, BoatPart.of(Emblem.TRIDENT), p)
+        assertEquals(Emblem.TRIDENT, withEmblem.emblem)
+        assertTrue(withEmblem.sailStyle != SailStyle.NONE || withEmblem.flagStyle != FlagStyle.NONE)
+        val printed = BoatParts.applyTo(bare.copy(flagStyle = FlagStyle.PENNANT), BoatPart.of(ClothPattern.STARS), p)
+        assertEquals(SailStyle.NONE, printed.sailStyle, "a boat with a flag keeps its rig")
+        assertEquals(ClothPattern.STARS, printed.cloth)
+    }
+
+    @Test
+    fun sightTackleIsReportedInOnlineCasts() {
+        val session = CastSession.seeded(com.deepline.fishing.core.online.OnlineProtocol.tournamentSpecs, 42L, lanternActive = true)
+        session.detectorActive = true
+        while (session.phase != CastPhase.SURFACED) session.update(1f / 30f, null)
+        val result = session.result!!
+        assertTrue(result.lanternUsed && result.detectorUsed && result.sightAided)
+        val turn = BattleTurn(playerIndex = 0, castNumber = 1, round = 0, seed = 42L, timeLimitSec = null)
+        val sent = BattleCast(result, 30f).toDto()
+        assertTrue(sent.lanternUsed && sent.detectorUsed)
+        // The server keeps what the client used: secrets that need the dark check it.
+        val back = com.deepline.fishing.core.online.CastValidation.toBattleCast(sent, turn, com.deepline.fishing.core.online.OnlineProtocol.tournamentSpecs)!!
+        assertTrue(back.result.lanternUsed && back.result.detectorUsed)
     }
 }

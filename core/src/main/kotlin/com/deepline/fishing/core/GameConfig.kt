@@ -160,9 +160,13 @@ object GameConfig {
     /** The starter pack is offered from this app session on, for this long, once. */
     const val STARTER_OFFER_FROM_SESSION = 3
     const val STARTER_OFFER_HOURS = 72
+    const val STARTER_PACK_LANTERNS = 20
 
     /** One Captain's Club month. */
     const val CLUB_DAYS = 30
+
+    /** How long an active store subscription keeps the Club on after the store last confirmed it. */
+    const val CLUB_RENEWAL_GRACE_DAYS = 3
 
     /** Boat options bought with points cost their table price times this. */
     const val BOAT_PART_PRICE_SCALE = 6

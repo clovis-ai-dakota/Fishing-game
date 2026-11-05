@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -34,14 +36,14 @@ private val MainTab.icon: ImageVector
     get() = when (this) {
         MainTab.FISH -> GameIcons.Fish
         MainTab.DEX -> GameIcons.Dex
-        MainTab.UPGRADES -> GameIcons.Upgrades
+        MainTab.SHOP -> GameIcons.Shop
         MainTab.BATTLE -> GameIcons.Battle
     }
 
 private val MainTab.tourTarget: TourTarget?
     get() = when (this) {
         MainTab.DEX -> TourTarget.TAB_DEX
-        MainTab.UPGRADES -> TourTarget.TAB_UPGRADES
+        MainTab.SHOP -> TourTarget.TAB_SHOP
         MainTab.BATTLE -> TourTarget.TAB_BATTLE
         MainTab.FISH -> null
     }
@@ -59,17 +61,22 @@ fun MainScaffold(vm: GameViewModel) {
             when (current) {
                 MainTab.FISH -> HomeScreen(vm)
                 MainTab.DEX -> DexScreen(vm)
-                MainTab.UPGRADES -> UpgradesScreen(vm)
+                MainTab.SHOP -> com.deepline.fishing.ui.shop.ShopScreen(vm)
                 MainTab.BATTLE -> BattleSetupScreen(vm)
             }
         }
         NavigationBar(Modifier.tourTarget(TourTarget.NAV_BAR)) {
             for (tab in MainTab.entries) {
                 val target = tab.tourTarget
+                // A dot on the Shop tab when there's something for the player there (the Club's
+                // monthly pouch, or the starter pack offer while it's open).
+                val dot = tab == MainTab.SHOP && (vm.clubPouchReady || vm.starterOfferOpen)
                 NavigationBarItem(
                     selected = tab == current,
                     onClick = { vm.selectTab(tab) },
-                    icon = { Icon(tab.icon, contentDescription = null) },
+                    icon = {
+                        BadgedBox(badge = { if (dot) Badge() }) { Icon(tab.icon, contentDescription = null) }
+                    },
                     label = { Text(tab.label, maxLines = 1) },
                     alwaysShowLabel = true,
                     colors = NavigationBarItemDefaults.colors(

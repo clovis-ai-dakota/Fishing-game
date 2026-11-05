@@ -3,6 +3,8 @@ package com.deepline.fishing
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.performScrollToNode
 import com.deepline.fishing.core.BotDifficulty
 import com.deepline.fishing.core.GameConfig
 import com.deepline.fishing.core.PlayerProgress
@@ -26,13 +28,14 @@ class TackleShopUiTest : BoatUiTestBase() {
     @Test
     fun buyAndUseALuckyCharm() {
         val vm = launch(PlayerProgress(pointsBalance = 50_000, pointsEarned = 50_000, ropeLevels = mapOf(RopeStat.LENGTH to 4)))
-        compose.onNodeWithTag("tab_upgrades").performClick()
+        compose.onNodeWithTag("tab_shop").performClick()
         val price = Progression.tacklePrice(vm.progress, Tackle.LUCKY_CHARM)
-        compose.click("Tackle shop")
+        compose.onNodeWithTag("shop_page_tackle").performClick()
         compose.shot("60_tackle_shop")
-        // The charm's card: tap its price.
+        // The charm's card: buy just one with points.
         val before = vm.progress.pointsBalance
-        vm.buyTackle(Tackle.LUCKY_CHARM)
+        compose.onNodeWithTag("shop_list").performScrollToNode(hasTestTag("buy_one_lucky_charm"))
+        compose.onNodeWithTag("buy_one_lucky_charm").performClick()
         assertEquals(before - price, vm.progress.pointsBalance)
         assertEquals(1, vm.progress.luckyCharms)
 

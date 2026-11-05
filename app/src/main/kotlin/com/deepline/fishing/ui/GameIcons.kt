@@ -92,6 +92,32 @@ object GameIcons {
         }
     }
 
+    /** The Shop tab: a bag with two handles. */
+    val Shop: ImageVector = icon("Shop") {
+        filled {
+            // The bag.
+            moveTo(4.5f, 8f)
+            horizontalLineTo(19.5f)
+            lineTo(18.5f, 20.5f)
+            quadTo(18.4f, 21.5f, 17.4f, 21.5f)
+            horizontalLineTo(6.6f)
+            quadTo(5.6f, 21.5f, 5.5f, 20.5f)
+            close()
+            // The handle, as an arch over the opening.
+            moveTo(8f, 8f)
+            verticalLineTo(6.5f)
+            curveTo(8f, 4.2f, 9.8f, 2.5f, 12f, 2.5f)
+            curveTo(14.2f, 2.5f, 16f, 4.2f, 16f, 6.5f)
+            verticalLineTo(8f)
+            horizontalLineTo(14.3f)
+            verticalLineTo(6.5f)
+            curveTo(14.3f, 5.2f, 13.3f, 4.2f, 12f, 4.2f)
+            curveTo(10.7f, 4.2f, 9.7f, 5.2f, 9.7f, 6.5f)
+            verticalLineTo(8f)
+            close()
+        }
+    }
+
     /** The Battle tab: a lightning bolt. */
     val Battle: ImageVector = icon("Battle") {
         filled {

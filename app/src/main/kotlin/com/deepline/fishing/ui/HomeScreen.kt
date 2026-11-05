@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -44,7 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.GameViewModel
 import com.deepline.fishing.DexSection
-import com.deepline.fishing.MainTab
+import com.deepline.fishing.ShopPage
 import com.deepline.fishing.Screen
 import com.deepline.fishing.core.DepthZone
 import com.deepline.fishing.core.FishCatalog
@@ -153,7 +154,7 @@ private fun DepthCard(vm: GameViewModel) {
     val maxDepth = RopeStat.LENGTH.valueAt(RopeStat.LENGTH.maxLevel)
     val reachZone = DepthZone.of(specs.lengthM - 0.01f)
     val deepest = p.collection.values.maxOfOrNull { it.deepestM } ?: 0f
-    Card(onClick = { vm.selectTab(MainTab.UPGRADES) }, modifier = Modifier.fillMaxWidth()) {
+    Card(onClick = { vm.openShop(ShopPage.ROPE) }, modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("Your rope", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
@@ -309,9 +310,16 @@ private fun CastArea(vm: GameViewModel) {
                     enabled = p.lanterns > 0,
                 )
             }
-            // The other tackle, once the player owns some (bought in Upgrades).
-            if (p.luckyCharms > 0 || p.sparkleLures > 0) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            // The other tackle, once the player owns some (bought in the Shop).
+            if (p.luckyCharms > 0 || p.sparkleLures > 0 || p.detectors > 0) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.horizontalScroll(rememberScrollState())) {
+                    if (p.detectors > 0) {
+                        FilterChip(
+                            selected = vm.useDetector,
+                            onClick = { vm.toggleDetector(!vm.useDetector) },
+                            label = { Text("Detector ×${p.detectors}") },
+                        )
+                    }
                     if (p.luckyCharms > 0) {
                         FilterChip(
                             selected = vm.useCharm,

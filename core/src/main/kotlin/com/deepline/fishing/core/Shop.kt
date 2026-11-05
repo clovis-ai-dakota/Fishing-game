@@ -85,7 +85,9 @@ object ShopCatalog {
         ShopItem("lantern_crate", "Lantern crate", "A crate of Lanterns.", ShopSection.TACKLE, 99, ItemKind.CONSUMABLE,
             listOf(Grant.TacklePack(Tackle.LANTERN)), minutesPerEuro = GameConfig.LANTERN_MINUTES_PER_EURO),
         ShopItem("lantern_chest", "Lantern chest", "A chest of Lanterns.", ShopSection.TACKLE, 199, ItemKind.CONSUMABLE,
-            listOf(Grant.TacklePack(Tackle.LANTERN)), minutesPerEuro = GameConfig.LANTERN_MINUTES_PER_EURO, badge = "Best value"),
+            listOf(Grant.TacklePack(Tackle.LANTERN)), minutesPerEuro = GameConfig.LANTERN_MINUTES_PER_EURO),
+        ShopItem("lantern_barrel", "Lantern barrel", "A barrel of Lanterns, with a bulk bonus.", ShopSection.TACKLE, 499, ItemKind.CONSUMABLE,
+            listOf(Grant.TacklePack(Tackle.LANTERN)), minutesPerEuro = GameConfig.LANTERN_MINUTES_PER_EURO, badge = "+20%"),
         ShopItem("detector_pouch", "Detector pouch", "A pouch of rare fish detectors.", ShopSection.TACKLE, 50, ItemKind.CONSUMABLE,
             listOf(Grant.TacklePack(Tackle.DETECTOR))),
         ShopItem("detector_crate", "Detector crate", "A crate of rare fish detectors.", ShopSection.TACKLE, 99, ItemKind.CONSUMABLE,
@@ -127,14 +129,15 @@ object ShopCatalog {
         preset("starlight_voyager", 199),
         preset("royal_regatta", 199),
         preset("galaxy_dreamer", 199),
-        // Complete sets (boat + hook + line + trail): €4.99.
+        preset("neon_nights", 99),
+        // Complete sets (boat + hook + line + trail): €2.99, cheaper than the four pieces.
         ShopItem(
-            "set_coral_reef", "Coral Reef set", "The Coral Reef Cruiser with a matching hook, line and trail.", ShopSection.STYLE, 499, ItemKind.PERMANENT,
+            "set_coral_reef", "Coral Reef set", "The Coral Reef Cruiser with a matching hook, line and trail.", ShopSection.STYLE, 299, ItemKind.PERMANENT,
             listOf(Grant.Preset("coral_cruiser"), Grant.Cosmetics(listOf(Cosmetic.CORAL_HOOK, Cosmetic.OCEAN_LINE, Cosmetic.HEART_TRAIL))),
             badge = "Set",
         ),
         ShopItem(
-            "set_neon_nights", "Neon Nights set", "The Neon Nights boat with a matching hook, line and trail.", ShopSection.STYLE, 499, ItemKind.PERMANENT,
+            "set_neon_nights", "Neon Nights set", "The Neon Nights boat with a matching hook, line and trail.", ShopSection.STYLE, 299, ItemKind.PERMANENT,
             listOf(Grant.Preset("neon_nights"), Grant.Cosmetics(listOf(Cosmetic.NEON_HOOK, Cosmetic.NEON_LINE, Cosmetic.STAR_TRAIL))),
             badge = "Set",
         ),
@@ -147,16 +150,15 @@ object ShopCatalog {
 
     private val passes = listOf(
         ShopItem(
-            "starter_pack", "Starter pack", "The Coral Reef Cruiser, Metallic paint, a Neon line, a rainbow title badge and a crate of Lanterns.",
+            "starter_pack", "Starter pack", "The Coral Reef Cruiser, Metallic paint, a Neon line, a rainbow title badge and ${GameConfig.STARTER_PACK_LANTERNS} Lanterns.",
             ShopSection.PASSES, 199, ItemKind.PERMANENT,
             listOf(
                 Grant.Preset("coral_cruiser"),
                 parts(BoatPart.of(HullPattern.METALLIC)),
                 Grant.Cosmetics(listOf(Cosmetic.NEON_LINE)),
                 Grant.Unlock("badge:RAINBOW"),
-                Grant.TacklePack(Tackle.LANTERN, count = 20),
+                Grant.TacklePack(Tackle.LANTERN, count = GameConfig.STARTER_PACK_LANTERNS),
             ),
-            badge = "-50%",
         ),
         ShopItem(
             "captains_club", "Captain's Club", "${GameConfig.CLUB_DAYS} days: the members-only Aurora paint, a club title badge, cloud save, and a free Lantern pouch each month.",
@@ -209,6 +211,35 @@ object ShopCatalog {
     fun packCount(item: ShopItem, grant: Grant.TacklePack, p: PlayerProgress): Int =
         grant.count ?: (pointsPrice(item, p) / Progression.tacklePrice(p, grant.tackle)).toInt().coerceAtLeast(1)
 
+    /**
+     * What a bundle's contents would cost bought one by one, in euro cents (tackle at the pouch's
+     * rate). Bundles show the saving as their badge, so it's always true.
+     */
+    fun separateCents(item: ShopItem, p: PlayerProgress): Int = item.grants.sumOf { g -> separateCents(item, g, p) }
+
+    private fun separateCents(bundle: ShopItem, g: Grant, p: PlayerProgress): Int {
+        val singles = all.filter { it !== bundle && it.grants.size == 1 }
+        return when (g) {
+            is Grant.TacklePack -> {
+                val pouch = singles.filter { s -> (s.grants.first() as? Grant.TacklePack)?.let { it.tackle == g.tackle && it.count == null } == true }
+                    .minByOrNull { it.euroCents } ?: return 0
+                val perPouch = packCount(pouch, pouch.grants.first() as Grant.TacklePack, p)
+                (packCount(bundle, g, p).toDouble() / perPouch * pouch.euroCents).roundToLong().toInt()
+            }
+            is Grant.Cosmetics -> g.items.sumOf { c -> singles.firstOrNull { (it.grants.first() as? Grant.Cosmetics)?.items == listOf(c) }?.euroCents ?: 0 }
+            is Grant.BoatParts -> g.parts.sumOf { part -> singles.firstOrNull { (it.grants.first() as? Grant.BoatParts)?.parts == listOf(part) }?.euroCents ?: 0 }
+            else -> singles.firstOrNull { it.grants.first() == g }?.euroCents ?: 0
+        }
+    }
+
+    /** The saving shown on a bundle ("-45%"), or null when it isn't a bundle of shop items. */
+    fun discountPercent(item: ShopItem, p: PlayerProgress): Int? {
+        if (item.grants.size < 2) return null
+        val separate = separateCents(item, p)
+        if (separate <= item.euroCents) return null
+        return ((1.0 - item.euroCents.toDouble() / separate) * 100).toInt()
+    }
+
     // ---- Ownership -----------------------------------------------------------------------------
 
     fun owns(p: PlayerProgress, key: String) = key in p.ownedItems
@@ -248,6 +279,26 @@ object ShopCatalog {
             starterOfferEndsMs = if (opens) now + GameConfig.STARTER_OFFER_HOURS * 3_600_000L else p.starterOfferEndsMs,
         )
     }
+
+    // ---- Captain's Club --------------------------------------------------------------------------
+
+    /** The pouch a Club member gets for free each month. */
+    val clubPouch: ShopItem get() = byId("lantern_pouch")!!
+
+    fun clubPouchReady(p: PlayerProgress, now: Long) = isClubMember(p, now) && now >= p.clubPouchNextMs
+
+    /** Gives a Club member their monthly Lantern pouch; null when it isn't ready. */
+    fun claimClubPouch(p: PlayerProgress, now: Long): PlayerProgress? {
+        if (!clubPouchReady(p, now)) return null
+        return grant(p, clubPouch, now).copy(clubPouchNextMs = now + GameConfig.CLUB_DAYS * 86_400_000L)
+    }
+
+    /**
+     * A store reports an active Club subscription (it renews by itself): membership lasts at least
+     * [GameConfig.CLUB_RENEWAL_GRACE_DAYS] more days, so a lapsed renewal ends it soon after.
+     */
+    fun onClubSubscriptionActive(p: PlayerProgress, now: Long): PlayerProgress =
+        p.copy(clubUntilMs = maxOf(p.clubUntilMs, now + GameConfig.CLUB_RENEWAL_GRACE_DAYS * 86_400_000L))
 
     // ---- Buying ----------------------------------------------------------------------------------
 

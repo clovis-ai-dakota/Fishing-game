@@ -17,6 +17,9 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.platform.testTag
+import com.deepline.fishing.ShopPage
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,6 +40,32 @@ import com.deepline.fishing.ui.tour.tourTarget
 
 private const val FRIEND = "FRIEND"
 private const val ONLINE = "ONLINE"
+
+/**
+ * Switches for the tackle allowed in battles (Lantern, rare fish detector), with what's left. Also
+ * on the battle screen before each cast, and on the Fish tab.
+ */
+@Composable
+fun SightTackleChips(vm: GameViewModel, showShopLink: Boolean = false) {
+    val p = vm.progress
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        FilterChip(
+            selected = vm.useLantern && p.lanterns > 0,
+            onClick = { vm.toggleLantern(!vm.useLantern) },
+            enabled = p.lanterns > 0,
+            label = { Text("Lantern ×${p.lanterns}") },
+            modifier = Modifier.testTag("battle_lantern"),
+        )
+        FilterChip(
+            selected = vm.useDetector && p.detectors > 0,
+            onClick = { vm.toggleDetector(!vm.useDetector) },
+            enabled = p.detectors > 0,
+            label = { Text("Detector ×${p.detectors}") },
+            modifier = Modifier.testTag("battle_detector"),
+        )
+        if (showShopLink) TextButton(onClick = { vm.openShop(ShopPage.TACKLE) }) { Text("Get more") }
+    }
+}
 
 @Composable
 fun BattleSetupScreen(vm: GameViewModel) {
@@ -115,9 +144,19 @@ fun BattleSetupScreen(vm: GameViewModel) {
                 } else {
                     "Both players use your current rope and fish the very same water for each cast, " +
                         "so skill decides."
-                } + " No lanterns in battles. Battle catches don't count for your points or fish log.",
+                } + " Battle catches don't count for your points or fish log.",
                 style = MaterialTheme.typography.bodySmall,
             )
+            Column(Modifier.tourTarget(TourTarget.BATTLE_TACKLE), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("Tackle for your casts", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text(
+                    "Lanterns and detectors work in battles: each of your casts uses one while switched on. " +
+                        "The Lucky charm and the Sparkle lure are for solo casts only.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                SightTackleChips(vm, showShopLink = true)
+            }
             // Wagers: only against the computer.
             val rival = BotDifficulty.entries.firstOrNull { it.name == opponentKey }
             if (rival != null) {

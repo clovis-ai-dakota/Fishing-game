@@ -169,14 +169,13 @@ class BoatCustomisationUiTest : BoatUiTestBase() {
         assertEquals(HullPattern.STRIPE, vm.progress.boatDesign.pattern)
         assertEquals(vm.progress.boatDesign, vm.skins.customBoat)
 
-        // The shop: premade boats with prices, nothing can be bought yet.
-        compose.click("Premium skins")
+        // The shop's premade boats, on the Style page of the Shop tab.
+        compose.click("Shop boats")
         assertEquals(Screen.SHOP, vm.screen)
-        val buttons = compose.onAllNodesWithText("Coming soon")
-        assertTrue(buttons.fetchSemanticsNodes().isNotEmpty())
-        buttons.assertAll(isNotEnabled())
+        assertEquals(ShopPage.STYLE, vm.shopPage)
+        compose.onNodeWithText("Premade boats").assertExists()
         compose.shot("57_shop")
-        vm.onBack()
+        vm.openDex(DexSection.SKINS)
         assertEquals(Screen.DEX, vm.screen)
 
         // Wearing the classic boat again.

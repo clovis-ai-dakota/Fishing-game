@@ -11,6 +11,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Snackbar
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.ui.platform.testTag
+import com.deepline.fishing.billing.TestStore
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -40,7 +45,7 @@ fun AppRoot(vm: GameViewModel) {
             Box(Modifier.fillMaxSize()) {
                 when (vm.screen) {
                     // The four tabs share the bottom navigation bar.
-                    Screen.HOME, Screen.DEX, Screen.UPGRADES, Screen.BATTLE_SETUP -> MainScaffold(vm)
+                    Screen.HOME, Screen.DEX, Screen.SHOP, Screen.BATTLE_SETUP -> MainScaffold(vm)
                     // Full screens, without the bar.
                     Screen.CAST -> CastScreen(vm)
                     Screen.FISH_DETAIL -> FishDetailScreen(vm)
@@ -48,11 +53,23 @@ fun AppRoot(vm: GameViewModel) {
                     Screen.BATTLE -> BattleScreen(vm)
                     Screen.ONLINE_LOBBY -> OnlineLobbyScreen(vm)
                     Screen.BOAT_EDITOR -> com.deepline.fishing.ui.boat.BoatEditorScreen(vm)
-                    Screen.SHOP -> com.deepline.fishing.ui.boat.ShopScreen(vm)
                 }
                 vm.tour?.let { TourOverlay(it, onNext = vm::tourNext, onBack = vm::tourBack, onSkip = vm::skipTour) }
+                // What just happened in the shop (a purchase, a pending payment), above the tab bar.
+                val message = vm.shopMessage
+                if (message != null && isTabScreen(vm.screen) && vm.tour == null) {
+                    Snackbar(
+                        action = { TextButton(onClick = vm::dismissShopMessage) { Text("OK") } },
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .navigationBarsPadding()
+                            .padding(start = 12.dp, end = 12.dp, bottom = 88.dp),
+                    ) { Text(message) }
+                }
             }
         }
+        // Debug builds pay through the test store: the tester decides how each payment goes.
+        vm.testStore?.request?.let { item -> TestStoreDialog(item, onAnswer = { vm.testStore?.answer(it) }) }
         // Fishing secrets are explained wherever they happen: in a cast, after a battle, at home.
         vm.secretPopup?.let { id ->
             FishingSecrets.byId(id)?.let { SecretDiscoveredDialog(it, onAnswer = vm::answerSecretPopup) }
@@ -72,6 +89,28 @@ fun AppRoot(vm: GameViewModel) {
             )
         }
     }
+}
+
+/** The test store's payment sheet: no real money, the tester picks the outcome. */
+@Composable
+private fun TestStoreDialog(item: com.deepline.fishing.core.ShopItem, onAnswer: (TestStore.TestOutcome) -> Unit) {
+    AlertDialog(
+        onDismissRequest = { onAnswer(TestStore.TestOutcome.CANCEL) },
+        title = { Text("Test store") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("Pay ${item.euroLabel} for ${item.name}? This is a test build: no real money is charged. Choose how the payment goes.")
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(onClick = { onAnswer(TestStore.TestOutcome.PENDING) }, modifier = Modifier.testTag("test_store_pending")) { Text("Pending") }
+                    OutlinedButton(onClick = { onAnswer(TestStore.TestOutcome.FAIL) }, modifier = Modifier.testTag("test_store_fail")) { Text("Fail") }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onAnswer(TestStore.TestOutcome.APPROVE) }, modifier = Modifier.testTag("test_store_approve")) { Text("Approve") }
+        },
+        dismissButton = { TextButton(onClick = { onAnswer(TestStore.TestOutcome.CANCEL) }) { Text("Cancel") } },
+    )
 }
 
 /** Shared layout for the secondary screens: a back button, a title, then the content. */

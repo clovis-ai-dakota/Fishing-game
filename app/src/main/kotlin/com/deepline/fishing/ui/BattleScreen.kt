@@ -172,6 +172,8 @@ fun BattleScreen(vm: GameViewModel) {
                                 style = MaterialTheme.typography.bodySmall,
                             )
                         }
+                        // Sight tackle can be switched on before each of the device owner's casts.
+                        if (!player.isBot) SightTackleChips(vm)
                         Button(
                             onClick = vm::playNextTurn,
                             modifier = Modifier

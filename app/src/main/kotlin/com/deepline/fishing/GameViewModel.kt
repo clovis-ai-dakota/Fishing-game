@@ -1,5 +1,6 @@
 package com.deepline.fishing
 
+import android.app.Activity
 import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -33,7 +34,19 @@ import com.deepline.fishing.core.RopeSpecs
 import com.deepline.fishing.core.RopeStat
 import com.deepline.fishing.core.SecretRules
 import com.deepline.fishing.core.Secrets
+import com.deepline.fishing.core.ItemKind
+import com.deepline.fishing.core.PremiumSkins
+import com.deepline.fishing.core.ShopCatalog
+import com.deepline.fishing.core.ShopClock
+import com.deepline.fishing.core.ShopItem
+import com.deepline.fishing.core.ShopSection
 import com.deepline.fishing.core.Tackle
+import com.deepline.fishing.billing.PlayStore
+import com.deepline.fishing.billing.Store
+import com.deepline.fishing.billing.StoreListener
+import com.deepline.fishing.billing.StoreProblem
+import com.deepline.fishing.billing.StorePurchase
+import com.deepline.fishing.billing.TestStore
 import com.deepline.fishing.core.online.ClientMessage
 import com.deepline.fishing.core.online.LiveStatus
 import com.deepline.fishing.core.online.OnlineMatch
@@ -41,26 +54,39 @@ import com.deepline.fishing.core.online.OnlineProtocol
 import com.deepline.fishing.core.online.ServerMessage
 import com.deepline.fishing.core.online.toDto
 import com.deepline.fishing.ui.Skins
+import com.deepline.fishing.ui.shop.ShopText
 import com.deepline.fishing.ui.tour.Tour
 import com.deepline.fishing.ui.tour.TourSession
 import kotlin.random.Random
 
 /**
- * Where the player is. [HOME] (the Fish tab), [DEX], [UPGRADES] and [BATTLE_SETUP] are the four
+ * Where the player is. [HOME] (the Fish tab), [DEX], [SHOP] and [BATTLE_SETUP] are the four
  * bottom-bar tabs; the others are full screens pushed on top of them (no tab bar).
  */
-enum class Screen { HOME, DEX, UPGRADES, BATTLE_SETUP, CAST, FISH_DETAIL, MILESTONES, BATTLE, ONLINE_LOBBY, BOAT_EDITOR, SHOP }
+enum class Screen { HOME, DEX, SHOP, BATTLE_SETUP, CAST, FISH_DETAIL, MILESTONES, BATTLE, ONLINE_LOBBY, BOAT_EDITOR }
 
 /** The four top-level destinations of the bottom navigation bar, in order. */
 enum class MainTab(val label: String, val screen: Screen) {
     FISH("Fish", Screen.HOME),
     DEX("Dex", Screen.DEX),
-    UPGRADES("Upgrades", Screen.UPGRADES),
+    SHOP("Shop", Screen.SHOP),
     BATTLE("Battle", Screen.BATTLE_SETUP);
 
     companion object {
         fun of(screen: Screen): MainTab? = entries.firstOrNull { it.screen == screen }
     }
+}
+
+/**
+ * The pages of the Shop tab: rope upgrades (points only), then the shop's sections, where every
+ * item has a euro price and a points price. A section only shows once it has items.
+ */
+enum class ShopPage(val label: String, val section: ShopSection?) {
+    ROPE("Rope", null),
+    TACKLE("Tackle", ShopSection.TACKLE),
+    STYLE("Style", ShopSection.STYLE),
+    PASSES("Passes", ShopSection.PASSES),
+    AQUARIUM("Aquarium", ShopSection.AQUARIUM),
 }
 
 /** The sections of the Dex tab. Secrets only appears once one is found; Skins is always there. */
@@ -146,6 +172,8 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         private set
 
     init {
+        // Each app start is a session (the starter pack is offered from a later one).
+        update(ShopCatalog.onSessionStart(progress, ShopClock.now()))
         // A first launch (no answer stored yet) shows the full tour; afterwards it only opens
         // again if the player asked for it, or to show steps added since the version they saw.
         val showAgain = store.getString(KEY_TOUR_AGAIN)?.toBooleanStrictOrNull() ?: true
@@ -182,6 +210,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     private fun showTourStep(t: TourSession) {
         screen = t.current.screen
         if (screen == Screen.DEX) dexSection = t.current.dexSection ?: DexSection.FISH
+        if (screen == Screen.SHOP) shopPage = t.current.shopPage ?: ShopPage.ROPE
     }
 
     /** Skipping and finishing both close the tour and ask about next time. */
@@ -212,6 +241,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     /** A tap on the bottom navigation bar. */
     fun selectTab(tab: MainTab) {
         screen = tab.screen
+        shopMessage = null
     }
 
     /** Opens the Dex on [section] (falls back to Species if that section isn't unlocked yet). */
@@ -244,9 +274,132 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         screen = Screen.BOAT_EDITOR
     }
 
-    fun openShop() {
+    // --- Shop ----------------------------------------------------------------------------
+
+    var shopPage by mutableStateOf(ShopPage.ROPE)
+        private set
+
+    /** Opens the Shop tab on [page]. */
+    fun openShop(page: ShopPage = shopPage) {
+        shopPage = page
         screen = Screen.SHOP
     }
+
+    fun selectShopPage(page: ShopPage) {
+        shopPage = page
+    }
+
+    /** Pages with something to show (the Aquarium once it has items). */
+    val shopPages: List<ShopPage>
+        get() = ShopPage.entries.filter { it.section == null || ShopCatalog.inSection(it.section).isNotEmpty() }
+
+    /** What just happened in the shop (a purchase, a pending payment...), until dismissed. */
+    var shopMessage by mutableStateOf<String?>(null)
+        private set
+
+    fun dismissShopMessage() {
+        shopMessage = null
+    }
+
+    private val storeListener = object : StoreListener {
+        override fun onPurchased(purchase: StorePurchase) = grantStorePurchase(purchase)
+
+        override fun onSubscriptionActive(productId: String) {
+            update(ShopCatalog.onClubSubscriptionActive(progress, ShopClock.now()))
+        }
+
+        override fun onProblem(productId: String?, problem: StoreProblem, message: String?) {
+            val name = productId?.let { ShopCatalog.byId(it)?.name }
+            shopMessage = when (problem) {
+                StoreProblem.CANCELLED -> "Purchase cancelled: nothing was charged."
+                StoreProblem.PENDING -> "${name ?: "Your purchase"} is waiting for the payment to clear. It'll arrive as soon as it does."
+                StoreProblem.FAILED -> "The payment didn't go through" + (message?.takeIf { it.isNotBlank() }?.let { ": $it" } ?: ".")
+                StoreProblem.UNAVAILABLE -> message ?: "${billing.name} isn't available right now."
+            }
+        }
+    }
+
+    /** Pays with money: Google Play in release builds, the test store in debug builds and tests. */
+    val billing: Store = if (BuildConfig.USE_PLAY_BILLING) PlayStore(app, storeListener) { ShopCatalog.all } else TestStore(storeListener)
+
+    /** The test store, when that's what [billing] is (its dialog is part of the app). */
+    val testStore: TestStore? get() = billing as? TestStore
+
+    /** Purchase tokens already granted, so a purchase delivered twice is only granted once. */
+    private val grantedTokens = LinkedHashSet(store.getString(KEY_GRANTED)?.split(',')?.filter { it.isNotBlank() }.orEmpty())
+
+    private fun grantStorePurchase(purchase: StorePurchase) {
+        val item = ShopCatalog.byId(purchase.productId) ?: return
+        if (purchase.token !in grantedTokens) {
+            val owned = item.kind == ItemKind.PERMANENT && ShopCatalog.owns(progress, item.id)
+            if (!owned) {
+                val contents = ShopText.contents(item, progress)
+                update(ShopCatalog.grant(progress, item, ShopClock.now()))
+                shopMessage = "Thank you! ${item.name}: $contents."
+            }
+            grantedTokens += purchase.token
+            while (grantedTokens.size > MAX_GRANTED_TOKENS) grantedTokens.remove(grantedTokens.first())
+            store.putString(KEY_GRANTED, grantedTokens.joinToString(","))
+        }
+        billing.finish(purchase)
+    }
+
+    fun shopPointsPrice(item: ShopItem): Long = ShopCatalog.pointsPrice(item, progress)
+
+    fun canBuy(item: ShopItem): Boolean = ShopCatalog.canBuy(item, progress, ShopClock.now())
+
+    /** Buys [item] with points; false if it can't be bought now or isn't affordable. */
+    fun buyWithPoints(item: ShopItem): Boolean {
+        val contents = ShopText.contents(item, progress)
+        val next = ShopCatalog.buyWithPoints(progress, item, ShopClock.now()) ?: return false
+        update(next)
+        shopMessage = "${item.name}: $contents."
+        return true
+    }
+
+    /** Buys [item] with money through [billing] (Play needs the [activity] for its sheet). */
+    fun buyWithMoney(item: ShopItem, activity: Activity?) {
+        if (!canBuy(item)) return
+        shopMessage = null
+        billing.buy(activity, item)
+    }
+
+    /** Asks the store for purchases not granted yet (a new phone, a payment that cleared). */
+    fun restorePurchases() {
+        shopMessage = "Checking ${billing.name} for your purchases…"
+        billing.restore()
+    }
+
+    val isClubMember: Boolean get() = ShopCatalog.isClubMember(progress, ShopClock.now())
+
+    val clubPouchReady: Boolean get() = ShopCatalog.clubPouchReady(progress, ShopClock.now())
+
+    fun claimClubPouch() {
+        val pouch = ShopCatalog.clubPouch
+        val contents = ShopText.contents(pouch, progress)
+        ShopCatalog.claimClubPouch(progress, ShopClock.now())?.let {
+            update(it)
+            shopMessage = "Captain's Club: $contents."
+        }
+    }
+
+    val starterOfferOpen: Boolean get() = ShopCatalog.starterOfferOpen(progress, ShopClock.now())
+
+    /** Wears a premade boat the player owns. */
+    fun wearPreset(presetId: String) {
+        ShopCatalog.wearPreset(progress, presetId)?.let(::update)
+    }
+
+    /** Puts a paint, emblem or print the player owns on their boat, and wears the boat. */
+    fun applyBoatPart(part: BoatPart): Boolean = saveBoatDesign(com.deepline.fishing.core.BoatParts.applyTo(progress.boatDesign, part, progress))
+
+    /** Whether the boat the player wears uses [part]. */
+    fun isOnBoat(part: BoatPart): Boolean =
+        progress.customBoatEquipped && part in com.deepline.fishing.core.BoatParts.partsOf(progress.boatDesign)
+
+    /** Whether the player is wearing the premade boat [presetId]. */
+    fun isWearingPreset(presetId: String): Boolean =
+        progress.customBoatEquipped && PremiumSkins.byId(presetId)?.design == progress.boatDesign
 
     /** Buys a boat option with points; false if it can't be bought or isn't affordable. */
     fun unlockBoatPart(part: BoatPart): Boolean {
@@ -299,6 +452,40 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         useLure = enabled && progress.sparkleLures > 0
     }
 
+    /** The rare fish detector, switched on for the next cast (in battles too). */
+    var useDetector by mutableStateOf(false)
+        private set
+
+    fun toggleDetector(enabled: Boolean) {
+        useDetector = enabled && progress.detectors > 0
+    }
+
+    /**
+     * Species the detector marks during the current cast (those not caught yet when it started),
+     * or null when it's off. Only the screen uses it: the water is the same.
+     */
+    var detectorTargets by mutableStateOf<Set<String>?>(null)
+        private set
+
+    /** Uses up the sight tackle switched on (Lantern, detector) for one cast; allowed in battles. */
+    private fun useSightTackle(): Pair<Boolean, Boolean> {
+        var p = progress
+        val lantern = useLantern && p.lanterns > 0
+        if (lantern) p = Progression.consumeLantern(p) ?: p
+        val detector = useDetector && p.detectors > 0
+        if (detector) p = Progression.consumeTackle(p, Tackle.DETECTOR) ?: p
+        update(p)
+        return lantern to detector
+    }
+
+    /** Switches tackle off once it has run out. */
+    private fun refreshTackleToggles() {
+        useLantern = useLantern && progress.lanterns > 0
+        useCharm = useCharm && progress.luckyCharms > 0
+        useLure = useLure && progress.sparkleLures > 0
+        useDetector = useDetector && progress.detectors > 0
+    }
+
     fun buyTackle(item: Tackle) {
         Progression.buyTackle(progress, item)?.let(::update)
     }
@@ -307,9 +494,8 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     private var nextSparklingChance = GameConfig.SPARKLING_CHANCE
 
     fun startCast() {
+        val (lantern, detector) = useSightTackle()
         var p = progress
-        val lantern = useLantern && p.lanterns > 0
-        if (lantern) p = Progression.consumeLantern(p) ?: p
         val charm = useCharm && p.luckyCharms > 0
         if (charm) p = Progression.consumeTackle(p, Tackle.LUCKY_CHARM) ?: p
         val lure = useLure && p.sparkleLures > 0
@@ -319,10 +505,16 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         val s = castFactory(p.specs, lantern)
         nextSparklingChance = GameConfig.SPARKLING_CHANCE
         if (charm) s.bonusBumps = GameConfig.LUCKY_CHARM_EXTRA_BUMPS
+        s.detectorActive = detector
         beginSession(s, turn = null)
     }
 
     private fun beginSession(s: CastSession, turn: BattleTurn?) {
+        detectorTargets = if (s.detectorActive) {
+            com.deepline.fishing.core.FishCatalog.all.filterNot(progress::isDiscovered).map { it.id }.toSet()
+        } else {
+            null
+        }
         explainedThisCast.clear()
         secretQueue = emptyList()
         session = s
@@ -488,6 +680,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             } else {
                 battle?.record(turn, cast)
             }
+            refreshTackleToggles()
             onBattleChanged()
             screen = Screen.BATTLE
             return
@@ -496,9 +689,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         result?.let { update(Progression.applyCast(progress, it)) }
         // Master angler: the fish log has just been completed (it can only happen once).
         (Secrets.revealedByProgress(progress) - progress.discoveredSecrets).forEach(::onSecretTriggered)
-        useLantern = useLantern && progress.lanterns > 0
-        useCharm = useCharm && progress.luckyCharms > 0
-        useLure = useLure && progress.sparkleLures > 0
+        refreshTackleToggles()
         screen = Screen.HOME
     }
 
@@ -592,15 +783,16 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         if (isOnlineBattle && online != null) {
             val turn = online.myNextTurn() ?: return
             lastLiveSentAt = -1f
-            beginSession(CastSession.seeded(OnlineProtocol.tournamentSpecs, turn.seed, timeLeftAtStart = turn.timeLimitSec), turn)
+            beginSession(battleCast(OnlineProtocol.tournamentSpecs, turn), turn)
             return
         }
         val b = battle ?: return
         var turn = b.nextTurn() ?: return
         val firstBot = b.players[turn.playerIndex].bot
         if (firstBot == null) {
-            // Both players use the same rope and the same water; no lanterns in battles.
-            beginSession(CastSession.seeded(progress.specs, turn.seed, timeLeftAtStart = turn.timeLimitSec), turn)
+            // Both players use the same rope and the same water. Lanterns and detectors are
+            // allowed (anyone can get them); the charm and the lure are solo only.
+            beginSession(battleCast(progress.specs, turn), turn)
             return
         }
         while (true) {
@@ -609,6 +801,13 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             turn = b.nextTurn() ?: break
         }
         onBattleChanged()
+    }
+
+    /** A battle cast on the turn's shared water, with the sight tackle switched on. */
+    private fun battleCast(specs: RopeSpecs, turn: BattleTurn): CastSession {
+        val (lantern, detector) = useSightTackle()
+        return CastSession.seeded(specs, turn.seed, lanternActive = lantern, timeLeftAtStart = turn.timeLimitSec)
+            .also { it.detectorActive = detector }
     }
 
     fun forfeitBattle(playerIndex: Int = 0) {
@@ -678,8 +877,8 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             Screen.BATTLE -> if (battle?.isOver != false) leaveBattle() else Unit
             Screen.ONLINE_LOBBY -> closeOnlineLobby()
             Screen.FISH_DETAIL -> screen = Screen.DEX
-            Screen.BOAT_EDITOR, Screen.SHOP -> openDex(DexSection.SKINS)
-            Screen.DEX, Screen.UPGRADES, Screen.BATTLE_SETUP, Screen.MILESTONES -> screen = Screen.HOME
+            Screen.BOAT_EDITOR -> openDex(DexSection.SKINS)
+            Screen.DEX, Screen.SHOP, Screen.BATTLE_SETUP, Screen.MILESTONES -> screen = Screen.HOME
         }
     }
 
@@ -807,6 +1006,8 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         const val KEY_SERVER = "online.server"
         const val KEY_TOUR_AGAIN = "tour.showAgain"
         const val KEY_TOUR_SEEN = "tour.seenVersion"
+        const val KEY_GRANTED = "store.granted"
+        const val MAX_GRANTED_TOKENS = 200
         const val LIVE_INTERVAL_SEC = 0.5f
     }
 }
