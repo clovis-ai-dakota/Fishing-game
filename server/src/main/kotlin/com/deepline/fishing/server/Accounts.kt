@@ -94,4 +94,33 @@ class AccountStore(private val dir: File? = null, private val clock: () -> Long 
         val a = authenticate(id, secret)
         if (a.gifts.any { it.id in giftIds }) write(a.copy(gifts = a.gifts.filterNot { it.id in giftIds }))
     }
+
+    private val deletionListeners = java.util.concurrent.CopyOnWriteArrayList<(String) -> Unit>()
+
+    /**
+     * Anything else the server keeps about players registers here, so deleting an account erases
+     * it too (Google Play and the GDPR need every piece of a player's data gone).
+     */
+    fun onDelete(listener: (playerId: String) -> Unit) {
+        deletionListeners += listener
+    }
+
+    /**
+     * Erases everything kept for the player: their file (the secret's hash, the cloud save, gifts
+     * waiting) and what [onDelete] listeners keep. Needs the player's secret, like every other
+     * call; an id that was never claimed (only gifts sent to it) is the first caller's, as in
+     * [authenticate]. True if there was something to delete; deleting twice is harmless.
+     */
+    fun delete(id: String, secret: String): Boolean = synchronized(lock) {
+        if (!PlayerId.isValid(id) || !PlayerId.isValidSecret(secret)) throw Failure(Problem.BAD_REQUEST)
+        val existing = read(id)
+        if (existing?.secretHash != null && existing.secretHash != PlayerId.hash(secret)) throw Failure(Problem.FORBIDDEN)
+        memory.remove(id)
+        dir?.let {
+            File(it, "$id.json.tmp").delete()
+            File(it, "$id.json").delete()
+        }
+        deletionListeners.forEach { it(id) }
+        existing != null
+    }
 }

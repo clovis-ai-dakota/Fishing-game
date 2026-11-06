@@ -84,6 +84,8 @@ class GlBackend(
         if (failed) return
         failed = true
         Log.e("DeepLine3D", message)
+        // A non-fatal crash report (if allowed): which devices fall back to 2D, and why.
+        com.deepline.fishing.analytics.GameAnalytics.problem("render3d", message)
         onError(message)
     }
 

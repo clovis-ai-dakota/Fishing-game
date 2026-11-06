@@ -57,6 +57,7 @@ object OffscreenGl {
                     renderNow(appContext.applicationContext, frame, opaque, into)
                 } catch (e: Exception) {
                     Log.e("DeepLine3D", "Offscreen render failed", e)
+                    com.deepline.fishing.analytics.GameAnalytics.problem("render3d_offscreen", e)
                     failed = true
                     null
                 }
@@ -67,6 +68,7 @@ object OffscreenGl {
     private fun renderNow(appContext: Context, frame: Frame, opaque: Boolean, into: Bitmap?): Bitmap? {
         if (failed) return null
         if (!ensureContext(appContext)) {
+            com.deepline.fishing.analytics.GameAnalytics.problem("render3d_offscreen", "no offscreen GL context")
             failed = true
             return null
         }

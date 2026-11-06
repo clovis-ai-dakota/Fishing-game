@@ -48,6 +48,7 @@ fun Application.battleServer(lobby: Lobby = Lobby(), accounts: AccountStore = Ac
         get("/health") { call.respondText("ok") }
         webSocket("/battle") { lobby.handle(this) }
         accountRoutes(accounts)
+        accountDeletionPage(accounts)
     }
 }
 
@@ -96,5 +97,8 @@ private fun Route.accountRoutes(accounts: AccountStore) {
     }
     post(AccountApi.ACK_PATH) {
         call.handle { b -> apiJson.decodeFromString(AckRequest.serializer(), b).let { accounts.ackGifts(it.id, it.secret, it.giftIds) }; null }
+    }
+    post(AccountApi.DELETE_ACCOUNT_PATH) {
+        call.handle { b -> apiJson.decodeFromString(AuthRequest.serializer(), b).let { accounts.delete(it.id, it.secret) }; null }
     }
 }

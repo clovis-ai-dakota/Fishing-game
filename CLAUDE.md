@@ -146,7 +146,37 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
   secret (the recovery code); the server keeps a hash and one JSON file per player. Gifts (to
   online opponents, `AccountApi.isGiftable`: looks and tackle packs, never passes) are paid in the
   app (euros as `gift_<id>` consumables, or points refunded on failure) and acknowledged after
-  they're granted. Cloud save is a Club perk.
+  they're granted. Cloud save is a Club perk. Deleting an account (`AccountStore.delete`, in-app
+  in Settings > Privacy and on the server's `/delete-account` page) must erase everything the
+  server keeps about the player: any new server-side per-player data registers an
+  `AccountStore.onDelete` listener, and the privacy policy and `docs/play-data-safety.md` are
+  updated.
+- **Analytics, crash reports and consent** (`app/.../analytics/`, `app/.../privacy/`, research in
+  `docs/research/analytics-privacy.md`):
+  - Log only through the facade (`Analytics.event/screen/recordError/setUserProperty`; the game's
+    events are named in `GameAnalytics`, handled errors go through `GameAnalytics.problem`).
+    Never call Firebase directly: only `FirebaseTelemetry` does.
+  - Never log personal data: no player names, ids (ours or an opponent's), recovery codes, free
+    text, emails, server addresses or raw exception messages that could hold them. Game facts only.
+  - Consent gating lives behind the facade (`ConsentGatedBackend`, `Telemetry`): callers never
+    check it, and nothing may be collected before the player's answer. Don't start Firebase or
+    add an SDK that collects anything outside that path (the manifest keeps Firebase's auto-init
+    removed and every collection flag off). Choices are device preferences (`ConsentStore` in the
+    KeyValueStore), never in `PlayerProgress`. A new purpose or recipient of data bumps
+    `ConsentStore.CONSENT_VERSION` (everyone is asked again) and updates the consent sheet text,
+    the privacy policy and the Data safety answers.
+  - Every new event, parameter or user property goes in `docs/analytics-events.md` (with why);
+    `AnalyticsTaxonomyTest` fails on an undocumented name or one breaking Firebase's limits.
+    Prefer Firebase's recommended event names; never log revenue (Play purchases are measured by
+    Firebase once linked).
+  - `app/google-services.json` is optional: without it the Firebase Gradle plugins aren't
+    applied, no backend is installed and no consent is asked. Builds and tests must keep working
+    both with and without it. UI tests that need a collector install a `RecordingTelemetry` with
+    `Telemetry.install` (and `Telemetry.uninstall()` after).
+  - Robolectric pitfall: from the second test of a class on, the view model is built with the
+    first test's Application (lifecycle caches its factory), so it reads that test's preferences.
+    Tests that need a fresh first launch reset state themselves within one test (see
+    `PrivacyUiTest.kt`).
 - All tunable numbers live in `core/.../GameConfig.kt` (plus the tables in `FishSpecies.kt`,
   `Upgrades.kt` and `Secrets.kt`). The tour and HUD read them, so don't hard-code them in UI text.
 - Run `./gradlew :core:test :server:test :app:testDebugUnitTest` before pushing. App UI tests

@@ -24,8 +24,9 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 
 /**
- * Gifts and cloud saves on the battle server (see [AccountApi]). Every call runs off the main
- * thread and throws [AccountException] with a message for the player when it fails.
+ * Gifts, cloud saves and account deletion on the battle server (see [AccountApi]). Every call
+ * runs off the main thread and throws [AccountException] with a message for the player when it
+ * fails.
  */
 open class AccountClient(private val baseUrl: () -> String) {
     class AccountException(message: String) : Exception(message)
@@ -89,6 +90,11 @@ open class AccountClient(private val baseUrl: () -> String) {
 
     open suspend fun ack(who: PlayerId, giftIds: List<String>) {
         check(post(AccountApi.ACK_PATH, json.encodeToString(AckRequest.serializer(), AckRequest(who.id, who.secret, giftIds))).first)
+    }
+
+    /** Erases this player's account on the server (Settings > Privacy). */
+    open suspend fun deleteAccount(who: PlayerId) {
+        check(post(AccountApi.DELETE_ACCOUNT_PATH, json.encodeToString(AuthRequest.serializer(), AuthRequest(who.id, who.secret))).first)
     }
 
     fun close() {

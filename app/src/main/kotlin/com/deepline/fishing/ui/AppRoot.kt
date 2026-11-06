@@ -101,6 +101,8 @@ fun AppRoot(vm: GameViewModel) {
                 dismissButton = { TextButton(onClick = { vm.answerTourAgain(false) }) { Text("No thanks") } },
             )
         }
+        // Privacy: asked once before anything is collected; the tour waits for the answer.
+        if (vm.privacy.askConsent) com.deepline.fishing.privacy.ConsentSheet(onAnswer = vm.privacy::choose)
     }
 }
 
