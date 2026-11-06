@@ -17,6 +17,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Analytics and crash reports: Firebase if configured, collecting only after consent.
+        com.deepline.fishing.analytics.Telemetry.start(this)
         enableEdgeToEdge()
         setContent {
             val night = viewModel.nightMode.isNight(phoneIsDark = isSystemInDarkTheme())
@@ -26,6 +28,7 @@ class MainActivity : ComponentActivity() {
                 val view = LocalView.current
                 SideEffect { WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = light }
                 AppRoot(viewModel)
+                com.deepline.fishing.analytics.TrackScreens(viewModel)
             }
         }
     }

@@ -118,7 +118,8 @@ dependencies {
 
     // Analytics and crash reports (Firebase). Nothing is collected until the player agrees, and
     // nothing at all without app/google-services.json: see analytics/Telemetry.kt.
-    implementation(platform("com.google.firebase:firebase-bom:35.1.0"))
+    // BoM 34.19.0: the newest whose libraries Kotlin 2.2 can read (BoM 35 is built with Kotlin 2.4 metadata).
+    implementation(platform("com.google.firebase:firebase-bom:34.19.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-crashlytics")
 

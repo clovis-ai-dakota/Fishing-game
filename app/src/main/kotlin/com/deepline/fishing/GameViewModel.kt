@@ -42,6 +42,7 @@ import com.deepline.fishing.core.ShopClock
 import com.deepline.fishing.core.ShopItem
 import com.deepline.fishing.core.ShopSection
 import com.deepline.fishing.core.Tackle
+import com.deepline.fishing.analytics.GameAnalytics
 import com.deepline.fishing.billing.PlayStore
 import com.deepline.fishing.billing.Store
 import com.deepline.fishing.billing.StoreListener
@@ -172,6 +173,18 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
 
     val isOnlineBattle: Boolean get() = onlineMatch != null && battle === onlineMatch?.battle
 
+    // --- Privacy: consent to analytics and crash reports, account deletion (privacy/) ------
+
+    val privacy = com.deepline.fishing.privacy.PrivacyController(store, viewModelScope)
+
+    /** Settings > Privacy: erases the online account, then plays on with a new random identity. */
+    fun deleteOnlineAccount() = privacy.deleteAccount(accounts, playerIdentity) { fresh ->
+        saveIdentity(fresh)
+        playerIdentity = fresh
+        lastBackupMs = 0L
+        store.putString(KEY_LAST_BACKUP, "0")
+    }
+
     // --- Tour ----------------------------------------------------------------------------
 
     /** The guided tour, while it is showing. */
@@ -188,7 +201,8 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         // again if the player asked for it, or to show steps added since the version they saw.
         val showAgain = store.getString(KEY_TOUR_AGAIN)?.toBooleanStrictOrNull() ?: true
         val seen = store.getString(KEY_TOUR_SEEN)?.toIntOrNull() ?: 0
-        Tour.planAtLaunch(showAgain, seen)?.let { beginTour(TourSession(it.steps, whatsNew = it.whatsNew)) }
+        // The consent sheet comes first (nothing is collected before it's answered), then the tour.
+        Tour.planAtLaunch(showAgain, seen)?.let { privacy.afterConsent { beginTour(TourSession(it.steps, whatsNew = it.whatsNew)) } }
     }
 
     /** Starts the full tour from the menu. */
@@ -198,12 +212,13 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         if (this.session != null) return
         askTourAgain = false
         tour = session
+        GameAnalytics.tourStarted(session)
         showTourStep(session)
     }
 
     fun tourNext() {
         val t = tour ?: return
-        if (t.isLast) return endTour()
+        if (t.isLast) return endTour(completed = true)
         val next = t.copy(index = t.index + 1)
         tour = next
         showTourStep(next)
@@ -224,9 +239,10 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /** Skipping and finishing both close the tour and ask about next time. */
-    fun skipTour() = endTour()
+    fun skipTour() = endTour(completed = false)
 
-    private fun endTour() {
+    private fun endTour(completed: Boolean) {
+        tour?.let { GameAnalytics.tourEnded(it, completed) }
         tour = null
         screen = Screen.HOME
         store.putString(KEY_TOUR_SEEN, Tour.VERSION.toString())
@@ -241,6 +257,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     private fun update(p: PlayerProgress) {
         progress = p
         repository.save(p)
+        GameAnalytics.progressChanged(p)
     }
 
     fun navigate(target: Screen) {
@@ -321,6 +338,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         }
 
         override fun onProblem(productId: String?, problem: StoreProblem, message: String?) {
+            GameAnalytics.storeProblem(productId, problem.name.lowercase(), message)
             val name = productId?.let { ShopCatalog.byId(it)?.name }
             shopMessage = when (problem) {
                 StoreProblem.CANCELLED -> "Purchase cancelled: nothing was charged."
@@ -345,6 +363,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     private val grantedTokens = LinkedHashSet(store.getString(KEY_GRANTED)?.split(',')?.filter { it.isNotBlank() }.orEmpty())
 
     private fun grantStorePurchase(purchase: StorePurchase) {
+        if (purchase.token !in grantedTokens) GameAnalytics.storePurchase(purchase.productId)
         com.deepline.fishing.core.online.AccountApi.itemOfGiftProduct(purchase.productId)?.let { item ->
             if (purchase.token !in grantedTokens) {
                 rememberToken(purchase.token)
@@ -413,6 +432,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             try {
                 block()
             } catch (e: AccountClient.AccountException) {
+                GameAnalytics.problem("account", e)
                 if (!quiet) shopMessage = e.message
             } finally {
                 if (!quiet) accountBusy = false
@@ -487,6 +507,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         val price = ShopCatalog.pointsPrice(item, progress)
         if (progress.pointsBalance < price || !com.deepline.fishing.core.online.AccountApi.isGiftable(item)) return
         update(progress.copy(pointsBalance = progress.pointsBalance - price))
+        GameAnalytics.spend(price, "gift", item.id)
         giftTarget = null
         deliverGift(item, to.playerId, to.name, refundPoints = price)
     }
@@ -497,6 +518,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         pendingGifts[product.id] = to.playerId to to.name
         savePendingGifts()
         giftTarget = null
+        GameAnalytics.storeCheckout(item, gift = true)
         billing.buy(activity, product)
     }
 
@@ -508,8 +530,10 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
                 accounts.sendGift(playerIdentity, fromName, toId, item.id)
                 shopMessage = "${item.name} sent to $toName!"
             } catch (e: AccountClient.AccountException) {
+                GameAnalytics.problem("gift", e)
                 if (refundPoints > 0) {
                     update(progress.copy(pointsBalance = progress.pointsBalance + refundPoints))
+                    GameAnalytics.earn(refundPoints, "gift_refund")
                     shopMessage = "${e.message} Your points were given back."
                 } else {
                     receiveGift(item, "You")
@@ -565,6 +589,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     fun buyWithPoints(item: ShopItem): Boolean {
         val contents = ShopText.contents(item, progress)
         val next = ShopCatalog.buyWithPoints(progress, item, ShopClock.now()) ?: return false
+        GameAnalytics.shopPointsPurchase(item, progress, next)
         update(next)
         shopMessage = "${item.name}: $contents."
         return true
@@ -574,6 +599,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     fun buyWithMoney(item: ShopItem, activity: Activity?) {
         if (!canBuy(item)) return
         shopMessage = null
+        GameAnalytics.storeCheckout(item)
         billing.buy(activity, item)
     }
 
@@ -608,13 +634,16 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         val open = com.deepline.fishing.core.Seasons.claimable(progress, now)
         if (open.isEmpty()) return
         val what = open.flatMap { it.grants }.joinToString(", ") { ShopText.seasonGrant(it, progress) }
-        update(com.deepline.fishing.core.Seasons.claimAll(progress, now))
+        val next = com.deepline.fishing.core.Seasons.claimAll(progress, now)
+        GameAnalytics.seasonClaimed(open.size, open.any { it.premium }, progress, next)
+        update(next)
         shopMessage = "Season rewards: $what."
     }
 
     fun claimEventReward() {
         val now = ShopClock.now()
         com.deepline.fishing.core.Seasons.claimEvent(progress, now)?.let {
+            GameAnalytics.weekendEventClaimed(progress, it)
             update(it)
             shopMessage = "Weekend event reward claimed!"
         }
@@ -639,6 +668,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     /** Buys a boat option with points; false if it can't be bought or isn't affordable. */
     fun unlockBoatPart(part: BoatPart): Boolean {
         val next = Progression.unlockBoatPart(progress, part) ?: return false
+        GameAnalytics.pointsChanged(progress, next, "boat_part", part.key.lowercase())
         update(next)
         return true
     }
@@ -722,7 +752,10 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun buyTackle(item: Tackle) {
-        Progression.buyTackle(progress, item)?.let(::update)
+        Progression.buyTackle(progress, item)?.let {
+            GameAnalytics.tackleBought(item, progress, it)
+            update(it)
+        }
     }
 
     /** The Sparkling chance of the water about to be generated (raised by a Sparkle lure). */
@@ -752,6 +785,8 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         }
         explainedThisCast.clear()
         secretQueue = emptyList()
+        // A solo cast's lure toggle is still on while its lure is in use (see refreshTackleToggles).
+        GameAnalytics.castStarted(s, battle?.mode.takeIf { turn != null }, isOnlineBattle, lure = turn == null && useLure)
         session = s
         battleTurn = turn
         pendingResult = null
@@ -852,7 +887,9 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         if (!explainedThisCast.add(id)) return
         val explain = Progression.shouldExplainSecret(progress, id)
         // The first time also grants the secret's one-time reward (points, Lanterns, skins).
-        update(Progression.discoverSecret(progress, id))
+        val next = Progression.discoverSecret(progress, id)
+        if (id !in progress.discoveredSecrets) GameAnalytics.secretDiscovered(id, battleTurn != null || screen == Screen.BATTLE, progress, next)
+        update(next)
         if (explain) secretQueue = secretQueue + id
     }
 
@@ -885,6 +922,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     /** Leaves the cast without scoring anything. In a battle, this forfeits the match. */
     fun abandonCast() {
         val turn = battleTurn
+        session?.let { GameAnalytics.castAbandoned(it, battle?.mode.takeIf { turn != null }, isOnlineBattle) }
         session = null
         paused = false
         pendingResult = null
@@ -901,6 +939,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         val result = pendingResult
         val turn = battleTurn
         val s = session
+        if (result != null && s != null) GameAnalytics.castFinished(result, s, turn, battle?.mode.takeIf { turn != null }, isOnlineBattle, progress)
         pendingResult = null
         session = null
         battleTurn = null
@@ -935,7 +974,10 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Steps a rope stat down one level and refunds what it cost. */
     fun downgrade(stat: RopeStat) {
-        Progression.downgrade(progress, stat)?.let(::update)
+        Progression.downgrade(progress, stat)?.let {
+            GameAnalytics.ropeChanged(stat, progress, it)
+            update(it)
+        }
     }
 
     /** The title the player wears (shown at home and in battles), or null. */
@@ -992,15 +1034,24 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun buyUpgrade(stat: RopeStat) {
-        Progression.upgrade(progress, stat)?.let(::update)
+        Progression.upgrade(progress, stat)?.let {
+            GameAnalytics.ropeChanged(stat, progress, it)
+            update(it)
+        }
     }
 
     fun buyLantern() {
-        Progression.buyLantern(progress)?.let(::update)
+        Progression.buyLantern(progress)?.let {
+            GameAnalytics.tackleBought(Tackle.LANTERN, progress, it)
+            update(it)
+        }
     }
 
     fun claimMilestone(milestone: Milestone) {
-        Progression.claimMilestone(progress, milestone)?.let(::update)
+        Progression.claimMilestone(progress, milestone)?.let {
+            GameAnalytics.milestoneClaimed(milestone, progress, it)
+            update(it)
+        }
     }
 
     // --- Battle flow ---------------------------------------------------------------------
@@ -1039,6 +1090,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         battleOpponent = opponent
         battleRecorded = false
         battleTurn = null
+        GameAnalytics.battleStarted(mode, opponent, battleStake)
         onBattleChanged()
         screen = Screen.BATTLE
     }
@@ -1146,10 +1198,13 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             for (id in Secrets.revealedByBattle(b, outcome, playerIndex = 0, rival = rival)) {
                 if (id in progress.discoveredSecrets) {
                     update(progress.copy(pointsBalance = progress.pointsBalance + SecretRules.SHUTOUT_BONUS))
+                    GameAnalytics.earn(SecretRules.SHUTOUT_BONUS.toLong(), "secret_bonus")
                 }
                 onSecretTriggered(id)
             }
         }
+        val wager = lastWagerResult
+        GameAnalytics.battleEnded(b, outcome, battleOpponent, onlineMatch?.myIndex ?: 0, wager?.stake ?: 0L, wager?.payout ?: 0L)
     }
 
     /**
@@ -1250,6 +1305,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
                 battleRecorded = false
                 battleTurn = null
                 onlineStatus = OnlineStatus.IN_MATCH
+                GameAnalytics.battleStarted(match.mode, Opponent.Online, stake = 0L)
                 onBattleChanged()
                 screen = Screen.BATTLE
             }
@@ -1270,6 +1326,8 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         onlineStatus = OnlineStatus.DISCONNECTED
         onlineError = reason
         val match = onlineMatch
+        // Only the kind of failure: the reason can name the server's address.
+        GameAnalytics.problem("online", if (match != null && match.outcome == null) "connection lost in a match" else "connection closed")
         if (match != null && match.outcome == null) {
             match.connectionLost(reason)
             if (screen == Screen.CAST && battleTurn != null) {

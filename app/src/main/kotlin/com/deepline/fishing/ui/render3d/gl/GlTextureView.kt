@@ -136,6 +136,7 @@ private class RenderThread(
 
     private fun stopWithError(message: String) {
         Log.e("DeepLine3D", message)
+        com.deepline.fishing.analytics.GameAnalytics.problem("render3d_preview", message)
         running = false
         OffscreenGl.markFailed()
     }

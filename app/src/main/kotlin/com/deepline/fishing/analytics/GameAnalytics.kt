@@ -238,8 +238,13 @@ object GameAnalytics {
         )
     }
 
-    fun storeProblem(productId: String?, problem: String) {
-        Analytics.event(STORE_PROBLEM, mapOf("item_id" to (productId ?: "unknown"), "problem" to problem))
+    /**
+     * A euro purchase didn't go through ([kind]: cancelled, pending, failed, unavailable). A
+     * store failure is also reported as a non-fatal error (with the store's own message).
+     */
+    fun storeProblem(productId: String?, kind: String, message: String?) {
+        Analytics.event(STORE_PROBLEM, mapOf("item_id" to (productId ?: "unknown"), "problem" to kind))
+        if (kind == "failed" || kind == "unavailable") problem("billing", "$kind: ${message ?: "no message"}")
     }
 
     private const val GIFT_PREFIX = "gift_"
@@ -283,10 +288,11 @@ object GameAnalytics {
     fun battleEnded(battle: Battle, outcome: BattleOutcome, opponent: Opponent?, me: Int, stake: Long, payout: Long) {
         if (lastEndedBattle === battle) return
         lastEndedBattle = battle
+        val winner = outcome.winner
         val result = when {
-            outcome.winner == null -> "draw"
-            opponent == Opponent.Friend -> "player_${outcome.winner + 1}"
-            outcome.winner == me -> "win"
+            winner == null -> "draw"
+            opponent == Opponent.Friend -> "player_${winner + 1}"
+            winner == me -> "win"
             else -> "loss"
         }
         val who = opponent?.let(::opponentName) ?: "unknown"

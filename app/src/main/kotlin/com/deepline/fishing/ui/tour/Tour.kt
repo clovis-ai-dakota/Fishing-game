@@ -29,6 +29,7 @@ enum class TourTarget {
     // -- Social targets below.
 
     // -- Privacy targets below.
+    SETTINGS_PRIVACY,
 
     // -- Language targets below.
 
@@ -412,6 +413,16 @@ object Tour {
         // -- Social steps below.
 
         // -- Privacy steps below.
+        TourStep(
+            id = "privacy",
+            title = "Your privacy",
+            body = "Usage statistics and crash reports are only sent if you allow them. Change your mind at any " +
+                "time with the two switches in Settings, under Privacy. That's also where you can delete your " +
+                "online account and read the privacy policy.",
+            screen = Screen.SETTINGS,
+            target = TourTarget.SETTINGS_PRIVACY,
+            sinceVersion = VERSION,
+        ),
 
         // -- Language steps below.
 
