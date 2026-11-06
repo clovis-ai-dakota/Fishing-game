@@ -94,24 +94,28 @@ fun CastScreen(vm: GameViewModel) {
         }
     }
 
+    // Leaving the cast screen (results collected, cast quit, battle turn over): menu music again.
+    androidx.compose.runtime.DisposableEffect(Unit) { onDispose { vm.feel.onCastEnd() } }
+
     // The loop only runs while the cast is live: no frames are spent on the pause dialog or
-    // the results panel. [time] keeps counting from where it stopped.
+    // the results panel. [time] keeps counting from where it stopped, and slows down with the
+    // game during a (solo) slow-motion moment.
     val running = !vm.paused && vm.pendingResult == null && vm.secretPopup == null
     LaunchedEffect(session, running) {
         if (!running) return@LaunchedEffect
-        val resumedAt = time
-        var start = 0L
         var last = 0L
         while (true) {
             withFrameNanos { now ->
-                if (start == 0L) start = now
                 if (last != 0L) {
                     val dt = (now - last) / 1_000_000_000f
                     vm.onFrame(dt, steer.targetX())
+                    time += dt * vm.feel.timeScale
                 }
                 last = now
-                time = resumedAt + (now - start) / 1_000_000_000f
-                if (use3d) scene3d.render { w, h -> sceneBuilder.build(session, time, w, h, skins) }
+                if (use3d) {
+                    val fx = vm.feel.fx(session)
+                    scene3d.render { w, h -> sceneBuilder.build(session, time, w, h, skins, fx = fx) }
+                }
             }
         }
     }
@@ -121,7 +125,10 @@ fun CastScreen(vm: GameViewModel) {
             com.deepline.fishing.ui.render3d.gl.Scene3d(scene3d, Modifier.fillMaxSize())
             // Show the paused scene too (the loop above only runs during play).
             LaunchedEffect(session, running) {
-                if (!running) scene3d.render { w, h -> sceneBuilder.build(session, time, w, h, skins) }
+                if (!running) {
+                    val fx = vm.feel.fx(session)
+                    scene3d.render { w, h -> sceneBuilder.build(session, time, w, h, skins, fx = fx) }
+                }
             }
         }
         Canvas(
@@ -147,8 +154,10 @@ fun CastScreen(vm: GameViewModel) {
         ) {
             // Until the 3D view has drawn its first frame, the 2D scene covers it (no black flash).
             val detect = vm.detectorTargets
-            if (use3d && scene3d.ready) drawCastOverlay(session, time, textMeasurer, aimX = steer.targetX(), detect = detect)
-            else drawCastScene(session, time, textMeasurer, aimX = steer.targetX(), skins = skins, detect = detect)
+            // Shake, flash and particles (render only: steering and hits never move).
+            val fx = vm.feel.fx(session)
+            if (use3d && scene3d.ready) drawCastOverlay(session, time, textMeasurer, aimX = steer.targetX(), detect = detect, fx = fx)
+            else drawCastScene(session, time, textMeasurer, aimX = steer.targetX(), skins = skins, detect = detect, fx = fx)
         }
 
         val turn = vm.battleTurn

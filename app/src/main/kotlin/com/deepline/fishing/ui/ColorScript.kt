@@ -65,6 +65,27 @@ object ColorScript {
     /** A card background for a zone: the water of that zone, top to bottom. */
     fun zoneGradient(zone: DepthZone): Pair<Long, Long> = water(zone.minDepth + 10f) to water(min(zone.maxDepth, 680f))
 
+    /**
+     * Splashes, foam and bubbles (game feel particles) at [depth]: white spray above and at the
+     * surface, pale aqua bubbles in the light, then dimmer and greener, so in the deep they read
+     * as faint shapes rather than lights. Drawn under the darkness like the rest of the scene.
+     */
+    fun splash(depth: Float, atmosphere: Atmosphere = Atmosphere.FAMILY): Long = when {
+        depth < 2f -> 0xFFFFFFFF
+        else -> mix(
+            mix(0xFFE6FBFF, 0xFFA9E4F0, smooth(2f, 200f, depth)),
+            if (atmosphere == Atmosphere.NIGHTMARE) 0xFF6E4A55 else 0xFF4F8C8A,
+            smooth(250f, 600f, depth),
+        )
+    }
+
+    /** The flash of a rare catch: warm white, gold for a Sparkling or legendary fish. */
+    const val CATCH_FLASH = 0xFFFFF4D6
+    const val GOLD_FLASH = 0xFFFFD866
+
+    /** Glints thrown off by a Sparkling catch (the Sparkling gold). */
+    const val GLINT = 0xFFFFE07A
+
     internal fun smooth(e0: Float, e1: Float, x: Float): Float {
         val t = ((x - e0) / (e1 - e0)).coerceIn(0f, 1f)
         return t * t * (3 - 2 * t)

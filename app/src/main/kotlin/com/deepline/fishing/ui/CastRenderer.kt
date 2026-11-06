@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
@@ -25,7 +26,11 @@ import com.deepline.fishing.core.GameConfig
 import com.deepline.fishing.core.Lighting
 import com.deepline.fishing.core.Obstacle
 import com.deepline.fishing.core.ObstacleKind
+import com.deepline.fishing.feel.CastFx
+import com.deepline.fishing.feel.Particle
+import com.deepline.fishing.feel.ParticleStyle
 import kotlin.math.PI
+import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.cos
 import kotlin.math.floor
@@ -72,6 +77,32 @@ fun DrawScope.drawCastScene(
     cameraTop: Float? = null,
     /** Species a rare fish detector marks (not caught yet), or null when it's off. */
     detect: Set<String>? = null,
+    /** Game feel: screen shake, a flash and particles (render only, see `CastFx`). */
+    fx: CastFx = CastFx.NONE,
+) {
+    // The shake moves the whole picture; the background and the darkness bleed past the edges
+    // so no unlit strip ever shows.
+    val dx = fx.shakeX * size.width
+    val dy = fx.shakeY * size.width
+    if (dx == 0f && dy == 0f) {
+        drawCastSceneContent(session, timeSeconds, textMeasurer, aimX, skins, cameraTop, detect, fx, bleed = 0f)
+    } else {
+        translate(dx, dy) {
+            drawCastSceneContent(session, timeSeconds, textMeasurer, aimX, skins, cameraTop, detect, fx, bleed = ceil(max(abs(dx), abs(dy))) + 2f)
+        }
+    }
+}
+
+private fun DrawScope.drawCastSceneContent(
+    session: CastSession,
+    timeSeconds: Float,
+    textMeasurer: TextMeasurer,
+    aimX: Float?,
+    skins: Skins,
+    cameraTop: Float?,
+    detect: Set<String>?,
+    fx: CastFx,
+    bleed: Float,
 ) {
     val scale = size.width / GameConfig.WORLD_WIDTH
     val viewHeight = size.height / scale
@@ -84,23 +115,24 @@ fun DrawScope.drawCastScene(
     val elapsed = session.elapsedSeconds
 
     // Sky
-    if (surfaceY > 0f) {
+    if (surfaceY > -bleed) {
         drawRect(
             Brush.verticalGradient(listOf(Color(0xFF8FD3F4), Color(0xFFD7F1FF)), startY = 0f, endY = surfaceY),
-            size = Size(size.width, surfaceY),
+            topLeft = Offset(-bleed, -bleed),
+            size = Size(size.width + 2f * bleed, surfaceY + bleed),
         )
     }
 
     // Water
-    val waterTop = surfaceY.coerceAtLeast(0f)
+    val waterTop = surfaceY.coerceAtLeast(-bleed)
     drawRect(
         Brush.verticalGradient(
             listOf(waterColor(max(top, 0f), skins.atmosphere), waterColor(bottom, skins.atmosphere)),
             startY = waterTop,
             endY = size.height,
         ),
-        topLeft = Offset(0f, waterTop),
-        size = Size(size.width, size.height - waterTop),
+        topLeft = Offset(-bleed, waterTop),
+        size = Size(size.width + 2f * bleed, size.height + bleed - waterTop),
     )
 
     // Sun rays near the surface, fading with depth.
@@ -339,6 +371,12 @@ fun DrawScope.drawCastScene(
         }
     }
 
+    // Game feel: splashes and bubbles, and a rare catch's flash, under the darkness.
+    if (fx.particles.isNotEmpty()) drawParticles(fx.particles, top, scale, skins.atmosphere)
+    if (fx.flash > 0f) {
+        drawRect(Color(fx.flashColor).copy(alpha = fx.flash.coerceIn(0f, 1f)), topLeft = Offset(-bleed, -bleed), size = Size(size.width + 2f * bleed, size.height + 2f * bleed))
+    }
+
     // Darkness below 300 m; a lantern widens the lit circle around the hook.
     val darkness = Lighting.darkness(session.hookDepth)
     if (darkness > 0f) {
@@ -351,6 +389,8 @@ fun DrawScope.drawCastScene(
                 center = hook,
                 radius = radius,
             ),
+            topLeft = Offset(-bleed, -bleed),
+            size = Size(size.width + 2f * bleed, size.height + 2f * bleed),
         )
         if (session.lanternActive) {
             drawCircle(
@@ -403,6 +443,34 @@ internal fun DrawScope.drawDetectorMarks(session: CastSession, detect: Set<Strin
 }
 
 private val DetectorCyan = Color(0xFF4DD0E1)
+
+/**
+ * Game feel particles (splashes, foam, bubbles, glints) at their world positions, in the colour
+ * script's splash colour for their depth. Drawn before the darkness, like the 3D view's.
+ */
+internal fun DrawScope.drawParticles(particles: List<Particle>, top: Float, scale: Float, atmosphere: com.deepline.fishing.core.Atmosphere) {
+    for (p in particles) {
+        val c = Offset(p.x * scale, (p.depth - top) * scale)
+        val r = max(p.radius * scale, 1f)
+        if (c.y < -r * 4f || c.y > size.height + r * 4f) continue
+        val a = p.alpha.coerceIn(0f, 1f)
+        when (p.style) {
+            ParticleStyle.DROPLET -> drawCircle(Color(ColorScript.splash(p.depth, atmosphere)).copy(alpha = 0.9f * a), radius = r, center = c)
+            ParticleStyle.FOAM -> drawCircle(Color(ColorScript.splash(p.depth, atmosphere)).copy(alpha = 0.5f * a), radius = r, center = c)
+            ParticleStyle.BUBBLE -> {
+                val col = Color(ColorScript.splash(p.depth, atmosphere))
+                drawCircle(col.copy(alpha = 0.7f * a), radius = r, center = c, style = Stroke(width = max(1f, r * 0.3f)))
+                drawCircle(col.copy(alpha = 0.6f * a), radius = r * 0.25f, center = c + Offset(-r * 0.35f, -r * 0.35f))
+            }
+            ParticleStyle.GLINT -> {
+                val col = Color(ColorScript.GLINT).copy(alpha = a)
+                val w = max(1.5f, r * 0.25f)
+                drawLine(col, c - Offset(r, 0f), c + Offset(r, 0f), strokeWidth = w, cap = StrokeCap.Round)
+                drawLine(col, c - Offset(0f, r), c + Offset(0f, r), strokeWidth = w, cap = StrokeCap.Round)
+            }
+        }
+    }
+}
 
 private fun DrawScope.drawBoatAndRod(
     cx: Float,
@@ -598,6 +666,22 @@ fun DrawScope.drawCastOverlay(
     cameraTop: Float? = null,
     /** Species a rare fish detector marks, or null when it's off (see [drawDetectorMarks]). */
     detect: Set<String>? = null,
+    /** The shake moves the overlay with the 3D view (its flash and particles are drawn in 3D). */
+    fx: CastFx = CastFx.NONE,
+) {
+    val dx = fx.shakeX * size.width
+    val dy = fx.shakeY * size.width
+    if (dx == 0f && dy == 0f) drawCastOverlayContent(session, timeSeconds, textMeasurer, aimX, cameraTop, detect)
+    else translate(dx, dy) { drawCastOverlayContent(session, timeSeconds, textMeasurer, aimX, cameraTop, detect) }
+}
+
+private fun DrawScope.drawCastOverlayContent(
+    session: CastSession,
+    timeSeconds: Float,
+    textMeasurer: TextMeasurer,
+    aimX: Float?,
+    cameraTop: Float?,
+    detect: Set<String>?,
 ) {
     val scale = size.width / GameConfig.WORLD_WIDTH
     val viewHeight = size.height / scale

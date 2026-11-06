@@ -15,6 +15,9 @@ import com.deepline.fishing.ui.FishLooks
 import com.deepline.fishing.ui.FishStyles
 import com.deepline.fishing.ui.Skins
 import com.deepline.fishing.ui.BoatLook
+import com.deepline.fishing.feel.CastFx
+import com.deepline.fishing.feel.Particle
+import com.deepline.fishing.feel.ParticleStyle
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
@@ -70,7 +73,16 @@ class SceneBuilder {
     private var lastTime = Float.NaN
     private var lastSession: CastSession? = null
 
-    fun build(session: CastSession, timeSeconds: Float, widthPx: Int, heightPx: Int, skins: Skins = Skins.CLASSIC, cameraTop: Float? = null): Frame {
+    fun build(
+        session: CastSession,
+        timeSeconds: Float,
+        widthPx: Int,
+        heightPx: Int,
+        skins: Skins = Skins.CLASSIC,
+        cameraTop: Float? = null,
+        /** Game feel: shake, flash and particles (render only; see `CastFx`). */
+        fx: CastFx = CastFx.NONE,
+    ): Frame {
         if (session !== lastSession) {
             yaw.clear()
             lastSession = session
@@ -93,11 +105,21 @@ class SceneBuilder {
         val water = waterColor(camDepth, atmo)
         val darkness = Lighting.darkness(hookDepth)
         val hookWorld = Vec3(session.hookX, -hookDepth, 0f)
-        val (hookSx, hookSy) = cam.toScreen(hookWorld)
+        // Screen shake: the whole picture slides in screen space (a translation after the
+        // projection), so every depth moves by the same pixels as the 2D overlay. The camera and
+        // the play plane mapping stay as they are, and so does the darkness around the hook.
+        val shakePxX = fx.shakeX * widthPx
+        val shakePxY = fx.shakeY * widthPx
+        val proj = if (shakePxX == 0f && shakePxY == 0f) cam.proj
+        else Mat4.multiply(Mat4.translation(2f * shakePxX / widthPx, -2f * shakePxY / heightPx, 0f), cam.proj)
+        val viewProj = if (proj === cam.proj) cam.viewProj else Mat4.multiply(proj, cam.view)
+        val (hookSx0, hookSy0) = cam.toScreen(hookWorld)
+        val hookSx = hookSx0 + shakePxX
+        val hookSy = hookSy0 + shakePxY
         val globals = mapOf(
             "uView" to cam.view,
-            "uProj" to cam.proj,
-            "uInvViewProj" to Mat4.invert(cam.viewProj),
+            "uProj" to proj,
+            "uInvViewProj" to Mat4.invert(viewProj),
             "uTime" to f(timeSeconds),
             "uResolution" to f(widthPx.toFloat(), heightPx.toFloat()),
             "uCamPos" to f(cam.eye.x, cam.eye.y, cam.eye.z),
@@ -223,10 +245,19 @@ class SceneBuilder {
         addTrail(sprites, hookEye, timeSeconds, skins.trail)
         addMarineSnow(sprites, top, bottom, timeSeconds, atmo)
         if (atmo == Atmosphere.NIGHTMARE) addNightmare(items, sprites, top, bottom, timeSeconds)
+        // Game feel: splashes and bubbles (before the darkness, like everything that isn't a lure).
+        addParticles(sprites, fx.particles, atmo)
 
         // Jellies are see-through: drawn after the opaque things.
         items.sortWith(compareBy { if (it.blend == Blend.OPAQUE) 0 else 1 })
         if (sprites.isNotEmpty()) items += sprites.toItem(Blend.ALPHA)
+        // A rare catch's flash: a tint in front of the scene, still under the darkness.
+        if (fx.flash > 0f) {
+            val flash = SpriteBatch()
+            val c = rgb(fx.flashColor)
+            flash.quad(Vec3(GameConfig.WORLD_WIDTH / 2f, -cam.centerDepth, FLASH_Z), GameConfig.WORLD_WIDTH * 1.6f, cam.viewHeight * 1.6f, floatArrayOf(c[0], c[1], c[2], fx.flash.coerceIn(0f, 1f)), SHAPE_FLAT)
+            items += flash.toItem(Blend.ALPHA)
+        }
 
         // Darkness, then what shines through it.
         if (darkness > 0f) {
@@ -601,6 +632,20 @@ class SceneBuilder {
         }
     }
 
+    /** Game feel particles at their world positions, slightly in front of the play plane. */
+    private fun addParticles(sprites: SpriteBatch, particles: List<Particle>, atmo: Atmosphere) {
+        for (p in particles) {
+            val at = Vec3(p.x, -p.depth, PARTICLE_Z)
+            val a = p.alpha.coerceIn(0f, 1f)
+            when (p.style) {
+                ParticleStyle.DROPLET -> sprites.quad(at, p.radius * 2.8f, rgba(ColorScript.splash(p.depth, atmo), 0.9f * a), SHAPE_DOT)
+                ParticleStyle.FOAM -> sprites.quad(at, p.radius * 2.8f, rgba(ColorScript.splash(p.depth, atmo), 0.5f * a), SHAPE_DOT)
+                ParticleStyle.BUBBLE -> sprites.quad(at, p.radius * 2f, rgba(ColorScript.splash(p.depth, atmo), 0.8f * a), SHAPE_RING)
+                ParticleStyle.GLINT -> sprites.quad(at, p.radius * 4f, rgba(ColorScript.GLINT, a), SHAPE_STAR)
+            }
+        }
+    }
+
     private fun addGlints(sprites: SpriteBatch, center: Vec3, length: Float, t: Float, id: Int) {
         for (k in 0 until 3) {
             val ph = t * 1.6f + k * 2.1f + id
@@ -684,6 +729,10 @@ class SceneBuilder {
         const val TURN_SPEED = 8.5f
 
         val OUTLINE_INK = f(0.05f, 0.07f, 0.13f)
+
+        /** Particles sit just in front of the play plane; the flash in front of everything. */
+        const val PARTICLE_Z = 0.4f
+        const val FLASH_Z = 2.5f
 
         const val SHAPE_DOT = 0f
         const val SHAPE_RING = 1f

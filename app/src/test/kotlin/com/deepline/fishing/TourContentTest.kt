@@ -135,6 +135,20 @@ class TourContentTest {
     }
 
     @Test
+    fun soundAndFeelAreExplained() {
+        // Version 11: sound, music and haptics settings, and Reduce motion, shown on the Settings screen.
+        val step = Tour.steps.single { it.id == "sound" }
+        assertEquals(Tour.VERSION, step.sinceVersion)
+        assertEquals(Screen.SETTINGS, step.screen)
+        assertEquals(TourTarget.SETTINGS_SOUND, step.target)
+        for (topic in listOf("volume", "music", "sound effects", "vibration", "Reduce motion", "screen shake", "slow motion", "flashes")) {
+            assertTrue("The sound step doesn't mention $topic", step.body.contains(topic, ignoreCase = true))
+        }
+        // It comes before the last step, which replays the tour from the same screen.
+        assertTrue(Tour.steps.indexOf(step) < Tour.steps.lastIndex)
+    }
+
+    @Test
     fun theTourNeverGivesAwayASecret() {
         // Secrets are discovered by playing and explained then (see FishingSecrets), not in the tour.
         val secretNames = com.deepline.fishing.ui.secrets.FishingSecrets.all.map { it.title }

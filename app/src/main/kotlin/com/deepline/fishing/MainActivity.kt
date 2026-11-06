@@ -34,4 +34,15 @@ class MainActivity : ComponentActivity() {
         super.onPause()
         viewModel.onAppPaused()
     }
+
+    // Sound stops while the game is in the background and comes back with it.
+    override fun onStart() {
+        super.onStart()
+        viewModel.feel.onForeground()
+    }
+
+    override fun onStop() {
+        viewModel.feel.onBackground()
+        super.onStop()
+    }
 }
