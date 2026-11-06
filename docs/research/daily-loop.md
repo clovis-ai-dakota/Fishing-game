@@ -196,5 +196,23 @@ reminders and limited-time events, and what Deep Line does as a result. Numbers 
 Daily rewards and challenges are player income, so the career simulation (`EconomyTest`'s
 `Career`, about three casts a day) claims the daily reward every day, plays the day's challenges
 as they come (no rerolls, no tackle bought for them), claims what it completes, and fishes
-migration water. Reward sizes and the rope's cost curve were re-tuned so the targets still hold
-(see the README's economy section for the numbers).
+migration water. Reward sizes and the rope's cost curve were re-tuned so the targets still hold.
+
+What the simulation showed (seed 2, casts to the Midnight Trench / Abyssal Floor / full rope):
+
+| Career | Midnight | Abyss | Full rope | All maxed |
+| --- | --- | --- | --- | --- |
+| Before the daily loop (season free track only) | 24 | 159 | 302 | 305 |
+| First sizing (rewards of 0.3 to 1 cast's points a day, points for every challenge) | 20 | 96 | 167 | 168 |
+| Smaller points, challenges paying mostly tackle | 23 | 123 | 221 | 234 |
+| Same, rope levels 5 to 10 about 20% dearer (**shipped**) | 23 | 153 | 260 | 291 |
+| Shipped prices without the daily loop | 24 | 202 | 316 | - |
+
+Other seeds with the shipped numbers: Midnight 21 to 24, Abyss 124 to 159, full rope 229 to 268.
+
+Why such a small income moved the pace so much: late in a career the good player buys a Lantern
+for almost every dark cast, so what they save per cast (income minus Lanterns) is only about
+2,000 points at rope level 9. A daily loop worth about 11% of a career's points (the shipped
+sizing) more than doubles that margin. So the daily loop's points are kept small (a fraction of a
+cast's points a day), its value is mostly tackle to try (detectors, Sparkle lures, Lucky charms,
+which the simulation never uses), and the upper rope levels were made dearer to keep the targets.
