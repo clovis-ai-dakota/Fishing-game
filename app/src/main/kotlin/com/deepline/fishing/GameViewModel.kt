@@ -70,6 +70,8 @@ enum class Screen {
     /** Settings (the gear on the Fish tab): sound, notifications, privacy, language, the tour. */
     SETTINGS,
     // -- Daily loop screens below.
+    /** The daily reward calendar, today's challenges and migrations (from the Fish tab's daily card). */
+    DAILY,
 
     // -- Social screens below.
 
@@ -181,6 +183,9 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     var askTourAgain by mutableStateOf(false)
         private set
 
+    /** The daily loop: daily reward, challenges, reminders (see daily/DailyController.kt). */
+    val daily = com.deepline.fishing.daily.DailyController(app, store, { progress }, ::update)
+
     init {
         // Each app start is a session (the starter pack is offered from a later one).
         update(ShopCatalog.onSessionStart(progress, ShopClock.now()))
@@ -189,6 +194,26 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         val showAgain = store.getString(KEY_TOUR_AGAIN)?.toBooleanStrictOrNull() ?: true
         val seen = store.getString(KEY_TOUR_SEEN)?.toIntOrNull() ?: 0
         Tour.planAtLaunch(showAgain, seen)?.let { beginTour(TourSession(it.steps, whatsNew = it.whatsNew)) }
+        daily.onAppOpened()
+    }
+
+    fun openDaily() {
+        screen = Screen.DAILY
+    }
+
+    /** The app came back to the foreground: a new day may have started. */
+    fun onAppResumed() = daily.onAppOpened()
+
+    /** A tapped reminder opens the screen it talks about. */
+    fun openFromNotification(key: String?) {
+        val target = com.deepline.fishing.daily.ReminderTarget.of(key) ?: return
+        daily.onNotificationOpened(target)
+        if (session != null || tour != null) return
+        when (target) {
+            com.deepline.fishing.daily.ReminderTarget.DAILY -> openDaily()
+            com.deepline.fishing.daily.ReminderTarget.MIGRATION -> screen = Screen.HOME
+            com.deepline.fishing.daily.ReminderTarget.EVENT -> openShop(ShopPage.PASSES)
+        }
     }
 
     /** Starts the full tour from the menu. */
@@ -728,6 +753,9 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     /** The Sparkling chance of the water about to be generated (raised by a Sparkle lure). */
     private var nextSparklingChance = GameConfig.SPARKLING_CHANCE
 
+    /** The migration's spawn boost for the water about to be generated (solo casts only). */
+    private var nextBoost: com.deepline.fishing.core.SpawnBoost? = null
+
     fun startCast() {
         val (lantern, detector) = useSightTackle()
         var p = progress
@@ -737,8 +765,11 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         if (lure) p = Progression.consumeTackle(p, Tackle.SPARKLE_LURE) ?: p
         update(p)
         nextSparklingChance = GameConfig.SPARKLING_CHANCE * if (lure) GameConfig.SPARKLE_LURE_MULTIPLIER else 1f
+        // A migration makes two species more common, in solo casts only (battles share seeded water).
+        nextBoost = com.deepline.fishing.core.Migrations.boostAt(ShopClock.now())
         val s = castFactory(p.specs, lantern)
         nextSparklingChance = GameConfig.SPARKLING_CHANCE
+        nextBoost = null
         if (charm) s.bonusBumps = GameConfig.LUCKY_CHARM_EXTRA_BUMPS
         s.detectorActive = detector
         beginSession(s, turn = null)
@@ -762,7 +793,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Builds the water for a regular cast. Tests swap it to fish hand-placed water. */
     internal var castFactory: (RopeSpecs, Boolean) -> CastSession = { specs, lantern ->
-        CastSession.create(specs, lantern, sparklingChance = nextSparklingChance)
+        CastSession.create(specs, lantern, sparklingChance = nextSparklingChance, boost = nextBoost)
     }
 
     /** Fishing secrets waiting to be explained; the first one is showing (the cast is paused). */
@@ -921,7 +952,11 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             return
         }
         // Battle casts never reach here: only regular casts count for points and the fish log.
-        result?.let { update(Progression.applyCast(progress, it)) }
+        result?.let {
+            val before = progress
+            update(Progression.applyCast(progress, it))
+            daily.afterCast(before, progress)
+        }
         autoBackup()
         // Master angler: the fish log has just been completed (it can only happen once).
         (Secrets.revealedByProgress(progress) - progress.discoveredSecrets).forEach(::onSecretTriggered)
@@ -1168,6 +1203,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             Screen.THEMES -> screen = Screen.HOME
             Screen.SETTINGS -> screen = Screen.HOME
             // -- Daily loop screens' back below.
+            Screen.DAILY -> screen = Screen.HOME
 
             // -- Social screens' back below.
 

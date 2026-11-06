@@ -101,6 +101,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.0")
 
+    // Local reminders for the daily loop (see daily/Reminders.kt): no push server.
+    implementation("androidx.work:work-runtime-ktx:2.10.5")
+
     // Google Play Billing (euro purchases; see billing/PlayStore.kt).
     implementation("com.android.billingclient:billing-ktx:7.1.1")
 
@@ -111,5 +114,6 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.robolectric:robolectric:4.16.1")
     testImplementation("androidx.compose.ui:ui-test-junit4")
+    testImplementation("androidx.work:work-testing:2.10.5")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }

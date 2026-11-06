@@ -61,6 +61,7 @@ fun AppRoot(vm: GameViewModel) {
                     Screen.THEMES -> com.deepline.fishing.ui.shop.ThemesScreen(vm)
                     Screen.SETTINGS -> com.deepline.fishing.ui.settings.SettingsScreen(vm)
                     // -- Daily loop screens below.
+                    Screen.DAILY -> com.deepline.fishing.ui.daily.DailyScreen(vm)
 
                     // -- Social screens below.
 

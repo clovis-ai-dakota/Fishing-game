@@ -1,5 +1,6 @@
 package com.deepline.fishing
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -28,6 +29,25 @@ class MainActivity : ComponentActivity() {
                 AppRoot(viewModel)
             }
         }
+        // Opened from a reminder: go to the screen it talks about.
+        if (savedInstanceState == null) openFromNotification(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        openFromNotification(intent)
+    }
+
+    private fun openFromNotification(intent: Intent?) {
+        val key = intent?.getStringExtra(com.deepline.fishing.daily.ReminderNotifications.EXTRA_OPEN) ?: return
+        intent.removeExtra(com.deepline.fishing.daily.ReminderNotifications.EXTRA_OPEN)
+        viewModel.openFromNotification(key)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.onAppResumed()
     }
 
     override fun onPause() {

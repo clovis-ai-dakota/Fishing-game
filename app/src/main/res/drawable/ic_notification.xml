@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The status bar icon of reminders: a single-colour fish (Android tints it). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M2.5,12 C5.5,6.5 12.5,6 16.5,12 C12.5,18 5.5,17.5 2.5,12 Z M5.8,11.2 A1.2,1.2 0 1,0 8.2,11.2 A1.2,1.2 0 1,0 5.8,11.2 Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M15.5,12 L21.5,7 L20,12 L21.5,17 Z" />
+</vector>
