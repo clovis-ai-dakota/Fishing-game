@@ -277,11 +277,12 @@ improves and try to fill the Dex.
 
 Deeper casts earn far more (about 140 points per cast with the starting rope, 18,000 with a
 full one), so prices follow income. Tuned with a career simulation of a good player
-(`EconomyTest`, about three casts a day, claiming the season's free track and the daily loop):
-the Midnight Trench takes about 23 casts, the Abyssal Floor about 150 and a full rope about 260
-(all three stats maxed around cast 290, roughly 5 hours of play).
+(`EconomyTest`, about three casts a day, claiming the season's free track and the daily loop;
+the median of five careers, since one career depends a lot on its luck): the Midnight Trench
+takes about 23 casts, the Abyssal Floor about 150 and a full rope about 250 (all three stats
+maxed around cast 290, roughly 5 hours of play).
 
-- **Rope upgrades** follow `RopeStat.COST_CURVE` (200 points for the first level, 225,000 for
+- **Rope upgrades** follow `RopeStat.COST_CURVE` (200 points for the first level, 240,000 for
   the last), weighted per stat; downgrades refund in full. The levels from 5 up were raised
   (about +20%) when the daily loop added income.
 - **Tackle** (Shop): one-cast items switched on before a cast. **Lantern** (lights the dark) and
@@ -292,7 +293,7 @@ the Midnight Trench takes about 23 casts, the Abyssal Floor about 150 and a full
 - **The shop**: everything else in the Shop can be bought with points too (see above).
 - **Seasons** and the **daily loop**: the season's free track, daily rewards, challenges and
   migration water are all part of the career simulation. The daily loop pays about 11% of what a
-  career earns; without it the same career takes about 24, 200 and 316 casts.
+  career earns; without it the same career takes about 24, 200 and 330 casts.
 - **Boat parts** cost 6× their table price.
 - **Wagers** on battles against the computer (1k to 100k points): a win pays the stake back
   ×1.2 (Easy), ×1.6 (Normal) or ×2.4 (Hard), a draw refunds it, a loss or forfeit keeps it.

@@ -131,7 +131,8 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
   - The season's free track (`Seasons.rewards`) is player income: `Career` claims it (about three
     casts a day), so re-run `EconomyTest` when changing season XP or rewards.
   - So is the daily loop (daily rewards, challenge rewards, migration water): `Career` claims the
-    daily reward each day and the challenges it finishes. The late game is limited by savings
+    daily reward each day and the challenges it finishes. `EconomyTest` checks the median of five
+    careers (seeds 1 to 5): a single career swings by dozens of casts with its luck. The late game is limited by savings
     (income minus Lanterns bought), so even small daily income moves the pace a lot: re-run
     `EconomyTest` (it also prints points per cast, which `POINTS_PER_CAST_BY_LENGTH_LEVEL` must
     track) whenever you touch `DailyRewards`, `CHALLENGE_REWARD_CASTS` or the migration numbers.

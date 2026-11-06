@@ -205,10 +205,16 @@ What the simulation showed (seed 2, casts to the Midnight Trench / Abyssal Floor
 | Before the daily loop (season free track only) | 24 | 159 | 302 | 305 |
 | First sizing (rewards of 0.3 to 1 cast's points a day, points for every challenge) | 20 | 96 | 167 | 168 |
 | Smaller points, challenges paying mostly tackle | 23 | 123 | 221 | 234 |
-| Same, rope levels 5 to 10 about 20% dearer (**shipped**) | 23 | 153 | 260 | 291 |
-| Shipped prices without the daily loop | 24 | 202 | 316 | - |
+| Same, rope levels 5 to 10 about 20% dearer, migrations left out of the simulation | 23 | 153 | 260 | 291 |
+| Same with migrations (seed 2 alone) | 22 | 116 | 222 | 241 |
+| Levels 9 and 10 a little dearer again, **shipped**: median of seeds 1 to 5 | 23 | 147 | 249 | 290 |
+| Shipped prices without the daily loop (seed 2) | 24 | 202 | 328 | - |
 
-Other seeds with the shipped numbers: Midnight 21 to 24, Abyss 124 to 159, full rope 229 to 268.
+One career swings a lot with its luck (seeds 1 to 5 with the shipped numbers: Midnight 22 to 27,
+Abyss 116 to 155, full rope 222 to 291), so `EconomyTest` now checks the median of five careers
+instead of a single one. Migrations change only which species spawn; on average over several
+careers they add little income (full rope after 251 casts without them, 256 with them, over six
+seeds), but they move any single career a lot.
 
 Why such a small income moved the pace so much: late in a career the good player buys a Lantern
 for almost every dark cast, so what they save per cast (income minus Lanterns) is only about

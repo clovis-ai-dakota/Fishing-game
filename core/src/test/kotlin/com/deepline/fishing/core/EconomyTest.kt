@@ -109,24 +109,34 @@ object Career {
 class EconomyTest {
     @Test
     fun aGoodPlayersCareerHasTheIntendedPace() {
-        val r = Career.play(seed = 2L, casts = 320)
-        println("ECONOMY casts to Midnight ${r.castsToLevel[4]}, Abyss ${r.castsToLevel[8]}, full rope ${r.castsToLevel[10]}, all maxed ${r.castsToMaxAll}, earned ${r.earned}")
-        println("ECONOMY daily loop: ${r.dailyPoints} points from daily rewards and ${r.challengesClaimed} challenges; points per cast by length level ${r.pointsPerCast.toSortedMap()}")
-        val solo = Career.play(seed = 2L, casts = 320, daily = false)
-        println("ECONOMY without the daily loop: Midnight ${solo.castsToLevel[4]}, Abyss ${solo.castsToLevel[8]}, full rope ${solo.castsToLevel[10]}")
-        val midnight = r.castsToLevel[4] ?: error("never reached the Midnight Trench")
-        val abyss = r.castsToLevel[8] ?: error("never reached the Abyssal Floor")
-        val full = r.castsToLevel[10] ?: error("never maxed the rope's length")
+        // One career depends a lot on its luck (the water, migrations), so the pace is the median
+        // of a few careers.
+        val runs = (1L..5L).map { Career.play(seed = it, casts = 340) }
+        for ((i, r) in runs.withIndex()) {
+            println(
+                "ECONOMY seed ${i + 1}: Midnight ${r.castsToLevel[4]}, Abyss ${r.castsToLevel[8]}, full rope ${r.castsToLevel[10]}, " +
+                    "all maxed ${r.castsToMaxAll}, earned ${r.earned}, daily loop ${r.dailyPoints} (${r.challengesClaimed} challenges)",
+            )
+        }
+        fun median(what: String, f: (Career.Report) -> Int?) = runs.map { f(it) ?: error("a career never reached $what") }.sorted()[runs.size / 2]
+        val midnight = median("the Midnight Trench") { it.castsToLevel[4] }
+        val abyss = median("the Abyssal Floor") { it.castsToLevel[8] }
+        val full = median("a full rope") { it.castsToLevel[10] }
+        println("ECONOMY median: Midnight $midnight, Abyss $abyss, full rope $full; points per cast by length level ${runs[1].pointsPerCast.toSortedMap()}")
+        val solo = Career.play(seed = 2L, casts = 340, daily = false)
+        println("ECONOMY seed 2 without the daily loop: Midnight ${solo.castsToLevel[4]}, Abyss ${solo.castsToLevel[8]}, full rope ${solo.castsToLevel[10]}")
         assertTrue(midnight in 15..45, "Midnight Trench after $midnight casts")
         assertTrue(abyss in 100..200, "Abyssal Floor after $abyss casts")
         assertTrue(full in 200..330, "full rope after $full casts")
-        // The daily loop is a bonus on top of fishing, not the main income.
-        assertTrue(r.dailyPoints < r.earned / 5, "daily loop paid ${r.dailyPoints} of ${r.earned}")
-        assertTrue(r.challengesClaimed > 0)
-        // Points per cast stay close to the table daily rewards and challenge targets are sized by.
-        for ((level, measured) in r.pointsPerCast) {
-            val table = GameConfig.POINTS_PER_CAST_BY_LENGTH_LEVEL[level]
-            assertTrue(measured in table / 2..table * 2, "points per cast at length $level: measured $measured, table $table")
+        for (r in runs) {
+            // The daily loop is a bonus on top of fishing, not the main income.
+            assertTrue(r.dailyPoints < r.earned / 5, "daily loop paid ${r.dailyPoints} of ${r.earned}")
+            assertTrue(r.challengesClaimed > 0)
+            // Points per cast stay close to the table daily rewards and challenge targets are sized by.
+            for ((level, measured) in r.pointsPerCast) {
+                val table = GameConfig.POINTS_PER_CAST_BY_LENGTH_LEVEL[level]
+                assertTrue(measured in table / 2..table * 2, "points per cast at length $level: measured $measured, table $table")
+            }
         }
         // Tackle keeps costing a good share of a cast at every stage.
         for (level in 4..10) {

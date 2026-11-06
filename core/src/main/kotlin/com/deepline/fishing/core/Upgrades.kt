@@ -30,7 +30,7 @@ enum class RopeStat(
          * reaches the Midnight Trench around cast 30, the Abyssal Floor around cast 140 and the
          * end of a full rope around cast 250; see EconomyTest).
          */
-        val COST_CURVE = intArrayOf(200, 900, 3_000, 9_000, 26_000, 55_000, 85_000, 120_000, 170_000, 225_000)
+        val COST_CURVE = intArrayOf(200, 900, 3_000, 9_000, 26_000, 55_000, 85_000, 120_000, 180_000, 240_000)
     }
 }
 
