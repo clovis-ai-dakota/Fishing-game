@@ -50,7 +50,8 @@ class SoundPoolAudioEngine(private val context: Context) : AudioEngine {
     private val music = MusicMixer()
     private val players = EnumMap<MusicTrack, Player>(MusicTrack::class.java)
 
-    private var background = false
+    /** Starts true: nothing plays (and no audio focus is asked for) until the app is on screen. */
+    private var background = true
     private var released = false
     private var hasFocus = false
     private var focusRequested = false

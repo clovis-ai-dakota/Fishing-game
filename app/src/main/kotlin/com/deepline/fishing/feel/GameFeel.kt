@@ -130,7 +130,7 @@ class GameFeel(
         surfaceSplashed = false
         lanternLit = false
         audio.play(Sfx.CAST_SPLASH)
-        juice.addBurst(BurstKind.ENTRY_SPLASH, session.hookX, 0f, session.elapsedSeconds)
+        juice.addBurst(BurstKind.ENTRY_SPLASH, LINE_ENTRY_X, 0f, session.elapsedSeconds)
         updateMusic(session.hookDepth, force = true)
     }
 
@@ -235,6 +235,8 @@ class GameFeel(
         const val SETTING_REDUCE_MOTION = "reduce_motion"
 
         private val MENU_MIX = mapOf(MusicTrack.MENU to 1f)
+        /** Where the line meets the water at the start of a cast: just short of the rod tip (see `rodItem` / `drawBoatAndRod`). */
+        val LINE_ENTRY_X = GameConfig.WORLD_WIDTH / 2f + 1.8f
         private const val FIRST_BUBBLE_SEC = 0.4f
         private const val STREAK_WINDOW_SEC = 1.5f
         private const val REEL_TICK_METERS = 3f

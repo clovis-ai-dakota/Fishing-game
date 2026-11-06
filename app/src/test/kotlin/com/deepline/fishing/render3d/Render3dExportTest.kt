@@ -201,8 +201,8 @@ class Render3dExportTest {
         fun fxAt(session: CastSession, vararg bursts: com.deepline.fishing.feel.Burst, flash: Float = 0f) =
             com.deepline.fishing.feel.CastFx(flash = flash, flashColor = com.deepline.fishing.ui.ColorScript.GOLD_FLASH, particles = com.deepline.fishing.feel.Particles.of(bursts.toList(), session.elapsedSeconds))
         val start = CastSession(RopeSpecs(120f, 10f, 9f), false, World(emptyList(), emptyList()))
-        while (start.elapsedSeconds < 0.28f) start.update(1f / 60f, null)
-        export("juice_splash", SceneBuilder().build(start, 0.3f, w, h, cameraTop = -7f, fx = fxAt(start, com.deepline.fishing.feel.Burst(com.deepline.fishing.feel.BurstKind.ENTRY_SPLASH, GameConfig.WORLD_WIDTH / 2f, 0f, 0f, 1))))
+        while (start.elapsedSeconds < 0.2f) start.update(1f / 60f, null)
+        export("juice_splash", SceneBuilder().build(start, 0.3f, w, h, cameraTop = -7f, fx = fxAt(start, com.deepline.fishing.feel.Burst(com.deepline.fishing.feel.BurstKind.ENTRY_SPLASH, com.deepline.fishing.feel.GameFeel.LINE_ENTRY_X, 0f, 0f, 1))))
 
         val mid = CastSession(RopeSpecs(200f, 20f, 9f), false, World(emptyList(), emptyList()))
         while (mid.hookDepth < 80f) mid.update(1f / 60f, null)

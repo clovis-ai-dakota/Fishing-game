@@ -20,6 +20,7 @@ interface AudioEngine {
     /** The app went to the background: silence everything until [resume]. */
     fun pause()
 
+    /** The app is on screen (also called when it first appears: nothing plays before that). */
     fun resume()
 
     fun release()

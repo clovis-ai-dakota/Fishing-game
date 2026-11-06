@@ -635,12 +635,14 @@ class SceneBuilder {
     /** Game feel particles at their world positions, slightly in front of the play plane. */
     private fun addParticles(sprites: SpriteBatch, particles: List<Particle>, atmo: Atmosphere) {
         for (p in particles) {
-            val at = Vec3(p.x, -p.depth, PARTICLE_Z)
+            // Spray and foam at the surface go in front of the hull's near side and the water
+            // skirt (a splash flies towards the viewer); everything else sits by the play plane.
+            val at = Vec3(p.x, -p.depth, if (p.depth < SURFACE_BAND_M) SURFACE_PARTICLE_Z else PARTICLE_Z)
             val a = p.alpha.coerceIn(0f, 1f)
             when (p.style) {
                 ParticleStyle.DROPLET -> sprites.quad(at, p.radius * 2.8f, rgba(ColorScript.splash(p.depth, atmo), 0.9f * a), SHAPE_DOT)
                 ParticleStyle.FOAM -> sprites.quad(at, p.radius * 2.8f, rgba(ColorScript.splash(p.depth, atmo), 0.5f * a), SHAPE_DOT)
-                ParticleStyle.BUBBLE -> sprites.quad(at, p.radius * 2f, rgba(ColorScript.splash(p.depth, atmo), 0.8f * a), SHAPE_RING)
+                ParticleStyle.BUBBLE -> sprites.quad(at, p.radius * 2.4f, rgba(ColorScript.splash(p.depth, atmo), 0.8f * a), SHAPE_RING)
                 ParticleStyle.GLINT -> sprites.quad(at, p.radius * 4f, rgba(ColorScript.GLINT, a), SHAPE_STAR)
             }
         }
@@ -732,6 +734,8 @@ class SceneBuilder {
 
         /** Particles sit just in front of the play plane; the flash in front of everything. */
         const val PARTICLE_Z = 0.4f
+        const val SURFACE_PARTICLE_Z = 1.6f
+        const val SURFACE_BAND_M = 0.3f
         const val FLASH_Z = 2.5f
 
         const val SHAPE_DOT = 0f
