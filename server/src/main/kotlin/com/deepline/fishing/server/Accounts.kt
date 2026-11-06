@@ -66,6 +66,9 @@ class AccountStore(private val dir: File? = null, private val clock: () -> Long 
         }
     }
 
+    /** Whether [id] belongs to a player who has used the server (so a friend request can reach them). */
+    fun isRegistered(id: String): Boolean = synchronized(lock) { PlayerId.isValid(id) && read(id)?.secretHash != null }
+
     fun save(id: String, secret: String, data: String) = synchronized(lock) {
         if (data.toByteArray().size > AccountApi.MAX_SAVE_BYTES) throw Failure(Problem.TOO_BIG)
         write(authenticate(id, secret).copy(save = data, savedAtMs = clock()))

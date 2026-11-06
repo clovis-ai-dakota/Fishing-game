@@ -34,10 +34,25 @@ fun main() {
     val port = System.getenv("PORT")?.toIntOrNull() ?: 8080
     // Gifts and cloud saves are kept as files here (one per player).
     val data = File(System.getenv("DEEPLINE_DATA_DIR") ?: "data/accounts")
-    embeddedServer(Netty, port = port, host = "0.0.0.0") { battleServer(accounts = AccountStore(data)) }.start(wait = true)
+    val accounts = AccountStore(data)
+    // Friends, weekly leaderboards and tournaments, clubs: one file per player, week and club.
+    val social = SocialStore(
+        accounts,
+        File(System.getenv("DEEPLINE_SOCIAL_DIR") ?: "data/social"),
+        // A secret salt keeps each week's tournament water unknown until the week starts.
+        tournamentSalt = System.getenv("DEEPLINE_TOURNAMENT_SALT")?.toLongOrNull() ?: 0L,
+        // Clubs ship in a later app update; "off" makes every club call answer 404.
+        clubsEnabled = System.getenv("DEEPLINE_CLUBS")?.lowercase() != "off",
+    )
+    embeddedServer(Netty, port = port, host = "0.0.0.0") { battleServer(accounts = accounts, social = social) }.start(wait = true)
 }
 
-fun Application.battleServer(lobby: Lobby = Lobby(), accounts: AccountStore = AccountStore()) {
+fun Application.battleServer(lobby: Lobby = Lobby(), accounts: AccountStore = AccountStore(), social: SocialStore = SocialStore(accounts)) {
+    // Verified players' battle casts count on the weekly leaderboards.
+    lobby.verifyPlayer = { id, secret ->
+        runCatching { accounts.authenticate(id, secret) }.isSuccess.also { ok -> if (ok) social.seen(id) }
+    }
+    lobby.onValidatedCast = social::recordBattleCast
     install(WebSockets) {
         pingPeriod = 15.seconds
         timeout = 30.seconds
@@ -48,6 +63,7 @@ fun Application.battleServer(lobby: Lobby = Lobby(), accounts: AccountStore = Ac
         get("/health") { call.respondText("ok") }
         webSocket("/battle") { lobby.handle(this) }
         accountRoutes(accounts)
+        socialRoutes(social)
     }
 }
 

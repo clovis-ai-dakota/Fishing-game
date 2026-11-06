@@ -13,3 +13,5 @@ captures/
 .kotlin/
 # Battle server account files (written by the server and the online UI tests)
 data/accounts/
+# Friends, weekly leaderboards, tournaments and clubs (written by the server)
+data/social/
