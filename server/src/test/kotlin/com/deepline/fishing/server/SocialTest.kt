@@ -429,14 +429,21 @@ class SocialTest {
             @Suppress("UNREACHABLE_CODE")
             error("unreachable")
         }
-        // Alice proves who she is; Bob only claims an id (a wrong secret).
+        suspend fun DefaultClientWebSocketSession.started(): ServerMessage.MatchStarted {
+            while (true) {
+                val m = next()
+                if (m is ServerMessage.MatchStarted) return m
+            }
+        }
+        // Bob's id is already his (an id belongs to the first secret it's used with).
+        social.hello(bob, "Bob")
+        // Alice proves who she is; someone else only claims Bob's id (with the wrong secret).
         val a = join("Alice", alice, alice.secret)
         val b = join("Bob", bob, carol.secret)
         a.send(Frame.Text(OnlineProtocol.encode(ClientMessage.QuickMatch(BattleMode.HEAVY_HAUL))))
         b.send(Frame.Text(OnlineProtocol.encode(ClientMessage.QuickMatch(BattleMode.HEAVY_HAUL))))
-        a.next()
-        val startA = generateSequence { null as ServerMessage? }.let { a.next() as? ServerMessage.MatchStarted ?: a.next() as ServerMessage.MatchStarted }
-        val startB = b.next() as? ServerMessage.MatchStarted ?: b.next() as ServerMessage.MatchStarted
+        val startA = a.started()
+        val startB = b.started()
         for ((ws, start) in listOf(a to startA, b to startB)) {
             val turn = OnlineMatch(start).myNextTurn()!!
             val cast = BotPlayer.playCast(OnlineProtocol.tournamentSpecs, turn.seed, BotDifficulty.HARD)
