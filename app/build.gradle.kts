@@ -6,6 +6,15 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
+// Firebase is optional: its Gradle plugins (which read the config and upload Crashlytics mapping
+// files) only run once app/google-services.json exists. Without it the app builds and runs the
+// same, and analytics/crash reports stay off (see analytics/Telemetry.kt, docs/firebase-setup.md).
+val firebaseConfigured = file("google-services.json").exists()
+if (firebaseConfigured) {
+    apply(plugin = "com.google.gms.google-services")
+    apply(plugin = "com.google.firebase.crashlytics")
+}
+
 android {
     namespace = "com.deepline.fishing"
     compileSdk = 36
@@ -21,6 +30,12 @@ android {
         // The default reaches a server running on the development machine from the Android emulator.
         val serverUrl = (project.findProperty("deeplineServerUrl") as String?) ?: "ws://10.0.2.2:8080/battle"
         buildConfigField("String", "DEFAULT_SERVER_URL", "\"$serverUrl\"")
+
+        // The published privacy policy, linked from the consent sheet and Settings > Privacy. Set
+        // it before releasing: -PdeeplinePrivacyPolicyUrl=https://your-site/privacy (see
+        // docs/privacy-policy.md). The placeholder uses a reserved domain that never resolves.
+        val privacyUrl = (project.findProperty("deeplinePrivacyPolicyUrl") as String?) ?: "https://deepline.example/privacy"
+        buildConfigField("String", "PRIVACY_POLICY_URL", "\"$privacyUrl\"")
     }
 
     buildTypes {
@@ -100,6 +115,12 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.10.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.0")
+
+    // Analytics and crash reports (Firebase). Nothing is collected until the player agrees, and
+    // nothing at all without app/google-services.json: see analytics/Telemetry.kt.
+    implementation(platform("com.google.firebase:firebase-bom:35.1.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-crashlytics")
 
     // Google Play Billing (euro purchases; see billing/PlayStore.kt).
     implementation("com.android.billingclient:billing-ktx:7.1.1")

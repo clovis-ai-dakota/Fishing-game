@@ -17,6 +17,10 @@ import kotlinx.serialization.Serializable
  * - `/api/gifts/inbox`: [AuthRequest] → [Inbox], the gifts waiting.
  * - `/api/gifts/ack`: [AckRequest] → 204, once the app has given them to the player (so a gift
  *   is never lost if the app closes in between; the app also remembers ids it has granted).
+ * - `/api/account/delete`: [AuthRequest] → 204. Erases everything kept for the player (their
+ *   file: the secret's hash, the cloud save, gifts waiting). Deleting an id the server doesn't
+ *   know also answers 204, so a retry is harmless. Google Play requires this for apps with
+ *   accounts, with a web page too: [DELETE_ACCOUNT_PAGE] (a form taking the recovery code).
  *
  * Errors: 400 malformed, 403 wrong secret, 413 too big.
  */
@@ -26,6 +30,10 @@ object AccountApi {
     const val SEND_GIFT_PATH = "/api/gifts/send"
     const val INBOX_PATH = "/api/gifts/inbox"
     const val ACK_PATH = "/api/gifts/ack"
+    const val DELETE_ACCOUNT_PATH = "/api/account/delete"
+
+    /** The web page where players can delete their account with their recovery code. */
+    const val DELETE_ACCOUNT_PAGE = "/delete-account"
 
     /** A cloud save can't be bigger than this (a save is a few kilobytes). */
     const val MAX_SAVE_BYTES = 256 * 1024
