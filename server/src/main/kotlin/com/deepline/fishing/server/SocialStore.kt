@@ -294,7 +294,8 @@ class SocialStore(
                 )
             }.sortedWith(compareByDescending<FriendDto> { it.online }.thenBy { it.name.lowercase() }),
             incoming = me.incoming.map { card(it.from) },
-            outgoing = me.outgoing.map(::card),
+            // Asking someone doesn't reveal the name they chose: only accepting does.
+            outgoing = me.outgoing.map { PlayerCard(it, Leaderboards.anglerName(it)) },
             challenges = me.challenges.filter { it.expiresAtMs > now && it.from in me.friends },
         )
     }

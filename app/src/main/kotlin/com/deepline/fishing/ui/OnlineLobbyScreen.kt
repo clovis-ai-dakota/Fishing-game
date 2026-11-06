@@ -25,6 +25,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
@@ -92,6 +93,10 @@ fun OnlineLobbyScreen(vm: GameViewModel) {
                                     color = MaterialTheme.colorScheme.secondary,
                                 )
                                 Text("Waiting for your opponent to join…", style = MaterialTheme.typography.bodySmall)
+                                // A challenge to a friend: whether it reached them.
+                                vm.social.challengeStatus?.let {
+                                    Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.secondary, modifier = Modifier.testTag("challenge_status"))
+                                }
                             } else {
                                 Text("Looking for an opponent…", style = MaterialTheme.typography.titleMedium)
                                 Text(

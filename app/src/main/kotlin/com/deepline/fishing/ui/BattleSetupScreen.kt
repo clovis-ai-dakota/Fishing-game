@@ -84,6 +84,8 @@ fun BattleSetupScreen(vm: GameViewModel) {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
+            // Friends, the weekly leaderboards and tournament (and clubs) open from here.
+            com.deepline.fishing.ui.social.SocialEntryCard(vm)
             Column(Modifier.tourTarget(TourTarget.BATTLE_MODES), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text("Mode", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 BattleMode.entries.forEach { m ->
