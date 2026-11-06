@@ -101,9 +101,10 @@ object Career {
 }
 
 /**
- * The pacing of a good player's career with the current prices (rope costs, tackle, milestones):
- * if a change to scoring or prices moves these, re-tune [RopeStat.COST_CURVE] and
- * [GameConfig.TACKLE_PRICE_BY_LENGTH_LEVEL].
+ * The pacing of a good player's career with the current prices (rope costs, tackle, milestones)
+ * and player income (the season's free track, daily rewards and challenges, migrations): if a
+ * change to scoring, prices or rewards moves these, re-tune [RopeStat.COST_CURVE],
+ * [GameConfig.TACKLE_PRICE_BY_LENGTH_LEVEL] or the rewards ([DailyRewards], [Seasons.rewards]).
  */
 class EconomyTest {
     @Test
@@ -119,6 +120,14 @@ class EconomyTest {
         assertTrue(midnight in 15..45, "Midnight Trench after $midnight casts")
         assertTrue(abyss in 100..200, "Abyssal Floor after $abyss casts")
         assertTrue(full in 200..330, "full rope after $full casts")
+        // The daily loop is a bonus on top of fishing, not the main income.
+        assertTrue(r.dailyPoints < r.earned / 5, "daily loop paid ${r.dailyPoints} of ${r.earned}")
+        assertTrue(r.challengesClaimed > 0)
+        // Points per cast stay close to the table daily rewards and challenge targets are sized by.
+        for ((level, measured) in r.pointsPerCast) {
+            val table = GameConfig.POINTS_PER_CAST_BY_LENGTH_LEVEL[level]
+            assertTrue(measured in table / 2..table * 2, "points per cast at length $level: measured $measured, table $table")
+        }
         // Tackle keeps costing a good share of a cast at every stage.
         for (level in 4..10) {
             val price = Tackle.LANTERN.price(level)
