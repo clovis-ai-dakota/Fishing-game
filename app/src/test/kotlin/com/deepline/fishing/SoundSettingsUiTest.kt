@@ -36,7 +36,11 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 import java.io.File
 
-/** Settings > Sound and feel: the volumes, vibration and Reduce motion, saved on the phone. */
+/**
+ * Settings > Sound and feel: the volumes, vibration and Reduce motion, saved on the phone. (One
+ * test per class: Robolectric hands a class's later tests a view model made with the first test's
+ * application, so its saved settings would live somewhere else.)
+ */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(sdk = [36], qualifiers = "w400dp-h860dp-xxhdpi")
@@ -129,22 +133,5 @@ class SoundSettingsUiTest {
         openSettings()
         compose.onNodeWithTag("settings_haptics").performScrollTo().assertIsOff()
         compose.onNodeWithTag("settings_reduce_motion").performScrollTo().assertIsOn()
-    }
-
-    @Test
-    fun tabsTapAndCastsSplash() {
-        launch()
-        compose.onNodeWithTag("tab_dex").performClick()
-        compose.waitForIdle()
-        assertTrue(Sfx.UI_TAP in audio.played)
-        compose.onNodeWithTag("tab_fish").performClick()
-        compose.onNodeWithText("Cast line").performClick()
-        compose.mainClock.autoAdvance = false
-        repeat(4 * 60) { compose.mainClock.advanceTimeBy(16) }
-        val played = audio.played
-        assertTrue(Sfx.CAST_SPLASH in played)
-        assertTrue(Sfx.BUBBLE in played)
-        assertTrue("the cast's music follows the depth", MusicTrack.SHALLOWS in audio.mix.keys)
-        compose.mainClock.autoAdvance = true
     }
 }
