@@ -221,6 +221,34 @@ it again next time. The **?** button at the top of the Fish tab replays it. When
 steps, returning players get a short "What's new" tour of just those steps
 (`app/.../ui/tour/Tour.kt`).
 
+### Sound and feel
+
+Casts sound and feel like fishing: a splash when the line hits the water, bubbles on the way
+down, a knock for each bump (a fish's head, a rock, driftwood or a jelly, each lower than the last,
+with a deep thud on the last one), the reel's ratchet on the way up, a chime for every catch that
+climbs with catches in a row, bigger ones for rare and Sparkling fish and a fanfare for the
+legendary, the whirr of the fast reel, a splash at the surface and a jingle with the results.
+Claims, purchases, battle results, Lanterns and secrets (one sound for all of them, so it gives
+nothing away) have their own sounds. The music follows the hook: a calm layer near the surface
+crossfades into a darker one in the deep, and the menus have their own track.
+
+- **Haptics** (sparingly): bumps, catches by rarity, the fast reel, claims and battle wins, using
+  Android's haptic primitives where the phone has them and short clicks otherwise. Never on
+  ordinary taps.
+- **Juice, drawn only**: trauma-based screen shake on bumps and snags, a hit-stop and a short slow
+  motion with a flash on rare catches, and splash and bubble particles. Shake moves the picture,
+  never the hook, the fish or hit detection, and flashes and particles are drawn under the
+  darkness, so they never light up dark water. Slow motion only plays in solo casts: battles and
+  online casts always run in real time.
+- **Settings > Sound and feel**: master, music and sound effect volumes, Vibration, and Reduce
+  motion (no shake, slow motion or flashes; it starts as the phone's "remove animations" setting).
+  They're saved on the phone. The audio pauses when the game goes to the background and respects
+  audio focus (it pauses for calls and other apps, and stays quiet if you're already playing your
+  own music).
+- **Credits**: every sound and track is CC0 (public domain), from OpenGameArt.org, listed in
+  Settings > Credits and in `app/src/main/assets/audio/CREDITS.md`. Research and decisions:
+  `docs/research/game-feel.md`.
+
 ### Around the casts
 
 There is no time limit: it is an ongoing collection game. Explore deeper zones as your rope
@@ -341,6 +369,10 @@ server/ Ktor battle server: WebSocket battles (room codes, quick match, authorit
         account API (Accounts.kt: gifts and cloud saves in one JSON file per player) + tests
 app/    Android app (Jetpack Compose)
         GameViewModel.kt   game state, persistence via SharedPreferences, online flow
+        audio/             audio engine (SoundPool effects, crossfaded music, audio focus), the
+                           sound table (Sfx) and the CC0 credits; files in assets/audio
+        feel/              game feel: event-to-sound/haptic mapping, haptics, screen shake,
+                           slow motion, particles, the sound settings
         OnlineConnection.kt WebSocket client (Ktor + OkHttp)
         AccountClient.kt   gifts and cloud save client
         billing/           Store: Google Play Billing (PlayStore) and the debug test store
@@ -378,6 +410,9 @@ Requirements: JDK 17+ (JDK 21 for the app UI tests: Robolectric needs it for And
   match their hitboxes and that hook skins keep the hook's size. `Render3dExportTest` exports
   frames that `node tools/render3d-preview/render.cjs` draws with WebGL2 (headless Chromium) and
   the app's own shaders, into `app/build/render3d/*.png`.
+- `app` feel: unit tests for the shake math, the event-to-sound/haptic mapping, the mixers, the
+  settings and that every audio file is credited and CC0; `SoundSettingsUiTest` and
+  `GameSoundsUiTest` run the real app with a recording audio engine.
 - `app`: Robolectric UI tests that run the real app on the JVM. They tap through every
   screen, play casts and battles, render the dark zone with and without a Lantern, and play a
   full online match against the real server (started as a separate process). Screenshots are
