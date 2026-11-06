@@ -221,6 +221,30 @@ it again next time. The **?** button at the top of the Fish tab replays it. When
 steps, returning players get a short "What's new" tour of just those steps
 (`app/.../ui/tour/Tour.kt`).
 
+### Privacy, analytics and crash reports
+
+- **Nothing is collected without consent.** On first launch (in builds with Firebase), a short
+  consent sheet asks, before the tour, whether the game may send **usage statistics** (Google
+  Analytics for Firebase) and **crash reports** (Firebase Crashlytics). "Don't allow" and
+  "Allow" look the same; "Choose for each" sets the two separately, both off by default. Until
+  a "yes", Firebase isn't even started (manifest flags off, Consent Mode v2 denied by default).
+- **Settings > Privacy**: the two switches (change your mind any time; turning statistics off
+  clears the analytics data on the phone), *Reset my statistics ID*, the privacy policy, and
+  **Delete my online account** (erases the player's file on the game server: player ID, cloud
+  save, waiting gifts; the game then uses a new random ID). The server also serves a web page
+  for it, `/delete-account`, which takes the recovery code (Google Play requires both paths).
+- No ads, no advertising ID, no Android ID; statistics are linked to a random ID, never to the
+  player's name or player ID. Play purchases are measured by Firebase itself once linked.
+- Code: `app/.../analytics/` (the `Analytics` facade, `GameAnalytics` events, the consent gate,
+  `FirebaseTelemetry`) and `app/.../privacy/` (choices, the sheet, the controller). Every event:
+  [`docs/analytics-events.md`](docs/analytics-events.md). Research and decisions:
+  [`docs/research/analytics-privacy.md`](docs/research/analytics-privacy.md). Setup:
+  [`docs/firebase-setup.md`](docs/firebase-setup.md). Drafts: [privacy policy](docs/privacy-policy.md),
+  [Play Data safety answers](docs/play-data-safety.md).
+- **Firebase is optional**: without `app/google-services.json` the app builds, runs and tests the
+  same, collects nothing and asks nothing. Build releases with
+  `-PdeeplinePrivacyPolicyUrl=https://...` (the published policy).
+
 ### Around the casts
 
 There is no time limit: it is an ongoing collection game. Explore deeper zones as your rope
@@ -338,11 +362,14 @@ core/   Pure Kotlin game logic (no Android dependency) + unit tests
         online/            battle protocol (JSON messages), cast validation, client-side match mirror,
                            AccountApi.kt (the gift and cloud save HTTP API)
 server/ Ktor battle server: WebSocket battles (room codes, quick match, authoritative) and the
-        account API (Accounts.kt: gifts and cloud saves in one JSON file per player) + tests
+        account API (Accounts.kt: gifts and cloud saves in one JSON file per player, account
+        deletion; AccountDeletionPage.kt: the /delete-account web page) + tests
 app/    Android app (Jetpack Compose)
         GameViewModel.kt   game state, persistence via SharedPreferences, online flow
         OnlineConnection.kt WebSocket client (Ktor + OkHttp)
-        AccountClient.kt   gifts and cloud save client
+        AccountClient.kt   gifts, cloud save and account deletion client
+        analytics/         Analytics facade, GameAnalytics (the events), consent gate, Firebase backend
+        privacy/           privacy choices, consent sheet, PrivacyController (Settings > Privacy)
         billing/           Store: Google Play Billing (PlayStore) and the debug test store
         ui/CastScreen.kt   game loop, HUD, pause, results
         ui/render3d/       3D renderer: procedural meshes, scene builder, GL backend (gl/)
@@ -393,7 +420,9 @@ docker build -t deepline-server . && docker run -p 8080:8080 deepline-server
 
 Gifts and cloud saves are stored as one JSON file per player in `data/accounts`
 (`DEEPLINE_DATA_DIR` to change it; keep it on a persistent volume). The HTTP API is described in
-`core/.../online/AccountApi.kt`.
+`core/.../online/AccountApi.kt`. Players can delete their account from the game or on
+`https://<host>/delete-account` (the link to give Google Play); set `DEEPLINE_PRIVACY_CONTACT`
+(an email address) and `DEEPLINE_PRIVACY_POLICY_URL` so that page says how to reach you.
 
 Any host that runs a Docker container or a JVM works (for example Fly.io, Render, Railway or a
 VPS). Players connect to `ws://<host>:8080/battle`, or `wss://<host>/battle` behind HTTPS.
