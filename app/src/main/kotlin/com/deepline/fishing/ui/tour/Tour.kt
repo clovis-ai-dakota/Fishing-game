@@ -13,7 +13,7 @@ import com.deepline.fishing.core.online.OnlineProtocol
 
 /** A UI element a tour step can point at (see `Modifier.tourTarget`). */
 enum class TourTarget {
-    HOME_CAST, HOME_POINTS, HOME_LANTERN, HOME_MILESTONES, HOME_TOUR, HOME_BOAT,
+    HOME_CAST, HOME_POINTS, HOME_LANTERN, HOME_MILESTONES, HOME_SETTINGS, HOME_BOAT,
     NAV_BAR, TAB_DEX, TAB_SHOP, TAB_BATTLE,
     SHOP_ROPE, DEX_HEADER, DEX_FILTERS, MILESTONES_FIRST, BATTLE_MODES, BATTLE_OPPONENT,
     SKINS_CUSTOMISE, SKINS_ATMOSPHERE, SHOP_STYLE,
@@ -21,6 +21,17 @@ enum class TourTarget {
     SHOP_PRICES, SHOP_PASSES, BATTLE_TACKLE, SHOP_SEASON,
     DEX_AQUARIUM, SHOP_AQUARIUM, SKINS_BADGE,
     HOME_THEMES, THEMES_MODE, SHOP_THEMES,
+    SETTINGS_TOUR,
+    // -- Game feel (sound, haptics) targets below.
+
+    // -- Daily loop targets below.
+
+    // -- Social targets below.
+
+    // -- Privacy targets below.
+
+    // -- Language targets below.
+
 }
 
 /** A small illustration shown in a tour card. */
@@ -65,8 +76,10 @@ object Tour {
      * 9: the Shop tab (two prices for everything), the rare fish detector, sight tackle in
      *    battles, and passes.
      * 10: themes for the menus (a sea scene behind them) and a night mode.
+     * 11: Settings (the gear), sound and haptics, daily rewards and challenges, friends,
+     *     leaderboards, tournaments and clubs, privacy choices and languages.
      */
-    const val VERSION = 10
+    const val VERSION = 11
 
     private val bumps = GameConfig.DESCENT_TOUCH_LIMIT
     private val bumpFree = GameConfig.BUMP_FREE_DEPTH.toInt()
@@ -385,12 +398,30 @@ object Tour {
             sinceVersion = 8,
         ),
         TourStep(
+            id = "settings",
+            title = "Settings",
+            body = "The gear at the top of the Fish tab opens Settings.",
+            screen = Screen.HOME,
+            target = TourTarget.HOME_SETTINGS,
+            sinceVersion = VERSION,
+        ),
+        // -- Game feel (sound, haptics) steps below.
+
+        // -- Daily loop steps below.
+
+        // -- Social steps below.
+
+        // -- Privacy steps below.
+
+        // -- Language steps below.
+
+        TourStep(
             id = "replay",
             title = "That's it, good fishing!",
-            body = "You can replay this tour any time with the ? button at the top of the Fish tab.",
-            screen = Screen.HOME,
-            target = TourTarget.HOME_TOUR,
-            sinceVersion = 5,
+            body = "You can replay this tour any time from Settings.",
+            screen = Screen.SETTINGS,
+            target = TourTarget.SETTINGS_TOUR,
+            sinceVersion = VERSION,
         ),
     )
 

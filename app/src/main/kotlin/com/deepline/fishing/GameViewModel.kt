@@ -65,7 +65,15 @@ import kotlin.random.Random
  * Where the player is. [HOME] (the Fish tab), [DEX], [SHOP] and [BATTLE_SETUP] are the four
  * bottom-bar tabs; the others are full screens pushed on top of them (no tab bar).
  */
-enum class Screen { HOME, DEX, SHOP, BATTLE_SETUP, CAST, FISH_DETAIL, MILESTONES, BATTLE, ONLINE_LOBBY, BOAT_EDITOR, AQUARIUM, THEMES }
+enum class Screen {
+    HOME, DEX, SHOP, BATTLE_SETUP, CAST, FISH_DETAIL, MILESTONES, BATTLE, ONLINE_LOBBY, BOAT_EDITOR, AQUARIUM, THEMES,
+    /** Settings (the gear on the Fish tab): sound, notifications, privacy, language, the tour. */
+    SETTINGS,
+    // -- Daily loop screens below.
+
+    // -- Social screens below.
+
+}
 
 /** The four top-level destinations of the bottom navigation bar, in order. */
 enum class MainTab(val label: String, val screen: Screen) {
@@ -979,6 +987,10 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         screen = Screen.THEMES
     }
 
+    fun openSettings() {
+        screen = Screen.SETTINGS
+    }
+
     fun buyUpgrade(stat: RopeStat) {
         Progression.upgrade(progress, stat)?.let(::update)
     }
@@ -1154,6 +1166,11 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             Screen.BOAT_EDITOR -> openDex(DexSection.SKINS)
             Screen.AQUARIUM -> openDex(DexSection.FISH)
             Screen.THEMES -> screen = Screen.HOME
+            Screen.SETTINGS -> screen = Screen.HOME
+            // -- Daily loop screens' back below.
+
+            // -- Social screens' back below.
+
             Screen.DEX, Screen.SHOP, Screen.BATTLE_SETUP, Screen.MILESTONES -> screen = Screen.HOME
         }
     }

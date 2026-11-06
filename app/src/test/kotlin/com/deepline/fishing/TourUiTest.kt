@@ -9,6 +9,7 @@ import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -120,7 +121,8 @@ class TourUiTest {
         launch()
         assertEquals(false, isShowing("Welcome to Deep Line!"))
 
-        compose.onNodeWithContentDescription("Take the tour").performClick()
+        compose.onNodeWithContentDescription("Settings").performClick()
+        compose.onNodeWithTag("settings_tour").performClick()
         compose.onNodeWithText("Welcome to Deep Line!").assertExists()
         compose.click("Next")
         compose.click("Skip tour")

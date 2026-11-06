@@ -193,6 +193,25 @@ object GameIcons {
         filled { circle(12.2f, 19f, 1.6f) }
     }
 
+    /** Settings: a cog with eight teeth around a hole. */
+    val Settings: ImageVector = icon("Settings") {
+        filled(evenOdd = true) {
+            val teeth = 8
+            for (i in 0 until teeth * 2) {
+                val outer = i % 2 == 0
+                val r = if (outer) 10.2f else 7.6f
+                for (k in 0..1) {
+                    val a = ((i + k * 0.5f - 0.25f) / (teeth * 2f)) * 2f * Math.PI.toFloat()
+                    val x = 12f + r * kotlin.math.cos(a)
+                    val y = 12f + r * kotlin.math.sin(a)
+                    if (i == 0 && k == 0) moveTo(x, y) else lineTo(x, y)
+                }
+            }
+            close()
+            circle(12f, 12f, 3.4f)
+        }
+    }
+
     /** Locked Dex entries. */
     val Lock: ImageVector = icon("Lock") {
         stroked(2.2f) {

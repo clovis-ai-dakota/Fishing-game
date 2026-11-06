@@ -59,7 +59,7 @@ class TourContentTest {
         }
         // Version 5: every tab of the bottom bar, the Dex's seen/caught states, filters and pages.
         for (tab in com.deepline.fishing.MainTab.entries) assertTrue("Tour doesn't mention the ${tab.label} tab", tab.label in text)
-        for (topic in listOf("Seen", "Catch it", "Filter", "swipe", "trophy", "Secrets section", "? button")) {
+        for (topic in listOf("Seen", "Catch it", "Filter", "swipe", "trophy", "Secrets section", "Settings")) {
             assertTrue("Tour doesn't mention $topic", text.contains(topic, ignoreCase = true))
         }
     }
@@ -69,12 +69,15 @@ class TourContentTest {
         // The bar itself, and every tab the tour sends the player to, is highlighted at least once.
         val targets = Tour.steps.mapNotNull { it.target }.toSet()
         assertTrue(TourTarget.NAV_BAR in targets)
-        for (t in listOf(TourTarget.HOME_CAST, TourTarget.HOME_POINTS, TourTarget.HOME_TOUR, TourTarget.DEX_HEADER, TourTarget.DEX_FILTERS)) {
+        for (t in listOf(TourTarget.HOME_CAST, TourTarget.HOME_POINTS, TourTarget.HOME_SETTINGS, TourTarget.SETTINGS_TOUR, TourTarget.DEX_HEADER, TourTarget.DEX_FILTERS)) {
             assertTrue("No step points at $t", t in targets)
         }
         // Changed in version 5, so returning players saw them in "What's new".
         val v5 = Tour.steps.filter { it.sinceVersion == 5 }.map { it.id }
-        assertTrue(v5.containsAll(listOf("cast", "dex", "dex_filters", "milestones", "secrets", "replay")))
+        assertTrue(v5.containsAll(listOf("cast", "dex", "dex_filters", "milestones", "secrets")))
+        // Version 11: Settings (the gear), where the tour can be replayed.
+        val v11 = Tour.steps.filter { it.sinceVersion == 11 }.map { it.id }
+        assertTrue(v11.containsAll(listOf("settings", "replay")))
         // Version 6: customising the boat and the atmosphere.
         val v6 = Tour.steps.filter { it.sinceVersion == 6 }.map { it.id }
         assertTrue(v6.containsAll(listOf("boat", "atmosphere")))

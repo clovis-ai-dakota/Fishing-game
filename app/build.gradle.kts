@@ -29,10 +29,14 @@ android {
             // pending). Build with -PdeeplinePlayBilling=true to test real Google Play billing.
             val play = (project.findProperty("deeplinePlayBilling") as String?)?.toBoolean() ?: false
             buildConfigField("boolean", "USE_PLAY_BILLING", play.toString())
+            // Features built and testable now but shipped in a later update: on in debug builds.
+            buildConfigField("boolean", "CLUBS_ENABLED", clubs(default = true))
         }
         release {
             isMinifyEnabled = false
             buildConfigField("boolean", "USE_PLAY_BILLING", "true")
+            // Clubs ship in their own update: off in release builds until then (-PdeeplineClubs=true).
+            buildConfigField("boolean", "CLUBS_ENABLED", clubs(default = false))
         }
     }
 
@@ -59,6 +63,10 @@ android {
         }
     }
 }
+
+/** A feature flag's value: `-PdeeplineClubs=true|false` overrides the build type's default. */
+fun clubs(default: Boolean): String =
+    ((project.findProperty("deeplineClubs") as String?)?.toBoolean() ?: default).toString()
 
 kotlin {
     compilerOptions {

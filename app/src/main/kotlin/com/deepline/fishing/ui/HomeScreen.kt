@@ -98,8 +98,8 @@ fun HomeScreen(vm: GameViewModel) {
             IconButton(onClick = vm::openThemes, modifier = Modifier.tourTarget(TourTarget.HOME_THEMES)) {
                 Icon(GameIcons.Palette, contentDescription = "Themes", tint = MaterialTheme.colorScheme.primary)
             }
-            IconButton(onClick = vm::startTour, modifier = Modifier.tourTarget(TourTarget.HOME_TOUR)) {
-                Icon(GameIcons.Help, contentDescription = "Take the tour")
+            IconButton(onClick = vm::openSettings, modifier = Modifier.tourTarget(TourTarget.HOME_SETTINGS)) {
+                Icon(GameIcons.Settings, contentDescription = "Settings")
             }
         },
     ) {

@@ -59,6 +59,11 @@ fun AppRoot(vm: GameViewModel) {
                     Screen.BOAT_EDITOR -> com.deepline.fishing.ui.boat.BoatEditorScreen(vm)
                     Screen.AQUARIUM -> com.deepline.fishing.ui.shop.AquariumScreen(vm)
                     Screen.THEMES -> com.deepline.fishing.ui.shop.ThemesScreen(vm)
+                    Screen.SETTINGS -> com.deepline.fishing.ui.settings.SettingsScreen(vm)
+                    // -- Daily loop screens below.
+
+                    // -- Social screens below.
+
                 }
                 vm.tour?.let { TourOverlay(it, onNext = vm::tourNext, onBack = vm::tourBack, onSkip = vm::skipTour) }
                 // What just happened in the shop (a purchase, a pending payment), above the tab bar.

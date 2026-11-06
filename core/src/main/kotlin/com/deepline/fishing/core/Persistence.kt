@@ -54,6 +54,10 @@ object ProgressCodec {
         appendLine("boatParts=${p.unlockedBoatParts.sorted().joinToString(",")}")
         appendLine("atmosphereUnlocked=${if (p.atmosphereUnlocked) 1 else 0}")
         appendLine("atmosphere=${p.atmosphere.name}")
+        // -- Daily loop: new lines below.
+
+        // -- Social: new lines below.
+
         for ((stat, level) in p.ropeLevels) appendLine("rope.${stat.name}=$level")
         for ((id, e) in p.collection) {
             appendLine("fish.$id=${e.caught},${e.sparklingCaught},${e.deepestM},${e.bestPoints}")
@@ -120,6 +124,10 @@ object ProgressCodec {
                 )
                 key == "atmosphereUnlocked" -> p = p.copy(atmosphereUnlocked = value.trim() == "1")
                 key == "atmosphere" -> Atmosphere.entries.firstOrNull { it.name == value.trim() }?.let { p = p.copy(atmosphere = it) }
+                // -- Daily loop: new keys below.
+
+                // -- Social: new keys below.
+
                 key == "battle" -> {
                     val parts = value.split(',').map { it.trim().toIntOrNull() }
                     if (parts.size == 3 && parts.all { it != null }) {

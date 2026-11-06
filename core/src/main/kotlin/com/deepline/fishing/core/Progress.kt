@@ -75,6 +75,10 @@ data class PlayerProgress(
     /** The Nightmare atmosphere unlocks the first time a cast reaches the Abyssal Floor. */
     val atmosphereUnlocked: Boolean = false,
     val atmosphere: Atmosphere = Atmosphere.FAMILY,
+    // -- Daily loop (streak, daily challenges, migrations): new fields below this line.
+
+    // -- Social (friends, leaderboards, tournaments, clubs): new fields below this line.
+
 ) {
     fun level(stat: RopeStat): Int = ropeLevels[stat] ?: 0
     val specs: RopeSpecs get() = RopeSpecs.fromLevels(ropeLevels)
