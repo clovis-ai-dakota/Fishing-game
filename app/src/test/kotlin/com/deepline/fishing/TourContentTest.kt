@@ -25,7 +25,9 @@ class TourContentTest {
         // explained from the Dex, which opens it. The boat editor is explained from the Fish tab's
         // boat, which leads to it.
         // The aquarium is explained from the Shop's Aquarium page (and opened from the Dex).
-        val explainedElsewhere = setOf(Screen.CAST, Screen.BATTLE, Screen.ONLINE_LOBBY, Screen.FISH_DETAIL, Screen.BOAT_EDITOR, Screen.AQUARIUM)
+        val explainedElsewhere = setOf(Screen.CAST, Screen.BATTLE, Screen.ONLINE_LOBBY, Screen.FISH_DETAIL, Screen.BOAT_EDITOR, Screen.AQUARIUM) +
+            // Clubs ship later: with the flag off there is no club screen to explain.
+            (if (FeatureFlags.clubs) emptySet() else setOf(Screen.CLUBS))
         val visited = Tour.steps.map { it.screen }.toSet()
         for (screen in Screen.entries - explainedElsewhere) {
             assertTrue("The tour never shows the $screen screen", screen in visited)
@@ -132,6 +134,56 @@ class TourContentTest {
             assertTrue("Tour doesn't mention ${mode.displayName}", text.contains(mode.displayName.removePrefix("Like my "), ignoreCase = true))
         }
         for (topic in listOf("theme", "Shop", "euros or points")) assertTrue("Tour doesn't mention $topic", text.contains(topic, ignoreCase = true))
+    }
+
+    @Test
+    fun friendsLeaderboardsAndTheTournamentAreExplained() {
+        // Version 11: friends, weekly leaderboards and the weekly tournament (from the Battle tab).
+        val v11 = Tour.steps.filter { it.sinceVersion == Tour.VERSION }.map { it.id }
+        assertTrue(v11.containsAll(listOf("social", "friend_code", "friends", "leaderboards", "tournament")))
+        val targets = Tour.steps.mapNotNull { it.target }.toSet()
+        for (t in listOf(TourTarget.BATTLE_SOCIAL, TourTarget.SOCIAL_ID, TourTarget.FRIENDS_ADD, TourTarget.BOARD_KINDS, TourTarget.TOURNAMENT_ENTER)) {
+            assertTrue("No step points at $t", t in targets)
+        }
+        for (screen in listOf(Screen.SOCIAL, Screen.FRIENDS, Screen.LEADERBOARDS, Screen.TOURNAMENT)) {
+            assertTrue("The tour never shows $screen", Tour.steps.any { it.screen == screen })
+        }
+        for (kind in com.deepline.fishing.core.social.BoardKind.entries) {
+            assertTrue("Tour doesn't mention the ${kind.displayName} board", kind.displayName.lowercase() in text.lowercase())
+        }
+        for (view in com.deepline.fishing.core.social.BoardView.entries) {
+            assertTrue("Tour doesn't mention the ${view.displayName} view", text.contains(view.displayName, ignoreCase = true))
+        }
+        for (topic in listOf(
+            "player id", "accept", "Challenge", "Monday at 00:00 UTC", "${GameConfig.TOURNAMENT_ATTEMPTS} attempts",
+            "same water", "${GameConfig.LEAGUE_SIZE} anglers", "Tournament title badge", "final rank",
+        )) {
+            assertTrue("Tour doesn't mention $topic", text.contains(topic, ignoreCase = true))
+        }
+    }
+
+    @Test
+    fun clubStepsFollowTheFlag() {
+        val before = FeatureFlags.clubs
+        try {
+            FeatureFlags.clubs = true
+            val on = Tour.steps
+            assertTrue(on.any { it.id == "clubs" && it.screen == Screen.CLUBS && it.target == TourTarget.CLUBS_JOIN })
+            assertTrue(on.single { it.id == "clubs" }.sinceVersion in 1..Tour.VERSION)
+            assertTrue("${GameConfig.CLUB_MAX_MEMBERS} anglers" in on.single { it.id == "clubs" }.body)
+            assertEquals("replay", on.last().id)
+            FeatureFlags.clubs = false
+            val off = Tour.steps
+            assertTrue(off.none { it.id in com.deepline.fishing.ui.tour.SocialTour.clubStepIds })
+            assertTrue(off.none { it.screen == Screen.CLUBS || it.target == TourTarget.CLUBS_JOIN })
+            assertTrue(off.none { it.body.contains("Join a club", ignoreCase = true) })
+            assertEquals(on.size - com.deepline.fishing.ui.tour.SocialTour.clubStepIds.size, off.size)
+            assertEquals("replay", off.last().id)
+            // "What's new" follows the flag too.
+            assertTrue(Tour.planAtLaunch(showAgain = false, seenVersion = Tour.VERSION - 1)!!.steps.none { it.id == "clubs" })
+        } finally {
+            FeatureFlags.clubs = before
+        }
     }
 
     @Test
