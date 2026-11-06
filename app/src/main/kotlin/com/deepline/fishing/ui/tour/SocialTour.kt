@@ -11,10 +11,13 @@ import com.deepline.fishing.core.social.BoardView
  * The tour's steps for friends, the weekly leaderboards, the weekly tournament and clubs. Club
  * steps are only in [Tour.steps] while [FeatureFlags.clubs] is on ([isShown]).
  *
- * Shipping clubs: give the club steps `sinceVersion` = the new [Tour.VERSION] in that update, so
- * returning players see them in "What's new".
+ * Shipping clubs: bump [Tour.VERSION] and set [CLUB_STEPS_VERSION] to it, so returning players
+ * (who never saw the club step while the flag was off) get it in "What's new".
  */
 object SocialTour {
+    /** The tour version that introduces the club steps: the new [Tour.VERSION] when clubs ship. */
+    const val CLUB_STEPS_VERSION = Tour.VERSION
+
     /** Steps that explain clubs, shown only while clubs are switched on. */
     val clubStepIds = setOf("clubs")
 
@@ -80,7 +83,7 @@ object SocialTour {
                 "each reward reached. There's no chat.",
             screen = Screen.CLUBS,
             target = TourTarget.CLUBS_JOIN,
-            sinceVersion = version,
+            sinceVersion = CLUB_STEPS_VERSION,
         ),
     )
 }

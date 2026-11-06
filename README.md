@@ -48,7 +48,7 @@ labelled, in the thumb zone), so every main area is one tap away:
 - **Shop**: rope upgrades and downgrades (points only), then tackle, style, passes and the
   aquarium, each with a euro price and a points price (see below). A dot on the tab means
   something is waiting there (a Club gift, season rewards, the starter pack offer).
-- **Battle**: battle setup and the way online.
+- **Battle**: battle setup, the way online, and friends and rankings.
 
 Casts, battles, the online lobby, Milestones and Dex pages are full screens without the bar.
 System back goes from any tab to Fish, then leaves the app.
@@ -288,8 +288,48 @@ catches don't count towards points or the fish log. The record against the compu
 - The server is authoritative: it checks every cast (species exist, live at that depth, fit
   within the tournament rope's length and weight limit, valid turn) and **recomputes the
   points itself**. Leaving or losing the connection mid-match forfeits it.
-- Not handled yet: reconnecting to a match after a dropped connection, accounts or rankings,
-  and full anti-cheat (a modified client could still report fish it never actually hooked).
+- Not handled yet: reconnecting to a match after a dropped connection, and full anti-cheat for
+  battles (a modified client could still report fish it never actually hooked; the weekly
+  tournament, and the leaderboards, check every catch against the cast's water).
+- Players who send their secret with the battle Hello (protocol 7) are verified: their validated
+  battle casts count on the weekly leaderboards.
+
+### Friends and rankings
+
+A card at the top of the Battle tab opens **Friends and rankings** (`ui/social/`). Everything there
+needs the battle server; when it can't be reached the screens say so, and the rest of the game
+works offline.
+
+- **Your player id is your friend code.** Share it (Copy or Share) and add friends with theirs:
+  they accept before you're friends, and nobody can be found by name. Asking someone who already
+  asked you makes you friends at once; declining and removing are silent. Up to 50 friends.
+  Friends see the name you use online, your title, whether you're online and their week's best
+  catches. **Challenge** opens a battle room for the mode you pick and sends its code to your
+  friend, who joins it from their Friends screen (for 10 minutes).
+- **Weekly leaderboards**: best cast, deepest catch and rarest catch, for everyone (top 50), your
+  league (30 anglers grouped by when they first scored that week) or you and your friends, with
+  your own rank. They **reset every Monday at 00:00 UTC**. They're server-authoritative: only the
+  weekly tournament's attempts and verified online battle casts count, both on the standard rope
+  with the online rules, with points recomputed by the server and every catch checked against
+  the cast's water. Strangers are shown with a name made from their player id, never by the name
+  they typed.
+- **Weekly tournament**: all week, everyone fishes **the same water** (one seed per week, kept
+  secret by the server until you start) with the standard rope and 4 bumps; Lanterns and
+  detectors work, as in battles. **5 attempts**, the best counts; starting an attempt uses it
+  (quitting scores 0). Tournament catches don't count for points or the fish log. When the week is
+  over, rewards go by final rank: the winner and top 1%, top 10% (both get the new **Tournament**
+  title badge frame), top 25%, top half, and something for everyone who took part. Rewards are
+  claimed on the tournament screen, for 4 weeks.
+- **Clubs** (built, shipped in a later update: `FeatureFlags.clubs`, on in debug builds): join with
+  a 6-character code or start a club with a generated name; up to 30 members, an owner (remove,
+  hand over, rename) and members, no chat. The weekly goal is fish caught together in solo casts
+  (100, 300 and 600 fish, at most 400 a day per member): every member who helped gets each tier's
+  reward. A club board ranks members, and the week's most active clubs are listed.
+- **Delete my social data** (at the bottom of the hub) removes your friends, requests, rankings and
+  club membership from the server.
+
+Numbers live in `GameConfig` (the social block); rules in `core/.../core/social/`; the research
+behind the design is in `docs/research/social.md`.
 
 The computer rival plays by exactly the same rules (see `core/.../Bot.kt`): it dodges objects
 on the way down and aims for fish heads on the way up. Its difficulty changes how far ahead it
@@ -334,15 +374,19 @@ core/   Pure Kotlin game logic (no Android dependency) + unit tests
         Showcase.kt        title badge frames, Dex card styles, the aquarium
         Themes.kt          menu themes and the night mode
         Tackle.kt          one-cast tackle (Lantern, detector, charm, lure)
-        PlayerId.kt        public id, secret and recovery code (gifts, cloud save)
+        PlayerId.kt        public id, secret and recovery code (gifts, cloud save, friends)
         online/            battle protocol (JSON messages), cast validation, client-side match mirror,
                            AccountApi.kt (the gift and cloud save HTTP API)
-server/ Ktor battle server: WebSocket battles (room codes, quick match, authoritative) and the
-        account API (Accounts.kt: gifts and cloud saves in one JSON file per player) + tests
+        social/            weekly reset (Weeks), the weekly tournament and its water check, leaderboard
+                           values and public names, clubs, and SocialApi.kt (the social HTTP API)
+server/ Ktor battle server: WebSocket battles (room codes, quick match, authoritative), the
+        account API (Accounts.kt: gifts and cloud saves in one JSON file per player) and the social
+        API (SocialStore.kt, SocialRoutes.kt: friends, weekly leaderboards and tournament, clubs) + tests
 app/    Android app (Jetpack Compose)
         GameViewModel.kt   game state, persistence via SharedPreferences, online flow
         OnlineConnection.kt WebSocket client (Ktor + OkHttp)
         AccountClient.kt   gifts and cloud save client
+        social/            SocialController (state of the social screens) and SocialClient (HTTP)
         billing/           Store: Google Play Billing (PlayStore) and the debug test store
         ui/CastScreen.kt   game loop, HUD, pause, results
         ui/render3d/       3D renderer: procedural meshes, scene builder, GL backend (gl/)
@@ -351,6 +395,7 @@ app/    Android app (Jetpack Compose)
         ui/dex/            the Dex: species grid and pages, secrets, skins library, FishPortrait
         ui/boat/           boat editor; ui/BoatArt.kt draws boats in 2D
         ui/shop/           the Shop tab, seasons and events, the aquarium, themes, gifts and the account
+        ui/social/         friends and rankings: the hub, friends, leaderboards, tournament, clubs
         ui/theme/          menu themes: palettes (day and night) and the animated sea scene
         ui/GameIcons.kt    icons drawn in code
         ui/*Screen.kt      Fish tab (HomeScreen), milestones, battle setup / hub
@@ -394,6 +439,17 @@ docker build -t deepline-server . && docker run -p 8080:8080 deepline-server
 Gifts and cloud saves are stored as one JSON file per player in `data/accounts`
 (`DEEPLINE_DATA_DIR` to change it; keep it on a persistent volume). The HTTP API is described in
 `core/.../online/AccountApi.kt`.
+
+Friends, the weekly leaderboards and tournament, and clubs are stored in `data/social`
+(`DEEPLINE_SOCIAL_DIR`; also on a persistent volume): one JSON file per player (`players/`), per
+week (`weeks/`) and per club (`clubs/`), written atomically under one lock. Weeks older than their
+claim window are deleted. The API is described in `core/.../social/SocialApi.kt`. Settings:
+
+| Variable | Default | What it does |
+| --- | --- | --- |
+| `DEEPLINE_SOCIAL_DIR` | `data/social` | Where social data is kept |
+| `DEEPLINE_TOURNAMENT_SALT` | `0` | A secret number mixed into each week's tournament seed, so the water can't be known before the week. Set it in production and never change it mid-week. |
+| `DEEPLINE_CLUBS` | on | `off` answers every club call with 404 (club endpoints always exist otherwise) |
 
 Any host that runs a Docker container or a JVM works (for example Fly.io, Render, Railway or a
 VPS). Players connect to `ws://<host>:8080/battle`, or `wss://<host>/battle` behind HTTPS.
