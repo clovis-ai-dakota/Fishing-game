@@ -476,8 +476,13 @@ class CastSession(
     }
 
     companion object {
-        fun create(specs: RopeSpecs, lanternActive: Boolean, random: Random = Random.Default, sparklingChance: Float = GameConfig.SPARKLING_CHANCE): CastSession =
-            CastSession(specs, lanternActive, WorldGenerator.generate(specs.lengthM, random, sparklingChance))
+        fun create(
+            specs: RopeSpecs,
+            lanternActive: Boolean,
+            random: Random = Random.Default,
+            sparklingChance: Float = GameConfig.SPARKLING_CHANCE,
+            boost: SpawnBoost? = null,
+        ): CastSession = CastSession(specs, lanternActive, WorldGenerator.generate(specs.lengthM, random, sparklingChance, boost))
 
         /** A cast on the water generated from [seed]: the same seed always gives the same fish. */
         fun seeded(specs: RopeSpecs, seed: Long, lanternActive: Boolean = false, timeLeftAtStart: Float? = null): CastSession =

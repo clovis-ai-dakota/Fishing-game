@@ -3,8 +3,11 @@ package com.deepline.fishing.core
 import kotlin.random.Random
 
 object WorldGenerator {
-    /** Populates the water column down to slightly past [maxDepth]. */
-    fun generate(maxDepth: Float, random: Random, sparklingChance: Float = GameConfig.SPARKLING_CHANCE): World {
+    /**
+     * Populates the water column down to slightly past [maxDepth]. A [boost] (a migration, solo
+     * casts only) makes some species more common; it never changes how many fish there are.
+     */
+    fun generate(maxDepth: Float, random: Random, sparklingChance: Float = GameConfig.SPARKLING_CHANCE, boost: SpawnBoost? = null): World {
         val limit = maxDepth + 15f
         val fish = ArrayList<FishEntity>()
         var depth = GameConfig.FIRST_FISH_DEPTH
@@ -12,7 +15,7 @@ object WorldGenerator {
         while (depth < limit) {
             val candidates = FishCatalog.regular.filter { depth >= it.minDepth && depth <= it.maxDepth }
             if (candidates.isNotEmpty()) {
-                val species = weightedPick(candidates, random) { it.rarity }
+                val species = weightedPick(candidates, random) { boost?.weightOf(it) ?: it.rarity }
                 val halfLength = species.bodyLengthM / 2f
                 fish += FishEntity(
                     id = id++,
