@@ -219,13 +219,14 @@ class FakeSocialClient : SocialClient({ "" }) {
     }
 }
 
-/** Friends, the weekly leaderboards, the weekly tournament and clubs, against a pretend server. */
-@RunWith(RobolectricTestRunner::class)
-@GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [36], qualifiers = "w400dp-h860dp-xxhdpi")
-class SocialUiTest : BoatUiTestBase() {
+/**
+ * Shared setup for the social UI tests: the app against a [FakeSocialClient], analytics recorded.
+ * Each scenario is its own class, so each gets a fresh JVM (see `forkEvery` in app/build.gradle.kts):
+ * a ViewModel would otherwise keep the first test's Application, and its saved progress.
+ */
+abstract class SocialUiTestBase : BoatUiTestBase() {
     private val flagBefore = FeatureFlags.clubs
-    private val events = ArrayList<String>()
+    protected val events = ArrayList<String>()
 
     @After
     fun restore() {
@@ -233,7 +234,7 @@ class SocialUiTest : BoatUiTestBase() {
         Analytics.backend = AnalyticsBackend.None
     }
 
-    private fun launchSocial(progress: PlayerProgress = PlayerProgress(lanterns = 3)): Pair<GameViewModel, FakeSocialClient> {
+    protected fun launchSocial(progress: PlayerProgress = PlayerProgress(lanterns = 3)): Pair<GameViewModel, FakeSocialClient> {
         Analytics.backend = object : AnalyticsBackend {
             override fun event(name: String, params: Map<String, Any?>) {
                 events += name
@@ -249,15 +250,21 @@ class SocialUiTest : BoatUiTestBase() {
         return vm to fake
     }
 
-    private fun tap(tag: String) {
+    protected fun tap(tag: String) {
         val node = compose.onNodeWithTag(tag)
         runCatching { node.performScrollTo() }
         node.performClick()
         compose.waitForIdle()
     }
 
-    private fun exists(tag: String) = compose.onAllNodes(hasTestTag(tag)).fetchSemanticsNodes().isNotEmpty()
+    protected fun exists(tag: String) = compose.onAllNodes(hasTestTag(tag)).fetchSemanticsNodes().isNotEmpty()
+}
 
+/** Friends: requests by id, answers, challenges into a battle room, removing. */
+@RunWith(RobolectricTestRunner::class)
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+@Config(sdk = [36], qualifiers = "w400dp-h860dp-xxhdpi")
+class SocialFriendsUiTest : SocialUiTestBase() {
     @Test
     fun friendsAreAddedByIdAndCanBeChallenged() {
         val (vm, fake) = launchSocial()
@@ -328,7 +335,13 @@ class SocialUiTest : BoatUiTestBase() {
         vm.onBack()
         assertEquals(Screen.BATTLE_SETUP, vm.screen)
     }
+}
 
+/** The weekly leaderboards: every board and view, and the offline state. */
+@RunWith(RobolectricTestRunner::class)
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+@Config(sdk = [36], qualifiers = "w400dp-h860dp-xxhdpi")
+class SocialLeaderboardsUiTest : SocialUiTestBase() {
     @Test
     fun leaderboardsShowEveryViewAndTheOfflineState() {
         val (vm, fake) = launchSocial()
@@ -357,7 +370,13 @@ class SocialUiTest : BoatUiTestBase() {
         compose.shot("96b_leaderboards_night")
         assertTrue("leaderboard_view" in events)
     }
+}
 
+/** The weekly tournament: a reward claimed once, an attempt on the week's water, a quit attempt. */
+@RunWith(RobolectricTestRunner::class)
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+@Config(sdk = [36], qualifiers = "w400dp-h860dp-xxhdpi")
+class SocialTournamentUiTest : SocialUiTestBase() {
     @Test
     fun aTournamentAttemptIsFishedOnTheWeeksWaterAndSent() {
         val start = PlayerProgress(lanterns = 3, ropeLevels = mapOf(RopeStat.LENGTH to 1))
@@ -419,14 +438,18 @@ class SocialUiTest : BoatUiTestBase() {
         compose.waitForIdle()
         compose.shot("98b_tournament_night")
     }
+}
 
+/** Clubs, with the feature switched on: join by code, the weekly goal, leave, start one. */
+@RunWith(RobolectricTestRunner::class)
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+@Config(sdk = [36], qualifiers = "w400dp-h860dp-xxhdpi")
+class SocialClubsUiTest : SocialUiTestBase() {
     @Test
     fun clubsWhenTheFeatureIsOn() {
         FeatureFlags.clubs = true
         val (vm, fake) = launchSocial(PlayerProgress(lanterns = 1))
-        println("SOCIALDEBUG launched lanterns=${vm.progress.lanterns} owned=${vm.progress.ownedItems} sessions=${vm.progress.sessions}")
         vm.openSocial()
-        println("SOCIALDEBUG hub lanterns=${vm.progress.lanterns}")
         compose.waitUntil(5_000) { exists("social_clubs") }
         tap("social_clubs")
         assertEquals(Screen.CLUBS, vm.screen)
@@ -441,9 +464,7 @@ class SocialUiTest : BoatUiTestBase() {
         compose.onNodeWithTag("club_code_shown").assertExists()
         compose.shot("99b_club")
         // The weekly goal's first tier is reached: claim it.
-        println("SOCIALDEBUG before claim lanterns=${vm.progress.lanterns} claims=${vm.progress.clubClaims} claimable=${vm.social.club?.club?.claimable}")
         tap("club_claim")
-        println("SOCIALDEBUG after claim lanterns=${vm.progress.lanterns} claims=${vm.progress.clubClaims}")
         assertEquals(2, vm.progress.lanterns)
         assertTrue(Clubs.claimKey(fake.week, 1) in vm.progress.clubClaims)
         compose.waitUntil(5_000) { fake.claimedKeys.isNotEmpty() }
@@ -467,7 +488,13 @@ class SocialUiTest : BoatUiTestBase() {
         assertTrue(events.containsAll(listOf("join_group", "club_leave", "club_reward")))
         assertTrue(Tour.steps.any { it.id == "clubs" })
     }
+}
 
+/** Clubs switched off (as in release builds): no club screen, card, tour step or server call. */
+@RunWith(RobolectricTestRunner::class)
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+@Config(sdk = [36], qualifiers = "w400dp-h860dp-xxhdpi")
+class SocialClubsOffUiTest : SocialUiTestBase() {
     @Test
     fun withClubsOffThereIsNoClubAnywhere() {
         FeatureFlags.clubs = false
