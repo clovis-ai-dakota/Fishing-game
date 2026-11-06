@@ -104,6 +104,8 @@ class SoundSettingsUiTest {
         compose.onNodeWithTag("settings_sfx_volume").performScrollTo().performSemanticsAction(SemanticsActions.SetProgress) { it(0.5f) }
         compose.onNodeWithTag("settings_haptics").performScrollTo().performClick()
         compose.onNodeWithTag("settings_reduce_motion").performScrollTo().performClick()
+        // Values set directly (as accessibility services do) are saved after a short pause.
+        compose.mainClock.advanceTimeBy(1_000)
         compose.waitForIdle()
 
         assertEquals(0.3f, store.getString(FeelSettings.KEY_MUSIC)!!.toFloat(), 0.01f)

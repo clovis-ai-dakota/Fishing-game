@@ -8,6 +8,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -20,6 +25,7 @@ import com.deepline.fishing.feel.FeelSettings
 import com.deepline.fishing.feel.GameFeel
 import com.deepline.fishing.ui.tour.TourTarget
 import com.deepline.fishing.ui.tour.tourTarget
+import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
 /**
@@ -86,9 +92,20 @@ fun SoundSettingsSection(vm: GameViewModel) {
     }
 }
 
-/** A volume: a title, the level in percent, and a slider. */
+/**
+ * A volume: a title, the level in percent, and a slider. [onDone] runs when the slider is let go,
+ * or shortly after the last change when there's no drag to let go of (accessibility services set
+ * the value directly).
+ */
 @Composable
 private fun VolumeRow(title: String, value: Float, tag: String, onChange: (Float) -> Unit, onDone: () -> Unit) {
+    var pending by remember { mutableStateOf(false) }
+    LaunchedEffect(value, pending) {
+        if (!pending) return@LaunchedEffect
+        delay(COMMIT_AFTER_MS)
+        pending = false
+        onDone()
+    }
     Column(Modifier.fillMaxWidth()) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(title, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
@@ -100,8 +117,16 @@ private fun VolumeRow(title: String, value: Float, tag: String, onChange: (Float
         }
         Slider(
             value = value,
-            onValueChange = onChange,
-            onValueChangeFinished = onDone,
+            onValueChange = {
+                pending = true
+                onChange(it)
+            },
+            onValueChangeFinished = {
+                if (pending) {
+                    pending = false
+                    onDone()
+                }
+            },
             valueRange = 0f..1f,
             modifier = Modifier
                 .fillMaxWidth()
@@ -110,3 +135,5 @@ private fun VolumeRow(title: String, value: Float, tag: String, onChange: (Float
         )
     }
 }
+
+private const val COMMIT_AFTER_MS = 600L
