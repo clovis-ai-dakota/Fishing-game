@@ -15,15 +15,19 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import com.deepline.fishing.analytics.RecordingTelemetry
 import com.deepline.fishing.analytics.Telemetry
+import com.deepline.fishing.billing.TestStore
 import com.deepline.fishing.core.CastSession
 import com.deepline.fishing.core.FishCatalog
 import com.deepline.fishing.core.FishEntity
 import com.deepline.fishing.core.GameConfig
+import com.deepline.fishing.core.LocalDays
 import com.deepline.fishing.core.Obstacle
 import com.deepline.fishing.core.ObstacleKind
 import com.deepline.fishing.core.PlayerProgress
 import com.deepline.fishing.core.ProgressRepository
 import com.deepline.fishing.core.RopeSpecs
+import com.deepline.fishing.core.ShopCatalog
+import com.deepline.fishing.core.ShopClock
 import com.deepline.fishing.core.World
 import com.deepline.fishing.privacy.ConsentStore
 import com.deepline.fishing.privacy.PrivacyChoices
@@ -32,6 +36,7 @@ import com.deepline.fishing.review.ReviewPrompters
 import com.deepline.fishing.ui.tour.Tour
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -44,7 +49,8 @@ import org.robolectric.annotation.GraphicsMode
 
 /**
  * The Play review card is asked for right after a happy moment, once the screen is calm: never
- * during a cast or over a secret's explanation, and only once in a long while.
+ * during a cast, over the results or over a secret's explanation, never right after a setback,
+ * and only once in a long while.
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -78,6 +84,7 @@ class ReviewPromptUiTest {
     fun tearDown() {
         scenario?.close()
         ReviewPrompters.factory = null
+        ShopClock.override = null
         Telemetry.uninstall()
     }
 
@@ -125,25 +132,58 @@ class ReviewPromptUiTest {
         return vm
     }
 
-    @Test
-    fun aRareCatchAsksOnceTheResultsAreCollected() {
-        val vm = launchSeasonedPlayer()
+    /** Answers every "show this again?" secret explanation that is open. */
+    private fun answerSecretExplanations() {
+        while (isShowing("No thanks")) {
+            compose.click("No thanks")
+            compose.advanceSeconds(0.2f)
+        }
+    }
 
+    /** One cast in [sparklingWater] (about 19 s), explanations answered, results left showing. */
+    private fun castToResults() {
         compose.click("Cast line")
         compose.advanceSeconds(7f)
-        // The last bump hooked the Sparkling fish; its secret is explained mid-cast: no card.
-        assertTrue(isShowing("The last bump hooks what it hits"))
-        assertNull(vm.reviewToAsk)
-        compose.click("No thanks")
+        answerSecretExplanations()
         compose.advanceSeconds(12f)
         assertTrue(isShowing("Cast complete"))
-        // The results are showing: still in the cast, still no card.
-        assertTrue(prompter.launches.isEmpty())
+    }
 
+    private fun collect() {
         compose.click("Collect")
         compose.waitForIdle()
-        println("DEBUG pending=${vm.review.pending} state=${vm.review.state} toAsk=${vm.reviewToAsk} screen=${vm.screen} casts=${vm.progress.castsMade} popup=${vm.secretPopup} askTour=${vm.askTourAgain} optIn=${vm.daily.askOptIn} consent=${vm.privacy.askConsent} result=${vm.pendingResult}")
-        // Back on the Fish tab, calm: Play's card is asked for, exactly once.
+    }
+
+    // One test only: from a class's second test on, Robolectric hands the view model the first
+    // test's preferences (see CLAUDE.md), so the scenarios run in order here.
+    @Test
+    fun theCardComesAfterAHappyCalmMomentAndRarely() {
+        val start = System.currentTimeMillis()
+        ShopClock.override = start
+        val vm = launchSeasonedPlayer()
+
+        // 1. A rare catch (the 4th bump hooks a Sparkling fish). Its secret is explained mid-cast:
+        //    no card during the cast, nor while the results are showing.
+        compose.click("Cast line")
+        compose.advanceSeconds(7f)
+        assertTrue(isShowing("The last bump hooks what it hits"))
+        assertNull(vm.reviewToAsk)
+        answerSecretExplanations()
+        compose.advanceSeconds(12f)
+        assertTrue(isShowing("Cast complete"))
+        answerSecretExplanations()
+        compose.waitForIdle()
+        assertTrue(prompter.launches.isEmpty())
+        collect()
+        // The happy moment was noted when the results were collected...
+        if (vm.secretPopup != null) {
+            // ...and waits for any explanation still open over the Fish tab.
+            assertNotNull(vm.review.pending)
+            assertTrue(prompter.launches.isEmpty())
+            answerSecretExplanations()
+            compose.waitForIdle()
+        }
+        // Calm at last: Play's card is asked for, exactly once.
         assertEquals(listOf("MainActivity"), prompter.launches)
         assertEquals(1, vm.review.state.asks)
         assertNull(vm.review.pending)
@@ -152,33 +192,31 @@ class ReviewPromptUiTest {
         assertEquals(1, event.params["ask"])
         assertEquals(emptyList<String>(), recorder.problems())
 
-        // Another rare catch right away: asked recently, so nothing.
-        compose.click("Cast line")
-        compose.advanceSeconds(19f)
-        compose.click("Collect")
-        compose.waitForIdle()
+        // 2. Another rare catch right away: asked recently, nothing.
+        castToResults()
+        collect()
         assertEquals(1, prompter.launches.size)
-        assertEquals(1, recorder.events.count { it.name == "review_prompt" })
-    }
 
-    @Test
-    fun aFailedPurchaseKeepsTheCardAway() {
-        val vm = launchSeasonedPlayer()
-        // A payment that failed a moment ago (the test store stands in for Google Play).
-        val item = com.deepline.fishing.core.ShopCatalog.all.first { vm.canBuy(it) }
+        // 3. Months later, a payment fails just before a rare catch: a setback, nothing.
+        val later = start + (GameConfig.Review.COOLDOWN_DAYS + 1) * LocalDays.DAY_MS
+        ShopClock.override = later
+        val item = ShopCatalog.all.first { vm.canBuy(it) }
         vm.buyWithMoney(item, null)
-        vm.testStore!!.answer(com.deepline.fishing.billing.TestStore.TestOutcome.FAIL)
+        vm.testStore!!.answer(TestStore.TestOutcome.FAIL)
         compose.waitForIdle()
+        // The failure's message covers the Cast button until it's dismissed.
+        compose.click("OK")
+        compose.waitForIdle()
+        castToResults()
+        collect()
+        assertEquals(1, prompter.launches.size)
+        assertEquals(1, vm.review.state.asks)
 
-        compose.click("Cast line")
-        compose.advanceSeconds(7f)
-        compose.click("No thanks")
-        compose.advanceSeconds(12f)
-        compose.click("Collect")
-        compose.waitForIdle()
-        // A rare catch, but right after a setback: no card, nothing counted.
-        assertTrue(prompter.launches.isEmpty())
-        assertEquals(0, vm.review.state.asks)
-        assertTrue(recorder.events.none { it.name == "review_prompt" })
+        // 4. An hour after the setback, a rare catch may ask again.
+        ShopClock.override = later + GameConfig.Review.SETBACK_QUIET_MINUTES * 60_000L
+        castToResults()
+        collect()
+        assertEquals(2, prompter.launches.size)
+        assertEquals(2, recorder.events.count { it.name == "review_prompt" })
     }
 }
