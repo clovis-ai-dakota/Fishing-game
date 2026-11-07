@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Words and formats used all over the app: buttons, units, numbers, lists. Keys start with
+    common_. Use these instead of a copy in an area's file, so the same word is translated once.
+-->
+<resources>
+    <!-- The app's name, also shown by the launcher. A brand name: don't translate. -->
+    <string name="app_name" translatable="false">Deep Line</string>
+
+    <!-- Buttons. -->
+    <!-- Closes a message (snackbar, dialog). -->
+    <string name="common_ok">OK</string>
+    <string name="common_cancel">Cancel</string>
+    <!-- The back button at the top left of a full screen ("‹" is an arrow pointing back). -->
+    <string name="common_back">‹ Back</string>
+    <!-- Short negative answer to a yes/no question ("Show the tour next time?"). -->
+    <string name="common_no_thanks">No thanks</string>
+    <string name="common_got_it">Got it</string>
+
+    <!-- Units. %1$s is a number already formatted for the language (e.g. "1,250" or "4.5"). Keep
+         the unit symbol (m, kg, m/s) and add the space your language puts before units. -->
+    <!-- Meters (depth, distance). -->
+    <string name="common_meters">%1$s m</string>
+    <!-- Kilograms (weight). -->
+    <string name="common_kg">%1$s kg</string>
+    <!-- Meters per second (steering speed). -->
+    <string name="common_meters_per_second">%1$s m/s</string>
+    <!-- Points, the game's score and currency, as a short unit after a number: "1,250 pts". %1$s:
+         the number, already formatted. -->
+    <string name="common_points">%1$s pts</string>
+    <!-- A gain of points, e.g. "+1,250 pts". -->
+    <string name="common_points_plus">+%1$s pts</string>
+    <!-- A clock time on the hour, 24-hour style ("21:00"). %1$d: the hour (0 to 23). -->
+    <string name="common_time_on_the_hour">%1$02d:00</string>
+    <!-- Durations. -->
+    <plurals name="common_days">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
+    <plurals name="common_lanterns">
+        <!-- A count of Lanterns (the game's light for dark water; see the glossary). -->
+        <item quantity="one">%d Lantern</item>
+        <item quantity="other">%d Lanterns</item>
+    </plurals>
+    <!-- Compact numbers for small chips: thousands and millions ("5k", "1.5M"). %1$s: the number of
+         thousands or millions, formatted with at most one decimal. -->
+    <string name="common_compact_thousands">%1$sk</string>
+    <string name="common_compact_millions">%1$sM</string>
+    <!-- A fraction of a goal: "3 / 10". -->
+    <string name="common_progress_of">%1$s / %2$s</string>
+
+    <!-- Lists: "a, b and c". common_list_middle joins all items but the last ("a, b");
+         common_list_end adds the last one ("a, b and c", or "a and b" for two items). -->
+    <string name="common_list_middle">%1$s, %2$s</string>
+    <string name="common_list_end">%1$s and %2$s</string>
+</resources>
