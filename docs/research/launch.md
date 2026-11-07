@@ -23,12 +23,12 @@ Play's numbers change often.
 | 16 KB pages | The app has no native code of its own; the two AndroidX `.so` files in the bundle are 16 KB aligned (checked with `readelf`). AGP 8.13 aligns uncompressed libraries. `tools/release/check-release.sh` re-checks every build. | §3 |
 | Signing | Play App Signing (Google keeps the app signing key); the developer keeps an **upload key** made with `keytool`, read by Gradle from `~/.gradle/gradle.properties` or environment variables, never committed. Without it, `bundleRelease` still builds an unsigned bundle (for CI and checks). | §4 |
 | Format | Android App Bundle (`./gradlew :app:bundleRelease`), required for new apps since Aug 2021. | §4 |
-| R8 | On for release (`isMinifyEnabled`, `isShrinkResources`), with the libraries' own consumer rules plus a few `-dontwarn` lines in `app/proguard-rules.pro`. Checked here by building and inspecting the minified bundle; it must still be smoke-tested on a phone through the internal test track (§5). | §5 |
+| R8 | On for release (`isMinifyEnabled`, `isShrinkResources`), with the libraries' own consumer rules plus one `-dontwarn` in `app/proguard-rules.pro`. Built and inspected here (APK 4.7 MB instead of 19.6 MB for debug, bundle 9.0 MB instead of 13.7 MB); it must still be smoke-tested on a phone through the internal test track (§5). | §5 |
 | Versioning | `app/version.properties`: `versionCode` +1 for every upload, `versionName` semantic (1.0.0 at launch); `-PdeeplineVersionCode` overrides it on CI. | §6 |
 | Cleartext | Off in release (network security config), allowed in debug only (local server on `ws://10.0.2.2`). Release builds must use `-PdeeplineServerUrl=wss://...`. | §11 |
 | Content rating | IARC questionnaire answers in `docs/store/content-rating.md`: no violence beyond fishing, no gambling (wagers use points that can't be cashed out; flagged), in-app purchases yes, users interact (names typed for battles, friends), no chat. Expected PEGI 3 / ESRB Everyone, with "In-Game Purchases" and "Users Interact" notices. | §8 |
 | Audience | Kept at **13+ (not designed for children)**, with the Families question flagged again for the developer (France's age of digital consent is 15; cute art may draw Play's attention). | §9 |
-| Store listing | Title "Deep Line: Fishing Adventure" style names (≤ 30 characters), keywords in the title and short description, the core loop in the first lines, six languages written natively (en, fr, es, de, pt-BR, tr), checked by `StoreListingTest`. | §7, §10 |
+| Store listing | Brand plus the main search term in the title ("Deep Line: Deep Sea Fishing", ≤ 30 characters), keywords in the short description, the core loop in the first lines, six languages written natively (en, fr, es, de, pt-BR, tr), checked by `StoreListingTest`. | §7, §10 |
 | Graphics | Feature graphic 1024×500 rendered from the game's own 3D renderer; adaptive launcher icon with a monochrome layer; 512×512 Play icon rendered from the same vector layers. | §7 |
 | Promo video | 1920×1080 (YouTube shows promo videos in landscape), 25 s, real 3D frames of casts rendered by the WebGL preview, the game's CC0 music. | §7 |
 | Rollout | 10% → 20% → 50% → 100% over about a week, halting on crash rate > 1.09% or ANR rate > 0.47% (Play's bad-behaviour thresholds). | §12 |
@@ -159,14 +159,19 @@ What Google says (developer.android.com, *In-app reviews*):
   explicit `serializer()` calls, the safest pattern); Play Billing, Firebase, Play Review,
   WorkManager, OkHttp and coroutines ship consumer rules. Ktor has no official rules for its
   client; it is created here with an explicit engine (`HttpClient(OkHttp)`), so no
-  `ServiceLoader` lookup of engines is needed. R8 reported only missing optional classes
-  (SLF4J's binder and JMX for Ktor's debug helpers, BouncyCastle/Conscrypt/OpenJSSE for OkHttp),
-  silenced with `-dontwarn` in `app/proguard-rules.pro`.
+  `ServiceLoader` lookup of engines is needed. R8 reported a single missing class, an annotation
+  `review-ktx` 2.0.2 references from a newer play-services-basement
+  (`com.google.android.gms.common.annotation.NoNullnessRewrite`), silenced with `-dontwarn` in
+  `app/proguard-rules.pro`.
 - **Crash reports**: the App Bundle carries the R8 mapping file, which Play Console uses to
   deobfuscate Android vitals; the Crashlytics Gradle plugin uploads it too once
   `google-services.json` exists.
 - **Verification here**: no emulator or phone on the build machine. The minified bundle was built
-  and inspected (entry points, the worker, serializers kept). **Before the closed test, install
+  and inspected: `MainActivity` and `ReminderWorker` keep their names (manifest and WorkManager
+  look them up by name), `GameViewModel`'s `(Application)` constructor is kept (lifecycle's rule
+  for the reflective factory), the kotlinx.serialization and WorkManager rules are in R8's
+  configuration, and the bundle carries the mapping file. A signed, strict build with a test key
+  passed `tools/release/check-release.sh`. **Before the closed test, install
   the internal-track build on a real phone and walk the main paths** (first launch and consent,
   tour, a cast, a battle against the computer, an online battle, the Shop with a test purchase,
   Settings > Privacy, a reminder), and read the pre-launch report. To turn R8 off in an

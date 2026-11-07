@@ -7,6 +7,8 @@
 //
 // Usage: node tools/promo-video/make-promo-video.cjs [--locale en-US] [--in app/build/promo-video]
 //                                                    [--out <file.mp4>] [--keep-png]
+//                                                    [--only <first>-<last>] (redraw only those frames,
+//                                                     reusing the other PNGs kept by --keep-png)
 // Normally run through tools/promo-video/make-promo-video.sh (exports the frames first).
 const { chromium } = require('playwright');
 const fs = require('node:fs');
@@ -27,7 +29,9 @@ const END_CARD_FRAMES = 4 * FPS;
 const TITLE_FRAMES = 3 * FPS;
 
 // Captions: the store listing's screenshot captions, in order (docs/store/screenshots.md).
-const captions = fs.readFileSync(`docs/store/listings/${locale}/screenshot_captions.txt`, 'utf8').trim().split('\n');
+// A number and its unit stay on one line ("300 m").
+const captions = fs.readFileSync(`docs/store/listings/${locale}/screenshot_captions.txt`, 'utf8').trim().split('\n')
+  .map(c => c.replace(/(\d) (m)\b/g, '$1\u00a0$2'));
 const captionOf = { steer: captions[0], dodge: captions[1], hook: captions[2], dark: captions[3] };
 const labels = {
   'en-US': ['Depth', 'Bumps', 'Fish', 'Points'],
@@ -80,7 +84,8 @@ const page0 = `<html><head><style>
 </body></html>`;
 
 (async () => {
-  fs.rmSync(pngDir, { recursive: true, force: true });
+  const only = args.only ? args.only.split('-').map(Number) : null;
+  if (!only) fs.rmSync(pngDir, { recursive: true, force: true });
   fs.mkdirSync(pngDir, { recursive: true });
   const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--enable-webgl'] });
   const page = await browser.newPage({ viewport: { width: W, height: H } });
@@ -97,6 +102,7 @@ const page0 = `<html><head><style>
     const meta = frame.meta;
     const caption = captionOf[meta.caption] || '';
     if (caption !== lastCaption) { lastCaption = caption; captionSince = i; }
+    if (only && (i < only[0] || i > only[1])) continue;
     // A short dip to black at the cut between the two casts, and a fade into the end card.
     const cut = Math.min(Math.abs(i - clipEnd), Math.abs(i - frameFiles.length));
     const fade = cut < 5 ? (5 - cut) / 5 * 0.9 : 0;
@@ -152,7 +158,7 @@ function encode() {
     filters.push(`[${k + 3}:a]adelay=${Math.round(s.at * 1000)}:all=1,volume=${s.gain}[s${k}]`);
   });
   const mix = ['[m1]', '[m2]', ...sounds.map((_, k) => `[s${k}]`)].join('');
-  filters.push(`${mix}amix=inputs=${sounds.length + 2}:duration=longest:normalize=0,atrim=0:${seconds.toFixed(2)},afade=t=out:st=${(seconds - 1.5).toFixed(2)}:d=1.5[a]`);
+  filters.push(`${mix}amix=inputs=${sounds.length + 2}:duration=longest:normalize=0,atrim=0:${seconds.toFixed(2)},afade=t=out:st=${(seconds - 1.5).toFixed(2)}:d=1.5,loudnorm=I=-16:TP=-1.5:LRA=11,aresample=48000[a]`);
   const ff = [
     '-y', '-loglevel', 'error', '-framerate', String(FPS), '-i', path.join(pngDir, '%05d.png'),
     ...inputs.flatMap(f => ['-i', f]),
