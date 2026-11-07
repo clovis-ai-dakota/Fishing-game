@@ -178,7 +178,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         private set
     var onlineMatch by mutableStateOf<OnlineMatch?>(null)
         private set
-    var playerName by mutableStateOf(store.getString(KEY_NAME) ?: "Angler")
+    var playerName by mutableStateOf(store.getString(KEY_NAME) ?: "Angler") // i18n-ignore: the default name, sent online as typed
         private set
     var serverUrl by mutableStateOf(store.getString(KEY_SERVER) ?: BuildConfig.DEFAULT_SERVER_URL)
         private set

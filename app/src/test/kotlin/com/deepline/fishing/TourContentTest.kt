@@ -6,17 +6,30 @@ import com.deepline.fishing.core.RopeStat
 import com.deepline.fishing.ui.tour.Tour
 import com.deepline.fishing.ui.tour.TourTarget
 import com.deepline.fishing.ui.tour.TourStep
+import com.deepline.fishing.ui.i18n.UiText
+import com.deepline.fishing.ui.i18n.label
+import com.deepline.fishing.ui.i18n.labelText
+import com.deepline.fishing.ui.i18n.nameText
+import com.deepline.fishing.ui.i18n.skinSetText
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 /**
  * Keeps the tour in step with the app: if a feature is added without a tour step, this fails.
- * (See the note on [Tour].)
+ * (See the note on [Tour].) The tour's text is in string resources: this reads it as the player
+ * does, in English (Robolectric), and checks it names things the way the app's labels do.
  */
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [36])
 class TourContentTest {
-    private val text = Tour.steps.joinToString("\n") { it.title + " " + it.body }
+    private val text: String get() = Tour.steps.joinToString("\n") { it.title.text + " " + it.body.text }
+
+    private val UiText.shown: String get() = text
 
     @Test
     fun everyMenuScreenIsVisited() {
@@ -36,8 +49,9 @@ class TourContentTest {
 
     @Test
     fun everyBattleModeRopeUpgradeAndCoreRuleIsExplained() {
-        for (mode in BattleMode.entries) assertTrue("Tour doesn't mention ${mode.title}", mode.title in text)
-        for (stat in RopeStat.entries) assertTrue("Tour doesn't mention ${stat.displayName}", stat.displayName in text)
+        val text = text
+        for (mode in BattleMode.entries) assertTrue("Tour doesn't mention ${mode.title}", mode.labelText().shown in text)
+        for (stat in RopeStat.entries) assertTrue("Tour doesn't mention ${stat.displayName}", stat.labelText().shown in text)
         for (topic in listOf("Lantern", "Sparkling", "head", "Load", "Dex", "Milestone", "online", "Quick match", "Fishing secrets", "Skins")) {
             assertTrue("Tour doesn't mention $topic", text.contains(topic, ignoreCase = true))
         }
@@ -51,16 +65,16 @@ class TourContentTest {
         assertTrue("${com.deepline.fishing.core.FishCatalog.all.size} species" in text)
         assertTrue("title" in text.lowercase())
         // Version 6: boat customisation and the atmosphere.
-        for (topic in listOf("Customise", "Atmosphere", com.deepline.fishing.core.Atmosphere.NIGHTMARE.displayName)) {
+        for (topic in listOf("Customise", "Atmosphere", com.deepline.fishing.core.Atmosphere.NIGHTMARE.labelText().shown, com.deepline.fishing.core.DepthZone.ABYSS.labelText().shown)) {
             assertTrue("Tour doesn't mention $topic", text.contains(topic, ignoreCase = true))
         }
         val boatStep = Tour.steps.first { it.id == "boat" }
         assertTrue("The boat step points at the Fish tab's boat", boatStep.screen == Screen.HOME && boatStep.target == com.deepline.fishing.ui.tour.TourTarget.HOME_BOAT)
         for (slot in com.deepline.fishing.core.CosmeticSlot.entries) {
-            assertTrue("Tour doesn't mention the ${slot.displayName} skin slot", slot.displayName.lowercase() in text.lowercase())
+            assertTrue("Tour doesn't mention the ${slot.displayName} skin slot", slot.labelText().shown.lowercase() in text.lowercase())
         }
         // Version 5: every tab of the bottom bar, the Dex's seen/caught states, filters and pages.
-        for (tab in com.deepline.fishing.MainTab.entries) assertTrue("Tour doesn't mention the ${tab.label} tab", tab.label in text)
+        for (tab in com.deepline.fishing.MainTab.entries) assertTrue("Tour doesn't mention the ${tab.name} tab", str(tab.labelRes) in text)
         for (topic in listOf("Seen", "Catch it", "Filter", "swipe", "trophy", "Secrets section", "Settings")) {
             assertTrue("Tour doesn't mention $topic", text.contains(topic, ignoreCase = true))
         }
@@ -90,7 +104,8 @@ class TourContentTest {
         assertTrue(Tour.VERSION >= 8)
         assertTrue(Tour.steps.single { it.id == "fast_reel" }.sinceVersion == 8)
         // ...and the new ways to spend points.
-        for (item in com.deepline.fishing.core.Tackle.entries) assertTrue("Tour doesn't mention ${item.displayName}", item.displayName in text)
+        val text = text
+        for (item in com.deepline.fishing.core.Tackle.entries) assertTrue("Tour doesn't mention ${item.displayName}", item.labelText().shown in text)
         assertTrue("wager" in text.lowercase())
         assertTrue(Tour.steps.filter { it.sinceVersion == 8 }.map { it.id }.containsAll(listOf("wager")))
         for (t in listOf(TourTarget.HOME_BOAT, TourTarget.SHOP_STYLE, TourTarget.SKINS_ATMOSPHERE)) {
@@ -112,14 +127,15 @@ class TourContentTest {
         val shown = Tour.steps.filter { it.screen == Screen.SHOP }.map { it.shopPage ?: ShopPage.ROPE }.toSet()
         for (page in ShopPage.entries) {
             val hasItems = page.section == null || com.deepline.fishing.core.ShopCatalog.inSection(page.section).isNotEmpty()
-            if (hasItems) assertTrue("The tour never shows the Shop's ${page.label} page", page in shown)
+            if (hasItems) assertTrue("The tour never shows the Shop's ${page.name} page", page in shown)
         }
+        val text = text
         for (topic in listOf("euros", "points", "Captain's Club", "Starter pack", "battles", "${GameConfig.MINUTES_PER_EURO.toInt()} minutes", "aquarium", "gift", "recovery code", "Dex cards", "season pass", "weekend")) {
             assertTrue("Tour doesn't mention $topic", text.contains(topic, ignoreCase = true))
         }
         // Battles: which tackle is allowed.
         for (t in com.deepline.fishing.core.Tackle.entries.filter { it.usableInBattles }) {
-            assertTrue(Tour.steps.single { it.id == "battle_tackle" }.body.contains(t.displayName))
+            assertTrue(Tour.steps.single { it.id == "battle_tackle" }.body.shown.contains(t.labelText().shown))
         }
     }
 
@@ -130,8 +146,9 @@ class TourContentTest {
         assertTrue(v10.containsAll(listOf("themes", "night_mode")))
         val targets = Tour.steps.mapNotNull { it.target }.toSet()
         assertTrue(TourTarget.HOME_THEMES in targets && TourTarget.THEMES_MODE in targets)
+        val text = text
         for (mode in com.deepline.fishing.core.NightMode.entries) {
-            assertTrue("Tour doesn't mention ${mode.displayName}", text.contains(mode.displayName.removePrefix("Like my "), ignoreCase = true))
+            assertTrue("Tour doesn't mention ${mode.displayName}", text.contains(mode.labelText().shown.removePrefix("Like my "), ignoreCase = true))
         }
         for (topic in listOf("theme", "Shop", "euros or points")) assertTrue("Tour doesn't mention $topic", text.contains(topic, ignoreCase = true))
     }
@@ -144,7 +161,7 @@ class TourContentTest {
         assertEquals(Screen.SETTINGS, step.screen)
         assertEquals(TourTarget.SETTINGS_SOUND, step.target)
         for (topic in listOf("volume", "music", "sound effects", "vibration", "Reduce motion", "screen shake", "slow motion", "flashes")) {
-            assertTrue("The sound step doesn't mention $topic", step.body.contains(topic, ignoreCase = true))
+            assertTrue("The sound step doesn't mention $topic", step.body.shown.contains(topic, ignoreCase = true))
         }
         // It comes before the last step, which replays the tour from the same screen.
         assertTrue(Tour.steps.indexOf(step) < Tour.steps.lastIndex)
@@ -160,13 +177,14 @@ class TourContentTest {
             assertTrue("No step points at $t", t in targets)
         }
         assertTrue("The tour never shows the Daily screen", Tour.steps.any { it.screen == Screen.DAILY })
+        val text = text
         for (topic in listOf("streak", "shield", "challenges", "swap", "solo casts", "migrat", "reminders", "at most one a day")) {
             assertTrue("Tour doesn't mention $topic", text.contains(topic, ignoreCase = true))
         }
         // Numbers come from GameConfig.
-        assertTrue("${GameConfig.MAX_STREAK_SHIELDS}" in Tour.steps.single { it.id == "daily" }.body)
-        assertTrue("%02d:00".format(GameConfig.NOTIFY_QUIET_START_HOUR) in Tour.steps.single { it.id == "reminders" }.body)
-        assertTrue("${GameConfig.MIGRATION_HOURS / 24} days" in Tour.steps.single { it.id == "migrations" }.body)
+        assertTrue("${GameConfig.MAX_STREAK_SHIELDS}" in Tour.steps.single { it.id == "daily" }.body.shown)
+        assertTrue("%02d:00".format(GameConfig.NOTIFY_QUIET_START_HOUR) in Tour.steps.single { it.id == "reminders" }.body.shown)
+        assertTrue("${GameConfig.MIGRATION_HOURS / 24} days" in Tour.steps.single { it.id == "migrations" }.body.shown)
     }
 
     @Test
@@ -181,11 +199,12 @@ class TourContentTest {
         for (screen in listOf(Screen.SOCIAL, Screen.FRIENDS, Screen.LEADERBOARDS, Screen.TOURNAMENT)) {
             assertTrue("The tour never shows $screen", Tour.steps.any { it.screen == screen })
         }
+        val text = text
         for (kind in com.deepline.fishing.core.social.BoardKind.entries) {
-            assertTrue("Tour doesn't mention the ${kind.displayName} board", kind.displayName.lowercase() in text.lowercase())
+            assertTrue("Tour doesn't mention the ${kind.displayName} board", kind.labelText().shown.lowercase() in text.lowercase())
         }
         for (view in com.deepline.fishing.core.social.BoardView.entries) {
-            assertTrue("Tour doesn't mention the ${view.displayName} view", text.contains(view.displayName, ignoreCase = true))
+            assertTrue("Tour doesn't mention the ${view.displayName} view", text.contains(view.labelText().shown, ignoreCase = true))
         }
         for (topic in listOf(
             "player id", "accept", "Challenge", "Monday at 00:00 UTC", "${GameConfig.TOURNAMENT_ATTEMPTS} attempts",
@@ -203,13 +222,13 @@ class TourContentTest {
             val on = Tour.steps
             assertTrue(on.any { it.id == "clubs" && it.screen == Screen.CLUBS && it.target == TourTarget.CLUBS_JOIN })
             assertTrue(on.single { it.id == "clubs" }.sinceVersion in 1..Tour.VERSION)
-            assertTrue("${GameConfig.CLUB_MAX_MEMBERS} anglers" in on.single { it.id == "clubs" }.body)
+            assertTrue("${GameConfig.CLUB_MAX_MEMBERS} anglers" in on.single { it.id == "clubs" }.body.shown)
             assertEquals("replay", on.last().id)
             FeatureFlags.clubs = false
             val off = Tour.steps
             assertTrue(off.none { it.id in com.deepline.fishing.ui.tour.SocialTour.clubStepIds })
             assertTrue(off.none { it.screen == Screen.CLUBS || it.target == TourTarget.CLUBS_JOIN })
-            assertTrue(off.none { it.body.contains("Join a club", ignoreCase = true) })
+            assertTrue(off.none { it.body.shown.contains("Join a club", ignoreCase = true) })
             assertEquals(on.size - com.deepline.fishing.ui.tour.SocialTour.clubStepIds.size, off.size)
             assertEquals("replay", off.last().id)
             // "What's new" follows the flag too.
@@ -222,13 +241,27 @@ class TourContentTest {
     @Test
     fun theTourNeverGivesAwayASecret() {
         // Secrets are discovered by playing and explained then (see FishingSecrets), not in the tour.
-        val secretNames = com.deepline.fishing.ui.secrets.FishingSecrets.all.map { it.title }
+        val secretNames = com.deepline.fishing.ui.secrets.FishingSecrets.all.map { it.title.shown }
         // Cosmetics are named after the secret that unlocks them, and the legendary fish is a surprise.
-        val rewards = com.deepline.fishing.core.Cosmetic.entries.filterNot { it.fromShop }.flatMap { listOf(it.displayName, it.setName) }
-        val legendary = listOf(com.deepline.fishing.core.FishCatalog.sovereign.name, "sovereign", "only be caught")
+        val rewards = com.deepline.fishing.core.Cosmetic.entries.filterNot { it.fromShop }.flatMap { listOf(it.labelText().shown, skinSetText(it.setName).shown) }
+        val legendary = listOf(com.deepline.fishing.core.FishCatalog.sovereign.nameText().shown, "sovereign", "only be caught")
+        val text = text
         for (giveaway in listOf("last bump", "snag", "hooks what", "hooks whatever", "leviathan") + secretNames + rewards + legendary) {
             assertTrue("The tour reveals a secret: '$giveaway'", !text.contains(giveaway, ignoreCase = true))
         }
+    }
+
+    @Test
+    fun theLanguageSettingIsExplained() {
+        // Version 11: the game's language, chosen in Settings.
+        val step = Tour.steps.single { it.id == "language" }
+        assertEquals(Tour.VERSION, step.sinceVersion)
+        assertEquals(Screen.SETTINGS, step.screen)
+        assertEquals(TourTarget.SETTINGS_LANGUAGE, step.target)
+        for (language in listOf("English", "French", "Spanish", "German", "Brazilian Portuguese", "Turkish")) {
+            assertTrue("The language step doesn't name $language", language in step.body.shown)
+        }
+        assertTrue(Tour.steps.indexOf(step) < Tour.steps.lastIndex)
     }
 
     @Test
@@ -260,8 +293,8 @@ class TourContentTest {
     @Test
     fun whatsNewOnlyShowsNewerSteps() {
         val steps = listOf(
-            TourStep("a", "A", "a", Screen.HOME, sinceVersion = 1),
-            TourStep("b", "B", "b", Screen.HOME, sinceVersion = 2),
+            TourStep("a", UiText.raw("A"), UiText.raw("a"), Screen.HOME, sinceVersion = 1),
+            TourStep("b", UiText.raw("B"), UiText.raw("b"), Screen.HOME, sinceVersion = 2),
         )
         assertEquals(listOf("b"), steps.filter { it.sinceVersion > 1 }.map { it.id })
     }

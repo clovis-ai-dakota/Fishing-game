@@ -20,14 +20,14 @@ import java.util.Locale
  */
 enum class AppLanguage(val tag: String?, val endonym: String, val debugOnly: Boolean = false) {
     SYSTEM(null, ""),
-    ENGLISH("en", "English"),
-    FRENCH("fr", "Français"),
-    SPANISH("es", "Español"),
-    GERMAN("de", "Deutsch"),
-    PORTUGUESE_BR("pt-BR", "Português (Brasil)"),
-    TURKISH("tr", "Türkçe"),
-    PSEUDO_ACCENTS("en-XA", "[Ëñĝļîšĥ] (en-XA)", debugOnly = true),
-    PSEUDO_BIDI("ar-XB", "Bidi (ar-XB)", debugOnly = true),
+    ENGLISH("en", "English"), // i18n-ignore: each language's own name
+    FRENCH("fr", "Français"), // i18n-ignore
+    SPANISH("es", "Español"), // i18n-ignore
+    GERMAN("de", "Deutsch"), // i18n-ignore
+    PORTUGUESE_BR("pt-BR", "Português (Brasil)"), // i18n-ignore
+    TURKISH("tr", "Türkçe"), // i18n-ignore
+    PSEUDO_ACCENTS("en-XA", "[Ëñĝļîšĥ] (en-XA)", debugOnly = true), // i18n-ignore: debug-only test language
+    PSEUDO_BIDI("ar-XB", "Bidi (ar-XB)", debugOnly = true), // i18n-ignore: debug-only test language
     ;
 
     val locale: Locale? get() = tag?.let(Locale::forLanguageTag)

@@ -257,12 +257,12 @@ class PrivacySettingsUiTest : PrivacyUiTestBase() {
         compose.shot("93_privacy_delete_confirm")
         compose.onNodeWithTag("privacy_delete_confirm").performClick()
         compose.waitUntil(10_000) { vm.privacy.message != null }
-        assertTrue(vm.privacy.message!!.contains("wasn't deleted"))
+        assertTrue(vm.privacy.message!!.text.contains("wasn't deleted"))
         assertEquals(before, vm.playerIdentity)
 
         compose.onNodeWithTag("privacy_delete_account").performScrollTo().performClick()
         compose.onNodeWithTag("privacy_delete_confirm").performClick()
-        compose.waitUntil(10_000) { vm.privacy.message?.contains("was deleted") == true }
+        compose.waitUntil(10_000) { vm.privacy.message?.text?.contains("was deleted") == true }
         assertEquals("the server was asked with the old id and secret", listOf(before), deleted)
         assertNotEquals("the game moves on to a new random identity", before, vm.playerIdentity)
         assertEquals(vm.playerIdentity.id, store.getString("account.id"))

@@ -286,11 +286,11 @@ class SocialFriendsUiTest : SocialUiTestBase() {
         tap("friend_send")
         compose.waitUntil(5_000) { fake.requested.isNotEmpty() }
         assertEquals(listOf(friendId), fake.requested)
-        compose.waitUntil(5_000) { vm.social.message?.contains("Friend request sent") == true }
+        compose.waitUntil(5_000) { vm.social.message?.text?.contains("Friend request sent") == true }
         // Not an id.
         compose.onNodeWithTag("friend_id").performTextInput("abc")
         tap("friend_send")
-        assertTrue(vm.social.message!!.contains("letters and digits"))
+        assertTrue(vm.social.message!!.text.contains("letters and digits"))
 
         // Bob asked: accept him.
         tap("friend_accept_${bob.id}")
@@ -319,7 +319,7 @@ class SocialFriendsUiTest : SocialUiTestBase() {
         vm.social.onRoomCreated("ZXCVB", BattleMode.HEAVY_HAUL)
         compose.waitUntil(5_000) { fake.sentChallenges.isNotEmpty() }
         assertEquals(listOf(bob.id to "ZXCVB"), fake.sentChallenges)
-        assertTrue(vm.social.challengeStatus!!.contains("Challenge sent to Bob"))
+        assertTrue(vm.social.challengeStatus!!.text.contains("Challenge sent to Bob"))
         vm.closeOnlineLobby()
 
         // Removing a friend asks first.
@@ -458,7 +458,7 @@ class SocialClubsUiTest : SocialUiTestBase() {
         // A wrong code, then the right one (case doesn't matter).
         compose.onNodeWithTag("club_code").performTextInput("zzz999")
         tap("club_join")
-        compose.waitUntil(5_000) { vm.social.message?.contains("No club has that code") == true }
+        compose.waitUntil(5_000) { vm.social.message?.text?.contains("No club has that code") == true }
         vm.social.joinClub("abc-234")
         compose.waitUntil(5_000) { vm.social.club?.club != null }
         compose.onNodeWithTag("club_code_shown").assertExists()

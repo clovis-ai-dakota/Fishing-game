@@ -171,8 +171,8 @@ fun ShopItem.descriptionText(): UiText {
 /** The tag on a shop card ("Set", "Special", "+20%"), or null. */
 fun ShopItem.badgeText(): UiText? = when (badge) {
     null -> null
-    "Set" -> UiText.res(R.string.core_shop_badge_set)
-    "Special" -> UiText.res(R.string.core_shop_badge_special)
+    "Set" -> UiText.res(R.string.core_shop_badge_set) // i18n-ignore: core's badge value
+    "Special" -> UiText.res(R.string.core_shop_badge_special) // i18n-ignore: core's badge value
     else -> UiText.raw(badge!!)
 }
 

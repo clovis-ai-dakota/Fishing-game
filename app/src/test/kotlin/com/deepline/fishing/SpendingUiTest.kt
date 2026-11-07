@@ -60,7 +60,7 @@ class WagerUiTest : BoatUiTestBase() {
         compose.onNodeWithTag("tab_battle").performClick()
         compose.click("Wager (optional)")
         val stake = GameConfig.WAGER_STAKES.first { it <= 10_000 }
-        compose.click(com.deepline.fishing.ui.compactPoints(stake))
+        compose.click(com.deepline.fishing.ui.compactPointsText(stake).text)
         compose.shot("61_wager")
         compose.click("Start battle")
         assertEquals(10_000 - stake, vm.progress.pointsBalance)

@@ -70,7 +70,7 @@ open class AccountClient(private val baseUrl: () -> String) {
                 HttpStatusCode.BadRequest -> UiText.res(R.string.shop_account_refused)
                 else -> UiText.res(R.string.shop_account_server_problem, status.value)
             },
-            "HTTP ${status.value}",
+            "HTTP ${status.value}", // i18n-ignore: technical, for crash reports
         )
     }
 
