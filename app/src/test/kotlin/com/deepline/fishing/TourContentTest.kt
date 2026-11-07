@@ -149,6 +149,25 @@ class TourContentTest {
     }
 
     @Test
+    fun theDailyLoopIsExplained() {
+        // Version 11: daily rewards with streak shields, daily challenges, migrations, reminders.
+        val v11 = Tour.steps.filter { it.sinceVersion == 11 }.map { it.id }
+        assertTrue(v11.containsAll(listOf("daily", "daily_challenges", "migrations", "reminders")))
+        val targets = Tour.steps.mapNotNull { it.target }.toSet()
+        for (t in listOf(TourTarget.HOME_DAILY, TourTarget.DAILY_CHALLENGES, TourTarget.DAILY_MIGRATION, TourTarget.SETTINGS_NOTIFICATIONS)) {
+            assertTrue("No step points at $t", t in targets)
+        }
+        assertTrue("The tour never shows the Daily screen", Tour.steps.any { it.screen == Screen.DAILY })
+        for (topic in listOf("streak", "shield", "challenges", "swap", "solo casts", "migrat", "reminders", "at most one a day")) {
+            assertTrue("Tour doesn't mention $topic", text.contains(topic, ignoreCase = true))
+        }
+        // Numbers come from GameConfig.
+        assertTrue("${GameConfig.MAX_STREAK_SHIELDS}" in Tour.steps.single { it.id == "daily" }.body)
+        assertTrue("%02d:00".format(GameConfig.NOTIFY_QUIET_START_HOUR) in Tour.steps.single { it.id == "reminders" }.body)
+        assertTrue("${GameConfig.MIGRATION_HOURS / 24} days" in Tour.steps.single { it.id == "migrations" }.body)
+    }
+
+    @Test
     fun theTourNeverGivesAwayASecret() {
         // Secrets are discovered by playing and explained then (see FishingSecrets), not in the tour.
         val secretNames = com.deepline.fishing.ui.secrets.FishingSecrets.all.map { it.title }

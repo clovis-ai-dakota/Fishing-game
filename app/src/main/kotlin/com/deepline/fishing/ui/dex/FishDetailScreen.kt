@@ -151,6 +151,7 @@ private fun FishPage(species: FishSpecies, number: Int, state: DexState, entry: 
             )
         }
 
+        com.deepline.fishing.ui.daily.MigratingNote(species)
         val caught = state == DexState.CAUGHT
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             StatTile("Depth", "${species.minDepth.roundToInt()}–${species.maxDepth.roundToInt()} m", Modifier.weight(1f))

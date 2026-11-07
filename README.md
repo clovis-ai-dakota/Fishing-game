@@ -212,6 +212,41 @@ in-app **test store**: buying shows a dialog where you approve, cancel, fail or 
 pending (pending ones clear with Restore purchases). Build with `-PdeeplinePlayBilling=true` to
 try Play billing in a debug build.
 
+### Daily loop
+
+A daily card on the Fish tab (and the Daily screen it opens) holds the day's reward, the streak
+and today's challenges. Everything resets at the phone's local midnight. Research and decisions:
+`docs/research/daily-loop.md`; rules in `core/.../Daily.kt`, `Migrations.kt` and `Reminders.kt`,
+numbers in `GameConfig` (the calendar table is in `Daily.kt`).
+
+- **Daily reward**: claim once a day from a 7-day calendar: points on days 1, 3 and 5, a rare fish
+  detector, a Lucky charm and a Sparkle lure on days 2, 4 and 6, and on day 7 more points, a
+  Lantern and a streak shield. Points are "casts' worth" at your rope's reach
+  (`GameConfig.POINTS_PER_CAST_BY_LENGTH_LEVEL`), spendable but not counted for milestones.
+- **Forgiving streak**: the calendar never goes backwards (a missed day only pauses it). The
+  streak counts days in a row; a **streak shield** covers a missed day by itself (you start with
+  one, day 7 brings another, two at most). Without enough shields the streak starts over at 1;
+  nothing earned is lost. A clock set back or a flight west can't claim twice.
+- **Daily challenges**: one easy, one medium and one hard a day, from the day's seed and matched to
+  your rope (zones it reaches, species within reach that it can lift and that you've seen): cast a
+  few times, catch fish (from a zone, a given species, Sparkling ones, a new species), reach a
+  depth, score points, land kilograms, or land many fish in one cast. They pay tackle (detector,
+  Sparkle lure, Lucky charm) and, for the hard one, points. One free swap a day. Finished but
+  unclaimed challenges are collected for you at midnight. Only solo casts count: battle catches
+  never count outside the battle.
+- **Migrations**: every week from Tuesday 00:00 UTC for 48 hours (between the weekend events), two
+  less common species, one from the upper water and one from the deep, spawn as often as the most
+  common fish where they live. A banner shows them on the Fish tab and in the Dex (unknown species
+  stay "???"), and the Daily screen shows the next one. Solo only: battles fish shared seeded
+  water, so the online rules never change.
+- **Reminders** (local notifications, no push server): offered once, right after your first daily
+  reward, with a short explainer and then Android's permission dialog; Settings > Notifications
+  has a switch for all of them and one per kind (daily reward ready, streak at risk, migrations and
+  events, each its own Android channel). At most one a day, never between 21:00 and 09:00 local
+  time, nothing once today's reward is claimed; the streak reminder comes in the evening instead
+  of the daily one. Tapping one opens the Daily screen, the Fish tab or the Shop's Passes page.
+  A WorkManager check runs every 2 hours (`ReminderWorker`).
+
 ### Guided tour
 
 On first launch a guided tour walks through the game: it highlights each part of the app and
@@ -294,19 +329,23 @@ improves and try to fill the Dex.
 
 Deeper casts earn far more (about 140 points per cast with the starting rope, 18,000 with a
 full one), so prices follow income. Tuned with a career simulation of a good player
-(`EconomyTest`): the Midnight Trench takes about 25 casts, the Abyssal Floor about 150 and a
-full rope about 260 (all three stats maxed around cast 290, roughly 5 hours of play).
+(`EconomyTest`, about three casts a day, claiming the season's free track and the daily loop;
+the median of five careers, since one career depends a lot on its luck): the Midnight Trench
+takes about 23 casts, the Abyssal Floor about 150 and a full rope about 250 (all three stats
+maxed around cast 290, roughly 5 hours of play).
 
-- **Rope upgrades** follow `RopeStat.COST_CURVE` (200 points for the first level, 200,000 for
-  the last), weighted per stat; downgrades refund in full.
+- **Rope upgrades** follow `RopeStat.COST_CURVE` (200 points for the first level, 240,000 for
+  the last), weighted per stat; downgrades refund in full. The levels from 5 up were raised
+  (about +20%) when the daily loop added income.
 - **Tackle** (Shop): one-cast items switched on before a cast. **Lantern** (lights the dark) and
   **Rare fish detector** (marks uncaught species nearby), both allowed in battles, **Lucky charm**
   (one extra bump on the way down) and **Sparkle lure** (3× as many Sparkling fish), solo only.
   Their prices grow with the rope's reach (`GameConfig.TACKLE_PRICE_BY_LENGTH_LEVEL`), so they stay
   a real decision late in the game.
 - **The shop**: everything else in the Shop can be bought with points too (see above).
-- **Seasons**: the free track is part of the career simulation (casts at about three a day): with it
-  the Midnight Trench takes about 24 casts, the Abyssal Floor about 160 and a full rope about 300.
+- **Seasons** and the **daily loop**: the season's free track, daily rewards, challenges and
+  migration water are all part of the career simulation. The daily loop pays about 11% of what a
+  career earns; without it the same career takes about 24, 200 and 330 casts.
 - **Boat parts** cost 6× their table price.
 - **Wagers** on battles against the computer (1k to 100k points): a win pays the stake back
   ×1.2 (Easy), ×1.6 (Normal) or ×2.4 (Hard), a draw refunds it, a loss or forfeit keeps it.
@@ -383,6 +422,9 @@ core/   Pure Kotlin game logic (no Android dependency) + unit tests
         Persistence.kt     save/load (key=value text)
         Shop.kt            the shop: items, euro and points prices, what buying gives
         Seasons.kt         seasons, the season track and weekend events
+        Daily.kt           local days, the login streak and reward calendar, daily challenges
+        Migrations.kt      weekly migrations (spawn boosts for solo casts)
+        Reminders.kt       when a reminder is due (at most one a day, quiet hours)
         Showcase.kt        title badge frames, Dex card styles, the aquarium
         Themes.kt          menu themes and the night mode
         Tackle.kt          one-cast tackle (Lantern, detector, charm, lure)
@@ -410,6 +452,8 @@ app/    Android app (Jetpack Compose)
         ui/dex/            the Dex: species grid and pages, secrets, skins library, FishPortrait
         ui/boat/           boat editor; ui/BoatArt.kt draws boats in 2D
         ui/shop/           the Shop tab, seasons and events, the aquarium, themes, gifts and the account
+        daily/             the daily loop's controller, reminder channels, worker and scheduling
+        ui/daily/          the Fish tab's daily card, the Daily screen, migration banners
         ui/theme/          menu themes: palettes (day and night) and the animated sea scene
         ui/GameIcons.kt    icons drawn in code
         ui/*Screen.kt      Fish tab (HomeScreen), milestones, battle setup / hub

@@ -205,6 +205,52 @@ object GameConfig {
     /** Tiers the collector's edition opens straight away. */
     const val COLLECTOR_TIER_SKIP = 10
 
+    // ---- Daily loop (Daily.kt, Migrations.kt, Reminders.kt; the calendar table is in Daily.kt) ----
+
+    /**
+     * Points a good player earns per cast by Rope Length level, measured by the career simulation
+     * (EconomyTest prints it). Daily rewards and challenge point targets are sized in casts' worth
+     * of it, so they stay the same share of a day's fishing all career long.
+     */
+    val POINTS_PER_CAST_BY_LENGTH_LEVEL = intArrayOf(130, 360, 900, 1_800, 4_200, 5_500, 7_000, 10_000, 12_500, 14_000, 21_000)
+
+    /** Streak shields (each covers one missed day): new players get one, day 7 of the calendar another. */
+    const val STARTING_STREAK_SHIELDS = 1
+    const val MAX_STREAK_SHIELDS = 2
+
+    /** Free challenge rerolls a day (they don't carry over). */
+    const val DAILY_FREE_REROLLS = 1
+
+    /**
+     * The points a daily challenge pays (plus one piece of tackle), in casts' worth: easy, medium,
+     * hard. Tuned with EconomyTest.
+     */
+    val CHALLENGE_REWARD_CASTS = floatArrayOf(0f, 0f, 0.25f)
+
+    /** "Score N points" challenges, in casts' worth of points. */
+    const val CHALLENGE_POINTS_CASTS_MEDIUM = 2f
+    const val CHALLENGE_POINTS_CASTS_HARD = 4f
+
+    /**
+     * Migrations: how long each lasts, which species can migrate (spawn weight at most this), and
+     * the spawn weight they get meanwhile (the most common species have 30).
+     */
+    const val MIGRATION_HOURS = 48
+    const val MIGRATION_MAX_RARITY = 12
+    const val MIGRATION_SPAWN_WEIGHT = 40
+
+    /**
+     * Reminders (local notifications, at most one a day): none during quiet hours (local time),
+     * the daily reward from noon, a streak of at least [NOTIFY_STREAK_MIN_DAYS] days in the
+     * evening. The phone checks every [NOTIFY_CHECK_HOURS] hours whether one is due.
+     */
+    const val NOTIFY_QUIET_START_HOUR = 21
+    const val NOTIFY_QUIET_END_HOUR = 9
+    const val NOTIFY_DAILY_FROM_HOUR = 12
+    const val NOTIFY_STREAK_FROM_HOUR = 18
+    const val NOTIFY_STREAK_MIN_DAYS = 2
+    const val NOTIFY_CHECK_HOURS = 2L
+
     /** One Captain's Club month. */
     const val CLUB_DAYS = 30
 

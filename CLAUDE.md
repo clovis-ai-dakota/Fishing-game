@@ -130,6 +130,12 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     change; secrets read the cast's own `touchLimit`.
   - The season's free track (`Seasons.rewards`) is player income: `Career` claims it (about three
     casts a day), so re-run `EconomyTest` when changing season XP or rewards.
+  - So is the daily loop (daily rewards, challenge rewards, migration water): `Career` claims the
+    daily reward each day and the challenges it finishes. `EconomyTest` checks the median of five
+    careers (seeds 1 to 5): a single career swings by dozens of casts with its luck. The late game is limited by savings
+    (income minus Lanterns bought), so even small daily income moves the pace a lot: re-run
+    `EconomyTest` (it also prints points per cast, which `POINTS_PER_CAST_BY_LENGTH_LEVEL` must
+    track) whenever you touch `DailyRewards`, `CHALLENGE_REWARD_CASTS` or the migration numbers.
   - Wagers are against the computer only; winnings go to the balance, not `pointsEarned`.
 - **Shop** (`core/.../Shop.kt`, UI in `ui/shop/`; themes are on the Style page and in the Themes
   screen): every item has a euro price and a points
@@ -142,6 +148,32 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
   cancel, fail, pending). Purchases are granted once per token. Seasonal items and passes live in
   `Seasons.kt`, showcase items in `Showcase.kt`; new kinds of grant go through `Grant.Feature`.
   Bump the tour when the shop changes (`TourContentTest` checks every Shop page with items).
+- **Daily loop** (`core/.../Daily.kt`, `Migrations.kt`, `Reminders.kt`; app `daily/` and
+  `ui/daily/`; research and decisions in `docs/research/daily-loop.md`):
+  - Days are the player's **local** calendar days (`LocalDays`: epoch ms + the zone's offset, no
+    `java.time`, which needs API 26). The daily reward and challenges reset at local midnight, and
+    only ever move forwards: a day earlier than the last claimed (clock set back, a flight west)
+    never claims twice. Keep it that way, and test time zones and clock changes in `DailyTest`.
+  - Forgiving: the 7-day calendar (`DailyRewards.calendar`) never goes backwards, streak shields
+    cover missed days (`STARTING_STREAK_SHIELDS`, `MAX_STREAK_SHIELDS`), finished challenges are
+    collected at rollover. Nothing about streaks is ever sold.
+  - Rewards are sized in casts' worth (`POINTS_PER_CAST_BY_LENGTH_LEVEL`), are spendable balance
+    only (never `pointsEarned`), and are part of the economy (see above).
+  - Challenges (`Daily.generateDay`): one easy, one medium, one hard from the local day's seed,
+    matched to the rope (zones reached, species within reach that the rope can lift and the player
+    has seen), one free reroll a day. Only solo casts count (`Progression.applyCast` calls
+    `Daily.onCast`; battle casts never reach it). Never add a challenge that points at a fishing
+    secret (several of one species, every zone in one cast, no bumps...).
+  - Migrations: weekly 48 h windows (Tuesday 00:00 UTC) boosting two species' spawn weight
+    (`SpawnBoost`). **Solo only**: the boost goes into the solo `castFactory`, never into
+    `CastSession.seeded`, battles or the online protocol, so both players' water stays identical.
+  - Reminders (local notifications, WorkManager, no push server): opt-in, offered once with an
+    explainer after the first daily claim (never at first launch), then the Android 13+
+    permission dialog. **At most one a day**, none in quiet hours (`NOTIFY_QUIET_*`), none once
+    today's reward is claimed; the decision is the pure `DailyReminders.plan`. One channel per kind;
+    choices are device-only (`ReminderPrefs` in the key-value store, never in the save); taps open
+    the right screen (`ReminderTarget`). New kinds of reminder need a channel, a Settings switch
+    and a `ReminderPlanTest` case.
 - **Accounts** (`PlayerId`, `online/AccountApi.kt`, server `Accounts.kt`): a public id plus a
   secret (the recovery code); the server keeps a hash and one JSON file per player. Gifts (to
   online opponents, `AccountApi.isGiftable`: looks and tackle packs, never passes) are paid in the
@@ -197,7 +229,7 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     `Haptics.factory`. Put each such UI test in its own class: a class's later tests get a view
     model built with the first test's application, so saved settings would live elsewhere.
 - All tunable numbers live in `core/.../GameConfig.kt` (plus the tables in `FishSpecies.kt`,
-  `Upgrades.kt` and `Secrets.kt`). The tour and HUD read them, so don't hard-code them in UI text.
+  `Upgrades.kt`, `Secrets.kt` and `Daily.kt`). The tour and HUD read them, so don't hard-code them in UI text.
 - Run `./gradlew :core:test :server:test :app:testDebugUnitTest` before pushing. App UI tests
   need JDK 21 (Robolectric emulating Android 16).
 

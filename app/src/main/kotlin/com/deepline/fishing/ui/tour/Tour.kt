@@ -26,6 +26,7 @@ enum class TourTarget {
     SETTINGS_SOUND,
 
     // -- Daily loop targets below.
+    HOME_DAILY, DAILY_CALENDAR, DAILY_CHALLENGES, DAILY_MIGRATION, SETTINGS_NOTIFICATIONS,
 
     // -- Social targets below.
 
@@ -86,6 +87,8 @@ object Tour {
     private val bumps = GameConfig.DESCENT_TOUCH_LIMIT
     private val bumpFree = GameConfig.BUMP_FREE_DEPTH.toInt()
     private val dark = GameConfig.DARK_DEPTH.toInt()
+    private val calendarDays = com.deepline.fishing.core.DailyRewards.calendar.size
+    private fun hour(h: Int) = "%02d:00".format(h)
     private val skinSlots = (CosmeticSlot.entries - CosmeticSlot.TITLE).map { it.displayName.lowercase() }
         .let { it.dropLast(1).joinToString(", ") + " and " + it.last() }
 
@@ -420,6 +423,48 @@ object Tour {
         ),
 
         // -- Daily loop steps below.
+        TourStep(
+            id = "daily",
+            title = "Daily rewards",
+            body = "Claim a reward here once a day: points and tackle, and a bigger one every ${calendarDays}th day. Missing a " +
+                "day never sets the calendar back. Your streak counts the days in a row, and a streak shield covers a missed " +
+                "day by itself: you start with ${GameConfig.STARTING_STREAK_SHIELDS}, and every ${calendarDays}th day brings " +
+                "another (up to ${GameConfig.MAX_STREAK_SHIELDS}).",
+            screen = Screen.HOME,
+            target = TourTarget.HOME_DAILY,
+            sinceVersion = VERSION,
+        ),
+        TourStep(
+            id = "daily_challenges",
+            title = "Daily challenges",
+            body = "Every day brings three challenges, easy, medium and hard, matched to your rope, for tackle and points. " +
+                "Don't fancy one? Swap it for free, ${if (GameConfig.DAILY_FREE_REROLLS == 1) "once" else "${GameConfig.DAILY_FREE_REROLLS} times"} a day. " +
+                "Only solo casts count. New ones come at midnight, and " +
+                "finished ones are collected for you if you forget.",
+            screen = Screen.DAILY,
+            target = TourTarget.DAILY_CHALLENGES,
+            sinceVersion = VERSION,
+        ),
+        TourStep(
+            id = "migrations",
+            title = "Migrations",
+            body = "Every week, for ${GameConfig.MIGRATION_HOURS / 24} days, two less common species migrate: one near the " +
+                "surface and one in the deep, both far more common where they live. A banner shows them on the Fish tab " +
+                "and in the Dex. Migrations are for solo casts: battles never change.",
+            screen = Screen.DAILY,
+            target = TourTarget.DAILY_MIGRATION,
+            sinceVersion = VERSION,
+        ),
+        TourStep(
+            id = "reminders",
+            title = "Reminders",
+            body = "Want a nudge when your daily reward is ready, your streak is about to end or a migration starts? Turn " +
+                "reminders on in Settings: at most one a day, and never between ${hour(GameConfig.NOTIFY_QUIET_START_HOUR)} " +
+                "and ${hour(GameConfig.NOTIFY_QUIET_END_HOUR)}.",
+            screen = Screen.SETTINGS,
+            target = TourTarget.SETTINGS_NOTIFICATIONS,
+            sinceVersion = VERSION,
+        ),
 
         // -- Social steps below.
 

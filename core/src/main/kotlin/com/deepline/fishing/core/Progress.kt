@@ -76,6 +76,18 @@ data class PlayerProgress(
     val atmosphereUnlocked: Boolean = false,
     val atmosphere: Atmosphere = Atmosphere.FAMILY,
     // -- Daily loop (streak, daily challenges, migrations): new fields below this line.
+    /** Login streak (see `Daily`): days in a row the daily reward was claimed (shields cover missed days). */
+    val dailyStreak: Int = 0,
+    val dailyBestStreak: Int = 0,
+    /** The local day (`LocalDays`) of the last daily reward claim; null: never claimed. */
+    val dailyLastClaimDay: Long? = null,
+    /** Daily rewards claimed in all: the calendar gives its next day on the next claim. */
+    val dailyClaims: Int = 0,
+    val streakShields: Int = GameConfig.STARTING_STREAK_SHIELDS,
+    /** The day's challenges (one per difficulty), the local day they belong to, and rerolls used. */
+    val challengeDay: Long? = null,
+    val dailyChallenges: List<DailyChallenge> = emptyList(),
+    val challengeRerolls: Int = 0,
 
     // -- Social (friends, leaderboards, tournaments, clubs): new fields below this line.
 
@@ -124,9 +136,11 @@ object Progression {
             )
         }
         val gained = result.totalPoints.toLong()
+        // Solo casts also count for the day's challenges (Daily.kt; a new day collects the old one's).
+        val q = Daily.onCast(p, result, LocalDays.today())
         // Solo casts also climb the season's track and count for a weekend event.
-        return Seasons.onCast(p, result, ShopClock.now()).copy(
-            pointsBalance = p.pointsBalance + gained,
+        return Seasons.onCast(q, result, ShopClock.now()).copy(
+            pointsBalance = q.pointsBalance + gained,
             pointsEarned = p.pointsEarned + gained,
             collection = collection,
             seenSpecies = p.seenSpecies + result.seenSpeciesIds + result.catches.map { it.species.id },

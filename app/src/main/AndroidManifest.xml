@@ -7,6 +7,8 @@
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove" />
     <!-- Haptic feedback (bumps, catches, wins); turned off in Settings. -->
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Daily reminders (opt-in, asked after the first daily reward; at most one a day). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"

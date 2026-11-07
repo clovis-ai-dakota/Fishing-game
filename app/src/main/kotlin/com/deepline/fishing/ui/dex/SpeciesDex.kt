@@ -78,6 +78,8 @@ fun SpeciesDex(vm: GameViewModel) {
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         item(key = "header", span = { GridItemSpan(maxLineSpan) }) { DexHeader(p) }
+        // A migration under way (nothing between migrations).
+        item(key = "migration", span = { GridItemSpan(maxLineSpan) }) { com.deepline.fishing.ui.daily.MigrationBanner(vm) }
         item(key = "filters", span = { GridItemSpan(maxLineSpan) }) {
             Row(
                 Modifier

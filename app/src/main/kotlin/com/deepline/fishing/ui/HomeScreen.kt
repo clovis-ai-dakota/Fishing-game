@@ -119,6 +119,9 @@ fun HomeScreen(vm: GameViewModel) {
                 onClick = { vm.openDex(DexSection.SKINS) },
                 clickLabel = "Customise your boat",
             )
+            // The daily loop: a migration under way, then the daily reward and challenges.
+            com.deepline.fishing.ui.daily.MigrationBanner(vm)
+            com.deepline.fishing.ui.daily.DailyCard(vm, Modifier.tourTarget(TourTarget.HOME_DAILY))
             DepthCard(vm)
             DexProgressCard(vm)
             MilestoneStrip(vm)

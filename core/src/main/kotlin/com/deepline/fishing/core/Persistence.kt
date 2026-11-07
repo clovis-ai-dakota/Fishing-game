@@ -55,6 +55,14 @@ object ProgressCodec {
         appendLine("atmosphereUnlocked=${if (p.atmosphereUnlocked) 1 else 0}")
         appendLine("atmosphere=${p.atmosphere.name}")
         // -- Daily loop: new lines below.
+        appendLine("daily=${p.dailyStreak},${p.dailyBestStreak},${p.dailyLastClaimDay ?: ""},${p.dailyClaims},${p.streakShields}")
+        appendLine("challengeDay=${p.challengeDay ?: ""},${p.challengeRerolls}")
+        for (c in p.dailyChallenges) {
+            appendLine(
+                "challenge.${c.difficulty.name}=${c.kind.name},${c.target},${c.zone?.name ?: ""},${c.speciesId ?: ""}," +
+                    "${c.progress},${if (c.claimed) 1 else 0}",
+            )
+        }
 
         // -- Social: new lines below.
 
@@ -125,6 +133,24 @@ object ProgressCodec {
                 key == "atmosphereUnlocked" -> p = p.copy(atmosphereUnlocked = value.trim() == "1")
                 key == "atmosphere" -> Atmosphere.entries.firstOrNull { it.name == value.trim() }?.let { p = p.copy(atmosphere = it) }
                 // -- Daily loop: new keys below.
+                key == "daily" -> value.split(',').map { it.trim() }.takeIf { it.size == 5 }?.let { v ->
+                    val numbers = listOf(v[0], v[1], v[3], v[4]).map { it.toIntOrNull() }
+                    if (numbers.all { it != null && it >= 0 } && (v[2].isEmpty() || v[2].toLongOrNull() != null)) {
+                        p = p.copy(
+                            dailyStreak = numbers[0]!!, dailyBestStreak = numbers[1]!!, dailyLastClaimDay = v[2].toLongOrNull(),
+                            dailyClaims = numbers[2]!!, streakShields = numbers[3]!!.coerceAtMost(GameConfig.MAX_STREAK_SHIELDS),
+                        )
+                    }
+                }
+                key == "challengeDay" -> value.split(',').map { it.trim() }.takeIf { it.size == 2 }?.let { v ->
+                    val rerolls = v[1].toIntOrNull()
+                    if (rerolls != null && (v[0].isEmpty() || v[0].toLongOrNull() != null)) {
+                        p = p.copy(challengeDay = v[0].toLongOrNull(), challengeRerolls = rerolls)
+                    }
+                }
+                key.startsWith("challenge.") -> decodeChallenge(key.removePrefix("challenge."), value)?.let { c ->
+                    p = p.copy(dailyChallenges = (p.dailyChallenges.filter { it.difficulty != c.difficulty } + c).sortedBy { it.difficulty })
+                }
 
                 // -- Social: new keys below.
 
@@ -157,6 +183,23 @@ object ProgressCodec {
         // A saved Nightmare choice without the unlock (hand-edited save) falls back to Family.
         if (p.atmosphere == Atmosphere.NIGHTMARE && !p.atmosphereUnlocked) p = p.copy(atmosphere = Atmosphere.FAMILY)
         return p.copy(ropeLevels = ropeLevels, collection = collection)
+    }
+
+    /** A daily challenge: kind, target, zone, species, progress, claimed (unknown values: dropped). */
+    private fun decodeChallenge(difficulty: String, value: String): DailyChallenge? {
+        val v = value.split(',').map { it.trim() }
+        if (v.size != 6) return null
+        val zone = if (v[2].isEmpty()) null else DepthZone.entries.firstOrNull { it.name == v[2] } ?: return null
+        val species = if (v[3].isEmpty()) null else v[3].takeIf { FishCatalog.byId(it) != null } ?: return null
+        return DailyChallenge(
+            difficulty = ChallengeDifficulty.entries.firstOrNull { it.name == difficulty } ?: return null,
+            kind = ChallengeKind.entries.firstOrNull { it.name == v[0] } ?: return null,
+            target = v[1].toIntOrNull()?.takeIf { it > 0 } ?: return null,
+            zone = zone,
+            speciesId = species,
+            progress = v[4].toIntOrNull()?.coerceAtLeast(0) ?: return null,
+            claimed = v[5] == "1",
+        )
     }
 
     /** Colours as palette indexes, then the pattern, sail, flag and emblem names. */
