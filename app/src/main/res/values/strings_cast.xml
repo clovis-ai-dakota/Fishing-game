@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    During a cast: the short notices flashed over the water (GameViewModel). Keys start with
+    cast_. The cast screen's HUD, pause menu and results go here too (cast_<screen>_<purpose>).
+    Notices are read in a split second: keep them short and punchy.
+-->
+<resources>
+    <plurals name="cast_notice_bump">
+        <!-- The hook bumped into something on the way down. %d: bumps left before the line turns back up. -->
+        <item quantity="one">Bump! %d left</item>
+        <item quantity="other">Bump! %d left</item>
+    </plurals>
+    <!-- The last bump was used: the line goes back up. Heads: aim the hook at fish heads to catch them. -->
+    <string name="cast_notice_pulled_up">Line pulled up! Aim for heads</string>
+    <!-- The hook reached the end of the rope and turns back up. -->
+    <string name="cast_notice_rope_end">End of the rope! Reel in</string>
+    <!-- A fish was caught. %1$s: the species; %2$s: points won, already formatted. The two spaces
+         are kept on purpose (quoted). -->
+    <string name="cast_notice_caught">"%1$s  +%2$s"</string>
+    <!-- A Sparkling fish (gold outline, worth more) was caught. Same arguments. -->
+    <string name="cast_notice_caught_sparkling">"Sparkling %1$s  +%2$s"</string>
+    <!-- A fish too heavy for the rope slipped away. %1$s: the species. -->
+    <string name="cast_notice_too_heavy">Too heavy: %1$s</string>
+    <!-- The last bump of the way down hooked what it hit (a fish or an object). %1$s: what;
+         %2$s: points, already formatted. -->
+    <string name="cast_notice_last_bump">"Last bump hooked: %1$s  +%2$s"</string>
+    <!-- A timed battle's clock ran out during the cast. -->
+    <string name="cast_notice_times_up">Time\'s up!</string>
+</resources>

@@ -1,5 +1,11 @@
 package com.deepline.fishing.ui.shop
 
+import com.deepline.fishing.ui.shop.fishingTimeLabel
+import com.deepline.fishing.ui.shop.timeLeftLabel
+import com.deepline.fishing.ui.i18n.badgeText
+import com.deepline.fishing.ui.i18n.asString
+import com.deepline.fishing.ui.i18n.description
+import com.deepline.fishing.ui.i18n.label
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
@@ -127,7 +133,7 @@ fun ShopScreen(vm: GameViewModel) {
                 FilterChip(
                     selected = pg == page,
                     onClick = { vm.selectShopPage(pg) },
-                    label = { Text(pg.label) },
+                    label = { Text(androidx.compose.ui.res.stringResource(pg.labelRes)) },
                     modifier = Modifier.testTag("shop_page_${pg.name.lowercase()}"),
                 )
             }
@@ -161,10 +167,10 @@ internal fun PointsConfirmDialog(vm: GameViewModel, item: ShopItem, onDone: () -
     val price = vm.shopPointsPrice(item)
     AlertDialog(
         onDismissRequest = onDone,
-        title = { Text("Buy ${item.name}?") },
+        title = { Text("Buy ${item.label()}?") },
         text = {
             Text(
-                "You get: ${ShopText.contents(item, p)}.\n\nIt costs ${formatPoints(price)} pts; you'll have " +
+                "You get: ${ShopText.contents(item, p).asString()}.\n\nIt costs ${formatPoints(price)} pts; you'll have " +
                     "${formatPoints(p.pointsBalance - price)} pts left.",
             )
         },
@@ -208,7 +214,7 @@ private fun LazyGridScope.banners(vm: GameViewModel, page: ShopPage, actions: Sh
             val pouch = ShopCatalog.clubPouch
             Banner(
                 title = "Captain's Club gift",
-                text = "Your free monthly ${pouch.name.lowercase()} is ready: ${ShopText.contents(pouch, vm.progress)}.",
+                text = "Your free monthly ${pouch.label()} is ready: ${ShopText.contents(pouch, vm.progress).asString()}.",
             ) {
                 Button(onClick = vm::claimClubPouch, modifier = Modifier.testTag("claim_club_pouch")) { Text("Claim") }
             }
@@ -219,7 +225,7 @@ private fun LazyGridScope.banners(vm: GameViewModel, page: ShopPage, actions: Sh
         full("starter_banner") {
             Banner(
                 title = "Starter pack" + (ShopCatalog.discountPercent(starter, vm.progress)?.let { " · -$it%" } ?: ""),
-                text = "A one-time offer, ends in ${ShopText.timeLeft(vm.progress.starterOfferEndsMs - ShopClock.now())}.",
+                text = "A one-time offer, ends in ${ShopText.timeLeftLabel(vm.progress.starterOfferEndsMs - ShopClock.now())}.",
             ) {
                 TextButton(onClick = { vm.selectShopPage(ShopPage.PASSES) }) { Text("See it") }
             }
@@ -275,7 +281,7 @@ internal fun PriceButtons(item: ShopItem, actions: ShopActions, wide: Boolean = 
             onClick = { actions.buyWithMoney(item) },
             contentPadding = PaddingValues(horizontal = 8.dp),
             modifier = Modifier.weight(1f).testTag("buy_eur_${item.id}"),
-        ) { Text(vm.billing.priceOf(item) ?: item.euroLabel, maxLines = 1, fontWeight = FontWeight.Bold) }
+        ) { Text(vm.billing.priceOf(item) ?: com.deepline.fishing.ui.formatEuros(item.euroCents), maxLines = 1, fontWeight = FontWeight.Bold) }
         OutlinedButton(
             onClick = { actions.onPoints(item) },
             enabled = vm.progress.pointsBalance >= points,
@@ -341,10 +347,10 @@ private fun RopeCard(vm: GameViewModel, stat: RopeStat, modifier: Modifier) {
     Card(Modifier.fillMaxWidth().then(modifier)) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(stat.displayName, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                Text(stat.label(), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
                 Text("Lv $level / ${stat.maxLevel}", style = MaterialTheme.typography.labelLarge)
             }
-            Text(stat.description, style = MaterialTheme.typography.bodySmall)
+            Text(stat.description(), style = MaterialTheme.typography.bodySmall)
             LinearProgressIndicator(progress = { level.toFloat() / stat.maxLevel }, modifier = Modifier.fillMaxWidth())
             val current = formatStat(stat, stat.valueAt(level))
             Progression.downgradeRefund(p, stat)?.let { refund ->
@@ -391,11 +397,11 @@ private fun TackleCard(vm: GameViewModel, t: Tackle, actions: ShopActions, modif
     Card(Modifier.fillMaxWidth().then(modifier)) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(t.displayName, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                Text(t.label(), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
                 Text("You have ${Progression.tackleCount(p, t)}", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.secondary)
             }
             Text(
-                t.description + if (t.usableInBattles) " Works in battles too." else " Solo casts only.",
+                t.description() + if (t.usableInBattles) " Works in battles too." else " Solo casts only.",
                 style = MaterialTheme.typography.bodySmall,
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -410,10 +416,10 @@ private fun TackleCard(vm: GameViewModel, t: Tackle, actions: ShopActions, modif
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Column(Modifier.weight(1f)) {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Text(pack.name, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text(pack.label(), style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             pack.badge?.let { Badge(it) }
                         }
-                        Text(ShopText.contents(pack, p), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(ShopText.contents(pack, p).asString(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     val tagged = if (pack == ShopCatalog.inSection(ShopSection.TACKLE).first()) Modifier.tourTarget(TourTarget.SHOP_PRICES) else Modifier
                     Box(Modifier.weight(1.3f)) { PriceButtons(pack, actions, modifier = tagged) }
@@ -490,8 +496,8 @@ private val TileWater = Brush.verticalGradient(listOf(Color(0xFF0288D1), Color(0
 private fun BoatTile(vm: GameViewModel, item: ShopItem, actions: ShopActions, time: Float) {
     val presetId = (item.grants.first() as Grant.Preset).presetId
     val skin = PremiumSkins.byId(presetId) ?: return
-    Tile(item.name, item.badge, preview = { Canvas(Modifier.fillMaxSize()) { drawBoatTile(null, skin.design, time) } }) {
-        Text(skin.tagline, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, minLines = 2, maxLines = 2, overflow = TextOverflow.Ellipsis)
+    Tile(item.label(), item.badgeText()?.asString(), preview = { Canvas(Modifier.fillMaxSize()) { drawBoatTile(null, skin.design, time) } }) {
+        Text(skin.description(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, minLines = 2, maxLines = 2, overflow = TextOverflow.Ellipsis)
         when {
             vm.isWearingPreset(presetId) -> OwnedRow("Worn ✓")
             ShopCatalog.ownsPreset(vm.progress, presetId) -> OwnedRow { TextButton(onClick = { vm.wearPreset(presetId) }) { Text("Wear") } }
@@ -508,7 +514,7 @@ private fun SetCard(vm: GameViewModel, item: ShopItem, actions: ShopActions, tim
     Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) {
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(item.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                Text(item.label(), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                 item.badge?.let { Badge(it) }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -521,7 +527,7 @@ private fun SetCard(vm: GameViewModel, item: ShopItem, actions: ShopActions, tim
                     }
                 }
             }
-            Text(ShopText.contents(item, vm.progress) + ".", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(ShopText.contents(item, vm.progress).asString() + ".", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             if (ShopCatalog.owns(vm.progress, item.id)) OwnedRow() else PriceButtons(item, actions, wide = true)
         }
     }
@@ -532,7 +538,7 @@ private fun PartTile(vm: GameViewModel, item: ShopItem, actions: ShopActions, ti
     val part = (item.grants.first() as Grant.BoatParts).parts.first()
     val p = vm.progress
     val preview = BoatParts.applyTo(p.boatDesign, part, p)
-    Tile(item.name, item.badge, preview = { Canvas(Modifier.fillMaxSize()) { drawBoatTile(null, preview, time) } }) {
+    Tile(item.label(), item.badgeText()?.asString(), preview = { Canvas(Modifier.fillMaxSize()) { drawBoatTile(null, preview, time) } }) {
         when {
             vm.isOnBoat(part) -> OwnedRow("On your boat ✓")
             ShopCatalog.owns(p, item.id) || BoatParts.isAvailable(p, part) ->
@@ -546,7 +552,7 @@ private fun PartTile(vm: GameViewModel, item: ShopItem, actions: ShopActions, ti
 private fun GearTile(vm: GameViewModel, item: ShopItem, actions: ShopActions, time: Float) {
     val c: Cosmetic = (item.grants.first() as Grant.Cosmetics).items.first()
     val p = vm.progress
-    Tile(item.name, item.badge, preview = { Canvas(Modifier.fillMaxSize()) { drawSlotArt(c.slot, c, time) } }) {
+    Tile(item.label(), item.badgeText()?.asString(), preview = { Canvas(Modifier.fillMaxSize()) { drawSlotArt(c.slot, c, time) } }) {
         val worn = p.equippedSkins[c.slot] == c
         when {
             worn -> OwnedRow("Worn ✓") { TextButton(onClick = { vm.equipSkin(c.slot, null) }) { Text("Take off") } }
@@ -560,7 +566,7 @@ private fun GearTile(vm: GameViewModel, item: ShopItem, actions: ShopActions, ti
 private fun ThemeTile(vm: GameViewModel, item: ShopItem, actions: ShopActions) {
     val theme = com.deepline.fishing.core.MenuTheme.entries.first { it.unlockKey == (item.grants.first() as Grant.Unlock).key }
     val night = vm.nightMode.isNight(androidx.compose.foundation.isSystemInDarkTheme())
-    Tile(item.name.removeSuffix(" theme"), "★".repeat(theme.tier), preview = { ThemePreview(theme, night, Modifier.fillMaxSize()) }) {
+    Tile(theme.label(), "★".repeat(theme.tier), preview = { ThemePreview(theme, night, Modifier.fillMaxSize()) }) {
         when {
             vm.menuTheme == theme -> OwnedRow("In use ✓")
             ShopCatalog.owns(vm.progress, theme.unlockKey) -> OwnedRow { TextButton(onClick = { vm.setMenuTheme(theme) }) { Text("Use") } }
@@ -573,7 +579,7 @@ private fun ThemeTile(vm: GameViewModel, item: ShopItem, actions: ShopActions) {
 private fun BadgeTile(vm: GameViewModel, item: ShopItem, actions: ShopActions) {
     val key = (item.grants.first() as Grant.Unlock).key
     val frame = com.deepline.fishing.core.TitleFrame.entries.first { it.unlockKey == key }
-    Tile(item.name, item.badge, preview = {
+    Tile(item.label(), item.badgeText()?.asString(), preview = {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             com.deepline.fishing.ui.TitleBadge(vm.title ?: vm.playerName, frame = frame)
         }
@@ -590,7 +596,7 @@ private fun BadgeTile(vm: GameViewModel, item: ShopItem, actions: ShopActions) {
 private fun CardStyleTile(vm: GameViewModel, item: ShopItem, actions: ShopActions) {
     val key = (item.grants.first() as Grant.Unlock).key
     val style = com.deepline.fishing.core.CardStyle.entries.first { it.unlockKey == key }
-    Tile(item.name, item.badge, preview = { com.deepline.fishing.ui.dex.CardStyleSample(style, Modifier.fillMaxSize()) }) {
+    Tile(item.label(), item.badgeText()?.asString(), preview = { com.deepline.fishing.ui.dex.CardStyleSample(style, Modifier.fillMaxSize()) }) {
         when {
             vm.cardStyle == style -> OwnedRow("In use ✓")
             ShopCatalog.owns(vm.progress, key) -> OwnedRow { TextButton(onClick = { vm.setCardStyle(style) }) { Text("Use") } }
@@ -614,7 +620,7 @@ private fun LazyGridScope.aquariumPage(vm: GameViewModel, actions: ShopActions) 
     for (item in items.filter { (it.grants.single() as? Grant.Unlock)?.key == "aquarium:big" }) full(item.id) { ItemCard(vm, item, actions) }
     items(items.filter { (it.grants.single() as? Grant.Unlock)?.key?.startsWith("decor:") == true }, key = { it.id }) { item ->
         val decor = com.deepline.fishing.core.Decor.entries.first { it.unlockKey == (item.grants.single() as Grant.Unlock).key }
-        Tile(item.name, item.badge, preview = { AquariumTank(p, height = 120.dp, extraDecor = decor) }) {
+        Tile(item.label(), item.badgeText()?.asString(), preview = { AquariumTank(p, height = 120.dp, extraDecor = decor) }) {
             if (ShopCatalog.owns(p, item.id)) OwnedRow() else PriceButtons(item, actions)
         }
     }
@@ -665,10 +671,10 @@ internal fun ItemCard(vm: GameViewModel, item: ShopItem, actions: ShopActions, m
     ) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(item.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                Text(item.label(), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                 badge?.let { Badge(it) }
             }
-            Text(item.description, style = MaterialTheme.typography.bodySmall)
+            Text(item.description(), style = MaterialTheme.typography.bodySmall)
             if (badge != null && badge.startsWith("-")) {
                 Text(
                     "Worth ${euros(ShopCatalog.separateCents(item, p))} bought separately.",
@@ -678,7 +684,7 @@ internal fun ItemCard(vm: GameViewModel, item: ShopItem, actions: ShopActions, m
             }
             if (item.id == "starter_pack" && vm.starterOfferOpen) {
                 Text(
-                    "One time only: ends in ${ShopText.timeLeft(p.starterOfferEndsMs - now)}.",
+                    "One time only: ends in ${ShopText.timeLeftLabel(p.starterOfferEndsMs - now)}.",
                     style = MaterialTheme.typography.labelMedium,
                     color = com.deepline.fishing.ui.rewardTextColor(),
                 )
@@ -706,8 +712,8 @@ internal fun ItemCard(vm: GameViewModel, item: ShopItem, actions: ShopActions, m
 private fun LazyGridScope.footer(vm: GameViewModel) = full("footer") {
     Column(Modifier.padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(
-            "Points prices: about ${ShopText.fishingTime(GameConfig.MINUTES_PER_EURO)} of fishing per euro at your rope's " +
-                "reach (Lantern packs: ${ShopText.fishingTime(GameConfig.LANTERN_MINUTES_PER_EURO)}), so paying saves time " +
+            "Points prices: about ${ShopText.fishingTimeLabel(GameConfig.MINUTES_PER_EURO)} of fishing per euro at your rope's " +
+                "reach (Lantern packs: ${ShopText.fishingTimeLabel(GameConfig.LANTERN_MINUTES_PER_EURO)}), so paying saves time " +
                 "and never buys anything points can't. Bigger purchases give " +
                 "+${((GameConfig.tierBonus(499) - 1f) * 100).roundToInt()}% to +${((GameConfig.tierBonus(999) - 1f) * 100).roundToInt()}% more.",
             style = MaterialTheme.typography.bodySmall,

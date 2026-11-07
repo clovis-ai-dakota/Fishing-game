@@ -1,5 +1,6 @@
 package com.deepline.fishing.ui.social
 
+import com.deepline.fishing.ui.i18n.label
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -86,7 +87,7 @@ fun FriendsScreen(vm: GameViewModel) {
                     for (c in f.challenges) {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Column(Modifier.weight(1f)) {
-                                Text("${c.fromName} challenges you to ${c.mode.title}.", style = MaterialTheme.typography.bodyMedium)
+                                Text("${c.fromName} challenges you to ${c.mode.label()}.", style = MaterialTheme.typography.bodyMedium)
                                 Text(
                                     "The room closes in ${timeLeft(c.expiresAtMs, ShopClock.now())}.",
                                     style = MaterialTheme.typography.bodySmall,
@@ -150,7 +151,7 @@ fun FriendsScreen(vm: GameViewModel) {
                                 vm.challengeFriend(friend, mode)
                             },
                             modifier = Modifier.fillMaxWidth().testTag("challenge_mode_${mode.name.lowercase()}"),
-                        ) { Text(mode.title) }
+                        ) { Text(mode.label()) }
                     }
                 }
             },

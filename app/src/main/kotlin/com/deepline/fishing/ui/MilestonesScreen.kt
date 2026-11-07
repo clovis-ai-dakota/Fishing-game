@@ -18,7 +18,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import com.deepline.fishing.GameViewModel
+import com.deepline.fishing.R
+import com.deepline.fishing.ui.i18n.UiText
+import com.deepline.fishing.ui.i18n.asString
 import com.deepline.fishing.Screen
 import com.deepline.fishing.core.Milestone
 import com.deepline.fishing.core.Milestones
@@ -26,32 +30,32 @@ import com.deepline.fishing.core.Progression
 import com.deepline.fishing.ui.tour.TourTarget
 import com.deepline.fishing.ui.tour.tourTarget
 
-fun milestoneRewardText(m: Milestone): String = listOfNotNull(
-    if (m.rewardPoints > 0) "+${formatPoints(m.rewardPoints)} pts" else null,
-    when {
-        m.rewardLanterns == 1 -> "1 Lantern"
-        m.rewardLanterns > 1 -> "${m.rewardLanterns} Lanterns"
-        else -> null
-    },
-).joinToString(" · ")
+/** "+500 pts · 1 Lantern": what a milestone gives. */
+fun milestoneRewardText(m: Milestone): UiText = UiText.join(
+    listOfNotNull(
+        if (m.rewardPoints > 0) UiText.res(R.string.milestones_reward_points, UiText.number(m.rewardPoints)) else null,
+        if (m.rewardLanterns > 0) UiText.plural(R.plurals.common_lanterns, m.rewardLanterns) else null,
+    ),
+    " · ",
+)
 
 @Composable
 fun MilestonesScreen(vm: GameViewModel) {
     val p = vm.progress
-    SubScreen(title = "Milestones", onBack = { vm.navigate(Screen.HOME) }) {
+    SubScreen(title = stringResource(R.string.milestones_title), onBack = { vm.navigate(Screen.HOME) }) {
         LazyColumn(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             item {
                 Text(
-                    "Earned in total: ${formatPoints(p.pointsEarned)} pts",
+                    stringResource(R.string.milestones_earned, formatPoints(p.pointsEarned)),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.Bold,
                 )
                 Text(
-                    "Milestones count every point you earn from fish, even after spending them on upgrades.",
+                    stringResource(R.string.milestones_explainer),
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
@@ -64,17 +68,17 @@ fun MilestonesScreen(vm: GameViewModel) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Column(Modifier.weight(1f)) {
                                 Text(
-                                    "${formatPoints(m.threshold)} pts",
+                                    stringResource(R.string.milestones_threshold, formatPoints(m.threshold)),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
                                 )
-                                Text(milestoneRewardText(m), style = MaterialTheme.typography.bodyMedium)
+                                Text(milestoneRewardText(m).asString(), style = MaterialTheme.typography.bodyMedium)
                             }
                             when {
-                                claimed -> Text("Claimed ✓", color = MaterialTheme.colorScheme.tertiary)
-                                reached -> Button(onClick = { vm.claimMilestone(m) }) { Text("Claim") }
+                                claimed -> Text(stringResource(R.string.milestones_claimed), color = MaterialTheme.colorScheme.tertiary)
+                                reached -> Button(onClick = { vm.claimMilestone(m) }) { Text(stringResource(R.string.milestones_claim)) }
                                 else -> Text(
-                                    "${formatPoints(p.pointsEarned)} / ${formatPoints(m.threshold)}",
+                                    stringResource(R.string.common_progress_of, formatPoints(p.pointsEarned), formatPoints(m.threshold)),
                                     style = MaterialTheme.typography.bodySmall,
                                 )
                             }

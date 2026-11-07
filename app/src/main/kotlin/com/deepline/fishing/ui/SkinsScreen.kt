@@ -60,7 +60,8 @@ fun TitleBadge(title: String, modifier: Modifier = Modifier, frame: com.deepline
     )
     val look = badgeLook(frame, t)
     Text(
-        look.icon + " " + title,
+        // Titles travel by their English name (online too): shown in the game's language.
+        look.icon + " " + com.deepline.fishing.ui.i18n.titleLabel(title),
         modifier = modifier
             .clip(RoundedCornerShape(50))
             .background(look.fill)

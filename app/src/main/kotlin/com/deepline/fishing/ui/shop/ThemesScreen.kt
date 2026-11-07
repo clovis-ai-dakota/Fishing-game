@@ -1,5 +1,7 @@
 package com.deepline.fishing.ui.shop
 
+import com.deepline.fishing.ui.i18n.description
+import com.deepline.fishing.ui.i18n.label
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -82,7 +84,7 @@ fun ThemesScreen(vm: GameViewModel) {
                                     onClick = { vm.setNightMode(mode) },
                                     shape = SegmentedButtonDefaults.itemShape(i, NightMode.entries.size),
                                     modifier = Modifier.testTag("mode_${mode.name.lowercase()}"),
-                                ) { Text(mode.displayName, maxLines = 1) }
+                                ) { Text(mode.label(), maxLines = 1) }
                             }
                         }
                         Text(
@@ -110,10 +112,10 @@ private fun ThemeCard(vm: GameViewModel, theme: MenuTheme, night: Boolean, actio
         Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             ThemePreview(theme, night, Modifier.fillMaxWidth().height(150.dp).clip(RoundedCornerShape(12.dp)))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(theme.displayName, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                Text(theme.label(), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
                 if (theme.tier > 0) Text("★".repeat(theme.tier), color = MaterialTheme.colorScheme.tertiary, style = MaterialTheme.typography.labelMedium)
             }
-            Text(theme.description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, minLines = 2, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Text(theme.description(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, minLines = 2, maxLines = 2, overflow = TextOverflow.Ellipsis)
             when {
                 vm.menuTheme == theme -> OwnedRow("In use ✓")
                 theme.isAvailable(p, ShopClock.now()) -> OwnedRow {

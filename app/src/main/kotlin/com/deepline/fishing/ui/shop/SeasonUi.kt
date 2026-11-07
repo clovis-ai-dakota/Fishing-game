@@ -1,5 +1,8 @@
 package com.deepline.fishing.ui.shop
 
+import com.deepline.fishing.ui.shop.timeLeftLabel
+import com.deepline.fishing.ui.i18n.asString
+import com.deepline.fishing.ui.i18n.label
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -55,7 +58,7 @@ fun SeasonCard(vm: GameViewModel, modifier: Modifier = Modifier) {
                 Column(Modifier.weight(1f)) {
                     Text("Season ${season.number} · ${season.name}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Text(
-                        "Ends in ${ShopText.timeLeft(season.msLeft(now))}" + if (pass) " · Pass active" else "",
+                        "Ends in ${ShopText.timeLeftLabel(season.msLeft(now))}" + if (pass) " · Pass active" else "",
                         style = MaterialTheme.typography.labelMedium,
                         color = if (pass) com.deepline.fishing.ui.rewardTextColor() else MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -112,8 +115,8 @@ private fun TierCell(vm: GameViewModel, reward: SeasonReward, reached: Boolean, 
     ) {
         Text(
             when {
-                claimed -> "✓ " + reward.grants.joinToString(", ") { ShopText.seasonGrant(it, vm.progress) }
-                else -> reward.grants.joinToString(", ") { ShopText.seasonGrant(it, vm.progress) }
+                claimed -> "✓ " + ShopText.seasonGrants(reward.grants, vm.progress).asString()
+                else -> ShopText.seasonGrants(reward.grants, vm.progress).asString()
             },
             style = MaterialTheme.typography.labelSmall,
             color = when {
@@ -143,7 +146,7 @@ fun EventCard(vm: GameViewModel, modifier: Modifier = Modifier) {
                 Text("Weekend events", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 Text(
                     "Every weekend brings a fishing goal with a reward. The next one starts in " +
-                        "${ShopText.timeLeft(Seasons.nextEventStart(now) - now)}.",
+                        "${ShopText.timeLeftLabel(Seasons.nextEventStart(now) - now)}.",
                     style = MaterialTheme.typography.bodySmall,
                 )
                 return@Column
@@ -151,13 +154,13 @@ fun EventCard(vm: GameViewModel, modifier: Modifier = Modifier) {
             val p = Seasons.currentEvent(vm.progress, now)
             val pass = Seasons.hasEventPass(p, event)
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Weekend event: ${event.goal.displayName}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                Text("Weekend event: ${event.goal.label()}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                 Text("${p.eventProgress} / ${event.goal.target}", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.secondary)
             }
             LinearProgressIndicator(progress = { p.eventProgress / event.goal.target.toFloat() }, modifier = Modifier.fillMaxWidth())
             Text(
-                "Ends in ${ShopText.timeLeft(event.msLeft(now))}. Reward: " + Seasons.eventFree.joinToString(", ") { ShopText.seasonGrant(it, p) } +
-                    if (pass) "; with your event pass (progress counts double): " + Seasons.eventPass.joinToString(", ") { ShopText.seasonGrant(it, p) } + "." else ".",
+                "Ends in ${ShopText.timeLeftLabel(event.msLeft(now))}. Reward: " + ShopText.seasonGrants(Seasons.eventFree, p).asString() +
+                    if (pass) "; with your event pass (progress counts double): " + ShopText.seasonGrants(Seasons.eventPass, p).asString() + "." else ".",
                 style = MaterialTheme.typography.bodySmall,
             )
             if (Seasons.eventClaimable(p, now).isNotEmpty()) {

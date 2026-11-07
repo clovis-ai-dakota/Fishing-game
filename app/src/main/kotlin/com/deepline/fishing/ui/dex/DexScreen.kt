@@ -53,7 +53,7 @@ fun DexScreen(vm: GameViewModel) {
                         selected = s == section,
                         onClick = { vm.openDex(s) },
                         shape = SegmentedButtonDefaults.itemShape(i, sections.size),
-                    ) { Text(s.label, maxLines = 1) }
+                    ) { Text(androidx.compose.ui.res.stringResource(s.labelRes), maxLines = 1) }
                 }
             }
         }

@@ -1,5 +1,8 @@
 package com.deepline.fishing.social
 
+import com.deepline.fishing.R
+import com.deepline.fishing.ui.i18n.UiText
+import com.deepline.fishing.ui.i18n.labelText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -83,11 +86,11 @@ class SocialController(
         private set
 
     /** What just happened ("Friend request sent."), until dismissed. */
-    var message by mutableStateOf<String?>(null)
+    var message by mutableStateOf<UiText?>(null)
         private set
 
     /** About a challenge being sent, shown in the online lobby while waiting for the friend. */
-    var challengeStatus by mutableStateOf<String?>(null)
+    var challengeStatus by mutableStateOf<UiText?>(null)
         private set
 
     private var pendingChallenge: Pair<String, String>? = null
@@ -164,8 +167,8 @@ class SocialController(
     fun sendFriendRequest(typed: String) {
         val id = typed.uppercase().filter { it in PlayerId.ALPHABET }
         when {
-            !PlayerId.isValid(id) -> message = "A player id has ${PlayerId.ID_LENGTH} letters and digits."
-            id == identity().id -> message = "That's your own player id. Share it with your friends so they can add you."
+            !PlayerId.isValid(id) -> message = UiText.res(R.string.social_message_bad_id, PlayerId.ID_LENGTH)
+            id == identity().id -> message = UiText.res(R.string.social_message_own_id)
             else -> act {
                 client.requestFriend(identity(), id)
                 val now = client.friends(identity(), profile())
@@ -173,10 +176,10 @@ class SocialController(
                 val friend = now.friends.firstOrNull { it.id == id }
                 if (friend != null) {
                     Analytics.event("friend_add", mapOf("method" to "request_back"))
-                    message = "You're now friends with ${friend.name}."
+                    message = UiText.res(R.string.social_message_now_friends, friend.name)
                 } else {
                     Analytics.event("friend_request_sent")
-                    message = "Friend request sent to $id. You'll be friends once they accept."
+                    message = UiText.res(R.string.social_message_request_sent, id)
                 }
             }
         }
@@ -185,7 +188,7 @@ class SocialController(
     fun accept(card: PlayerCard) = act {
         client.acceptFriend(identity(), card.id)
         Analytics.event("friend_add", mapOf("method" to "accept"))
-        message = "You're now friends with ${card.name}."
+        message = UiText.res(R.string.social_message_now_friends, card.name)
         friends = client.friends(identity(), profile())
     }
 
@@ -198,14 +201,14 @@ class SocialController(
     fun remove(friend: FriendDto) = act {
         client.removeFriend(identity(), friend.id)
         Analytics.event("friend_remove")
-        message = "${friend.name} is no longer on your friends list."
+        message = UiText.res(R.string.social_message_removed, friend.name)
         friends = client.friends(identity(), profile())
     }
 
     /** The next battle room the player creates is sent to [friend] as a challenge. */
     fun prepareChallenge(friend: FriendDto) {
         pendingChallenge = friend.id to friend.name
-        challengeStatus = "Creating a room for ${friend.name}…"
+        challengeStatus = UiText.res(R.string.social_challenge_creating, friend.name)
     }
 
     /** A battle room was created: if it's for a challenge, invite the friend into it. */
@@ -219,9 +222,9 @@ class SocialController(
             challengeStatus = try {
                 client.challenge(identity(), to, code, mode)
                 Analytics.event("friend_challenge", mapOf("mode" to mode.name.lowercase()))
-                "Challenge sent to $name. They'll see it on their Friends screen for ${GameConfig.CHALLENGE_MINUTES} minutes."
+                UiText.plural(R.plurals.social_challenge_sent, GameConfig.CHALLENGE_MINUTES, name, GameConfig.CHALLENGE_MINUTES)
             } catch (e: SocialClient.SocialException) {
-                SocialText.problem(e.problem) + " The challenge wasn't sent: share the room code with your friend instead."
+                UiText.res(R.string.social_challenge_not_sent, SocialText.problem(e.problem))
             }
         }
     }
@@ -303,10 +306,10 @@ class SocialController(
     /** Gives a finished tournament's reward (once per phone) and tells the server. */
     fun claimReward(result: TournamentResult) {
         val before = progress()
-        val contents = result.tier.grants.joinToString(", ") { ShopText.seasonGrant(it, before) }
+        val contents = ShopText.seasonGrants(result.tier.grants, before)
         Tournaments.grant(before, result.week, result.tier, ShopClock.now())?.let {
             update(it)
-            message = "Tournament reward (${result.tier.displayName}): $contents."
+            message = UiText.res(R.string.social_message_tournament_reward, result.tier.labelText(), contents)
             Analytics.event("tournament_reward", mapOf("tier" to result.tier.name.lowercase()))
         }
         tournament = tournament?.let { t -> t.copy(rewards = t.rewards - result) }
@@ -333,7 +336,7 @@ class SocialController(
             club = mine
             rememberClub(mine.club)
             Analytics.event("join_group", mapOf("method" to "create"))
-            mine.club?.let { message = "Welcome to the ${it.name}! Share the code ${it.code} to invite anglers." }
+            mine.club?.let { message = UiText.res(R.string.social_message_club_created, it.name, it.code) }
         }
     }
 
@@ -341,7 +344,7 @@ class SocialController(
         if (!FeatureFlags.clubs) return
         val code = Clubs.normalizeCode(typed)
         if (!Clubs.isValidCode(code)) {
-            message = "A club code has ${Clubs.CODE_LENGTH} letters and digits."
+            message = UiText.res(R.string.social_message_bad_club_code, Clubs.CODE_LENGTH)
             return
         }
         act {
@@ -349,7 +352,7 @@ class SocialController(
             club = mine
             rememberClub(mine.club)
             Analytics.event("join_group", mapOf("method" to "code"))
-            mine.club?.let { message = "Welcome to the ${it.name}!" }
+            mine.club?.let { message = UiText.res(R.string.social_message_club_joined, it.name) }
         }
     }
 
@@ -360,19 +363,19 @@ class SocialController(
             club = MyClub(null)
             rememberClub(null)
             Analytics.event("club_leave")
-            message = "You left the club."
+            message = UiText.res(R.string.social_message_club_left)
         }
     }
 
-    fun kick(member: ClubMember) = clubAction("${member.name} was removed from the club.") { client.kick(identity(), member.id) }
+    fun kick(member: ClubMember) = clubAction(UiText.res(R.string.social_message_member_removed, member.name)) { client.kick(identity(), member.id) }
 
-    fun transfer(member: ClubMember) = clubAction("${member.name} now owns the club.") { client.transfer(identity(), member.id) }
+    fun transfer(member: ClubMember) = clubAction(UiText.res(R.string.social_message_owner_changed, member.name)) { client.transfer(identity(), member.id) }
 
-    fun renameClub(adjective: Int, noun: Int) = clubAction("The club is now the ${Clubs.name(adjective, noun)}.") {
+    fun renameClub(adjective: Int, noun: Int) = clubAction(UiText.res(R.string.social_message_club_renamed, Clubs.name(adjective, noun) ?: "")) {
         client.renameClub(identity(), adjective, noun)
     }
 
-    private fun clubAction(done: String, block: suspend () -> Unit) {
+    private fun clubAction(done: UiText, block: suspend () -> Unit) {
         if (!FeatureFlags.clubs) return
         act {
             block()
@@ -387,9 +390,9 @@ class SocialController(
         val c = club?.club ?: return
         val now = ShopClock.now()
         var p = progress()
-        val lines = ArrayList<String>()
+        val lines = ArrayList<UiText>()
         for (claim in c.claimable) {
-            val contents = Clubs.rewardOf(claim.tier).joinToString(", ") { ShopText.seasonGrant(it, p) }
+            val contents = ShopText.seasonGrants(Clubs.rewardOf(claim.tier), p)
             Clubs.grant(p, claim.week, claim.tier, now)?.let {
                 p = it
                 lines += contents
@@ -397,7 +400,7 @@ class SocialController(
         }
         if (lines.isNotEmpty()) {
             update(p)
-            message = "Club goal reward: ${lines.joinToString(", ")}."
+            message = UiText.res(R.string.social_message_club_reward, UiText.join(lines, ", "))
             Analytics.event("club_reward", mapOf("tiers" to lines.size))
         }
         club = MyClub(c.copy(claimable = emptyList()))
@@ -452,7 +455,7 @@ class SocialController(
         club = MyClub(null)
         store.putString(KEY_CLUB, "")
         Analytics.event("social_data_deleted")
-        message = "Your friends, rankings and club membership were deleted from the server."
+        message = UiText.res(R.string.social_message_forgotten)
     }
 
     fun close() = client.close()
@@ -468,32 +471,32 @@ class SocialController(
         private fun registerNames() {
             if (namesRegistered) return
             namesRegistered = true
-            ShopText.registerUnlockName { key -> if (key == com.deepline.fishing.core.TitleFrame.TOURNAMENT.unlockKey) "the Tournament title badge" else null }
+            ShopText.registerUnlockName { key -> if (key == com.deepline.fishing.core.TitleFrame.TOURNAMENT.unlockKey) UiText.res(R.string.shop_unlock_badge_tournament) else null }
         }
     }
 }
 
 /** What the social screens say when the server says no. Whole sentences. */
 object SocialText {
-    fun problem(p: SocialProblem?): String = when (p) {
-        null -> "Can't reach the server. Check your connection and try again."
-        SocialProblem.BAD_REQUEST -> "The server couldn't accept that."
-        SocialProblem.WRONG_SECRET -> "The server doesn't recognise this player. Restore your recovery code from the Shop's Account button."
-        SocialProblem.UNKNOWN_PLAYER -> "No angler has that player id yet."
-        SocialProblem.UNKNOWN_CLUB -> "No club has that code."
-        SocialProblem.CLUBS_OFF -> "Clubs aren't open on this server yet."
-        SocialProblem.NOT_FRIENDS -> "You can only challenge your friends."
-        SocialProblem.FRIENDS_FULL -> "Your friends list is full (${GameConfig.MAX_FRIENDS} friends). Remove someone first."
-        SocialProblem.THEIR_FRIENDS_FULL -> "That angler can't take more friend requests right now."
-        SocialProblem.ALREADY_IN_CLUB -> "You're already in a club. Leave it first."
-        SocialProblem.NOT_IN_CLUB -> "You're not in a club."
-        SocialProblem.NOT_OWNER -> "Only the club's owner can do that."
-        SocialProblem.CLUB_FULL -> "That club is full (${GameConfig.CLUB_MAX_MEMBERS} members)."
-        SocialProblem.REJOIN_LATER -> "You were removed from that club, so you can only rejoin it after ${GameConfig.CLUB_REJOIN_HOURS} hours."
-        SocialProblem.NO_ATTEMPTS_LEFT -> "You've used every attempt this week. A new tournament starts on Monday at 00:00 UTC."
-        SocialProblem.ATTEMPT_EXPIRED -> "That attempt took too long to come back, so it scored 0."
-        SocialProblem.CAST_REJECTED -> "The server couldn't accept that attempt, so it scored 0."
-        SocialProblem.TOO_BIG -> "That's too much for the server."
-        SocialProblem.TOO_MANY_REQUESTS -> "That's a lot at once. Please wait a little and try again."
+    fun problem(p: SocialProblem?): UiText = when (p) {
+        null -> UiText.res(R.string.social_problem_unreachable)
+        SocialProblem.BAD_REQUEST -> UiText.res(R.string.social_problem_bad_request)
+        SocialProblem.WRONG_SECRET -> UiText.res(R.string.social_problem_wrong_secret)
+        SocialProblem.UNKNOWN_PLAYER -> UiText.res(R.string.social_problem_unknown_player)
+        SocialProblem.UNKNOWN_CLUB -> UiText.res(R.string.social_problem_unknown_club)
+        SocialProblem.CLUBS_OFF -> UiText.res(R.string.social_problem_clubs_off)
+        SocialProblem.NOT_FRIENDS -> UiText.res(R.string.social_problem_not_friends)
+        SocialProblem.FRIENDS_FULL -> UiText.res(R.string.social_problem_friends_full, GameConfig.MAX_FRIENDS)
+        SocialProblem.THEIR_FRIENDS_FULL -> UiText.res(R.string.social_problem_their_friends_full)
+        SocialProblem.ALREADY_IN_CLUB -> UiText.res(R.string.social_problem_already_in_club)
+        SocialProblem.NOT_IN_CLUB -> UiText.res(R.string.social_problem_not_in_club)
+        SocialProblem.NOT_OWNER -> UiText.res(R.string.social_problem_not_owner)
+        SocialProblem.CLUB_FULL -> UiText.res(R.string.social_problem_club_full, GameConfig.CLUB_MAX_MEMBERS)
+        SocialProblem.REJOIN_LATER -> UiText.res(R.string.social_problem_rejoin_later, GameConfig.CLUB_REJOIN_HOURS)
+        SocialProblem.NO_ATTEMPTS_LEFT -> UiText.res(R.string.social_problem_no_attempts)
+        SocialProblem.ATTEMPT_EXPIRED -> UiText.res(R.string.social_problem_attempt_expired)
+        SocialProblem.CAST_REJECTED -> UiText.res(R.string.social_problem_cast_rejected)
+        SocialProblem.TOO_BIG -> UiText.res(R.string.social_problem_too_big)
+        SocialProblem.TOO_MANY_REQUESTS -> UiText.res(R.string.social_problem_too_many_requests)
     }
 }

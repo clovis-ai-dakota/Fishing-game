@@ -455,4 +455,34 @@
     </plurals>
     <!-- Deep Dive: the deepest catch. %1$s: meters, already formatted. -->
     <string name="core_score_deepest">deepest catch %1$s m</string>
+
+    <!-- Fishing secrets: hidden tricks, each named once the player has pulled it off (Dex >
+         Secrets, the discovery dialog, cast results). A title is only ever shown after its secret
+         was found, and never appears in the tour. Short, catchy names, like a sports move. -->
+    <string name="core_secret_last_bump">The last bump hooks what it hits</string>
+    <string name="core_secret_free_pass">Free pass</string>
+    <string name="core_secret_schooling">Schooling</string>
+    <string name="core_secret_surface_skim">Surface skim</string>
+    <string name="core_secret_zen_cast">Zen cast</string>
+    <string name="core_secret_pinball">Pinball</string>
+    <string name="core_secret_second_encounter">Second encounter</string>
+    <string name="core_secret_clean_drop">Clean drop</string>
+    <string name="core_secret_rock_bottom">Rock bottom</string>
+    <string name="core_secret_buzzer_beater">Buzzer beater</string>
+    <string name="core_secret_corner_pocket">Corner pocket</string>
+    <string name="core_secret_grand_tour">Grand tour</string>
+    <string name="core_secret_sparkle_snag">Sparkle snag</string>
+    <string name="core_secret_ladder">Ladder</string>
+    <string name="core_secret_perfect_load">Perfect load</string>
+    <string name="core_secret_moonlit_angler">Moonlit angler</string>
+    <string name="core_secret_shutout">Shutout</string>
+    <string name="core_secret_while_it_flees">While it flees</string>
+    <string name="core_secret_blind_drop">Blind drop</string>
+    <string name="core_secret_zone_sweep">Zone sweep</string>
+    <string name="core_secret_grand_slam">Grand slam</string>
+    <string name="core_secret_double_header">Double header</string>
+    <string name="core_secret_crowd_surfer">Crowd surfer</string>
+    <string name="core_secret_david_and_goliath">David and Goliath</string>
+    <string name="core_secret_perfect_cast">Perfect cast</string>
+    <string name="core_secret_master_angler">Master angler</string>
 </resources>

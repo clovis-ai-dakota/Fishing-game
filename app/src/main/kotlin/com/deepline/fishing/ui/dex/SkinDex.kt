@@ -1,5 +1,7 @@
 package com.deepline.fishing.ui.dex
 
+import com.deepline.fishing.ui.i18n.label
+import com.deepline.fishing.ui.i18n.skinSetLabel
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -129,7 +131,7 @@ fun SkinDex(vm: GameViewModel) {
             val open = items.any { it in unlocked }
             item(key = "set-$set", span = { GridItemSpan(maxLineSpan) }) {
                 Text(
-                    if (open) "$set set" else "Locked set",
+                    if (open) "${skinSetLabel(set)} set" else "Locked set",
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = if (open) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant,
@@ -187,7 +189,7 @@ private fun SkinTile(c: Cosmetic, unlocked: Boolean, equipped: Boolean, time: Fl
                 }
             }
             Text(
-                if (unlocked) c.displayName else c.slot.displayName,
+                if (unlocked) c.label() else c.slot.label(),
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
@@ -200,7 +202,7 @@ private fun SkinTile(c: Cosmetic, unlocked: Boolean, equipped: Boolean, time: Fl
                 when {
                     !unlocked -> "Locked"
                     equipped -> "Equipped ✓"
-                    else -> c.slot.displayName
+                    else -> c.slot.label()
                 },
                 style = MaterialTheme.typography.labelSmall,
                 color = if (equipped) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant,
@@ -268,13 +270,13 @@ private fun ShowOffCard(vm: GameViewModel) {
             TitleBadge(vm.title ?: vm.playerName, frame = vm.titleFrame)
             androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 for (f in com.deepline.fishing.core.TitleFrame.entries.filter { it.isAvailable(p, now) }) {
-                    androidx.compose.material3.FilterChip(selected = vm.titleFrame == f, onClick = { vm.setTitleFrame(f) }, label = { Text(f.displayName) })
+                    androidx.compose.material3.FilterChip(selected = vm.titleFrame == f, onClick = { vm.setTitleFrame(f) }, label = { Text(f.label()) })
                 }
             }
             Text("Dex cards", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 for (s in com.deepline.fishing.core.CardStyle.entries.filter { it.isAvailable(p) }) {
-                    androidx.compose.material3.FilterChip(selected = vm.cardStyle == s, onClick = { vm.setCardStyle(s) }, label = { Text(s.displayName) })
+                    androidx.compose.material3.FilterChip(selected = vm.cardStyle == s, onClick = { vm.setCardStyle(s) }, label = { Text(s.label()) })
                 }
             }
             TextButton(onClick = { vm.openShop(com.deepline.fishing.ShopPage.STYLE) }) { Text("More badges and card styles in the Shop") }
@@ -294,7 +296,7 @@ private fun AtmosphereCard(vm: GameViewModel) {
             }
             if (!p.atmosphereUnlocked) {
                 Text(
-                    "Reach the ${DepthZone.ABYSS.displayName} to unlock ${Atmosphere.NIGHTMARE.displayName}: a frightening " +
+                    "Reach the ${DepthZone.ABYSS.label()} to unlock ${Atmosphere.NIGHTMARE.label()}: a frightening " +
                         "look for the deep water.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -306,7 +308,7 @@ private fun AtmosphereCard(vm: GameViewModel) {
                             selected = p.atmosphere == a,
                             onClick = { vm.setAtmosphere(a) },
                             shape = SegmentedButtonDefaults.itemShape(i, Atmosphere.entries.size),
-                        ) { Text(a.displayName) }
+                        ) { Text(a.label()) }
                     }
                 }
                 Text(

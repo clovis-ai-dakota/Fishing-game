@@ -24,7 +24,7 @@ import kotlinx.coroutines.withContext
 class OnlineConnection(
     private val scope: CoroutineScope,
     private val onMessage: (ServerMessage) -> Unit,
-    private val onClosed: (String) -> Unit,
+    private val onClosed: (com.deepline.fishing.ui.i18n.UiText) -> Unit,
 ) {
     private val client = HttpClient(OkHttp) { install(WebSockets) }
     private val outbox = Channel<ClientMessage>(Channel.UNLIMITED)
@@ -60,7 +60,10 @@ class OnlineConnection(
             }
             if (!closedByUser) {
                 withContext(Dispatchers.Main.immediate) {
-                    onClosed(error?.let { "Could not reach the server ($it)." } ?: "Disconnected from the server.")
+                    onClosed(
+                        error?.let { com.deepline.fishing.ui.i18n.UiText.res(R.string.online_error_unreachable, it) }
+                            ?: com.deepline.fishing.ui.i18n.UiText.res(R.string.online_error_disconnected),
+                    )
                 }
             }
         }

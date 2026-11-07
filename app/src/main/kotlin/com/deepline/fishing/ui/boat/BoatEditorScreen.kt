@@ -1,5 +1,6 @@
 package com.deepline.fishing.ui.boat
 
+import com.deepline.fishing.ui.i18n.asString
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -129,7 +130,7 @@ fun BoatEditorScreen(vm: GameViewModel) {
 
     asked?.let { (part, next) ->
         val r = BoatParts.requirement(part)
-        val name = partName(part)
+        val name = partName(part).asString()
         if (r is PartRequirement.Points) {
             val affordable = vm.progress.pointsBalance >= r.cost
             AlertDialog(
@@ -156,7 +157,7 @@ fun BoatEditorScreen(vm: GameViewModel) {
             AlertDialog(
                 onDismissRequest = { asked = null },
                 title = { Text("$name is locked") },
-                text = { Text("${requirementText(r)} to unlock it.") },
+                text = { Text("${requirementText(r).asString()} to unlock it.") },
                 confirmButton = { TextButton(onClick = { asked = null }) { Text("OK") } },
             )
         }
@@ -224,10 +225,10 @@ private fun ChipRow(
                     onClick = { choose(part, next) },
                     label = {
                         Column(Modifier.padding(vertical = 4.dp)) {
-                            Text(partName(part))
+                            Text(partName(part).asString())
                             if (!unlocked) {
                                 Text(
-                                    requirementText(BoatParts.requirement(part)),
+                                    requirementText(BoatParts.requirement(part)).asString(),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )

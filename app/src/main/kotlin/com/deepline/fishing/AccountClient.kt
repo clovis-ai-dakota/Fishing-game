@@ -9,6 +9,7 @@ import com.deepline.fishing.core.online.GiftRequest
 import com.deepline.fishing.core.online.Inbox
 import com.deepline.fishing.core.online.SaveRequest
 import com.deepline.fishing.core.online.SaveResponse
+import com.deepline.fishing.ui.i18n.UiText
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
@@ -26,10 +27,14 @@ import kotlinx.serialization.json.Json
 /**
  * Gifts, cloud saves and account deletion on the battle server (see [AccountApi]). Every call
  * runs off the main thread and throws [AccountException] with a message for the player when it
- * fails.
+ * fails ([AccountException.text], in strings_shop.xml).
  */
 open class AccountClient(private val baseUrl: () -> String) {
-    class AccountException(message: String) : Exception(message)
+    /** A failed call. [text] is what the player is told; the exception message stays technical. */
+    class AccountException(val text: UiText, message: String) : Exception(message) {
+        /** A failure with text that is already final (tests, a server's own words). */
+        constructor(message: String) : this(UiText.raw(message), message)
+    }
 
     // Made on first use, so a player who never goes online never opens a connection pool.
     private val lazyClient = lazy {
@@ -51,7 +56,7 @@ open class AccountClient(private val baseUrl: () -> String) {
             }
             r.status to r.bodyAsText()
         } catch (e: Exception) {
-            throw AccountException("Can't reach the server. Check your connection and try again.")
+            throw AccountException(UiText.res(R.string.shop_account_unreachable), "unreachable")
         }
     }
 
@@ -59,12 +64,13 @@ open class AccountClient(private val baseUrl: () -> String) {
         if (status.isSuccess()) return
         throw AccountException(
             when (status) {
-                HttpStatusCode.Forbidden -> "That recovery code doesn't match this player."
-                HttpStatusCode.NotFound -> "Nothing is saved for this player yet."
-                HttpStatusCode.PayloadTooLarge -> "That's too much for the server."
-                HttpStatusCode.BadRequest -> "The server couldn't accept that."
-                else -> "The server had a problem (${status.value})."
+                HttpStatusCode.Forbidden -> UiText.res(R.string.shop_account_wrong_code)
+                HttpStatusCode.NotFound -> UiText.res(R.string.shop_account_nothing_saved)
+                HttpStatusCode.PayloadTooLarge -> UiText.res(R.string.shop_account_too_large)
+                HttpStatusCode.BadRequest -> UiText.res(R.string.shop_account_refused)
+                else -> UiText.res(R.string.shop_account_server_problem, status.value)
             },
+            "HTTP ${status.value}",
         )
     }
 

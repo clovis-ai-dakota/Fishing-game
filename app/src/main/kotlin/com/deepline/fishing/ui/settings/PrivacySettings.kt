@@ -10,8 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import com.deepline.fishing.BuildConfig
 import com.deepline.fishing.GameViewModel
+import com.deepline.fishing.R
+import com.deepline.fishing.ui.i18n.asString
 import com.deepline.fishing.ui.tour.TourTarget
 import com.deepline.fishing.ui.tour.tourTarget
 
@@ -25,46 +28,43 @@ fun PrivacySettingsSection(vm: GameViewModel) {
     val privacy = vm.privacy
     val choices = privacy.current
     val uriHandler = LocalUriHandler.current
-    SettingsSection("Privacy", modifier = Modifier.tourTarget(TourTarget.SETTINGS_PRIVACY).testTag("settings_privacy")) {
+    SettingsSection(stringResource(R.string.privacy_settings_title), modifier = Modifier.tourTarget(TourTarget.SETTINGS_PRIVACY).testTag("settings_privacy")) {
         Text(
-            "Usage statistics and crash reports go to Google Firebase, linked to a random ID (never your name), " +
-                "and only if you allow them. They're never used for ads.",
+            stringResource(R.string.privacy_settings_intro),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         SettingsSwitchRow(
-            title = "Usage statistics",
-            subtitle = "How the game is played: screens, casts, battles, purchases.",
+            title = stringResource(R.string.privacy_analytics_title),
+            subtitle = stringResource(R.string.privacy_analytics_subtitle),
             checked = choices.analytics,
             onCheckedChange = privacy::setAnalytics,
             tag = "privacy_analytics",
         )
         SettingsSwitchRow(
-            title = "Crash reports",
-            subtitle = "What went wrong when the game crashes or something fails.",
+            title = stringResource(R.string.privacy_crash_title),
+            subtitle = stringResource(R.string.privacy_crash_subtitle),
             checked = choices.crashReports,
             onCheckedChange = privacy::setCrashReports,
             tag = "privacy_crash_reports",
         )
         if (!privacy.telemetryAvailable) {
             Text(
-                "This version of the game doesn't send any statistics or crash reports. Your choices are kept for " +
-                    "versions that do.",
+                stringResource(R.string.privacy_settings_unavailable),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         } else if (choices.analytics) {
             OutlinedButton(onClick = privacy::resetAnalyticsData, modifier = Modifier.testTag("privacy_reset_analytics")) {
-                Text("Reset my statistics ID")
+                Text(stringResource(R.string.privacy_reset_id))
             }
         }
         TextButton(
             onClick = { runCatching { uriHandler.openUri(BuildConfig.PRIVACY_POLICY_URL) } },
             modifier = Modifier.testTag("privacy_policy"),
-        ) { Text("Read the privacy policy") }
+        ) { Text(stringResource(R.string.privacy_read_policy)) }
         Text(
-            "Your online account (player ID, cloud backup, gifts waiting) is kept on the game server. Deleting it " +
-                "erases all of that; the progress on this phone stays.",
+            stringResource(R.string.privacy_account_explainer),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -73,32 +73,25 @@ fun PrivacySettingsSection(vm: GameViewModel) {
             enabled = !privacy.deleting,
             colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
             modifier = Modifier.testTag("privacy_delete_account"),
-        ) { Text(if (privacy.deleting) "Deleting your account…" else "Delete my online account") }
+        ) { Text(stringResource(if (privacy.deleting) R.string.privacy_deleting else R.string.privacy_delete_account)) }
         privacy.message?.let { message ->
-            Text(message, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.testTag("privacy_message"))
+            Text(message.asString(), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.testTag("privacy_message"))
         }
     }
 
     if (privacy.confirmingDeletion) {
         AlertDialog(
             onDismissRequest = privacy::cancelDeletion,
-            title = { Text("Delete your online account?") },
-            text = {
-                Text(
-                    "This erases everything the game server keeps for you: your player ID, your cloud backup and gifts " +
-                        "waiting for you. Your recovery code stops working, and this can't be undone.\n\n" +
-                        "Your progress on this phone stays, and your purchases stay with your Google Play account. " +
-                        "A Captain's Club subscription isn't cancelled: manage it in Google Play.",
-                )
-            },
+            title = { Text(stringResource(R.string.privacy_delete_confirm_title)) },
+            text = { Text(stringResource(R.string.privacy_delete_confirm_body)) },
             confirmButton = {
                 TextButton(
                     onClick = vm::deleteOnlineAccount,
                     colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
                     modifier = Modifier.testTag("privacy_delete_confirm"),
-                ) { Text("Delete my account") }
+                ) { Text(stringResource(R.string.privacy_delete_confirm_yes)) }
             },
-            dismissButton = { TextButton(onClick = privacy::cancelDeletion) { Text("Keep it") } },
+            dismissButton = { TextButton(onClick = privacy::cancelDeletion) { Text(stringResource(R.string.privacy_delete_confirm_no)) } },
         )
     }
 }

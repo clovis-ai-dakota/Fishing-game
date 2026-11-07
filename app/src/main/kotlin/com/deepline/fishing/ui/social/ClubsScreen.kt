@@ -1,5 +1,7 @@
 package com.deepline.fishing.ui.social
 
+import com.deepline.fishing.ui.i18n.label
+import com.deepline.fishing.ui.i18n.asString
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -183,7 +185,7 @@ private fun MyClubCards(vm: GameViewModel, club: ClubDto) {
                     modifier = Modifier.weight(1f),
                 )
                 Text(
-                    Clubs.rewardOf(tier).joinToString(", ") { ShopText.seasonGrant(it, vm.progress) },
+                    ShopText.seasonGrants(Clubs.rewardOf(tier), vm.progress).asString(),
                     style = MaterialTheme.typography.bodySmall,
                     color = rewardTextColor(),
                     modifier = Modifier.weight(1.4f),
@@ -210,7 +212,7 @@ private fun MyClubCards(vm: GameViewModel, club: ClubDto) {
                 Column(Modifier.weight(1f)) {
                     PlayerName(m.name, m.title, m.titleFrame, you = m.id == me?.id)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Hint(m.role.displayName)
+                        Hint(m.role.label())
                         OnlineLabel(m.online)
                     }
                 }

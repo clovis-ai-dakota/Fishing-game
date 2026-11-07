@@ -16,10 +16,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.GameViewModel
+import com.deepline.fishing.R
 import com.deepline.fishing.feel.Cue
 import com.deepline.fishing.feel.FeelSettings
 import com.deepline.fishing.feel.GameFeel
@@ -37,23 +39,23 @@ fun SoundSettingsSection(vm: GameViewModel) {
     val feel = vm.feel
     val s = feel.settings
     fun change(next: (FeelSettings) -> FeelSettings) = feel.update(next(feel.settings))
-    SettingsSection("Sound and feel", Modifier.tourTarget(TourTarget.SETTINGS_SOUND)) {
+    SettingsSection(stringResource(R.string.settings_sound_title), Modifier.tourTarget(TourTarget.SETTINGS_SOUND)) {
         VolumeRow(
-            title = "Volume",
+            title = stringResource(R.string.settings_sound_volume),
             value = s.master,
             tag = "settings_master_volume",
             onChange = { v -> change { it.copy(master = v) } },
             onDone = { feel.commit(GameFeel.SETTING_MASTER) },
         )
         VolumeRow(
-            title = "Music",
+            title = stringResource(R.string.settings_sound_music),
             value = s.music,
             tag = "settings_music_volume",
             onChange = { v -> change { it.copy(music = v) } },
             onDone = { feel.commit(GameFeel.SETTING_MUSIC) },
         )
         VolumeRow(
-            title = "Sound effects",
+            title = stringResource(R.string.settings_sound_effects),
             value = s.sfx,
             tag = "settings_sfx_volume",
             onChange = { v -> change { it.copy(sfx = v) } },
@@ -64,7 +66,7 @@ fun SoundSettingsSection(vm: GameViewModel) {
             },
         )
         SettingsSwitchRow(
-            title = "Vibration",
+            title = stringResource(R.string.settings_sound_vibration),
             checked = s.haptics,
             onCheckedChange = { on ->
                 change { it.copy(haptics = on) }
@@ -72,14 +74,10 @@ fun SoundSettingsSection(vm: GameViewModel) {
                 feel.cue(Cue.UI_TOGGLE)
             },
             tag = "settings_haptics",
-            subtitle = if (feel.hapticsAvailable) {
-                "A light touch for bumps, catches and big wins."
-            } else {
-                "This phone can't vibrate."
-            },
+            subtitle = stringResource(if (feel.hapticsAvailable) R.string.settings_sound_vibration_on else R.string.settings_sound_vibration_none),
         )
         SettingsSwitchRow(
-            title = "Reduce motion",
+            title = stringResource(R.string.settings_sound_reduce_motion),
             checked = s.reduceMotion,
             onCheckedChange = { on ->
                 change { it.copy(reduceMotion = on) }
@@ -87,7 +85,7 @@ fun SoundSettingsSection(vm: GameViewModel) {
                 feel.cue(Cue.UI_TOGGLE)
             },
             tag = "settings_reduce_motion",
-            subtitle = "No screen shake, slow motion or flashes during casts.",
+            subtitle = stringResource(R.string.settings_sound_reduce_motion_body),
         )
     }
 }
@@ -110,7 +108,7 @@ private fun VolumeRow(title: String, value: Float, tag: String, onChange: (Float
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(title, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
             Text(
-                "${(value * 100f).roundToInt()}%",
+                stringResource(R.string.settings_sound_percent, (value * 100f).roundToInt()),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

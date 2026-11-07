@@ -11,7 +11,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import com.deepline.fishing.GameViewModel
+import com.deepline.fishing.R
+import com.deepline.fishing.ui.hourText
+import com.deepline.fishing.ui.i18n.asString
 import com.deepline.fishing.core.GameConfig
 import com.deepline.fishing.core.ReminderKind
 import com.deepline.fishing.ui.daily.rememberReminderOptIn
@@ -29,39 +34,39 @@ fun NotificationSettingsSection(vm: GameViewModel) {
     val r = daily.reminders
     val turnOn = rememberReminderOptIn(vm, "settings")
     val context = LocalContext.current
-    SettingsSection("Notifications", Modifier.tourTarget(TourTarget.SETTINGS_NOTIFICATIONS)) {
+    SettingsSection(stringResource(R.string.settings_notif_title), Modifier.tourTarget(TourTarget.SETTINGS_NOTIFICATIONS)) {
         SettingsSwitchRow(
-            title = "Reminders",
-            subtitle = "When your daily reward is ready, your streak is about to end or a migration starts. $reminderPromise",
+            title = stringResource(R.string.settings_notif_reminders),
+            subtitle = stringResource(R.string.settings_notif_reminders_body, reminderPromise.asString()),
             checked = r.enabled,
             onCheckedChange = { on -> if (on) turnOn() else daily.setEnabled(false, "settings") },
             tag = "notif_master",
         )
         if (r.enabled) {
             SettingsSwitchRow(
-                title = "Daily reward ready",
-                subtitle = "From ${"%02d:00".format(GameConfig.NOTIFY_DAILY_FROM_HOUR)}, if you haven't opened the game yet that day.",
+                title = stringResource(R.string.settings_notif_daily),
+                subtitle = stringResource(R.string.settings_notif_daily_body, hourText(GameConfig.NOTIFY_DAILY_FROM_HOUR).asString()),
                 checked = r.dailyReady,
                 onCheckedChange = { daily.setKind(ReminderKind.DAILY_READY, it) },
                 tag = "notif_daily",
             )
             SettingsSwitchRow(
-                title = "Streak at risk",
-                subtitle = "In the evening, when a streak of ${GameConfig.NOTIFY_STREAK_MIN_DAYS} days or more would end at midnight.",
+                title = stringResource(R.string.settings_notif_streak),
+                subtitle = pluralStringResource(R.plurals.settings_notif_streak_body, GameConfig.NOTIFY_STREAK_MIN_DAYS, GameConfig.NOTIFY_STREAK_MIN_DAYS),
                 checked = r.streakAtRisk,
                 onCheckedChange = { daily.setKind(ReminderKind.STREAK_AT_RISK, it) },
                 tag = "notif_streak",
             )
             SettingsSwitchRow(
-                title = "Migrations and events",
-                subtitle = "When a migration or a weekend event starts.",
+                title = stringResource(R.string.settings_notif_events),
+                subtitle = stringResource(R.string.settings_notif_events_body),
                 checked = r.events,
                 onCheckedChange = { daily.setKind(ReminderKind.EVENT_STARTING, it) },
                 tag = "notif_events",
             )
             if (daily.blockedByPhone) {
                 Text(
-                    "Notifications for Deep Line are turned off on this phone, so no reminder can arrive.",
+                    stringResource(R.string.settings_notif_blocked),
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -69,7 +74,7 @@ fun NotificationSettingsSection(vm: GameViewModel) {
                 OutlinedButton(
                     onClick = { context.startActivity(appNotificationSettings(context.packageName)) },
                     modifier = Modifier.testTag("notif_phone_settings"),
-                ) { Text("Open phone settings") }
+                ) { Text(stringResource(R.string.settings_notif_phone_settings)) }
             }
         }
     }

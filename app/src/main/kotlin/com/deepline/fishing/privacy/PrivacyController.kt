@@ -4,10 +4,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.deepline.fishing.AccountClient
+import com.deepline.fishing.R
 import com.deepline.fishing.analytics.GameAnalytics
 import com.deepline.fishing.analytics.Telemetry
 import com.deepline.fishing.core.KeyValueStore
 import com.deepline.fishing.core.PlayerId
+import com.deepline.fishing.ui.i18n.UiText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -61,7 +63,7 @@ class PrivacyController(store: KeyValueStore, private val scope: CoroutineScope)
     /** Clears the analytics data on this phone and starts a new random id. */
     fun resetAnalyticsData() {
         Telemetry.resetAnalyticsData()
-        message = "The statistics kept on this phone were cleared, and you have a new random ID."
+        message = UiText.res(R.string.privacy_message_reset)
     }
 
     // --- The online account -----------------------------------------------------------------
@@ -75,7 +77,7 @@ class PrivacyController(store: KeyValueStore, private val scope: CoroutineScope)
         private set
 
     /** What just happened (shown in the Privacy section), until dismissed. */
-    var message by mutableStateOf<String?>(null)
+    var message by mutableStateOf<UiText?>(null)
         private set
 
     fun askToDeleteAccount() {
@@ -105,11 +107,10 @@ class PrivacyController(store: KeyValueStore, private val scope: CoroutineScope)
             try {
                 accounts.deleteAccount(who)
                 onDeleted(PlayerId.random())
-                message = "Your online account was deleted. Your progress on this phone is still here, " +
-                    "and the game now uses a new player ID."
+                message = UiText.res(R.string.privacy_message_deleted)
             } catch (e: AccountClient.AccountException) {
                 GameAnalytics.problem("account_delete", e)
-                message = "Your account wasn't deleted: ${e.message}"
+                message = UiText.res(R.string.privacy_message_not_deleted, e.text)
             } finally {
                 deleting = false
             }

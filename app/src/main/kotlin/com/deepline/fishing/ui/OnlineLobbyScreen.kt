@@ -1,5 +1,8 @@
 package com.deepline.fishing.ui
 
+import com.deepline.fishing.ui.i18n.label
+import com.deepline.fishing.ui.i18n.asString
+import com.deepline.fishing.ui.i18n.rules
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -50,8 +53,8 @@ fun OnlineLobbyScreen(vm: GameViewModel) {
             item {
                 Card(Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(vm.onlineMode.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        Text(vm.onlineMode.summary, style = MaterialTheme.typography.bodySmall)
+                        Text(vm.onlineMode.label(), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Text(vm.onlineMode.rules(), style = MaterialTheme.typography.bodySmall)
                         Text(
                             "Tournament rope: level ${OnlineProtocol.TOURNAMENT_ROPE_LEVEL} in every stat, for both players.",
                             style = MaterialTheme.typography.bodySmall,
@@ -95,12 +98,12 @@ fun OnlineLobbyScreen(vm: GameViewModel) {
                                 Text("Waiting for your opponent to join…", style = MaterialTheme.typography.bodySmall)
                                 // A challenge to a friend: whether it reached them.
                                 vm.social.challengeStatus?.let {
-                                    Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.secondary, modifier = Modifier.testTag("challenge_status"))
+                                    Text(it.asString(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.secondary, modifier = Modifier.testTag("challenge_status"))
                                 }
                             } else {
                                 Text("Looking for an opponent…", style = MaterialTheme.typography.titleMedium)
                                 Text(
-                                    "You'll be paired with the next player who picks ${vm.onlineMode.title}.",
+                                    "You'll be paired with the next player who picks ${vm.onlineMode.label()}.",
                                     style = MaterialTheme.typography.bodySmall,
                                 )
                             }
@@ -154,7 +157,7 @@ fun OnlineLobbyScreen(vm: GameViewModel) {
                 }
                 Text(text, style = MaterialTheme.typography.bodySmall)
                 vm.onlineError?.let {
-                    Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
+                    Text(it.asString(), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
                 }
             }
 

@@ -50,7 +50,10 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.deepline.fishing.R
 import com.deepline.fishing.core.FishCatalog
+import com.deepline.fishing.ui.i18n.asString
 import com.deepline.fishing.ui.SparkleGold
 import com.deepline.fishing.ui.drawFish
 import com.deepline.fishing.ui.drawHook
@@ -172,20 +175,20 @@ private fun TourCard(session: TourSession, onNext: () -> Unit, onBack: () -> Uni
         Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    (if (session.whatsNew) "What's new · " else "") + "${session.index + 1} / ${session.steps.size}",
+                    stringResource(if (session.whatsNew) R.string.tour_counter_whats_new else R.string.tour_counter, session.index + 1, session.steps.size),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.weight(1f),
                 )
-                TextButton(onClick = onSkip) { Text("Skip tour") }
+                TextButton(onClick = onSkip) { Text(stringResource(R.string.tour_skip)) }
             }
-            Text(step.title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            Text(step.title.asString(), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
             step.art?.let { TourArtwork(it) }
-            Text(step.body, style = MaterialTheme.typography.bodyMedium)
+            Text(step.body.asString(), style = MaterialTheme.typography.bodyMedium)
             Row(verticalAlignment = Alignment.CenterVertically) {
-                if (!session.isFirst) TextButton(onClick = onBack) { Text("Back") }
+                if (!session.isFirst) TextButton(onClick = onBack) { Text(stringResource(R.string.tour_back)) }
                 Spacer(Modifier.weight(1f))
-                Button(onClick = onNext) { Text(if (session.isLast) "Finish" else "Next") }
+                Button(onClick = onNext) { Text(stringResource(if (session.isLast) R.string.tour_finish else R.string.tour_next)) }
             }
         }
     }

@@ -43,7 +43,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import com.deepline.fishing.GameViewModel
+import com.deepline.fishing.R
+import com.deepline.fishing.ui.i18n.asString
+import com.deepline.fishing.ui.i18n.label
+import com.deepline.fishing.ui.i18n.shortLabel
 import com.deepline.fishing.DexSection
 import com.deepline.fishing.ShopPage
 import com.deepline.fishing.Screen
@@ -67,7 +73,7 @@ fun HomeScreen(vm: GameViewModel) {
     var showRules by remember { mutableStateOf(false) }
 
     TabScreen(
-        title = "Deep Line",
+        title = stringResource(R.string.app_name),
         subtitle = {
             val t = vm.title
             val frame = vm.titleFrame
@@ -78,7 +84,7 @@ fun HomeScreen(vm: GameViewModel) {
                 TitleBadge(vm.playerName, Modifier.padding(top = 2.dp), frame = frame)
             } else {
                 Text(
-                    "Catch every fish in the deep",
+                    stringResource(R.string.home_tagline),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -88,18 +94,18 @@ fun HomeScreen(vm: GameViewModel) {
             PointsPill(p.pointsBalance, Modifier.tourTarget(TourTarget.HOME_POINTS))
             val claimable = Progression.claimableCount(p)
             BadgedBox(
-                badge = { if (claimable > 0) Badge { Text("$claimable") } },
+                badge = { if (claimable > 0) Badge { Text(formatPoints(claimable)) } },
                 modifier = Modifier.tourTarget(TourTarget.HOME_MILESTONES),
             ) {
                 IconButton(onClick = { vm.navigate(Screen.MILESTONES) }) {
-                    Icon(GameIcons.Trophy, contentDescription = "Milestones", tint = MaterialTheme.colorScheme.secondary)
+                    Icon(GameIcons.Trophy, contentDescription = stringResource(R.string.home_cd_milestones), tint = MaterialTheme.colorScheme.secondary)
                 }
             }
             IconButton(onClick = vm::openThemes, modifier = Modifier.tourTarget(TourTarget.HOME_THEMES)) {
-                Icon(GameIcons.Palette, contentDescription = "Themes", tint = MaterialTheme.colorScheme.primary)
+                Icon(GameIcons.Palette, contentDescription = stringResource(R.string.home_cd_themes), tint = MaterialTheme.colorScheme.primary)
             }
             IconButton(onClick = vm::openSettings, modifier = Modifier.tourTarget(TourTarget.HOME_SETTINGS)) {
-                Icon(GameIcons.Settings, contentDescription = "Settings")
+                Icon(GameIcons.Settings, contentDescription = stringResource(R.string.home_cd_settings))
             }
         },
     ) {
@@ -117,7 +123,7 @@ fun HomeScreen(vm: GameViewModel) {
                 height = 190.dp,
                 modifier = Modifier.tourTarget(TourTarget.HOME_BOAT),
                 onClick = { vm.openDex(DexSection.SKINS) },
-                clickLabel = "Customise your boat",
+                clickLabel = stringResource(R.string.home_boat_action),
             )
             // The daily loop: a migration under way, then the daily reward and challenges.
             com.deepline.fishing.ui.daily.MigrationBanner(vm)
@@ -126,7 +132,7 @@ fun HomeScreen(vm: GameViewModel) {
             DexProgressCard(vm)
             MilestoneStrip(vm)
             TextButton(onClick = { showRules = true }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                Text("How to fish")
+                Text(stringResource(R.string.home_rules_title))
             }
         }
         CastArea(vm)
@@ -135,9 +141,9 @@ fun HomeScreen(vm: GameViewModel) {
     if (showRules) {
         AlertDialog(
             onDismissRequest = { showRules = false },
-            title = { Text("How to fish") },
+            title = { Text(stringResource(R.string.home_rules_title)) },
             text = { Text(rulesText(), style = MaterialTheme.typography.bodyMedium) },
-            confirmButton = { TextButton(onClick = { showRules = false }) { Text("Got it") } },
+            confirmButton = { TextButton(onClick = { showRules = false }) { Text(stringResource(R.string.common_got_it)) } },
         )
     }
 }
@@ -167,9 +173,9 @@ private fun DepthCard(vm: GameViewModel) {
     Card(onClick = { vm.openShop(ShopPage.ROPE) }, modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Your rope", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                Text(stringResource(R.string.home_rope_title), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
                 Text(
-                    "Reaches ${specs.lengthM.roundToInt()} m · ${reachZone.displayName}",
+                    stringResource(R.string.home_rope_reach, metersText(specs.lengthM).asString(), reachZone.label()),
                     style = MaterialTheme.typography.labelLarge,
                     color = com.deepline.fishing.ui.dex.zoneTextColor(reachZone),
                     fontWeight = FontWeight.Bold,
@@ -210,7 +216,7 @@ private fun DepthCard(vm: GameViewModel) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 for (stat in RopeStat.entries) {
                     Column(Modifier.weight(1f)) {
-                        Text(stat.displayName.removePrefix("Rope "), style = MaterialTheme.typography.labelSmall)
+                        Text(stat.shortLabel(), style = MaterialTheme.typography.labelSmall)
                         Text(
                             formatStat(stat, stat.valueAt(p.level(stat))),
                             style = MaterialTheme.typography.titleSmall,
@@ -220,8 +226,11 @@ private fun DepthCard(vm: GameViewModel) {
                 }
             }
             Text(
-                "Casts: ${p.castsMade} · Earned in total: ${formatPoints(p.pointsEarned)} pts" +
-                    if (deepest > 0f) " · Deepest catch ${deepest.roundToInt()} m" else "",
+                if (deepest > 0f) {
+                    stringResource(R.string.home_rope_stats_deepest, formatPoints(p.castsMade), formatPoints(p.pointsEarned), metersText(deepest).asString())
+                } else {
+                    stringResource(R.string.home_rope_stats, formatPoints(p.castsMade), formatPoints(p.pointsEarned))
+                },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -238,20 +247,21 @@ private fun DexProgressCard(vm: GameViewModel) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(GameIcons.Dex, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
-                Text("Dex", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                Text(stringResource(R.string.home_dex_title), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
                 Text(
-                    "Caught ${p.discoveredCount} / $total",
+                    stringResource(R.string.home_dex_caught, p.discoveredCount, total),
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.Bold,
                 )
             }
             LinearProgressIndicator(progress = { p.discoveredCount.toFloat() / total }, modifier = Modifier.fillMaxWidth())
+            val zones = DepthZone.entries.map { zone ->
+                val species = FishCatalog.all.filter { it.zone == zone }
+                stringResource(R.string.home_dex_zone, zone.shortLabel(), species.count(p::isDiscovered), species.size)
+            }
             Text(
-                "Seen ${p.seenCount} · " + DepthZone.entries.joinToString("  ·  ") { zone ->
-                    val species = FishCatalog.all.filter { it.zone == zone }
-                    "${zone.displayName.substringAfterLast(' ')} ${species.count(p::isDiscovered)}/${species.size}"
-                },
+                stringResource(R.string.home_dex_seen, p.seenCount) + " · " + zones.joinToString("  ·  "),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -268,10 +278,10 @@ private fun MilestoneStrip(vm: GameViewModel) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(GameIcons.Trophy, contentDescription = null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.secondary)
                 Spacer(Modifier.width(8.dp))
-                Text("Milestones", style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
+                Text(stringResource(R.string.home_milestones_title), style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
                 val claimable = Progression.claimableCount(p)
                 if (claimable > 0) {
-                    Text("$claimable to claim!", color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Bold)
+                    Text(pluralStringResource(R.plurals.home_milestones_to_claim, claimable, claimable), color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Bold)
                 }
             }
             if (next != null) {
@@ -280,11 +290,11 @@ private fun MilestoneStrip(vm: GameViewModel) {
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Text(
-                    "${formatPoints(p.pointsEarned)} / ${formatPoints(next.threshold)} · next: ${milestoneRewardText(next)}",
+                    stringResource(R.string.home_milestones_next, formatPoints(p.pointsEarned), formatPoints(next.threshold), milestoneRewardText(next).asString()),
                     style = MaterialTheme.typography.bodySmall,
                 )
             } else {
-                Text("All milestones reached!", style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.home_milestones_done), style = MaterialTheme.typography.bodySmall)
             }
         }
     }
@@ -308,9 +318,9 @@ private fun CastArea(vm: GameViewModel) {
                 )
                 Spacer(Modifier.width(10.dp))
                 Column(Modifier.weight(1f)) {
-                    Text("Lanterns: ${p.lanterns}", style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(R.string.home_lanterns, p.lanterns), style = MaterialTheme.typography.titleSmall)
                     Text(
-                        "Light up the dark below ${GameConfig.DARK_DEPTH.roundToInt()} m on the next cast.",
+                        stringResource(R.string.home_lanterns_hint, GameConfig.DARK_DEPTH.roundToInt()),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -328,21 +338,21 @@ private fun CastArea(vm: GameViewModel) {
                         FilterChip(
                             selected = vm.useDetector,
                             onClick = { vm.toggleDetector(!vm.useDetector) },
-                            label = { Text("Detector ×${p.detectors}") },
+                            label = { Text(stringResource(R.string.home_tackle_detector, p.detectors)) },
                         )
                     }
                     if (p.luckyCharms > 0) {
                         FilterChip(
                             selected = vm.useCharm,
                             onClick = { vm.toggleCharm(!vm.useCharm) },
-                            label = { Text("Lucky charm ×${p.luckyCharms}") },
+                            label = { Text(stringResource(R.string.home_tackle_charm, p.luckyCharms)) },
                         )
                     }
                     if (p.sparkleLures > 0) {
                         FilterChip(
                             selected = vm.useLure,
                             onClick = { vm.toggleLure(!vm.useLure) },
-                            label = { Text("Sparkle lure ×${p.sparkleLures}") },
+                            label = { Text(stringResource(R.string.home_tackle_lure, p.sparkleLures)) },
                         )
                     }
                 }
@@ -358,19 +368,17 @@ private fun CastArea(vm: GameViewModel) {
             ) {
                 Icon(GameIcons.Fish, contentDescription = null)
                 Spacer(Modifier.width(10.dp))
-                Text("Cast line", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.home_cast_button), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
             }
         }
     }
 }
 
-private fun rulesText(): String =
-    "• Drag left and right to steer the hook.\n" +
-        "• Going down: the hook sinks until it has bumped ${GameConfig.DESCENT_TOUCH_LIMIT} times " +
-        "or runs out of rope. A bump is touching a fish's head, or a rock, driftwood or jelly; " +
-        "brushing a fish's body or tail is free. The first ${GameConfig.BUMP_FREE_DEPTH.toInt()} m are bump-free.\n" +
-        "• Coming up: nudge a fish on its head (the pale face by the eye) to hook it. " +
-        "Touching the tail does nothing. The rope can only carry so much weight.\n" +
-        "• Deeper catches are worth more points. Sparkling fish are worth " +
-        "${GameConfig.SPARKLING_MULTIPLIER}× more.\n" +
-        "• Below ${GameConfig.DARK_DEPTH.roundToInt()} m it gets dark. A lantern lights up more of the water."
+@Composable
+private fun rulesText(): String = stringResource(
+    R.string.home_rules_body,
+    GameConfig.DESCENT_TOUCH_LIMIT,
+    GameConfig.BUMP_FREE_DEPTH.toInt(),
+    GameConfig.SPARKLING_MULTIPLIER,
+    GameConfig.DARK_DEPTH.roundToInt(),
+)

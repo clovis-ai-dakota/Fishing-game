@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The boat editor (Dex > Skins > Customise boat): how a locked option unlocks (BoatText.kt).
+    Option names (colours, patterns, sails, flags, emblems) are in strings_core.xml. The editor
+    screen's own text goes here too, under boat_editor_<purpose>. Keys start with boat_.
+-->
+<resources>
+    <!-- How a locked boat option unlocks: short labels under the option, also used in
+         "<label> to unlock it." -->
+    <string name="boat_requirement_free">Free</string>
+    <plurals name="boat_requirement_species">
+        <!-- Unlocked once this many species are caught. -->
+        <item quantity="one">Catch %d species</item>
+        <item quantity="other">Catch %d species</item>
+    </plurals>
+    <!-- Unlocked by catching a fish in a depth zone. %1$s: the zone's name, e.g. Midnight Trench. -->
+    <string name="boat_requirement_zone">Catch a fish in the %1$s</string>
+    <plurals name="boat_requirement_milestones">
+        <!-- Unlocked once this many milestones are claimed. -->
+        <item quantity="one">Claim %d milestone</item>
+        <item quantity="other">Claim %d milestones</item>
+    </plurals>
+    <!-- Sold in the Shop. -->
+    <string name="boat_requirement_shop">In the shop</string>
+</resources>

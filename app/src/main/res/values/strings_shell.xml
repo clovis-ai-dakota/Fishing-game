@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The app shell: the bottom tabs, the pages of the Shop and sections of the Dex (MainTab,
+    ShopPage, DexSection in GameViewModel.kt), and the dialogs AppRoot shows over every screen.
+    Keys start with shell_.
+-->
+<resources>
+    <!-- Bottom navigation tabs: one short word each (they sit side by side under icons; ~10
+         characters at most). Fish is where you cast your line. -->
+    <string name="shell_tab_fish">Fish</string>
+    <!-- The collection of every species (a game term: see the glossary). -->
+    <string name="shell_tab_dex">Dex</string>
+    <string name="shell_tab_shop">Shop</string>
+    <string name="shell_tab_battle">Battle</string>
+
+    <!-- Pages of the Shop tab (chips in a row). -->
+    <string name="shell_shop_page_rope">Rope</string>
+    <string name="shell_shop_page_tackle">Tackle</string>
+    <string name="shell_shop_page_style">Style</string>
+    <string name="shell_shop_page_passes">Passes</string>
+    <string name="shell_shop_page_aquarium">Aquarium</string>
+
+    <!-- Sections of the Dex tab (chips in a row). Secrets only appears once one is found. -->
+    <string name="shell_dex_section_species">Species</string>
+    <string name="shell_dex_section_secrets">Secrets</string>
+    <string name="shell_dex_section_skins">Skins</string>
+
+    <!-- Asked when the guided tour closes. -->
+    <string name="shell_tour_again_title">Show the tour next time?</string>
+    <string name="shell_tour_again_body">Should the tour open again the next time you start Deep Line? You can also take it any time from Settings, with the gear at the top of the Fish tab.</string>
+    <string name="shell_tour_again_yes">Yes, next time</string>
+
+    <!-- Debug builds only: a fake payment sheet for testing purchases (no real money). -->
+    <string name="shell_test_store_title">Test store</string>
+    <!-- %1$s: the price (e.g. €0.99); %2$s: the item's name. -->
+    <string name="shell_test_store_body">Pay %1$s for %2$s? This is a test build: no real money is charged. Choose how the payment goes.</string>
+    <string name="shell_test_store_pending">Pending</string>
+    <string name="shell_test_store_fail">Fail</string>
+    <string name="shell_test_store_approve">Approve</string>
+</resources>

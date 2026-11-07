@@ -37,11 +37,25 @@
         <item quantity="one">%d day</item>
         <item quantity="other">%d days</item>
     </plurals>
+    <plurals name="common_hours">
+        <item quantity="one">%d hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
+    <plurals name="common_weeks">
+        <item quantity="one">%d week</item>
+        <item quantity="other">%d weeks</item>
+    </plurals>
     <plurals name="common_lanterns">
         <!-- A count of Lanterns (the game's light for dark water; see the glossary). -->
         <item quantity="one">%d Lantern</item>
         <item quantity="other">%d Lanterns</item>
     </plurals>
+    <!-- Short durations (time left, fishing time): abbreviated units, numbers as digits.
+         d = days, h = hours, min = minutes. -->
+    <string name="common_duration_minutes">%1$d min</string>
+    <string name="common_duration_hours">%1$d h</string>
+    <string name="common_duration_hours_minutes">%1$d h %2$d min</string>
+    <string name="common_duration_days_hours">%1$d d %2$d h</string>
     <!-- Compact numbers for small chips: thousands and millions ("5k", "1.5M"). %1$s: the number of
          thousands or millions, formatted with at most one decimal. -->
     <string name="common_compact_thousands">%1$sk</string>

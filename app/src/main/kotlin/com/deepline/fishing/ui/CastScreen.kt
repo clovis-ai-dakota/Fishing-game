@@ -1,5 +1,8 @@
 package com.deepline.fishing.ui
 
+import com.deepline.fishing.ui.i18n.asString
+import com.deepline.fishing.ui.i18n.secretTitle
+import com.deepline.fishing.ui.i18n.label
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -391,7 +394,7 @@ private fun CastHud(
             else -> null
         }
         val activeNotice = notice?.takeIf { hud.elapsedSeconds - it.shownAtSeconds < 1.8f }
-        val message = activeNotice?.text ?: hint
+        val message = activeNotice?.text?.asString() ?: hint
         if (message != null) {
             Text(
                 text = message,
@@ -451,7 +454,7 @@ private fun ResultsPanel(result: CastResult, collectLabel: String, onCollect: ()
                                 }
                                 Spacer(Modifier.width(10.dp))
                                 Column(Modifier.weight(1f)) {
-                                    Text(sn.kind.displayName, color = com.deepline.fishing.ui.rewardTextColor(), fontWeight = FontWeight.SemiBold)
+                                    Text(sn.kind.label(), color = com.deepline.fishing.ui.rewardTextColor(), fontWeight = FontWeight.SemiBold)
                                     Text(
                                         "${sn.depth.roundToInt()} m · hooked by the last bump",
                                         style = MaterialTheme.typography.bodySmall,
@@ -475,7 +478,7 @@ private fun ResultsPanel(result: CastResult, collectLabel: String, onCollect: ()
                                 Spacer(Modifier.width(10.dp))
                                 Column(Modifier.weight(1f)) {
                                     Text(
-                                        (if (c.sparkling) "✦ Sparkling " else "") + c.species.name,
+                                        (if (c.sparkling) "✦ Sparkling " else "") + c.species.label(),
                                         color = if (c.sparkling) rewardTextColor() else MaterialTheme.colorScheme.onSurface,
                                         fontWeight = FontWeight.SemiBold,
                                     )
@@ -493,7 +496,7 @@ private fun ResultsPanel(result: CastResult, collectLabel: String, onCollect: ()
                 for (b in result.secretBonuses) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            "✦ Secret: " + (FishingSecrets.byId(b.secretId)?.title ?: b.secretId),
+                            "✦ Secret: " + secretTitle(b.secretId),
                             color = com.deepline.fishing.ui.rewardTextColor(),
                             fontWeight = FontWeight.SemiBold,
                             modifier = Modifier.weight(1f),

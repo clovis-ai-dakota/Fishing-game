@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    1v1 battles and online play: player names given by the game (GameViewModel) and online errors.
+    Keys start with battle_ (battle setup and battle screens) or online_ (the online lobby).
+    Names that players type are never translated.
+-->
+<resources>
+    <!-- The player's own name in a battle against the computer. -->
+    <string name="battle_player_you">You</string>
+    <!-- The computer opponent. %1$s: its difficulty (Easy, Normal or Hard). -->
+    <string name="battle_player_rival">Rival (%1$s)</string>
+    <!-- Two players sharing one phone (pass and play). -->
+    <string name="battle_player_one">Player 1</string>
+    <string name="battle_player_two">Player 2</string>
+
+    <!-- Online: a room code typed with the wrong length. %1$d: the code's length. -->
+    <string name="online_error_code_length">Room codes have %1$d characters.</string>
+    <!-- The connection to the battle server failed. %1$s: the technical reason (stays in English). -->
+    <string name="online_error_unreachable">Could not reach the server (%1$s).</string>
+    <string name="online_error_disconnected">Disconnected from the server.</string>
+</resources>

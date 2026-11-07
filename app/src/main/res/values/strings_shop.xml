@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The Shop: messages after a purchase, a gift or a cloud save (GameViewModel), what an item
+    gives (ShopText), account errors (AccountClient). Keys start with shop_. Item names and
+    descriptions are in strings_core.xml (core_shop_item_*). The Shop screens' own text goes here
+    too, under shop_<screen>_<purpose>.
+-->
+<resources>
+    <!-- What an item gives (ShopText): short noun phrases, joined with commas into a list, and
+         used after a colon ("Lantern pouch: 24 Lanterns"). -->
+    <plurals name="shop_grant_detectors">
+        <!-- A count of rare fish detectors (tackle that marks uncaught species). -->
+        <item quantity="one">%d rare fish detector</item>
+        <item quantity="other">%d rare fish detectors</item>
+    </plurals>
+    <plurals name="shop_grant_lucky_charms">
+        <item quantity="one">%d Lucky charm</item>
+        <item quantity="other">%d Lucky charms</item>
+    </plurals>
+    <plurals name="shop_grant_sparkle_lures">
+        <item quantity="one">%d Sparkle lure</item>
+        <item quantity="other">%d Sparkle lures</item>
+    </plurals>
+    <plurals name="shop_grant_club_days">
+        <!-- Membership time in the Captain's Club (the monthly pass). -->
+        <item quantity="one">%d day of Captain\'s Club</item>
+        <item quantity="other">%d days of Captain\'s Club</item>
+    </plurals>
+    <!-- A premade boat whose name is unknown. -->
+    <string name="shop_grant_a_boat">a boat</string>
+    <!-- A title (text shown under the player's name). %1$s: the title, e.g. Founder. -->
+    <string name="shop_grant_title">the %1$s title</string>
+    <!-- The season's boat, a season reward. %1$s: the boat's name, e.g. Tidecaller. -->
+    <string name="shop_grant_season_boat">the %1$s boat</string>
+    <!-- Boat options (boat editor): a paint for the hull, an emblem, a print on the sail. %1$s: its name. -->
+    <string name="shop_grant_paint">%1$s paint</string>
+    <string name="shop_grant_emblem">%1$s emblem</string>
+    <string name="shop_grant_sail_print">%1$s sail print</string>
+    <!-- What the passes give, after "Season pass:" etc. -->
+    <string name="shop_grant_season_pass">this season\'s premium track: a season badge, the season boat at tier 10 and lots of tackle</string>
+    <!-- %1$d: tiers skipped. -->
+    <string name="shop_grant_collector_edition">the season pass, %1$d tiers straight away, the season boat now and a collector\'s badge</string>
+    <string name="shop_grant_event_pass">double progress in this weekend\'s event, and a bigger reward with an event badge</string>
+    <!-- Title badge frames and other unlocks given by items and rewards. -->
+    <string name="shop_unlock_badge_rainbow">a rainbow title badge</string>
+    <string name="shop_unlock_badge_club_forever">a Club badge that never expires</string>
+    <string name="shop_unlock_badge_season">a season badge</string>
+    <string name="shop_unlock_badge_collector">a collector\'s badge</string>
+    <string name="shop_unlock_badge_event">an event badge</string>
+    <string name="shop_unlock_badge_tournament">the Tournament title badge</string>
+    <!-- Any other title badge frame. %1$s: the frame's name, e.g. Ocean. -->
+    <string name="shop_unlock_badge_frame">the %1$s title badge</string>
+
+    <!-- Messages after buying, shown in a bar at the bottom of the screen. -->
+    <!-- Bought with money. %1$s: the item; %2$s: what it gives. -->
+    <string name="shop_message_thanks">Thank you! %1$s: %2$s.</string>
+    <!-- Bought with points, or a monthly gift. %1$s: the item (or "Captain's Club"); %2$s: what it gives. -->
+    <string name="shop_message_got">%1$s: %2$s.</string>
+    <string name="shop_message_cancelled">Purchase cancelled: nothing was charged.</string>
+    <!-- %1$s: the item. -->
+    <string name="shop_message_pending">%1$s is waiting for the payment to clear. It\'ll arrive as soon as it does.</string>
+    <string name="shop_message_pending_unknown">Your purchase is waiting for the payment to clear. It\'ll arrive as soon as it does.</string>
+    <string name="shop_message_failed">The payment didn\'t go through.</string>
+    <!-- %1$s: the store's own explanation (may stay in English). -->
+    <string name="shop_message_failed_because">The payment didn\'t go through: %1$s</string>
+    <!-- %1$s: the store's name (Google Play). -->
+    <string name="shop_message_store_unavailable">%1$s isn\'t available right now.</string>
+    <!-- %1$s: the store's name (Google Play). -->
+    <string name="shop_message_restoring">Checking %1$s for your purchases…</string>
+    <!-- The Captain's Club's free monthly Lanterns. %1$s: what it gives. -->
+    <string name="shop_message_club_pouch">Captain\'s Club: %1$s.</string>
+    <!-- %1$s: the rewards, as a list. -->
+    <string name="shop_message_season_rewards">Season rewards: %1$s.</string>
+    <string name="shop_message_event_claimed">Weekend event reward claimed!</string>
+
+    <!-- Gifts to and from online opponents. -->
+    <!-- %1$s: the item; %2$s: the friend's name (as they typed it). -->
+    <string name="shop_gift_sent">%1$s sent to %2$s!</string>
+    <!-- After an error message: the gift couldn't be sent and was paid with points. -->
+    <string name="shop_gift_refunded">%1$s Your points were given back.</string>
+    <!-- After an error message: the gift couldn't be sent and was paid with money. %2$s: the item. -->
+    <string name="shop_gift_kept">%1$s The %2$s is yours instead.</string>
+    <!-- %1$s: who sent it (a player's name); %2$s: the item; %3$s: what it gives. -->
+    <string name="shop_gift_received">%1$s sent you %2$s: %3$s.</string>
+    <!-- %1$s: who sent it; %2$s: the item; %3$s: points given instead, already formatted. -->
+    <string name="shop_gift_received_owned">%1$s sent you %2$s. You had it already, so here are %3$s pts instead.</string>
+    <!-- Who a gift is from when the player bought it for themselves. -->
+    <string name="shop_gift_from_you">You</string>
+
+    <!-- Cloud save (a Captain's Club perk) and restoring progress with a recovery code. -->
+    <string name="shop_cloud_club_only">Cloud save is a Captain\'s Club perk.</string>
+    <string name="shop_cloud_backed_up">Your progress is backed up.</string>
+    <!-- "DL-" is the start of every recovery code: keep it as is. -->
+    <string name="shop_cloud_bad_code">That isn\'t a recovery code: it starts with DL- and has 24 letters and digits.</string>
+    <string name="shop_cloud_restored">Progress restored.</string>
+
+    <!-- Errors talking to the game server (gifts, cloud save, account). Full sentences. -->
+    <string name="shop_account_unreachable">Can\'t reach the server. Check your connection and try again.</string>
+    <string name="shop_account_wrong_code">That recovery code doesn\'t match this player.</string>
+    <string name="shop_account_nothing_saved">Nothing is saved for this player yet.</string>
+    <string name="shop_account_too_large">That\'s too much for the server.</string>
+    <string name="shop_account_refused">The server couldn\'t accept that.</string>
+    <!-- %1$d: the HTTP status code. -->
+    <string name="shop_account_server_problem">The server had a problem (%1$d).</string>
+</resources>

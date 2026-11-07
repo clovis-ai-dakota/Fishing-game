@@ -28,6 +28,10 @@ fun formatDecimal(value: Double, maxDecimals: Int = 1): String =
         minimumFractionDigits = 0
     }.format(value)
 
+/** A euro price in the language's style ("€0.99", "0,99 €"). Store prices from Google Play come formatted already. */
+fun formatEuros(cents: Int): String =
+    NumberFormat.getCurrencyInstance().apply { currency = java.util.Currency.getInstance("EUR") }.format(cents / 100.0)
+
 /** "1,250 pts": a points amount with its unit. */
 fun pointsText(value: Long): UiText = UiText.res(R.string.common_points, UiText.number(value))
 

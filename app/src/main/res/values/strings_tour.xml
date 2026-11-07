@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The guided tour (ui/tour/Tour.kt, SocialTour.kt, TourOverlay.kt): a card per step over the
+    screen it explains, with a title (a few words) and a body (2 to 4 sentences). Keys:
+    tour_<step id>_title and tour_<step id>_body. Numbers come from the game's settings as
+    arguments: never write them out. Names of screens, buttons, tackle, zones and modes must match
+    their labels elsewhere in the app (see the glossary in docs/localization.md), since the step
+    points at them.
+
+    Never hint at a fishing secret here (TourContentTest checks the English text): secrets are
+    found by playing. The Skins step may say that rare secrets unlock skins, nothing more.
+-->
+<resources>
+    <!-- The card's controls. -->
+    <!-- Step counter. %1$d: this step; %2$d: number of steps. -->
+    <string name="tour_counter">%1$d / %2$d</string>
+    <!-- Step counter in a short tour of only the steps added since the player's last tour. -->
+    <string name="tour_counter_whats_new">What\'s new · %1$d / %2$d</string>
+    <string name="tour_skip">Skip tour</string>
+    <string name="tour_back">Back</string>
+    <string name="tour_next">Next</string>
+    <string name="tour_finish">Finish</string>
+
+    <string name="tour_welcome_title">Welcome to Deep Line!</string>
+    <!-- "Next" and "Skip tour" are the card's buttons (tour_next, tour_skip). -->
+    <string name="tour_welcome_body">Catch every fish in the deep. This short tour shows how to play and what everything does. Tap Next, or Skip tour if you already know your way around.</string>
+
+    <string name="tour_tabs_title">Four tabs</string>
+    <!-- Fish, Dex, Shop and Battle are the tabs' names (shell_tab_*). -->
+    <string name="tour_tabs_body">The bar at the bottom takes you everywhere: Fish is where you cast, the Dex collects every species you meet, the Shop has rope upgrades, tackle and looks for your boat, and Battle is for 1v1 matches.</string>
+
+    <string name="tour_cast_title">Cast your line</string>
+    <!-- "Cast line" is the button's label (home_cast_button). -->
+    <string name="tour_cast_body">The big Cast line button at the bottom of the Fish tab drops your hook from the boat.</string>
+
+    <string name="tour_steer_title">Steer the hook</string>
+    <string name="tour_steer_body">During a cast, drag left and right anywhere on the screen. A ring shows where your finger is: the hook glides over to it and follows it. Rope Agility makes it faster.</string>
+
+    <!-- The way down: avoid bumping into things. -->
+    <string name="tour_descent_title">Going down: dodge</string>
+    <!-- %1$d: bumps allowed (4); %2$d: depth of the bump-free zone in meters. -->
+    <string name="tour_descent_body">The hook sinks until it has bumped %1$d times or reaches the end of the rope, then it turns back up. On a fish, only the head counts as a bump (the same spot you aim for on the way up); brushing a body or tail is free. Rocks, driftwood and jellies count wherever you touch them. The first %2$d m are bump-free.</string>
+
+    <string name="tour_ascent_title">Coming up: aim for heads</string>
+    <string name="tour_ascent_body">On the way up, steer so the hook meets a fish\'s head: the pale face by its eye. Touching the tail or body does nothing.</string>
+
+    <string name="tour_weight_title">Mind the weight</string>
+    <!-- "Load" is the label of the weight bar during a cast. -->
+    <string name="tour_weight_body">Your rope can only carry so much. Watch the Load bar: once it\'s full, heavier fish slip away.</string>
+
+    <string name="tour_fast_reel_title">Line full? Reel in fast</string>
+    <!-- %1$d: bumps allowed; %2$s: seconds, a decimal number already formatted (e.g. 1.5).
+         "Reel in fast" is the button's label. -->
+    <string name="tour_fast_reel_body">As soon as you\'ve used your %1$d bumps, or once nothing more can fit on your line, a Reel in fast button appears on the way up: it hauls the hook to the boat in %2$s seconds at most, wherever you are. Nothing more is caught after that. Handy against the clock in timed battles.</string>
+
+    <string name="tour_themes_title">Themes</string>
+    <!-- Lagoon is the default theme's name (core_theme_lagoon). -->
+    <string name="tour_themes_body">The palette button at the top changes how the menus look: the Lagoon by default, with a sea scene behind every tab. More themes are in the Shop for euros or points, and the richer ones cost more. The water you fish in never changes.</string>
+
+    <string name="tour_night_mode_title">Night mode</string>
+    <!-- Day and Night are the night mode's choices (core_night_*). -->
+    <string name="tour_night_mode_body">Every theme has a night version: choose Day, Night, or follow your phone\'s dark mode.</string>
+
+    <string name="tour_points_title">Score points</string>
+    <!-- %1$d: how many times more a Sparkling fish is worth (× is the multiplication sign). -->
+    <string name="tour_points_body">Deeper catches are worth more points, shown here at the top. Sparkling fish (gold outline and glints) are worth %1$d× more.</string>
+
+    <string name="tour_upgrades_title">Upgrade your rope</string>
+    <!-- Rope Length, Rope Strength and Rope Agility are the upgrades' names (core_rope_*). -->
+    <string name="tour_upgrades_body">Spend points in the Shop tab, on its Rope page. Rope Length lets you reach deeper zones and new fish, Rope Strength carries more weight, and Rope Agility steers faster. Changed your mind? Downgrade a level and get back every point it cost.</string>
+
+    <string name="tour_tackle_title">Tackle</string>
+    <!-- The four tackle names must match core_tackle_*. %1$d: the detector's radius in meters;
+         %2$d: how many times more Sparkling fish the lure brings. -->
+    <string name="tour_tackle_body">The Tackle page sells one-cast items to switch on before you cast. Lanterns light the dark, a Rare fish detector marks species you haven\'t caught yet within %1$d m of the hook, a Lucky charm gives one extra bump on the way down, and a Sparkle lure brings %2$d× as many Sparkling fish. Prices grow with your rope\'s reach.</string>
+
+    <string name="tour_two_prices_title">Two ways to pay</string>
+    <!-- %1$d: minutes of fishing per euro; %2$s: the time per euro for Lantern packs (e.g. "1 hour"). -->
+    <string name="tour_two_prices_body">Everything in the shop has two prices: euros, or points. A points price is about %1$d minutes of fishing per euro at your rope\'s reach (%2$s for Lantern packs), so paying only saves time: everything can be earned by playing. Paying with points asks you to confirm first.</string>
+
+    <string name="tour_lantern_title">Lanterns light the deep</string>
+    <!-- %1$d: depth where the water goes dark; %2$d: the lit radius with a Lantern; %3$d: without (meters). -->
+    <string name="tour_lantern_body">Below %1$d m the water is dark. Switch this on before a cast to light up much more water around the hook (%2$d m instead of %3$d m). One Lantern is used per cast; earn more from milestones or buy them in the Shop.</string>
+
+    <string name="tour_dex_title">Fill your Dex</string>
+    <!-- %1$d: number of species; %2$d: number of depth zones. "Seen" is a Dex state (a species met but not caught). -->
+    <string name="tour_dex_body">%1$d species live in %2$d depth zones, some of them rare, and each has a numbered card. A fish that swims close to your hook is marked as Seen: you learn its name and depths. Catch it to fill its card with its weight, points and your records.</string>
+
+    <string name="tour_dex_filters_title">Browse by zone</string>
+    <string name="tour_dex_filters_body">Filter the cards by depth zone, or show only the fish you\'ve caught. Tap a card to open its page, then swipe to flip through the Dex.</string>
+
+    <string name="tour_milestones_title">Milestone rewards</string>
+    <string name="tour_milestones_body">Every point you earn counts towards milestone rewards (bonus points and Lanterns), even after you spend it. The trophy at the top of the Fish tab opens them, with a badge when one is ready to claim.</string>
+
+    <string name="tour_secrets_title">Fishing secrets</string>
+    <!-- Hints that secrets exist, never what they are. The slots (hook, line, boat, bubble trail)
+         and "title" must match core_slot_*. -->
+    <string name="tour_secrets_body">Some tricks are only found by playing, and they pay off: every time you pull one off it adds a bonus to the cast, in battles too. The first time, it\'s explained on the spot and earns a discovery reward, and a Secrets section appears in the Dex. The rarest secrets also unlock Skins for your hook, line, boat and bubble trail, plus a title shown under your name, in online battles too. They\'re made to show off: looks only, never an advantage.</string>
+
+    <string name="tour_boat_title">Customise your boat</string>
+    <!-- "Customise boat" is the button's label in the Skins section. -->
+    <string name="tour_boat_body">Tap your boat at the top of the Fish tab to open the Skins section of the Dex. Customise boat lets you paint the hull, trim and cabin, and add a pattern, sails, a flag and an emblem. Basic colours are free; the rest unlock with points, or as you catch more species, reach new zones and claim milestones.</string>
+
+    <string name="tour_shop_style_title">Style</string>
+    <string name="tour_shop_style_body">The Style page has premade boats, paints, emblems and sail prints (previewed on your own boat), and new hooks, lines and trails. Like every skin, they only change the look, never the game.</string>
+
+    <string name="tour_aquarium_title">Your aquarium</string>
+    <string name="tour_aquarium_body">The fish you\'ve caught swim in your aquarium: open it with the Aquarium button in the Dex and pick who swims there. Decor and a bigger tank are on the Shop\'s Aquarium page.</string>
+
+    <string name="tour_season_title">Seasons and weekend events</string>
+    <!-- %1$s: how long a season lasts (e.g. "6 weeks"). -->
+    <string name="tour_season_body">Each season lasts %1$s. Every solo cast earns season XP and opens tiers of rewards: tackle and points for everyone, and more (a season boat, a badge) with the season pass. Every weekend also brings a fishing goal with its own reward. None of it changes battles.</string>
+
+    <string name="tour_passes_title">Passes</string>
+    <!-- The Captain's Club and the Starter pack are shop items (core_shop_item_*). -->
+    <string name="tour_passes_body">The Captain\'s Club is a monthly membership: a members-only paint, a club title badge, cloud save and a free Lantern pouch every month. New anglers also get a one-time Starter pack offer for a few days. A dot on the Shop tab means something is waiting for you there.</string>
+
+    <string name="tour_badges_title">Title badges and Dex cards</string>
+    <string name="tour_badges_body">Choose the frame of your title badge (shown under your name, online too) and how the Dex shows the species you\'ve caught. More come from the Shop, season passes and events.</string>
+
+    <string name="tour_atmosphere_title">Atmosphere</string>
+    <!-- Abyssal Floor (core_zone_abyss) and Nightmare (core_atmosphere_nightmare) must match their names in the app. -->
+    <string name="tour_atmosphere_body">The water is harmless near the surface and gets spookier the deeper you go. Reach the Abyssal Floor to unlock Nightmare, a frightening look for the deep: you see exactly as much as before, only the mood changes.</string>
+
+    <string name="tour_battle_title">1v1 battles</string>
+    <!-- The five battle modes' names must match core_mode_*. -->
+    <string name="tour_battle_body">Pick a mode: Best of 5, 3-Minute Rush, Heavy Haul, Species Hunt or Deep Dive. Both players fish the very same water, so skill decides.</string>
+
+    <string name="tour_opponents_title">Choose an opponent</string>
+    <!-- Easy, Normal and Hard match core_bot_*; "Quick match" is a button. %1$d: the rope's level in every stat. -->
+    <string name="tour_opponents_body">Play the computer (Easy, Normal or Hard), a friend on this phone, or someone online: create a room and share its code, or use Quick match. Online, both players use the same tournament rope (level %1$d in every stat).</string>
+
+    <string name="tour_battle_tackle_title">Tackle in battles</string>
+    <string name="tour_battle_tackle_body">Lanterns and Rare fish detectors work in battles too: switch them on here, and each of your casts uses one. Anyone can get them, so they\'re part of the game. The Lucky charm and the Sparkle lure are for solo casts only.</string>
+
+    <string name="tour_gifts_title">Gifts and cloud save</string>
+    <string name="tour_gifts_body">After an online battle you can send your opponent a gift: tackle or looks, paid with euros or points. Gifts for you arrive when you open the game. Captain\'s Club members are backed up on the server: the Shop\'s Account button shows the recovery code that restores it on a new phone.</string>
+
+    <string name="tour_wager_title">Wager points</string>
+    <!-- %1$s, %2$s, %3$s: how many times the stake a win pays back against each difficulty
+         (decimal numbers already formatted, e.g. 1.2). -->
+    <string name="tour_wager_body">Against the computer you can stake points on the result: a win pays the stake back %1$s× against Easy, %2$s× against Normal and %3$s× against Hard. A draw refunds it.</string>
+
+    <string name="tour_settings_title">Settings</string>
+    <string name="tour_settings_body">The gear at the top of the Fish tab opens Settings.</string>
+
+    <string name="tour_sound_title">Sound and feel</string>
+    <!-- Volume, Music, Sound effects, Vibration and Reduce motion are the settings' names (settings_sound_*). -->
+    <string name="tour_sound_body">Set the volume, the music and the sound effects separately here. The music follows your hook: calm near the surface, darker in the deep. Vibration adds a light touch to bumps, catches and big wins, and Reduce motion turns off screen shake, slow motion and flashes.</string>
+
+    <string name="tour_daily_title">Daily rewards</string>
+    <!-- %1$s: the calendar's length (e.g. "7 days", used twice); %2$d: shields a new player starts
+         with; %3$d: the most shields one can hold. -->
+    <string name="tour_daily_body">Claim a reward here once a day: points and tackle, and a bigger one every %1$s. Missing a day never sets the calendar back. Your streak counts the days in a row, and a streak shield covers a missed day by itself: you start with %2$d, and every %1$s bring another (up to %3$d).</string>
+
+    <string name="tour_daily_challenges_title">Daily challenges</string>
+    <!-- %1$s: free swaps a day (tour_daily_swaps, e.g. "1 swap a day"). -->
+    <string name="tour_daily_challenges_body">Every day brings three challenges, easy, medium and hard, matched to your rope, for tackle and points. Don\'t fancy one? Swap it for free (%1$s). Only solo casts count. New ones come at midnight, and finished ones are collected for you if you forget.</string>
+    <plurals name="tour_daily_swaps">
+        <item quantity="one">%d swap a day</item>
+        <item quantity="other">%d swaps a day</item>
+    </plurals>
+
+    <string name="tour_migrations_title">Migrations</string>
+    <!-- %1$s: how long a migration lasts (e.g. "2 days"). -->
+    <string name="tour_migrations_body">Every week, for %1$s, two less common species migrate: one near the surface and one in the deep, both far more common where they live. A banner shows them on the Fish tab and in the Dex. Migrations are for solo casts: battles never change.</string>
+
+    <string name="tour_reminders_title">Reminders</string>
+    <!-- %1$s and %2$s: times on the hour, start and end of the quiet hours (e.g. 21:00 and 09:00). -->
+    <string name="tour_reminders_body">Want a nudge when your daily reward is ready, your streak is about to end or a migration starts? Turn reminders on in Settings: at most one a day, and never between %1$s and %2$s.</string>
+
+    <string name="tour_social_title">Friends and rankings</string>
+    <!-- %1$d: the standard rope's level in every stat. -->
+    <string name="tour_social_body">Friends, the weekly leaderboards and the weekly tournament open from here. Everything there is fished on the standard rope of online battles (level %1$d in every stat), so skill is what counts.</string>
+
+    <string name="tour_friend_code_title">Your friend code</string>
+    <string name="tour_friend_code_body">Your player id is your friend code: share it so friends can add you. Nobody can find you by name, and strangers on the leaderboards only see a name made from your id.</string>
+
+    <string name="tour_friends_title">Add friends</string>
+    <!-- "Challenge" is a button on a friend's card. -->
+    <string name="tour_friends_body">Type a friend\'s player id to send a request: you\'re friends once they accept. Their cards show whether they\'re online and their best catches of the week, and Challenge invites them into an online battle room.</string>
+
+    <string name="tour_leaderboards_title">Weekly leaderboards</string>
+    <!-- The boards (best cast, deepest catch, rarest catch) and the views (everyone, league,
+         friends) must match core_board_* and core_view_*. %1$d: anglers in a league. 00:00 UTC
+         is a fixed time for everyone: keep it. -->
+    <string name="tour_leaderboards_body">Three boards, best cast, deepest catch and rarest catch, for everyone, your league of about %1$d anglers, or your friends. Only casts the server checks itself count: the weekly tournament and online battles. Every board resets on Monday at 00:00 UTC.</string>
+
+    <string name="tour_tournament_title">The weekly tournament</string>
+    <!-- %1$d: bumps; %2$d: attempts a week; %3$d: the percentage of players who win the badge. -->
+    <string name="tour_tournament_body">All week, everyone fishes the very same water with %1$d bumps. You get %2$d attempts and your best one counts; starting an attempt uses it. When the week ends, rewards go by your final rank, and the top %3$d%% win the Tournament title badge.</string>
+
+    <string name="tour_clubs_title">Clubs</string>
+    <!-- %1$d: the most members a club can have. -->
+    <string name="tour_clubs_body">Join a club with its code, or start one with a name made from fishing words. Up to %1$d anglers fish for a weekly goal together, and everyone who helped gets each reward reached. There\'s no chat.</string>
+
+    <string name="tour_privacy_title">Your privacy</string>
+    <string name="tour_privacy_body">Usage statistics and crash reports are only sent if you allow them. Change your mind at any time with the two switches in Settings, under Privacy. That\'s also where you can delete your online account and read the privacy policy.</string>
+
+    <string name="tour_language_title">Your language</string>
+    <!-- Name the six languages in your own language. -->
+    <string name="tour_language_body">Deep Line speaks English, French, Spanish, German, Brazilian Portuguese and Turkish. Pick one here, or keep your phone\'s language.</string>
+
+    <string name="tour_replay_title">That\'s it, good fishing!</string>
+    <string name="tour_replay_body">You can replay this tour any time from Settings.</string>
+</resources>
