@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Adaptive launcher icon, background layer (108 x 108; launchers show the middle 72 and may move
+    it): a sunlit sky band, the waterline, and water that darkens with depth like the game's
+    ColorScript (bright turquoise in the shallows, navy, then near-black). Also the Play Store
+    icon's background (tools/store-graphics renders it at 512 x 512).
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Sky -->
+    <path android:pathData="M0,0 L108,0 L108,38 L0,38 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="0" android:startY="0"
+                android:endX="0" android:endY="38"
+                android:startColor="#FFB9EEF7"
+                android:endColor="#FF7ED9EA" />
+        </aapt:attr>
+    </path>
+    <!-- Water, darker with depth -->
+    <path android:pathData="M0,36 Q13.5,33 27,36 T54,36 T81,36 T108,36 L108,108 L0,108 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="0" android:startY="36"
+                android:endX="0" android:endY="108"
+                android:startColor="#FF2CC3D8"
+                android:centerColor="#FF0E5E8C"
+                android:endColor="#FF04182B" />
+        </aapt:attr>
+    </path>
+    <!-- Light rays from the surface -->
+    <path
+        android:fillColor="#22FFFFFF"
+        android:pathData="M30,38 L42,38 L30,108 L10,108 Z" />
+    <path
+        android:fillColor="#18FFFFFF"
+        android:pathData="M62,38 L70,38 L86,108 L68,108 Z" />
+    <!-- Waterline highlight -->
+    <path
+        android:strokeColor="#CCFFFFFF"
+        android:strokeWidth="1.6"
+        android:pathData="M0,36 Q13.5,33 27,36 T54,36 T81,36 T108,36" />
+    <!-- Specks deep down -->
+    <path
+        android:fillColor="#5578E8F7"
+        android:pathData="M20,86 m-1.2,0 a1.2,1.2 0 1,0 2.4,0 a1.2,1.2 0 1,0 -2.4,0 M86,80 m-1,0 a1,1 0 1,0 2,0 a1,1 0 1,0 -2,0 M74,96 m-0.9,0 a0.9,0.9 0 1,0 1.8,0 a0.9,0.9 0 1,0 -1.8,0" />
+</vector>

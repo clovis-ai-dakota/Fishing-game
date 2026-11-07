@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Adaptive launcher icon, monochrome layer (Android 13+ themed icons): the foreground's line,
+    hook and fish in a single colour that the launcher tints; the eye is a hole (even-odd fill).
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2.2"
+        android:pathData="M46,10 L46,66" />
+    <path
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="3.4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M46,64 L46,73 A7,7 0 1,1 32,73 L33.5,68.5" />
+    <group android:translateX="-2.5">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M53,55 C58,43.5 74,43.5 80,55 C74,66.5 58,66.5 53,55 Z M60.5,52.5 m-2.6,0 a2.6,2.6 0 1,0 5.2,0 a2.6,2.6 0 1,0 -5.2,0 Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M78,55 L87,47.5 L85,55 L87,62.5 Z M63,46.5 L70,40.5 L73,47.5 Z" />
+    </group>
+    <path
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="1.2"
+        android:pathData="M52,44 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0 M56,37.5 m-1.3,0 a1.3,1.3 0 1,0 2.6,0 a1.3,1.3 0 1,0 -2.6,0" />
+</vector>
