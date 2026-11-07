@@ -208,7 +208,8 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
   - Robolectric pitfall: from the second test of a class on, the view model is built with the
     first test's Application (lifecycle caches its factory), so it reads that test's preferences.
     Tests that need a fresh first launch reset state themselves within one test (see
-    `PrivacyUiTest.kt`).
+    `PrivacyUiTest.kt`), or each scenario gets its own test class (each class gets a fresh JVM via
+    `forkEvery = 1`).
 - **Sound, haptics and juice** (`app/.../audio/`, `app/.../feel/`): game moments go through
   `feel/FeelMap` (pure, unit tested) to sounds, a haptic and render-only effects, and `GameFeel`
   (what the view model delegates to) applies them with the player's settings. New sounds go in the
@@ -228,6 +229,49 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
   - Robolectric uses `NoAudio`; tests inject fakes through `AudioEngines.factory` and
     `Haptics.factory`. Put each such UI test in its own class: a class's later tests get a view
     model built with the first test's application, so saved settings would live elsewhere.
+- **Social** (friends, weekly leaderboards, the weekly tournament, clubs; research and decisions in
+  `docs/research/social.md`). Rules in `core/.../core/social/` (`Weeks`, `Tournaments`,
+  `WaterCheck`, `Leaderboards`, `Clubs`) and the HTTP contract in `social/SocialApi.kt`; the server
+  in `SocialStore.kt` (one JSON file per player, week and club under `DEEPLINE_SOCIAL_DIR`, one
+  lock, atomic writes, rate limits) and `SocialRoutes.kt`; the app in `social/SocialController`
+  (state + calls, through an injectable `SocialClient`: UI tests use `FakeSocialClient` in
+  `SocialUiTest.kt`) and `ui/social/`, opened from the Battle tab (`Screen.SOCIAL` and the pushed
+  `FRIENDS`, `LEADERBOARDS`, `TOURNAMENT`, `CLUBS`, all `SubScreen`s).
+  - Everything social is authenticated with the account's id + secret, like gifts. Social calls
+    never block play: a failed call shows the offline card, nothing else.
+  - **Scores are server-authoritative**: leaderboards only take casts the server validated itself,
+    tournament attempts and verified online battle casts (the battle Hello carries the secret
+    since protocol 7), always on `OnlineProtocol.tournamentSpecs` with the online rules. Points are
+    recomputed (`CastValidation`) and catches checked against the cast's water (`WaterCheck`).
+    Never rank solo casts (any rope, charm, lure).
+  - **The weekly reset is Monday 00:00 UTC** (`Weeks`, the seasons' epoch) for the leaderboards,
+    the tournament and the clubs' goal: a new week is just a new week file on the server.
+  - The tournament: one seed per week (`Tournaments.seedOf`, salted by `DEEPLINE_TOURNAMENT_SALT`,
+    revealed when an attempt starts), `GameConfig.TOURNAMENT_ATTEMPTS` attempts, starting one uses
+    it, best score counts, rewards by final rank (`TournamentTier`) claimed after the week and
+    acknowledged after they're granted (the save remembers `tournamentClaims`). Tournament and
+    club rewards must stay below a weekend event's reward (`SocialRulesTest`), or re-tune with
+    `EconomyTest`. A tournament cast never counts for points or the fish log.
+  - Privacy: players are found by id only; typed names are shown to friends, club members and
+    battle opponents, never on public boards (strangers get `Leaderboards.anglerName`); club names
+    are generated (`Clubs.adjectives`/`nouns`), there's no chat. `SocialStore.forgetPlayer(id)`
+    erases every social trace of a player (friends and requests on both sides, challenges, club
+    membership with the club handed over, contributions, every kept week's entries) by sweeping
+    all the files: account deletion calls it (an `AccountStore.onDelete` listener), and so does
+    `/api/social/forget` ("Delete my social data"). New per-player social data must be erased there
+    too (`SocialTest.accountDeletionErasesEverySocialTrace` checks no file still names the player).
+  - Log key moments with `Analytics.event` (`friend_add`, `post_score`, `join_group`...), never ids,
+    codes or typed names.
+- **Clubs ship in a later update, behind `FeatureFlags.clubs`** (on in debug builds, off in
+  release; `-PdeeplineClubs=true|false` overrides). With the flag off there must be no club screen,
+  card, tour step, notification or server call: every club entry point checks the flag, and club
+  tour steps (`SocialTour.clubStepIds`) are filtered out of `Tour.steps`. `TourContentTest` and
+  `SocialClubsOffUiTest` check both states; run the app tests once with `-PdeeplineClubs=false`
+  when touching clubs. **To ship clubs**: (1) in `app/build.gradle.kts` change the release default
+  to `clubs(default = true)`; (2) bump `Tour.VERSION` and set `SocialTour.CLUB_STEPS_VERSION` to
+  the new version, so returning players get the club step in "What's new"; (3) on the server, club
+  endpoints always exist unless `DEEPLINE_CLUBS=off`: make sure production doesn't set it; (4)
+  describe clubs in the store listing. Re-check the club rewards against the economy first.
 - All tunable numbers live in `core/.../GameConfig.kt` (plus the tables in `FishSpecies.kt`,
   `Upgrades.kt`, `Secrets.kt` and `Daily.kt`). The tour and HUD read them, so don't hard-code them in UI text.
 - Run `./gradlew :core:test :server:test :app:testDebugUnitTest` before pushing. App UI tests

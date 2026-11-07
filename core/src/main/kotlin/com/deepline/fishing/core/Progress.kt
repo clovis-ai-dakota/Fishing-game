@@ -90,6 +90,10 @@ data class PlayerProgress(
     val challengeRerolls: Int = 0,
 
     // -- Social (friends, leaderboards, tournaments, clubs): new fields below this line.
+    /** Weekly tournaments whose reward was given on this phone (week indexes, see `Weeks`). */
+    val tournamentClaims: Set<Long> = emptySet(),
+    /** Club goal rewards given on this phone ("week:tier", see `Clubs.claimKey`). */
+    val clubClaims: Set<String> = emptySet(),
 
 ) {
     fun level(stat: RopeStat): Int = ropeLevels[stat] ?: 0

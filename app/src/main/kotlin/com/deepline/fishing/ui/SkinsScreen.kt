@@ -96,6 +96,8 @@ private fun badgeLook(frame: com.deepline.fishing.core.TitleFrame, t: Float): Ba
         com.deepline.fishing.core.TitleFrame.SEASON -> BadgeLook(shift(listOf(Color(0xFFB39DDB), Color(0xFFE1BEE7), Color(0xFF9FA8DA))), Color(0xFF1A1033), "❖", Color(0xFFECEFF1))
         com.deepline.fishing.core.TitleFrame.COLLECTOR -> BadgeLook(Brush.horizontalGradient(listOf(Color(0xFF111111), Color(0xFF2E2E2E), Color(0xFF111111))), Color(0xFFFFD54F), "♛", Color(0xFFFFD54F))
         com.deepline.fishing.core.TitleFrame.EVENT -> BadgeLook(shift(listOf(Color(0xFFFF4081), Color(0xFFFF80AB), Color(0xFFFFAB40))), Color.White, "✧")
+        // Won in the weekly tournament: polished silver with a gold rim.
+        com.deepline.fishing.core.TitleFrame.TOURNAMENT -> BadgeLook(shift(listOf(Color(0xFF90A4AE), Color(0xFFECEFF1), Color(0xFFB0BEC5))), Color(0xFF102027), "♜", Color(0xFFFFC107))
     }
 }
 

@@ -33,12 +33,13 @@ class OnlineConnection(
     @Volatile
     private var closedByUser = false
 
-    fun connect(url: String, playerName: String, title: String? = null, titleFrame: String? = null, playerId: String? = null) {
+    /** [secret] goes with [playerId]: the server then counts the player's validated casts on the weekly leaderboards. */
+    fun connect(url: String, playerName: String, title: String? = null, titleFrame: String? = null, playerId: String? = null, secret: String? = null) {
         job = scope.launch {
             var error: String? = null
             try {
                 client.webSocket(urlString = url) {
-                    send(Frame.Text(OnlineProtocol.encode(ClientMessage.Hello(playerName, title = title, titleFrame = titleFrame, playerId = playerId))))
+                    send(Frame.Text(OnlineProtocol.encode(ClientMessage.Hello(playerName, title = title, titleFrame = titleFrame, playerId = playerId, secret = secret))))
                     val writer = launch {
                         for (m in outbox) send(Frame.Text(OnlineProtocol.encode(m)))
                     }

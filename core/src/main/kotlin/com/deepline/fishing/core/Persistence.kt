@@ -65,6 +65,8 @@ object ProgressCodec {
         }
 
         // -- Social: new lines below.
+        appendLine("tournamentClaims=${p.tournamentClaims.sorted().joinToString(",")}")
+        appendLine("clubClaims=${p.clubClaims.sorted().joinToString(",")}")
 
         for ((stat, level) in p.ropeLevels) appendLine("rope.${stat.name}=$level")
         for ((id, e) in p.collection) {
@@ -153,6 +155,8 @@ object ProgressCodec {
                 }
 
                 // -- Social: new keys below.
+                key == "tournamentClaims" -> p = p.copy(tournamentClaims = value.split(',').mapNotNull { it.trim().toLongOrNull() }.toSet())
+                key == "clubClaims" -> p = p.copy(clubClaims = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet())
 
                 key == "battle" -> {
                     val parts = value.split(',').map { it.trim().toIntOrNull() }

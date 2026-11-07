@@ -64,6 +64,12 @@ fun AppRoot(vm: GameViewModel) {
                     Screen.DAILY -> com.deepline.fishing.ui.daily.DailyScreen(vm)
 
                     // -- Social screens below.
+                    Screen.SOCIAL -> com.deepline.fishing.ui.social.SocialHubScreen(vm)
+                    Screen.FRIENDS -> com.deepline.fishing.ui.social.FriendsScreen(vm)
+                    Screen.LEADERBOARDS -> com.deepline.fishing.ui.social.LeaderboardsScreen(vm)
+                    Screen.TOURNAMENT -> com.deepline.fishing.ui.social.TournamentScreen(vm)
+                    // Clubs ship in a later update: without the flag there is no club screen at all.
+                    Screen.CLUBS -> if (com.deepline.fishing.FeatureFlags.clubs) com.deepline.fishing.ui.social.ClubsScreen(vm) else com.deepline.fishing.ui.social.SocialHubScreen(vm)
 
                 }
                 vm.tour?.let { TourOverlay(it, onNext = vm::tourNext, onBack = vm::tourBack, onSkip = vm::skipTour) }

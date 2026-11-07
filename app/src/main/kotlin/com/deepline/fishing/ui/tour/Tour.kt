@@ -29,6 +29,7 @@ enum class TourTarget {
     HOME_DAILY, DAILY_CALENDAR, DAILY_CHALLENGES, DAILY_MIGRATION, SETTINGS_NOTIFICATIONS,
 
     // -- Social targets below.
+    BATTLE_SOCIAL, SOCIAL_ID, FRIENDS_ADD, BOARD_KINDS, TOURNAMENT_ENTER, CLUBS_JOIN,
 
     // -- Privacy targets below.
     SETTINGS_PRIVACY,
@@ -92,7 +93,8 @@ object Tour {
     private val skinSlots = (CosmeticSlot.entries - CosmeticSlot.TITLE).map { it.displayName.lowercase() }
         .let { it.dropLast(1).joinToString(", ") + " and " + it.last() }
 
-    val steps: List<TourStep> = listOf(
+    /** Every step, also those of features switched off (see [steps]). */
+    private val allSteps: List<TourStep> = listOf(
         TourStep(
             id = "welcome",
             title = "Welcome to Deep Line!",
@@ -467,6 +469,7 @@ object Tour {
         ),
 
         // -- Social steps below.
+        *SocialTour.steps(VERSION).toTypedArray(),
 
         // -- Privacy steps below.
         TourStep(
@@ -491,6 +494,9 @@ object Tour {
             sinceVersion = VERSION,
         ),
     )
+
+    /** The tour: every step whose feature is switched on (club steps only with `FeatureFlags.clubs`). */
+    val steps: List<TourStep> get() = allSteps.filter(SocialTour::isShown)
 
     data class Plan(val steps: List<TourStep>, val whatsNew: Boolean)
 

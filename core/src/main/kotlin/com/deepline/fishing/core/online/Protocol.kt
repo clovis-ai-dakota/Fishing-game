@@ -37,8 +37,10 @@ object OnlineProtocol {
      * 5: full-line touches (the Crowd surfer secret).
      * 6: Lanterns and rare fish detectors in battles (casts say whether they were used), title
      *    badge frames and public player ids (for gifts).
+     * 7: the player's secret in [ClientMessage.Hello], so the server knows the player is who their
+     *    id says and can put their validated battle casts on the weekly leaderboards.
      */
-    const val VERSION = 6
+    const val VERSION = 7
 
     /** Online battles use the same standard rope for both players. */
     const val TOURNAMENT_ROPE_LEVEL = 5
@@ -81,6 +83,11 @@ sealed interface ClientMessage {
         val titleFrame: String? = null,
         /** The player's public id (see `PlayerId`), so the opponent can send them a gift. */
         val playerId: String? = null,
+        /**
+         * The secret that goes with [playerId] (never relayed): when it matches, the player's
+         * validated casts count on the weekly leaderboards.
+         */
+        val secret: String? = null,
     ) : ClientMessage
 
     @Serializable @SerialName("create_room")

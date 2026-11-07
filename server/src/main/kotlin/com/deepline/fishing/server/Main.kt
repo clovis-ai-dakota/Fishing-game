@@ -34,10 +34,36 @@ fun main() {
     val port = System.getenv("PORT")?.toIntOrNull() ?: 8080
     // Gifts and cloud saves are kept as files here (one per player).
     val data = File(System.getenv("DEEPLINE_DATA_DIR") ?: "data/accounts")
-    embeddedServer(Netty, port = port, host = "0.0.0.0") { battleServer(accounts = AccountStore(data)) }.start(wait = true)
+    val accounts = AccountStore(data)
+    // Friends, weekly leaderboards and tournaments, clubs: one file per player, week and club.
+    val social = SocialStore(
+        accounts,
+        File(System.getenv("DEEPLINE_SOCIAL_DIR") ?: "data/social"),
+        // A secret salt keeps each week's tournament water unknown until the week starts.
+        tournamentSalt = System.getenv("DEEPLINE_TOURNAMENT_SALT")?.toLongOrNull() ?: 0L,
+        // Clubs ship in a later app update; "off" makes every club call answer 404.
+        clubsEnabled = System.getenv("DEEPLINE_CLUBS")?.lowercase() != "off",
+    )
+    // Behind a hosting proxy: the header it sets to the player's address (for rate limits).
+    val clientIpHeader = System.getenv("DEEPLINE_CLIENT_IP_HEADER")?.takeIf { it.isNotBlank() }
+    embeddedServer(Netty, port = port, host = "0.0.0.0") {
+        battleServer(accounts = accounts, social = social, clientIpHeader = clientIpHeader)
+    }.start(wait = true)
 }
 
-fun Application.battleServer(lobby: Lobby = Lobby(), accounts: AccountStore = AccountStore()) {
+fun Application.battleServer(
+    lobby: Lobby = Lobby(),
+    accounts: AccountStore = AccountStore(),
+    social: SocialStore = SocialStore(accounts),
+    clientIpHeader: String? = null,
+) {
+    // Verified players' battle casts count on the weekly leaderboards.
+    lobby.verifyPlayer = { id, secret ->
+        runCatching { accounts.authenticate(id, secret) }.isSuccess.also { ok -> if (ok) social.seen(id) }
+    }
+    lobby.onValidatedCast = social::recordBattleCast
+    // Deleting an account erases every social trace of the player too (friends, boards, clubs).
+    accounts.onDelete(social::forgetPlayer)
     install(WebSockets) {
         pingPeriod = 15.seconds
         timeout = 30.seconds
@@ -49,6 +75,7 @@ fun Application.battleServer(lobby: Lobby = Lobby(), accounts: AccountStore = Ac
         webSocket("/battle") { lobby.handle(this) }
         accountRoutes(accounts)
         accountDeletionPage(accounts)
+        socialRoutes(social, clientIpHeader = clientIpHeader)
     }
 }
 

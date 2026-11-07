@@ -1,10 +1,12 @@
 package com.deepline.fishing.server
 
 import com.deepline.fishing.core.Battle
+import com.deepline.fishing.core.BattleCast
 import com.deepline.fishing.core.BattleMode
 import com.deepline.fishing.core.BattlePlayer
 import com.deepline.fishing.core.Cosmetic
 import com.deepline.fishing.core.CosmeticSlot
+import com.deepline.fishing.core.online.CastDto
 import com.deepline.fishing.core.online.CastValidation
 import com.deepline.fishing.core.online.ClientMessage
 import com.deepline.fishing.core.online.OnlineProtocol
@@ -25,6 +27,8 @@ class Connection(private val session: WebSocketSession, val id: Long) {
     var title: String? = null
     var titleFrame: String? = null
     var playerId: String? = null
+    /** The player sent the secret that goes with [playerId]: their casts count on the leaderboards. */
+    var verified: Boolean = false
     var match: Match? = null
     var playerIndex: Int = -1
     var waitingRoom: String? = null
@@ -42,8 +46,16 @@ class Connection(private val session: WebSocketSession, val id: Long) {
     }
 }
 
-/** An online battle between two connections. The server's [battle] is authoritative. */
-class Match(val mode: BattleMode, val players: List<Connection>, seed: Long) {
+/**
+ * An online battle between two connections. The server's [battle] is authoritative. Each cast it
+ * validates is also handed to [onValidated] (the weekly leaderboards), with the seed of its water.
+ */
+class Match(
+    val mode: BattleMode,
+    val players: List<Connection>,
+    seed: Long,
+    private val onValidated: (Connection, BattleCast, CastDto, Long) -> Unit = { _, _, _, _ -> },
+) {
     val battle = Battle(mode, players.map { BattlePlayer(it.name) }, seed)
     private val mutex = Mutex()
 
@@ -78,6 +90,7 @@ class Match(val mode: BattleMode, val players: List<Connection>, seed: Long) {
             return@withLock
         }
         battle.record(expected, cast)
+        if (players[player].verified) runCatching { onValidated(players[player], cast, message.cast, expected.seed) }
         val recorded = ServerMessage.CastRecorded(expected, cast.toDto())
         players.forEach { it.send(recorded) }
         battle.outcome()?.let { finish(ServerMessage.MatchOver(it.winner, it.byForfeit)) }
@@ -101,6 +114,16 @@ class Match(val mode: BattleMode, val players: List<Connection>, seed: Long) {
 
 /** Pairs players (room codes and quick match) and routes their messages to matches. */
 class Lobby(private val random: Random = Random.Default) {
+    /** Checks a player's id and secret (set by the server from its account store). */
+    var verifyPlayer: (id: String, secret: String) -> Boolean = { _, _ -> false }
+
+    /** A verified player's validated battle cast, with the seed of its water (the weekly leaderboards). */
+    var onValidatedCast: (playerId: String, cast: BattleCast, dto: CastDto, seed: Long) -> Unit = { _, _, _, _ -> }
+
+    private fun castValidated(c: Connection, cast: BattleCast, dto: CastDto, seed: Long) {
+        c.playerId?.let { onValidatedCast(it, cast, dto, seed) }
+    }
+
     private val log = LoggerFactory.getLogger(Lobby::class.java)
     private val mutex = Mutex()
     private val rooms = HashMap<String, Pair<BattleMode, Connection>>()
@@ -136,6 +159,9 @@ class Lobby(private val random: Random = Random.Default) {
                 c.title = message.title?.takeIf { t -> Cosmetic.entries.any { it.slot == CosmeticSlot.TITLE && it.displayName == t } }
                 c.titleFrame = message.titleFrame?.takeIf { f -> com.deepline.fishing.core.TitleFrame.entries.any { it.name == f } }
                 c.playerId = message.playerId?.takeIf(com.deepline.fishing.core.PlayerId::isValid)
+                val secret = message.secret
+                val id = c.playerId
+                c.verified = id != null && secret != null && runCatching { verifyPlayer(id, secret) }.getOrDefault(false)
             }
             is ClientMessage.CreateRoom -> createRoom(c, message.mode)
             is ClientMessage.JoinRoom -> joinRoom(c, OnlineProtocol.normalizeRoomCode(message.code))
@@ -186,7 +212,7 @@ class Lobby(private val random: Random = Random.Default) {
             rooms.remove(code)
             val (mode, host) = room
             host.waitingRoom = null
-            Match(mode, listOf(host, c), random.nextLong())
+            Match(mode, listOf(host, c), random.nextLong(), ::castValidated)
         }
         error?.let { c.send(ServerMessage.Error(it)) }
         match?.let {
@@ -205,7 +231,7 @@ class Lobby(private val random: Random = Random.Default) {
             val other = quickQueue.remove(mode)
             if (other != null && other !== c) {
                 other.waitingQuick = null
-                Match(mode, listOf(other, c), random.nextLong())
+                Match(mode, listOf(other, c), random.nextLong(), ::castValidated)
             } else {
                 quickQueue[mode] = c
                 c.waitingQuick = mode

@@ -257,6 +257,38 @@ object GameConfig {
     /** How long an active store subscription keeps the Club on after the store last confirmed it. */
     const val CLUB_RENEWAL_GRACE_DAYS = 3
 
+    // ---- Social: friends, weekly leaderboards, the weekly tournament, clubs (see core/social) ----
+
+    /** Friends per player, and friend requests waiting for an answer, at most. */
+    const val MAX_FRIENDS = 50
+    const val MAX_FRIEND_REQUESTS = 30
+    /** Friend requests a player can send per day (abuse prevention). */
+    const val FRIEND_REQUESTS_PER_DAY = 20
+    /** A friend counts as online when seen by the server in the last this many minutes. */
+    const val ONLINE_WINDOW_MINUTES = 5
+    /** A challenge to a friend (a battle room code) waits this long. */
+    const val CHALLENGE_MINUTES = 10
+
+    /** Weekly leaderboards: how many entries the global view shows, and the size of a league. */
+    const val LEADERBOARD_TOP = 50
+    const val LEAGUE_SIZE = 30
+
+    /** The weekly tournament: attempts per week, and how long an attempt can take once started. */
+    const val TOURNAMENT_ATTEMPTS = 5
+    const val TOURNAMENT_ATTEMPT_MINUTES = 15
+    /** Weeks after a tournament ends during which its reward can still be claimed. */
+    const val TOURNAMENT_CLAIM_WEEKS = 4
+
+    /** Clubs (shipped later, see FeatureFlags.clubs): members, the weekly goal's tiers (fish caught together). */
+    const val CLUB_MAX_MEMBERS = 30
+    val CLUB_GOAL_TIERS = listOf(100, 300, 600)
+    /** Fish one member can add to the club goal per day (contributions are reported by the app). */
+    const val CLUB_FISH_PER_MEMBER_PER_DAY = 400
+    /** A player removed from a club can't rejoin it for this long. */
+    const val CLUB_REJOIN_HOURS = 24
+    /** Clubs a player can join or create per day. */
+    const val CLUB_JOINS_PER_DAY = 10
+
     /** Boat options bought with points cost their table price times this. */
     const val BOAT_PART_PRICE_SCALE = 6
     const val STARTING_LANTERNS = 1

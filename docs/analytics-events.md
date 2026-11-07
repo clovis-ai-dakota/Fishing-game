@@ -147,3 +147,23 @@ Add a section for each here, in the same format, when they land: the test lists 
 | `reminder_type_toggle` | `type` (the reminder kind), `on` (`true`/`false`) | Which reminder kinds players keep or mute. |
 | `reminder_sent` | `type` | Reminders actually shown (at most one a day, outside quiet hours). |
 | `reminder_open` | `type` | Reminders tapped: whether they bring players back (compare with `reminder_sent`). |
+
+### Friends, leaderboards, the tournament and clubs
+
+None of these carries an id, a code or a name.
+
+| Event | Parameters | Why |
+| --- | --- | --- |
+| `friend_request_sent` | none | How many players try to add a friend. |
+| `friend_add` | `method` (`accept`, or `request_back` when asking back makes friends at once) | Friendships made: the social loop's main health signal. |
+| `friend_remove` | none | Friendships ended. |
+| `friend_challenge` | `mode` (the battle mode) | Friends challenged to a battle room. |
+| `friend_challenge_accept` | `mode` | Challenges actually played. |
+| `leaderboard_view` | `board` (`best_cast`, `deepest`, `rarest`), `view` (`global`, `league`, `friends`) | Which boards and views players look at. |
+| `tournament_start` | `attempt` (1-based) | Attempts started: how many of the week's attempts players use. |
+| `post_score` | `score`, `level` (`tournament`) | Recommended event: a tournament attempt scored by the server. |
+| `tournament_reward` | `tier` (`champion`, `gold`, `silver`, `bronze`, `took_part`) | Rewards collected after the week, by band. |
+| `join_group` | `method` (`create` or `code`) | Recommended event: a club created or joined (debug builds until clubs ship). |
+| `club_leave` | none | Players leaving their club. |
+| `club_reward` | `tiers` (goal tiers claimed) | Club goal rewards collected. |
+| `social_data_deleted` | none | "Delete my social data" used. |

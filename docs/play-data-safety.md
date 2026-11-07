@@ -1,8 +1,8 @@
 # Google Play Data safety form: proposed answers
 
 Proposed answers for Play Console > **App content > Data safety**, for the app as it is now
-(Firebase Analytics and Crashlytics behind consent, the game server for online battles, gifts and
-cloud save, Google Play Billing). Check each answer against the current form and against the
+(Firebase Analytics and Crashlytics behind consent, the game server for online battles, gifts,
+cloud save, friends, weekly leaderboards and tournament, and clubs, Google Play Billing). Check each answer against the current form and against the
 privacy policy before submitting: they must match. Re-check when a feature adds data (social
 features, leaderboards, notifications...). Background: `docs/research/analytics-privacy.md`.
 
@@ -46,11 +46,25 @@ processor, your hosting provider) counts as collected, not shared, per Play's de
 | Ephemeral? | No |
 | Purposes | Analytics |
 
-### App activity > In-app search history, installed apps, other user-generated content
+### App activity > Other user-generated content: collected, not shared
 
-Not collected. (The battle name is sent to the server and the opponent for a match: if you
-consider it user-generated content, declare **Other user-generated content: collected, App
-functionality, required for online play**; it isn't stored.)
+| | |
+| --- | --- |
+| What | The battle name the player types: sent to the server and the opponent for a match, and shown to friends and club members (never on public boards, which use a generated name). |
+| Optional? | **Yes**: only for players who use online battles or friends. |
+| Ephemeral? | No (kept with the friends list until deleted) |
+| Purposes | App functionality |
+
+### App activity > Other actions: collected, not shared
+
+| | |
+| --- | --- |
+| What | Friends lists and requests, battle challenges, weekly leaderboard and tournament results (server-checked casts), club membership and contributions. |
+| Optional? | **Yes**: only for players who use those features. |
+| Ephemeral? | No (kept until the player deletes their social data or account; old weeks are pruned) |
+| Purposes | App functionality |
+
+In-app search history and installed apps: not collected.
 
 ### App info and performance > Crash logs: collected, not shared
 

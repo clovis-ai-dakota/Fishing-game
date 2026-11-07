@@ -75,7 +75,8 @@ enum class Screen {
     DAILY,
 
     // -- Social screens below.
-
+    /** Friends and rankings (from the Battle tab), and its pages. CLUBS only while FeatureFlags.clubs is on. */
+    SOCIAL, FRIENDS, LEADERBOARDS, TOURNAMENT, CLUBS,
 }
 
 /** The four top-level destinations of the bottom navigation bar, in order. */
@@ -976,6 +977,11 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         paused = false
         pendingResult = null
         battleTurn = null
+        // -- Social: quitting a tournament attempt scores 0 (the attempt is used).
+        if (tournamentAttempt != null) {
+            tournamentAttempt = null
+            return openSocial(Screen.TOURNAMENT)
+        }
         if (turn != null) {
             onlineMatch?.let { if (isOnlineBattle) it.markSent(turn) }
             forfeitBattle(turn.playerIndex)
@@ -992,6 +998,11 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         pendingResult = null
         session = null
         battleTurn = null
+        // -- Social: a tournament attempt goes to the server; it never counts for points or the log.
+        tournamentAttempt?.let { attempt ->
+            tournamentAttempt = null
+            return finishTournamentAttempt(attempt, result, s)
+        }
         if (turn != null && result != null && s != null) {
             val duration = turn.timeLimitSec?.let { minOf(it, s.elapsedSeconds) } ?: s.elapsedSeconds
             val cast = BattleCast(result, duration)
@@ -1284,6 +1295,8 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             Screen.DAILY -> screen = Screen.HOME
 
             // -- Social screens' back below.
+            Screen.SOCIAL -> screen = Screen.BATTLE_SETUP
+            Screen.FRIENDS, Screen.LEADERBOARDS, Screen.TOURNAMENT, Screen.CLUBS -> screen = Screen.SOCIAL
 
             Screen.DEX, Screen.SHOP, Screen.BATTLE_SETUP, Screen.MILESTONES -> screen = Screen.HOME
         }
@@ -1337,7 +1350,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             onlineStatus = OnlineStatus.CONNECTING
             connection = OnlineConnection(viewModelScope, ::onServerMessage, ::onConnectionClosed).also {
                 val frame = com.deepline.fishing.core.Showcase.titleFrame(progress, ShopClock.now())
-                it.connect(serverUrl, OnlineProtocol.sanitizeName(playerName), title, frame.name, playerIdentity.id)
+                it.connect(serverUrl, OnlineProtocol.sanitizeName(playerName), title, frame.name, playerIdentity.id, playerIdentity.secret)
             }
         }
         connection?.send(message)
@@ -1349,6 +1362,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             is ServerMessage.RoomCreated -> {
                 roomCode = message.code
                 onlineStatus = OnlineStatus.WAITING_ROOM
+                social.onRoomCreated(message.code, message.mode)
             }
             is ServerMessage.Waiting -> onlineStatus = OnlineStatus.WAITING_QUICK
             ServerMessage.WaitingCancelled -> {
@@ -1407,9 +1421,70 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         if (onlineMatch == null) onlineStatus = OnlineStatus.DISCONNECTED
     }
 
+    // --- Social: friends, weekly leaderboards, the weekly tournament, clubs ---------------------------
+
+    /** What the social screens show, and their server calls (tests swap `social.client` for a fake). */
+    val social = com.deepline.fishing.social.SocialController(
+        viewModelScope,
+        store,
+        identity = { playerIdentity },
+        profile = { com.deepline.fishing.core.social.Profile(OnlineProtocol.sanitizeName(playerName), title, titleFrame.name) },
+        progress = { progress },
+        update = ::update,
+        baseUrl = { com.deepline.fishing.core.online.AccountApi.httpBase(serverUrl) },
+    )
+
+    init {
+        social.onLaunch()
+    }
+
+    /** Opens a social screen (Clubs only while the feature is on) and refreshes what it shows. */
+    fun openSocial(target: Screen = Screen.SOCIAL) {
+        if (target == Screen.CLUBS && !FeatureFlags.clubs) return
+        screen = target
+        social.onOpen(target)
+    }
+
+    /** The weekly tournament attempt being fished, when the current cast is one. */
+    var tournamentAttempt by mutableStateOf<com.deepline.fishing.core.social.AttemptStart?>(null)
+        private set
+
+    /**
+     * Uses one of the week's attempts and casts on the tournament's water: the standard rope and
+     * the online rules; Lanterns and detectors are allowed, as in battles.
+     */
+    fun startTournamentAttempt() = social.startAttempt { start ->
+        val (lantern, detector) = useSightTackle()
+        val s = CastSession.seeded(com.deepline.fishing.core.social.Tournaments.specs, start.seed, lanternActive = lantern)
+        s.detectorActive = detector
+        beginSession(s, turn = null)
+        tournamentAttempt = start
+    }
+
+    private fun finishTournamentAttempt(attempt: com.deepline.fishing.core.social.AttemptStart, result: CastResult?, s: CastSession?) {
+        if (result != null && s != null) social.submitAttempt(attempt, BattleCast(result, s.elapsedSeconds).toDto())
+        refreshTackleToggles()
+        screen = Screen.TOURNAMENT
+    }
+
+    /** Challenges a friend: creates a battle room for [mode] and sends them its code. */
+    fun challengeFriend(friend: com.deepline.fishing.core.social.FriendDto, mode: BattleMode) {
+        social.prepareChallenge(friend)
+        openOnlineLobby(mode)
+        createRoom()
+    }
+
+    /** Joins the battle room a friend challenged the player to. */
+    fun acceptChallenge(challenge: com.deepline.fishing.core.social.ChallengeDto) {
+        social.onChallengeAccepted(challenge)
+        openOnlineLobby(challenge.mode)
+        joinRoom(challenge.code)
+    }
+
     override fun onCleared() {
         connection?.close()
         accounts.close()
+        social.close()
         billing.close()
         feel.release()
         super.onCleared()

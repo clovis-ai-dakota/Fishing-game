@@ -16,7 +16,9 @@ enum class TitleFrame(val displayName: String, val unlockKey: String?) {
     CLUB_FOREVER("Founder's club", "badge:CLUB_FOREVER"),
     SEASON("Season", "badge:SEASON"),
     COLLECTOR("Collector", "badge:COLLECTOR"),
-    EVENT("Weekend event", "badge:EVENT");
+    EVENT("Weekend event", "badge:EVENT"),
+    /** Won by finishing a weekly tournament in the top 10% (see `TournamentTier`). */
+    TOURNAMENT("Tournament", "badge:TOURNAMENT");
 
     fun isAvailable(p: PlayerProgress, now: Long): Boolean = when (this) {
         GOLD -> true

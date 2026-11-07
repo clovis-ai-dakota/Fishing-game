@@ -170,7 +170,7 @@ fun CastScreen(vm: GameViewModel) {
                 perPlayer != null -> "$name · Cast ${t.castNumber}/$perPlayer"
                 else -> "$name · Cast ${t.castNumber}"
             }
-        }
+        } ?: vm.tournamentAttempt?.let { "Tournament · Attempt ${it.attempt} of ${com.deepline.fishing.core.GameConfig.TOURNAMENT_ATTEMPTS}" }
         // Reading [time] subscribes this screen to every frame; the HUD then gets plain values
         // so it recomposes whenever one of them changes.
         @Suppress("UNUSED_VARIABLE")
@@ -212,6 +212,8 @@ fun CastScreen(vm: GameViewModel) {
                             } else {
                                 "Quitting forfeits the battle. The battle clock is stopped while paused."
                             }
+                        } else if (vm.tournamentAttempt != null) {
+                            "Quitting scores 0 for this tournament attempt, and it still counts as one of your attempts."
                         } else {
                             "Quitting ends this cast without scoring any of the fish on the line."
                         },
@@ -225,7 +227,7 @@ fun CastScreen(vm: GameViewModel) {
         }
 
         vm.pendingResult?.let {
-            ResultsPanel(it, collectLabel = if (turn != null) "Continue" else "Collect", onCollect = vm::collectResult)
+            ResultsPanel(it, collectLabel = if (turn != null || vm.tournamentAttempt != null) "Continue" else "Collect", onCollect = vm::collectResult)
         }
     }
 }
