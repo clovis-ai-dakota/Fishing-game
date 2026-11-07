@@ -251,6 +251,24 @@ object GameConfig {
     const val NOTIFY_STREAK_MIN_DAYS = 2
     const val NOTIFY_CHECK_HOURS = 2L
 
+    /**
+     * When the game may ask for a Google Play review (see ReviewPrompts.kt and
+     * docs/research/launch.md): only right after a happy moment (a rare catch, a new species, a
+     * won battle), once the player knows the game ([MIN_CASTS] solo casts over [MIN_PLAY_DAYS]
+     * different days), never within [SETBACK_QUIET_MINUTES] of a setback (a lost battle, a failed
+     * or cancelled purchase, a quit cast, a dropped connection), at most once every
+     * [COOLDOWN_DAYS] and [MAX_ASKS] times in all. Play has its own quota on top (about a month).
+     */
+    object Review {
+        const val MIN_CASTS = 25
+        const val MIN_PLAY_DAYS = 3
+        const val COOLDOWN_DAYS = 120
+        const val MAX_ASKS = 3
+        const val SETBACK_QUIET_MINUTES = 60
+        /** A catch of this many rarity stars or more (or a Sparkling one) is a rare catch. */
+        const val RARE_CATCH_STARS = 3
+    }
+
     /** One Captain's Club month. */
     const val CLUB_DAYS = 30
 

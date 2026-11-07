@@ -129,6 +129,9 @@ dependencies {
     // Google Play Billing (euro purchases; see billing/PlayStore.kt).
     implementation("com.android.billingclient:billing-ktx:7.1.1")
 
+    // Google Play In-App Review (review/ReviewPrompter.kt): Play's rating card after a happy moment.
+    implementation("com.google.android.play:review-ktx:2.0.2")
+
     val ktorVersion = "3.3.3"
     implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
     implementation("io.ktor:ktor-client-websockets:$ktorVersion")

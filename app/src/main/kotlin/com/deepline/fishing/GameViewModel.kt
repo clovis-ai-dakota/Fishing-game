@@ -203,6 +203,25 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     /** The daily loop: daily reward, challenges, reminders (see daily/DailyController.kt). */
     val daily = com.deepline.fishing.daily.DailyController(app, store, { progress }, ::update)
 
+    // --- Play review prompt (review/ReviewController.kt; rules in core ReviewPrompts) ------------
+
+    /** Asks for a Google Play review after a happy moment, rarely, never after a setback. */
+    val review = com.deepline.fishing.review.ReviewController(store, com.deepline.fishing.review.ReviewPrompters.create(app))
+
+    /**
+     * The happy moment to ask about now, once the screen is calm: no cast, tour, dialog, payment
+     * or explanation under way. MainActivity launches Play's card when this isn't null.
+     */
+    val reviewToAsk: com.deepline.fishing.core.ReviewMoment?
+        get() = review.pending?.takeIf {
+            session == null && screen != Screen.CAST && tour == null && !askTourAgain && secretPopup == null &&
+                testStore?.request == null && giftTarget == null && !privacy.askConsent && !daily.askOptIn &&
+                tournamentAttempt == null && pendingResult == null
+        }
+
+    /** Battle whose outcome the review prompt has already judged (each battle once). */
+    private var reviewedBattle: Battle? = null
+
     init {
         // Each app start is a session (the starter pack is offered from a later one).
         update(ShopCatalog.onSessionStart(progress, ShopClock.now()))
@@ -369,6 +388,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
 
         override fun onProblem(productId: String?, problem: StoreProblem, message: String?) {
             GameAnalytics.storeProblem(productId, problem.name.lowercase(), message)
+            if (problem != StoreProblem.PENDING) review.onSetback()
             val name = productId?.let { ShopCatalog.byId(it)?.name }
             shopMessage = when (problem) {
                 StoreProblem.CANCELLED -> "Purchase cancelled: nothing was charged."
@@ -829,6 +849,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         }
         explainedThisCast.clear()
         secretQueue = emptyList()
+        review.onBusy()
         // A solo cast's lure toggle is still on while its lure is in use (see refreshTackleToggles).
         GameAnalytics.castStarted(s, battle?.mode.takeIf { turn != null }, isOnlineBattle, lure = turn == null && useLure)
         session = s
@@ -973,6 +994,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     fun abandonCast() {
         val turn = battleTurn
         session?.let { GameAnalytics.castAbandoned(it, battle?.mode.takeIf { turn != null }, isOnlineBattle) }
+        review.onSetback()
         session = null
         paused = false
         pendingResult = null
@@ -1024,6 +1046,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             val before = progress
             update(Progression.applyCast(progress, it))
             daily.afterCast(before, progress)
+            review.onCastCollected(before, progress, it)
         }
         autoBackup()
         // Master angler: the fish log has just been completed (it can only happen once).
@@ -1252,6 +1275,11 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         val outcome = (if (isOnlineBattle) onlineMatch?.outcome else b.outcome()) ?: return
         val me = if (isOnlineBattle) onlineMatch?.myIndex else if (battleOpponent is Opponent.Computer) 0 else null
         feel.onBattleOutcome(b, outcome.winner, me)
+        // Pass and play (me == null) is someone else's game too: never a review moment.
+        if (me != null && reviewedBattle !== b) {
+            reviewedBattle = b
+            review.onBattleEnded(outcome.winner?.let { it == me }, outcome.byForfeit, progress.castsMade)
+        }
         if (!battleRecorded && battleOpponent is Opponent.Computer) {
             battleRecorded = true
             val won = outcome.winner?.let { it == 0 }
@@ -1402,6 +1430,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         // Only the kind of failure: the reason can name the server's address.
         GameAnalytics.problem("online", if (match != null && match.outcome == null) "connection lost in a match" else "connection closed")
         if (match != null && match.outcome == null) {
+            review.onSetback()
             match.connectionLost(reason)
             if (screen == Screen.CAST && battleTurn != null) {
                 session = null

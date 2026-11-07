@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
@@ -30,6 +31,10 @@ class MainActivity : ComponentActivity() {
                 SideEffect { WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = light }
                 AppRoot(viewModel)
                 com.deepline.fishing.analytics.TrackScreens(viewModel)
+                // Google Play's review card, right after a happy moment once the screen is calm.
+                viewModel.reviewToAsk?.let { moment ->
+                    LaunchedEffect(moment) { viewModel.review.launch(this@MainActivity) }
+                }
             }
         }
         // Opened from a reminder: go to the screen it talks about.
