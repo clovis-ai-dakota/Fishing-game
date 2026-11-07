@@ -370,6 +370,19 @@ class SocialTest {
         dir.deleteRecursively()
     }
 
+    @Test
+    fun rateLimitsUseASlidingWindow() {
+        var t = 0L
+        val limiter = RateLimiter { t }
+        repeat(3) { assertTrue(limiter.allow("k", 3, 1_000)) }
+        assertFalse(limiter.allow("k", 3, 1_000))
+        assertTrue(limiter.allow("other", 3, 1_000), "each key has its own count")
+        t = 999
+        assertFalse(limiter.allow("k", 3, 1_000))
+        t = 1_000
+        assertTrue(limiter.allow("k", 3, 1_000), "the oldest action has left the window")
+    }
+
     // ---- Over HTTP and WebSocket ----------------------------------------------------------------------
 
     private val json = Json { ignoreUnknownKeys = true }

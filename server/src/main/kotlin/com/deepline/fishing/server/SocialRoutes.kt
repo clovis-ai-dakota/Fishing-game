@@ -33,11 +33,16 @@ private val socialJson = Json {
 /** Requests per IP address per minute, across every social call (flood protection). */
 private const val REQUESTS_PER_IP_PER_MINUTE = 600
 
-/** The social API (see [SocialApi]): friends, leaderboards, the tournament and clubs. */
-fun Route.socialRoutes(social: SocialStore, limiter: RateLimiter = RateLimiter()) {
+/**
+ * The social API (see [SocialApi]): friends, leaderboards, the tournament and clubs. Behind a
+ * hosting proxy every request comes from the proxy's address: [clientIpHeader] names the header
+ * the proxy sets to the player's address (`DEEPLINE_CLIENT_IP_HEADER`, e.g. Fly-Client-IP), for the
+ * per-address rate limit. Only set it when the proxy overwrites that header.
+ */
+fun Route.socialRoutes(social: SocialStore, limiter: RateLimiter = RateLimiter(), clientIpHeader: String? = null) {
     /** A POST whose JSON body is a [request]; [block] returns the JSON answer, or null for 204. */
     fun <T> endpoint(path: String, request: KSerializer<T>, block: (T) -> String?) {
-        post(path) { call.answer(limiter) { body -> block(socialJson.decodeFromString(request, body)) } }
+        post(path) { call.answer(limiter, clientIpHeader) { body -> block(socialJson.decodeFromString(request, body)) } }
     }
     fun <T> T.json(serializer: KSerializer<T>): String = socialJson.encodeToString(serializer, this)
 
@@ -87,10 +92,11 @@ fun Route.socialRoutes(social: SocialStore, limiter: RateLimiter = RateLimiter()
     endpoint(SocialApi.FORGET_PATH, SocialRequest.serializer()) { social.forget(it.id, it.secret); null }
 }
 
-private suspend fun ApplicationCall.answer(limiter: RateLimiter, block: (String) -> String?) {
+private suspend fun ApplicationCall.answer(limiter: RateLimiter, clientIpHeader: String?, block: (String) -> String?) {
     val declared = request.headers[HttpHeaders.ContentLength]?.toLongOrNull()
     if (declared != null && declared > SocialApi.MAX_BODY_BYTES) return problem(SocialProblem.TOO_BIG)
-    if (!limiter.allow("ip:" + request.origin.remoteHost, REQUESTS_PER_IP_PER_MINUTE, 60_000L)) return problem(SocialProblem.TOO_MANY_REQUESTS)
+    val ip = clientIpHeader?.let { request.headers[it]?.substringBefore(',')?.trim()?.takeIf(String::isNotEmpty) } ?: request.origin.remoteHost
+    if (!limiter.allow("ip:$ip", REQUESTS_PER_IP_PER_MINUTE, 60_000L)) return problem(SocialProblem.TOO_MANY_REQUESTS)
     val body = receiveText()
     if (body.length > SocialApi.MAX_BODY_BYTES) return problem(SocialProblem.TOO_BIG)
     try {

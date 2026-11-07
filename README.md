@@ -450,6 +450,7 @@ claim window are deleted. The API is described in `core/.../social/SocialApi.kt`
 | `DEEPLINE_SOCIAL_DIR` | `data/social` | Where social data is kept |
 | `DEEPLINE_TOURNAMENT_SALT` | `0` | A secret number mixed into each week's tournament seed, so the water can't be known before the week. Set it in production and never change it mid-week. |
 | `DEEPLINE_CLUBS` | on | `off` answers every club call with 404 (club endpoints always exist otherwise) |
+| `DEEPLINE_CLIENT_IP_HEADER` | none | Behind a hosting proxy, the header it sets to the player's address (e.g. `Fly-Client-IP`), for the per-address rate limit. Only set it if the proxy overwrites that header. |
 
 Any host that runs a Docker container or a JVM works (for example Fly.io, Render, Railway or a
 VPS). Players connect to `ws://<host>:8080/battle`, or `wss://<host>/battle` behind HTTPS.
