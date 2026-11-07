@@ -30,7 +30,7 @@ Play's numbers change often.
 | Audience | Kept at **13+ (not designed for children)**, with the Families question flagged again for the developer (France's age of digital consent is 15; cute art may draw Play's attention). | §9 |
 | Store listing | Brand plus the main search term in the title ("Deep Line: Deep Sea Fishing", ≤ 30 characters), keywords in the short description, the core loop in the first lines, six languages written natively (en, fr, es, de, pt-BR, tr), checked by `StoreListingTest`. | §7, §10 |
 | Graphics | Feature graphic 1024×500 rendered from the game's own 3D renderer; adaptive launcher icon with a monochrome layer; 512×512 Play icon rendered from the same vector layers. | §7 |
-| Promo video | 1920×1080 (YouTube shows promo videos in landscape), 25 s, real 3D frames of casts rendered by the WebGL preview, the game's CC0 music. | §7 |
+| Promo video | 1920×1080 (YouTube shows promo videos in landscape), 24 s, real 3D frames of casts rendered by the WebGL preview, the game's CC0 music. | §7 |
 | Rollout | 10% → 20% → 50% → 100% over about a week, halting on crash rate > 1.09% or ANR rate > 0.47% (Play's bad-behaviour thresholds). | §12 |
 
 ## 1. The Play In-App Review API
@@ -209,7 +209,7 @@ What Google says (developer.android.com, *In-app reviews*):
   need a version per language; alt text for each.
 - **Promo video**: a YouTube URL (not a playlist or channel), public or unlisted, ads off (no
   monetisation), not age-restricted, shown in landscape; a feature graphic must exist. Guides
-  suggest 30 seconds to 2 minutes, others "under 30 seconds" *(re-check)*. Deep Line's is 25 s,
+  suggest 30 seconds to 2 minutes, others "under 30 seconds" *(re-check)*. Deep Line's is 24 s,
   1920×1080, with the portrait gameplay framed by captions.
 - **Localisation**: Play machine-translates listings that aren't translated, but hand-written
   translations read better and rank better for local searches (ASO guides). Custom store listings
