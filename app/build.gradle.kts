@@ -1,3 +1,4 @@
+import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -15,6 +16,33 @@ if (firebaseConfigured) {
     apply(plugin = "com.google.firebase.crashlytics")
 }
 
+// ---- Release builds (see docs/release-checklist.md and docs/research/launch.md) ----------------
+
+/** A Gradle property (-Pname=..., or ~/.gradle/gradle.properties), else an environment variable. */
+fun setting(property: String, env: String? = null): String? =
+    (project.findProperty(property) as String?)?.takeIf { it.isNotBlank() }
+        ?: env?.let { System.getenv(it) }?.takeIf { it.isNotBlank() }
+
+// Version: app/version.properties (+1 versionCode for every upload to Play), overridable on CI.
+val versionFile = Properties().apply { file("version.properties").inputStream().use { load(it) } }
+val appVersionCode = (setting("deeplineVersionCode") ?: versionFile.getProperty("versionCode")).toInt()
+val appVersionName = setting("deeplineVersionName") ?: versionFile.getProperty("versionName")
+
+// The upload key (Play App Signing keeps the real app signing key). Never commit it: put these in
+// ~/.gradle/gradle.properties or the CI's secret environment variables. Without them release
+// builds are unsigned (fine for checks and CI, refused by Play).
+val uploadStoreFile = setting("deeplineUploadStoreFile", "DEEPLINE_UPLOAD_STORE_FILE")
+val uploadStorePassword = setting("deeplineUploadStorePassword", "DEEPLINE_UPLOAD_STORE_PASSWORD")
+val uploadKeyAlias = setting("deeplineUploadKeyAlias", "DEEPLINE_UPLOAD_KEY_ALIAS")
+val uploadKeyPassword = setting("deeplineUploadKeyPassword", "DEEPLINE_UPLOAD_KEY_PASSWORD")
+val uploadKeyConfigured = listOf(uploadStoreFile, uploadStorePassword, uploadKeyAlias, uploadKeyPassword).all { it != null }
+
+// Server and privacy policy addresses (defaults are for development only).
+val serverUrl = setting("deeplineServerUrl") ?: "ws://10.0.2.2:8080/battle"
+val privacyUrl = setting("deeplinePrivacyPolicyUrl") ?: "https://deepline.example/privacy"
+// R8 shrinks and optimises release builds; -PdeeplineMinify=false turns it off (emergency only).
+val minifyRelease = setting("deeplineMinify")?.toBoolean() ?: true
+
 android {
     namespace = "com.deepline.fishing"
     compileSdk = 36
@@ -23,19 +51,35 @@ android {
         applicationId = "com.deepline.fishing"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = appVersionCode
+        versionName = appVersionName
 
         // Online battle server. Override with -PdeeplineServerUrl=wss://your-host/battle.
-        // The default reaches a server running on the development machine from the Android emulator.
-        val serverUrl = (project.findProperty("deeplineServerUrl") as String?) ?: "ws://10.0.2.2:8080/battle"
+        // The default reaches a server running on the development machine from the Android emulator
+        // (cleartext ws://, which only debug builds allow: see res/xml/network_security_config.xml).
         buildConfigField("String", "DEFAULT_SERVER_URL", "\"$serverUrl\"")
 
         // The published privacy policy, linked from the consent sheet and Settings > Privacy. Set
         // it before releasing: -PdeeplinePrivacyPolicyUrl=https://your-site/privacy (see
         // docs/privacy-policy.md). The placeholder uses a reserved domain that never resolves.
-        val privacyUrl = (project.findProperty("deeplinePrivacyPolicyUrl") as String?) ?: "https://deepline.example/privacy"
         buildConfigField("String", "PRIVACY_POLICY_URL", "\"$privacyUrl\"")
+    }
+
+    signingConfigs {
+        if (uploadKeyConfigured) {
+            create("upload") {
+                storeFile = file(uploadStoreFile!!)
+                storePassword = uploadStorePassword
+                keyAlias = uploadKeyAlias
+                keyPassword = uploadKeyPassword
+            }
+        }
+    }
+
+    bundle {
+        // Keep every language in the base APK: the in-app language picker must be able to switch to
+        // a language the phone isn't set to (Play would otherwise only install the phone's ones).
+        language { enableSplit = false }
     }
 
     buildTypes {
@@ -48,7 +92,12 @@ android {
             buildConfigField("boolean", "CLUBS_ENABLED", clubs(default = true))
         }
         release {
-            isMinifyEnabled = false
+            // R8: shrinks, optimises and obfuscates (libraries ship their own keep rules; ours are in
+            // proguard-rules.pro). The bundle carries the mapping file for Play's crash reports.
+            isMinifyEnabled = minifyRelease
+            isShrinkResources = minifyRelease
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfig = if (uploadKeyConfigured) signingConfigs.getByName("upload") else null
             buildConfigField("boolean", "USE_PLAY_BILLING", "true")
             // Clubs ship in their own update: off in release builds until then (-PdeeplineClubs=true).
             buildConfigField("boolean", "CLUBS_ENABLED", clubs(default = false))
@@ -87,6 +136,25 @@ kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_17)
     }
+}
+
+// Before a release build, list what would make it unfit for Google Play. Builds for checks and CI
+// only warn; the build that is uploaded uses -PdeeplineStrictRelease=true, which fails instead.
+gradle.taskGraph.whenReady {
+    val releasing = allTasks.any { t ->
+        t.project == project && t.name.endsWith("Release") && (t.name.startsWith("bundle") || t.name.startsWith("assemble"))
+    }
+    if (!releasing) return@whenReady
+    val problems = buildList {
+        if (!uploadKeyConfigured) add("no upload key (deeplineUpload* Gradle properties or DEEPLINE_UPLOAD_* variables): the build is unsigned and Play will refuse it")
+        if (!serverUrl.startsWith("wss://")) add("the game server is $serverUrl: release builds refuse cleartext, build with -PdeeplineServerUrl=wss://<host>/battle")
+        if ("deepline.example" in privacyUrl) add("the privacy policy link is the placeholder: build with -PdeeplinePrivacyPolicyUrl=https://...")
+        if (!minifyRelease) add("R8 is off (-PdeeplineMinify=false)")
+    }
+    if (problems.isEmpty()) return@whenReady
+    val text = "Release build $appVersionName ($appVersionCode) is not ready for Google Play:\n" + problems.joinToString("\n") { "  - $it" }
+    if (setting("deeplineStrictRelease")?.toBoolean() == true) throw GradleException(text)
+    logger.warn("WARNING: $text")
 }
 
 // The online UI test runs the real battle server as a separate process.

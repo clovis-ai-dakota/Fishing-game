@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Release builds: encrypted connections only (https://, wss://). The game server must be behind
+    TLS (build with -PdeeplineServerUrl=wss://<host>/battle): the Play Data safety form declares
+    that all data is encrypted in transit. Debug builds replace this file (src/debug/res/xml) to
+    reach a local development server over ws://.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
