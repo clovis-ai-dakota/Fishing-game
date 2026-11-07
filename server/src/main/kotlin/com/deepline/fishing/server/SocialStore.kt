@@ -753,24 +753,49 @@ class SocialStore(
 
     // ---- Account deletion ----------------------------------------------------------------------------
 
-    /**
-     * Deletes everything social about the player: friendships and requests on both sides,
-     * challenges, their club membership (handing the club over if they owned it), their club
-     * contributions, and their entries on the leaderboards and tournaments still kept.
-     */
+    /** The player asks to delete their social data ([SocialApi.FORGET_PATH]): see [forgetPlayer]. */
     fun forget(id: String, secret: String) = synchronized(lock) {
         auth(id, secret, write = true)
-        val me = player(id)
-        for (f in me.friends) unfriend(id, f)
-        for (t in me.outgoing + me.incoming.map { it.from }) dropRequests(id, t)
-        clubOf(me)?.let { removeMember(it, id) }
+        forgetPlayer(id)
+    }
+
+    /**
+     * Erases everything this store keeps about the player [id], for account deletion (the server
+     * registers it as an `AccountStore` deletion listener) and for [forget]. It needs no secret:
+     * the caller has already checked who is asking. Every file is swept, not just the ones the
+     * player's own file points to, so nothing is left behind even if records disagree:
+     * - friendships, friend requests (sent and received) and challenges, on everyone's side;
+     * - club membership (an owner's club passes to its longest-standing member, an empty club is
+     *   closed) and the player's contributions and claims in every club;
+     * - their entries on every kept week's leaderboards and tournament (others move up a rank);
+     * - their own file.
+     * An id that isn't a valid player id is ignored (ids are file names).
+     */
+    fun forgetPlayer(id: String) = synchronized(lock) {
+        if (!PlayerId.isValid(id)) return@synchronized
+        // Everyone else's lists: read without caching, saved only when something changes.
+        for (other in (players.keys + playerFiles.ids()).toSet() - id) {
+            val o = players[other] ?: playerFiles.read(other) ?: continue
+            val cleaned = o.copy(
+                friends = o.friends - id,
+                incoming = o.incoming.filterNot { it.from == id },
+                outgoing = o.outgoing - id,
+                challenges = o.challenges.filterNot { it.from == id },
+            )
+            if (cleaned != o) save(cleaned)
+        }
+        // Clubs: membership first (ownership passes on), then contributions and claims.
+        for (clubId in clubs.values.filter { c -> c.members.any { it.id == id } }.map { it.id }) {
+            clubs[clubId]?.let { removeMember(it, id) }
+        }
         for (c in clubs.values.toList()) {
             if (c.weeks.values.any { id in it.fish || id in it.today || id in it.claimed }) {
                 save(c.copy(weeks = c.weeks.mapValues { (_, cw) -> cw.copy(fish = cw.fish - id, today = cw.today - id, claimed = cw.claimed - id) }))
             }
         }
-        val current = Weeks.indexAt(now())
-        for (w in (current - GameConfig.TOURNAMENT_CLAIM_WEEKS - 1)..current) {
+        // Leaderboards and tournaments of every week still kept.
+        pruneWeeks()
+        for (w in (weeks.keys + weekFiles.ids().mapNotNull { it.toLongOrNull() }).toSet()) {
             val rec = weekRecord(w)
             if (id in rec.entries) save(rec.copy(entries = rec.entries - id))
         }

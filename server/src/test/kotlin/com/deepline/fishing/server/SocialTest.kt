@@ -371,6 +371,67 @@ class SocialTest {
     }
 
     @Test
+    fun accountDeletionErasesEverySocialTrace() {
+        val dir = Files.createTempDirectory("social-delete").toFile()
+        val dave = PlayerId.random()
+        val s = store(dir)
+        for ((p, n) in listOf(alice to "Alice", bob to "Bob", carol to "Carol", dave to "Dave")) s.hello(p, n)
+        // Last week's tournament, still claimable.
+        s.play(alice)
+        s.play(bob)
+        now = Weeks.startOf(week + 1) + 2 * day
+        // This week: a friend, requests both ways, a challenge, scores and a club Alice owns.
+        s.requestFriend(alice.id, alice.secret, bob.id)
+        s.acceptFriend(bob.id, bob.secret, alice.id)
+        s.requestFriend(carol.id, carol.secret, alice.id)
+        s.requestFriend(alice.id, alice.secret, dave.id)
+        s.challenge(alice.id, alice.secret, bob.id, "ABCDE", BattleMode.DEEP_DIVE)
+        s.play(alice)
+        s.play(bob)
+        val club = s.createClub(alice.id, alice.secret, 1, 2, null).club!!
+        now += 1_000
+        s.joinClub(bob.id, bob.secret, club.code, null)
+        now += 1_000
+        s.joinClub(carol.id, carol.secret, club.code, null)
+        s.contribute(alice.id, alice.secret, 40)
+        s.contribute(bob.id, bob.secret, 15)
+        assertTrue(dir.walkTopDown().filter { it.isFile }.any { alice.id in it.readText() })
+
+        // Deleting the account (no secret needed: the account store already checked it), from a
+        // fresh server process, so nothing is in memory and every file has to be swept.
+        val again = store(dir)
+        again.forgetPlayer(alice.id)
+        val left = dir.walkTopDown().filter { it.isFile && alice.id in it.readText() }.map { it.relativeTo(dir).path }.toList()
+        assertEquals(emptyList(), left, "no file mentions the deleted player")
+        val bobs = again.hello(bob, "Bob")
+        assertTrue(bobs.friends.isEmpty())
+        assertTrue(bobs.challenges.isEmpty())
+        assertTrue(again.hello(carol, "Carol").outgoing.isEmpty())
+        assertTrue(again.hello(dave, "Dave").incoming.isEmpty())
+        // The club passes to the longest-standing member, without Alice's fish.
+        val c = again.myClub(carol.id, carol.secret, null).club!!
+        assertEquals(setOf(bob.id, carol.id), c.members.map { it.id }.toSet())
+        assertEquals(bob.id, c.members.single { it.role == ClubRole.OWNER }.id)
+        assertEquals(15, c.weekFish)
+        // Leaderboards and tournaments, this week and last: Bob moves up.
+        val board = again.leaderboard(bob.id, bob.secret, BoardKind.BEST_CAST, BoardView.GLOBAL)
+        assertEquals(listOf(true), board.entries.map { it.you })
+        val t = again.tournament(bob.id, bob.secret)
+        assertEquals(1, t.participants)
+        assertEquals(1, t.rank)
+        val lastWeek = t.rewards.single()
+        assertEquals(1, lastWeek.participants)
+        assertEquals(TournamentTier.CHAMPION, lastWeek.tier)
+        // Ids that aren't player ids (they'd be file names) are ignored; unknown players are harmless.
+        again.forgetPlayer("../../etc")
+        again.forgetPlayer(PlayerId.random().id)
+        // The id starts afresh if it's used again.
+        assertTrue(again.hello(alice, "Alice").friends.isEmpty())
+        assertNull(again.tournament(alice.id, alice.secret).best)
+        dir.deleteRecursively()
+    }
+
+    @Test
     fun rateLimitsUseASlidingWindow() {
         var t = 0L
         val limiter = RateLimiter { t }

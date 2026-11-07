@@ -167,11 +167,12 @@ privacy controls (who can send requests, blocking).
   boards use generated names; clubs use generated names. A word filter for typed names remains a
   follow-up before a wide launch.
 - **Account deletion**: Google Play requires apps that let users create an account to let them
-  request its deletion, in the app and on the web. `POST /api/social/forget` (the "Delete my
-  social data" button) removes friendships on both sides, requests, challenges, club membership
-  (handing the club over), club contributions and leaderboard and tournament entries. A full
-  account deletion (cloud save and gifts in `Accounts.kt`) should call it too, and needs a web
-  form; that belongs with the privacy work.
+  request its deletion, in the app and on the web. `SocialStore.forgetPlayer(id)` removes
+  friendships on both sides, requests, challenges, club membership (handing the club over),
+  club contributions and leaderboard and tournament entries, sweeping every stored file so
+  nothing that names the player is left. Full account deletion (`AccountStore.delete`, with its
+  in-app and web entry points) calls it as a deletion listener; `POST /api/social/forget` (the
+  "Delete my social data" button) calls it for social data alone.
 - **Data kept**: week files are deleted once their rewards can't be claimed any more (after about
   5 weeks); old club weeks are dropped on save.
 

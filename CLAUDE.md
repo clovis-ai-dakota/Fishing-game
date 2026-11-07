@@ -172,8 +172,12 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     `EconomyTest`. A tournament cast never counts for points or the fish log.
   - Privacy: players are found by id only; typed names are shown to friends, club members and
     battle opponents, never on public boards (strangers get `Leaderboards.anglerName`); club names
-    are generated (`Clubs.adjectives`/`nouns`), there's no chat. `/api/social/forget` deletes a
-    player's social data: call it from any future account deletion.
+    are generated (`Clubs.adjectives`/`nouns`), there's no chat. `SocialStore.forgetPlayer(id)`
+    erases every social trace of a player (friends and requests on both sides, challenges, club
+    membership with the club handed over, contributions, every kept week's entries) by sweeping
+    all the files: account deletion calls it (an `AccountStore.onDelete` listener), and so does
+    `/api/social/forget` ("Delete my social data"). New per-player social data must be erased there
+    too (`SocialTest.accountDeletionErasesEverySocialTrace` checks no file still names the player).
   - Log key moments with `Analytics.event` (`friend_add`, `post_score`, `join_group`...), never ids,
     codes or typed names.
 - **Clubs ship in a later update, behind `FeatureFlags.clubs`** (on in debug builds, off in
