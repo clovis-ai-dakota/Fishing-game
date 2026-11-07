@@ -272,6 +272,17 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
   the new version, so returning players get the club step in "What's new"; (3) on the server, club
   endpoints always exist unless `DEEPLINE_CLUBS=off`: make sure production doesn't set it; (4)
   describe clubs in the store listing. Re-check the club rewards against the economy first.
+- **Play reviews and releases** (research: `docs/research/launch.md`; steps: `docs/release-checklist.md`):
+  - The review card (`app/.../review/`, rules in core `ReviewPrompts`, numbers in
+    `GameConfig.Review`) is asked for only after a happy moment, on a calm screen, never after a
+    setback: report new setbacks with `review.onSetback()`. Never add a "Rate us" button, a
+    question before the card, or a reward for reviewing (Play policy). Robolectric uses
+    `NoReviewPrompter`; tests inject fakes through `ReviewPrompters.factory`.
+  - Release builds: R8 on (`app/proguard-rules.pro`), cleartext refused (only `src/debug` allows
+    it), upload key and versions from outside the code (`app/version.properties`, `deeplineUpload*`
+    properties). Never commit keys. `tools/release/check-release.sh` checks a build.
+  - The store listing (`docs/store/listings/<locale>/`, six languages) quotes the game: change it
+    with the game (`StoreListingTest` checks limits, banned claims, secret names and numbers).
 - All tunable numbers live in `core/.../GameConfig.kt` (plus the tables in `FishSpecies.kt`,
   `Upgrades.kt`, `Secrets.kt` and `Daily.kt`). The tour and HUD read them, so don't hard-code them in UI text.
 - Run `./gradlew :core:test :server:test :app:testDebugUnitTest` before pushing. App UI tests

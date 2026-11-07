@@ -15,3 +15,7 @@ captures/
 **/data/accounts/
 # Friends, weekly leaderboards, tournaments and clubs (written by the server)
 **/data/social/
+# Signing keys and their passwords never go in the repository (docs/release-checklist.md)
+*.jks
+*.keystore
+keystore.properties

@@ -11,7 +11,7 @@ features, leaderboards, notifications...). Background: `docs/research/analytics-
 | Question | Answer | Notes |
 | --- | --- | --- |
 | Does your app collect or share any of the required user data types? | **Yes** | Device or other IDs, app activity, app info and performance, purchase history (see below). |
-| Is all of the user data collected by your app encrypted in transit? | **Yes, only if** the production game server is behind HTTPS/WSS | The default development URL is `ws://` (cleartext). Deploy with TLS (`wss://your-host/battle`, build with `-PdeeplineServerUrl=wss://...`); Firebase and Google Play always use TLS. If any player can still reach a `ws://` server, answer **No**. Consider removing `usesCleartextTraffic` from the release manifest. |
+| Is all of the user data collected by your app encrypted in transit? | **Yes**, with the production game server behind HTTPS/WSS | Release builds refuse cleartext connections (network security config: `app/src/main/res/xml/network_security_config.xml`; only debug builds allow `ws://` for the development server), so a release build can only talk to the server over TLS. Deploy with TLS (`wss://your-host/battle`, build with `-PdeeplineServerUrl=wss://...`; `-PdeeplineStrictRelease=true` refuses a `ws://` address). Firebase and Google Play always use TLS. |
 | Do you provide a way for users to request that their data is deleted? | **Yes** | In the app: Settings > Privacy > *Delete my online account*; on the web: `https://<your-server>/delete-account`; statistics and crash reports: switch off (clears the device's analytics data) and retention limits. |
 
 ## Account creation and deletion
@@ -114,6 +114,9 @@ location.
 - **Advertising ID**: the app does **not** use an advertising ID (the `AD_ID` permission is
   removed from the manifest; Analytics' ad ID collection is off).
 - **Ads**: the app contains **no ads**.
+- **In-app review** (Google Play In-App Review API): the rating and review text are typed into
+  Google Play's own card and handled by the Play Store under Play's terms; the app never receives
+  them, so there is nothing to declare for it (Play Core's data safety note says the same).
 - **Target audience and content**: see `docs/research/analytics-privacy.md` section 8 (the
   assumption is 13+, not designed for children; the developer must confirm).
 - **Privacy policy URL**: the published version of `docs/privacy-policy.md`.
