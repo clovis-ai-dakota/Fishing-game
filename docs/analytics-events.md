@@ -141,9 +141,9 @@ Add a section for each here, in the same format, when they land: the test lists 
 | `daily_challenge_complete` | `kind` (the challenge's kind), `difficulty` (`easy`, `medium`, `hard`) | Which challenges get done: checks they fit players' progress. |
 | `daily_challenge_claim` | `kind`, `difficulty` | Completed challenges whose reward is actually collected. |
 | `daily_challenge_reroll` | `difficulty`, `kind` (the new challenge) | Which challenges players swap away: candidates to rework. |
-| `notification_opt_in` | `source` (where it was switched on: `explainer`, `settings`...) | How many players accept reminders, and from where. |
-| `notification_opt_out` | `source` | How many refuse or turn them off: a too-pushy reminder shows up here first. |
-| `notification_permission` | `granted` (`true`/`false`), `source` | The Android 13+ system dialog's answer after the in-app explainer. |
-| `notification_type_toggle` | `type` (the reminder kind), `on` (`true`/`false`) | Which reminder kinds players keep or mute. |
-| `notification_sent` | `type` | Reminders actually shown (at most one a day, outside quiet hours). |
-| `notification_open` | `type` | Reminders tapped: whether they bring players back (compare with `notification_sent`). |
+| `reminder_opt_in` | `source` (where it was switched on: `explainer`, `settings`...) | How many players accept reminders, and from where. |
+| `reminder_opt_out` | `source` | How many refuse or turn them off: a too-pushy reminder shows up here first. |
+| `reminder_permission` | `granted` (`true`/`false`), `source` | The Android 13+ system dialog's answer after the in-app explainer. |
+| `reminder_type_toggle` | `type` (the reminder kind), `on` (`true`/`false`) | Which reminder kinds players keep or mute. |
+| `reminder_sent` | `type` | Reminders actually shown (at most one a day, outside quiet hours). |
+| `reminder_open` | `type` | Reminders tapped: whether they bring players back (compare with `reminder_sent`). |

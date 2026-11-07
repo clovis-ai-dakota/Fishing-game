@@ -228,7 +228,7 @@ class ReminderWorker(context: Context, params: WorkerParameters) : Worker(contex
             store,
             settings.copy(lastSentDay = LocalDays.dayOf(now), lastEventKey = reminder.eventKey.ifEmpty { settings.lastEventKey }),
         )
-        Analytics.event("notification_sent", mapOf("type" to reminder.kind.name.lowercase()))
+        Analytics.event("reminder_sent", mapOf("type" to reminder.kind.name.lowercase()))
         return Result.success()
     }
 }

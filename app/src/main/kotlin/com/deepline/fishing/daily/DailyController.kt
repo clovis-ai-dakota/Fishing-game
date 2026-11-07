@@ -153,12 +153,12 @@ class DailyController(
     fun answerOptIn(turnOn: Boolean) {
         askOptIn = false
         ReminderPrefs.markAsked(store)
-        if (!turnOn) Analytics.event("notification_opt_out", mapOf("source" to "explainer"))
+        if (!turnOn) Analytics.event("reminder_opt_out", mapOf("source" to "explainer"))
     }
 
     /** The system dialog's answer (or true straight away when no permission is needed). */
     fun onPermissionResult(granted: Boolean, source: String) {
-        Analytics.event("notification_permission", mapOf("granted" to granted, "source" to source))
+        Analytics.event("reminder_permission", mapOf("granted" to granted, "source" to source))
         if (granted) {
             setEnabled(true, source)
         } else {
@@ -173,10 +173,10 @@ class DailyController(
         if (on) {
             ReminderChannels.create(context)
             ReminderScheduler.schedule(context)
-            Analytics.event("notification_opt_in", mapOf("source" to source))
+            Analytics.event("reminder_opt_in", mapOf("source" to source))
         } else {
             ReminderScheduler.cancel(context)
-            Analytics.event("notification_opt_out", mapOf("source" to source))
+            Analytics.event("reminder_opt_out", mapOf("source" to source))
         }
     }
 
@@ -188,12 +188,12 @@ class DailyController(
                 ReminderKind.EVENT_STARTING -> reminders.copy(events = on)
             },
         )
-        Analytics.event("notification_type_toggle", mapOf("type" to kind.name.lowercase(), "on" to on))
+        Analytics.event("reminder_type_toggle", mapOf("type" to kind.name.lowercase(), "on" to on))
     }
 
     /** A reminder was tapped. */
     fun onNotificationOpened(target: ReminderTarget) {
-        Analytics.event("notification_open", mapOf("type" to target.key))
+        Analytics.event("reminder_open", mapOf("type" to target.key))
     }
 
     private fun saveReminders(s: ReminderSettings) {

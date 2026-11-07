@@ -153,8 +153,8 @@ reminders and limited-time events, and what Deep Line does as a result. Numbers 
   reminder rather than adding to it), an event reminder once per event. Texts rotate per day.
 - **Deep links**: daily and streak reminders open the Daily screen, a migration opens the Fish
   tab with its banner, a weekend event opens the Shop's Passes page.
-- Analytics: `notification_opt_in` / `notification_opt_out` (with where), `notification_open`
-  (with the type), `notification_sent`.
+- Analytics: `reminder_opt_in` / `reminder_opt_out` (with where), `reminder_open`
+  (with the type), `reminder_sent` (Firebase reserves `notification_open`, so the reminder events are named `reminder_*`).
 
 ## 4. Limited-time migrations
 
