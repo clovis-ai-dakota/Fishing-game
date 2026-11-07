@@ -134,6 +134,39 @@ object GameConfig {
     const val DETECTOR_RADIUS_M = 25f
 
     /**
+     * Game feel (app/.../feel): screen shake, slow motion and flashes. They are presentation only:
+     * shake moves the drawing, never the hook, the fish or what counts as a hit. Slow motion only
+     * plays in solo casts (battles and online casts always run in real time, so nobody gets more
+     * time to react than their opponent), and the Reduce motion setting turns all three off.
+     */
+    object Feel {
+        /** The largest shake offset, as a share of the screen width (at full trauma). */
+        const val SHAKE_MAX_OFFSET = 0.018f
+        /** Trauma lost per second (trauma runs from 0 to 1; the shake is trauma squared). */
+        const val SHAKE_DECAY_PER_SEC = 1.6f
+        /** How fast the shake wobbles (noise samples per second). */
+        const val SHAKE_FREQUENCY = 22f
+        /** Trauma added by a bump, the last bump, a snag and a big catch. */
+        const val TRAUMA_BUMP = 0.32f
+        const val TRAUMA_LAST_BUMP = 0.55f
+        const val TRAUMA_SNAG = 0.6f
+        const val TRAUMA_RARE_CATCH = 0.3f
+
+        /** Hit-stop on a rare catch: the game nearly freezes for this long (wall-clock seconds)... */
+        const val HIT_STOP_SECONDS = 0.06f
+        const val HIT_STOP_SCALE = 0.05f
+        /** ...then runs at this speed and eases back to normal over this long. Solo casts only. */
+        const val SLOW_MO_SCALE = 0.35f
+        const val SLOW_MO_SECONDS = 0.45f
+
+        /** A catch of this many rarity stars or more counts as rare (bigger sound, slow motion). */
+        const val RARE_CATCH_STARS = 3
+        /** How bright a rare catch's flash starts (0..1, drawn under the darkness) and how long it lasts. */
+        const val FLASH_ALPHA = 0.45f
+        const val FLASH_SECONDS = 0.3f
+    }
+
+    /**
      * The shop's exchange rate between euros and points: an item costs, in points, as much as a
      * good player earns in this many minutes of fishing per euro of its price, at their rope's
      * reach ([POINTS_PER_MINUTE_BY_LENGTH_LEVEL]). Paying saves a typical player about a day and

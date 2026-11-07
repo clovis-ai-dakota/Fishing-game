@@ -82,7 +82,8 @@ data class CastResult(
 }
 
 sealed interface CastEvent {
-    data class Touched(val touchesUsed: Int) : CastEvent
+    /** A bump on the way down; [kind] is what the hook hit (for sound and feedback). */
+    data class Touched(val touchesUsed: Int, val kind: BumpKind = BumpKind.FISH_HEAD) : CastEvent
     data class Reversed(val reason: ReverseReason) : CastEvent
     data class Caught(val record: CatchRecord) : CastEvent
     data class TooHeavy(val species: FishSpecies) : CastEvent
@@ -383,7 +384,7 @@ class CastSession(
         touches++
         lastTouchAtSeconds = elapsedSeconds
         _bumpTimes += elapsedSeconds
-        pendingEvents += CastEvent.Touched(touches)
+        pendingEvents += CastEvent.Touched(touches, _bumps.lastOrNull() ?: BumpKind.FISH_HEAD)
         if (touches >= touchLimit) {
             reverse(ReverseReason.TOUCH_LIMIT)
             return true

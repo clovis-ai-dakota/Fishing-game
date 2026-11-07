@@ -119,6 +119,9 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     private val store = SharedPrefsStore(app)
     private val repository = ProgressRepository(store)
 
+    /** Sound, music, haptics and the casts' screen effects (see feel/GameFeel.kt). */
+    val feel = com.deepline.fishing.feel.GameFeel.create(app, store)
+
     var progress by mutableStateOf(repository.load())
         private set
     var screen by mutableStateOf(Screen.HOME)
@@ -267,6 +270,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
 
     /** A tap on the bottom navigation bar. */
     fun selectTab(tab: MainTab) {
+        if (screen != tab.screen) feel.cue(com.deepline.fishing.feel.Cue.UI_TAP)
         screen = tab.screen
         shopMessage = null
         if (tab == MainTab.SHOP) checkGifts()
@@ -381,6 +385,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
                 val contents = ShopText.contents(item, progress)
                 update(ShopCatalog.grant(progress, item, ShopClock.now()))
                 shopMessage = "Thank you! ${item.name}: $contents."
+                feel.cue(com.deepline.fishing.feel.Cue.PURCHASE)
             }
             rememberToken(purchase.token)
         }
@@ -592,6 +597,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         GameAnalytics.shopPointsPurchase(item, progress, next)
         update(next)
         shopMessage = "${item.name}: $contents."
+        feel.cue(com.deepline.fishing.feel.Cue.PURCHASE)
         return true
     }
 
@@ -619,6 +625,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         ShopCatalog.claimClubPouch(progress, ShopClock.now())?.let {
             update(it)
             shopMessage = "Captain's Club: $contents."
+            feel.cue(com.deepline.fishing.feel.Cue.CLAIM)
         }
     }
 
@@ -638,6 +645,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         GameAnalytics.seasonClaimed(open.size, open.any { it.premium }, progress, next)
         update(next)
         shopMessage = "Season rewards: $what."
+        feel.cue(com.deepline.fishing.feel.Cue.CLAIM)
     }
 
     fun claimEventReward() {
@@ -646,6 +654,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             GameAnalytics.weekendEventClaimed(progress, it)
             update(it)
             shopMessage = "Weekend event reward claimed!"
+            feel.cue(com.deepline.fishing.feel.Cue.CLAIM)
         }
     }
 
@@ -670,6 +679,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         val next = Progression.unlockBoatPart(progress, part) ?: return false
         GameAnalytics.pointsChanged(progress, next, "boat_part", part.key.lowercase())
         update(next)
+        feel.cue(com.deepline.fishing.feel.Cue.PURCHASE)
         return true
     }
 
@@ -701,6 +711,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
 
     fun toggleLantern(enabled: Boolean) {
         useLantern = enabled && progress.lanterns > 0
+        if (useLantern) feel.cue(com.deepline.fishing.feel.Cue.LANTERN)
     }
 
     /** The other tackle switched on for the next cast (Lucky charm, Sparkle lure). */
@@ -755,6 +766,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         Progression.buyTackle(progress, item)?.let {
             GameAnalytics.tackleBought(item, progress, it)
             update(it)
+            feel.cue(com.deepline.fishing.feel.Cue.PURCHASE)
         }
     }
 
@@ -793,6 +805,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         notice = null
         paused = false
         screen = Screen.CAST
+        feel.onCastStart(s)
     }
 
     /** Builds the water for a regular cast. Tests swap it to fish hand-placed water. */
@@ -812,8 +825,10 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     fun onFrame(dt: Float, steerTargetX: Float?) {
         val s = session ?: return
         if (paused || pendingResult != null || secretPopup != null) return
-        s.update(dt, steerTargetX)
+        // Slow motion (a rare catch) only ever slows solo casts: battles run in real time.
+        s.update(feel.simDt(dt, solo = battleTurn == null), steerTargetX)
         val events = s.drainEvents()
+        feel.onCastFrame(s, events)
         // A last-bump hook comes with the line turning back; its notice is the one worth showing.
         val hooked = events.any { it is CastEvent.LastBumpHooked }
         for (event in events) {
@@ -851,6 +866,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         if (s.phase == CastPhase.SURFACED) {
             val result = s.result
             pendingResult = result
+            result?.let(feel::onCastResult)
             // Secrets pulled off in this cast are revealed with the results.
             result?.let { r -> Secrets.revealedBy(r).forEach(::onSecretTriggered) }
         }
@@ -886,6 +902,8 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     private fun onSecretTriggered(id: String) {
         if (!explainedThisCast.add(id)) return
         val explain = Progression.shouldExplainSecret(progress, id)
+        // One sound for every secret (it never tells which).
+        if (explain || id !in progress.discoveredSecrets) feel.cue(com.deepline.fishing.feel.Cue.SECRET)
         // The first time also grants the secret's one-time reward (points, Lanterns, skins).
         val next = Progression.discoverSecret(progress, id)
         if (id !in progress.discoveredSecrets) GameAnalytics.secretDiscovered(id, battleTurn != null || screen == Screen.BATTLE, progress, next)
@@ -1037,6 +1055,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         Progression.upgrade(progress, stat)?.let {
             GameAnalytics.ropeChanged(stat, progress, it)
             update(it)
+            feel.cue(com.deepline.fishing.feel.Cue.PURCHASE)
         }
     }
 
@@ -1044,6 +1063,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         Progression.buyLantern(progress)?.let {
             GameAnalytics.tackleBought(Tackle.LANTERN, progress, it)
             update(it)
+            feel.cue(com.deepline.fishing.feel.Cue.PURCHASE)
         }
     }
 
@@ -1051,6 +1071,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         Progression.claimMilestone(progress, milestone)?.let {
             GameAnalytics.milestoneClaimed(milestone, progress, it)
             update(it)
+            feel.cue(com.deepline.fishing.feel.Cue.CLAIM)
         }
     }
 
@@ -1183,6 +1204,8 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         battleVersion++
         val b = battle ?: return
         val outcome = (if (isOnlineBattle) onlineMatch?.outcome else b.outcome()) ?: return
+        val me = if (isOnlineBattle) onlineMatch?.myIndex else if (battleOpponent is Opponent.Computer) 0 else null
+        feel.onBattleOutcome(b, outcome.winner, me)
         if (!battleRecorded && battleOpponent is Opponent.Computer) {
             battleRecorded = true
             val won = outcome.winner?.let { it == 0 }
@@ -1352,6 +1375,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         connection?.close()
         accounts.close()
         billing.close()
+        feel.release()
         super.onCleared()
     }
 

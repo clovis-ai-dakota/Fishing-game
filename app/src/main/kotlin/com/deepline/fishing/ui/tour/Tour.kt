@@ -23,6 +23,7 @@ enum class TourTarget {
     HOME_THEMES, THEMES_MODE, SHOP_THEMES,
     SETTINGS_TOUR,
     // -- Game feel (sound, haptics) targets below.
+    SETTINGS_SOUND,
 
     // -- Daily loop targets below.
 
@@ -407,6 +408,16 @@ object Tour {
             sinceVersion = VERSION,
         ),
         // -- Game feel (sound, haptics) steps below.
+        TourStep(
+            id = "sound",
+            title = "Sound and feel",
+            body = "Set the volume, the music and the sound effects separately here. The music follows your " +
+                "hook: calm near the surface, darker in the deep. Vibration adds a light touch to bumps, " +
+                "catches and big wins, and Reduce motion turns off screen shake, slow motion and flashes.",
+            screen = Screen.SETTINGS,
+            target = TourTarget.SETTINGS_SOUND,
+            sinceVersion = VERSION,
+        ),
 
         // -- Daily loop steps below.
 

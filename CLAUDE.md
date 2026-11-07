@@ -177,6 +177,25 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     first test's Application (lifecycle caches its factory), so it reads that test's preferences.
     Tests that need a fresh first launch reset state themselves within one test (see
     `PrivacyUiTest.kt`).
+- **Sound, haptics and juice** (`app/.../audio/`, `app/.../feel/`): game moments go through
+  `feel/FeelMap` (pure, unit tested) to sounds, a haptic and render-only effects, and `GameFeel`
+  (what the view model delegates to) applies them with the player's settings. New sounds go in the
+  `Sfx` table (with pitch/volume variation, voice limit and minimum gap; no random pitch on tuned
+  sounds) and new feel numbers in `GameConfig.Feel`.
+  - **Audio is CC0 only.** Every file in `assets/audio` needs its source page, author, pack and
+    licence in `assets/audio/CREDITS.md` and `audio/AudioCredits.kt` (shown in Settings >
+    Credits); `AudioAssetsTest` fails otherwise. Keep the audio small (under 3 MB): mono OGG
+    effects, music loops made seamless at conversion.
+  - **Effects are render-only**: shake moves the drawing (2D translate with bleed, 3D projection
+    offset and `uHookScreen`), never the hook, fish, steering or hit detection; particles and
+    flashes are drawn before the darkness in both renderers. Slow motion only in solo casts
+    (`GameFeel.simDt(solo = ...)`): battles and online casts must run in real time.
+  - **Reduce motion** turns off shake, slow motion and flashes; haptics respect the Vibration
+    setting and stay sparse (no haptics on ordinary taps). Device settings (volumes, haptics,
+    reduce motion) live in the key-value store, not in `PlayerProgress`.
+  - Robolectric uses `NoAudio`; tests inject fakes through `AudioEngines.factory` and
+    `Haptics.factory`. Put each such UI test in its own class: a class's later tests get a view
+    model built with the first test's application, so saved settings would live elsewhere.
 - All tunable numbers live in `core/.../GameConfig.kt` (plus the tables in `FishSpecies.kt`,
   `Upgrades.kt` and `Secrets.kt`). The tour and HUD read them, so don't hard-code them in UI text.
 - Run `./gradlew :core:test :server:test :app:testDebugUnitTest` before pushing. App UI tests

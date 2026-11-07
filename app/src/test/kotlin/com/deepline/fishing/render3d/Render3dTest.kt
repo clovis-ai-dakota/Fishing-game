@@ -158,4 +158,92 @@ class Render3dTest {
             }
         }
     }
+
+    private fun darkSession(): CastSession {
+        val c = GameConfig.WORLD_WIDTH / 2f
+        val fish = listOf(com.deepline.fishing.core.FishEntity(0, FishCatalog.byId("glowfin_angler")!!, false, c + 3f, 352f, -1, 0f))
+        val session = CastSession(RopeSpecs(500f, 20f, 9f), false, com.deepline.fishing.core.World(fish, emptyList()))
+        while (session.hookDepth < 345f) session.update(1f / 60f, null)
+        return session
+    }
+
+    /** Particles and the flash go under the darkness: after it come only the darkness and lure glows. */
+    @Test
+    fun gameFeelIsDrawnUnderTheDarkness() {
+        val session = darkSession()
+        val particles = com.deepline.fishing.feel.Particles.of(
+            listOf(
+                com.deepline.fishing.feel.Burst(com.deepline.fishing.feel.BurstKind.BUMP_PUFF, session.hookX, session.hookDepth, session.elapsedSeconds - 0.2f, 1),
+                com.deepline.fishing.feel.Burst(com.deepline.fishing.feel.BurstKind.CATCH_BUBBLES, session.hookX, session.hookDepth, session.elapsedSeconds - 0.3f, 2, glints = true),
+            ),
+            session.elapsedSeconds,
+        )
+        assertTrue(particles.isNotEmpty())
+        val fx = com.deepline.fishing.feel.CastFx(flash = 0.4f, particles = particles)
+        val plain = SceneBuilder().build(session, 3f, 360, 800)
+        val juiced = SceneBuilder().build(session, 3f, 360, 800, fx = fx)
+        fun afterDark(f: com.deepline.fishing.ui.render3d.Frame) = f.items.drop(f.items.indexOfFirst { it.program == com.deepline.fishing.ui.render3d.Program.DARKNESS })
+        assertTrue(plain.items.any { it.program == com.deepline.fishing.ui.render3d.Program.DARKNESS })
+        val a = afterDark(plain)
+        val b = afterDark(juiced)
+        assertEquals(a.map { it.program to it.blend }, b.map { it.program to it.blend })
+        assertEquals(a.map { it.dynamicMesh?.vertexCount }, b.map { it.dynamicMesh?.vertexCount })
+        // ...and everything the effects added is before it (one more sprite batch for the flash).
+        assertTrue(juiced.items.size == plain.items.size + 1)
+    }
+
+    /** The shake slides the picture on screen; the camera, and so the play plane mapping, stay put. */
+    @Test
+    fun theShakeMovesOnlyThePicture() {
+        val session = darkSession()
+        val w = 360
+        val h = 800
+        val still = SceneBuilder().build(session, 3f, w, h)
+        val fx = com.deepline.fishing.feel.CastFx(shakeX = 0.01f, shakeY = -0.008f)
+        val shaken = SceneBuilder().build(session, 3f, w, h, fx = fx)
+        assertTrue(still.globals["uView"]!!.contentEquals(shaken.globals["uView"]!!))
+        fun screen(f: com.deepline.fishing.ui.render3d.Frame, p: Vec3): Pair<Float, Float> {
+            val c = Mat4.transformPoint(Mat4.multiply(f.globals["uProj"]!!, f.globals["uView"]!!), p)
+            return (c.x * 0.5f + 0.5f) * w to (0.5f - c.y * 0.5f) * h
+        }
+        // Every point, on the play plane or far behind it, moves by the same pixels.
+        for (p in listOf(Vec3(session.hookX, -session.hookDepth, 0f), Vec3(3f, -330f, 0f), Vec3(-10f, -360f, -50f))) {
+            val (x0, y0) = screen(still, p)
+            val (x1, y1) = screen(shaken, p)
+            assertEquals(fx.shakeX * w, x1 - x0, 0.05f)
+            assertEquals(fx.shakeY * w, y1 - y0, 0.05f)
+        }
+        // The darkness follows the drawn hook (its centre is in GL pixels, y up).
+        val h0 = still.globals["uHookScreen"]!!
+        val h1 = shaken.globals["uHookScreen"]!!
+        assertEquals(fx.shakeX * w, h1[0] - h0[0], 0.01f)
+        assertEquals(-fx.shakeY * w, h1[1] - h0[1], 0.01f)
+    }
+
+    /** Whole casts with the game feel on build valid frames. */
+    @Test
+    fun wholeCastsBuildFramesWithGameFeel() {
+        val feel = com.deepline.fishing.feel.GameFeel(com.deepline.fishing.audio.NoAudio, com.deepline.fishing.feel.NoHaptics, com.deepline.fishing.core.InMemoryStore())
+        val specs = RopeSpecs.fromLevels(RopeStat.entries.associateWith { 6 })
+        val session = CastSession.create(specs, lanternActive = false, random = Random(77))
+        val brain = BotBrain(BotDifficulty.HARD, Random(77))
+        val builder = SceneBuilder()
+        feel.onCastStart(session)
+        var t = 0f
+        var frames = 0
+        while (session.phase != CastPhase.SURFACED && frames < 20_000) {
+            session.update(feel.simDt(1f / 60f, solo = true), brain.steer(session, 1f / 60f))
+            feel.onCastFrame(session, session.drainEvents())
+            t += 1f / 60f
+            if (frames % 5 == 0) {
+                val frame = builder.build(session, t, 360, 800, fx = feel.fx(session))
+                for (item in frame.items) {
+                    val m = item.dynamicMesh ?: Meshes.get(item.meshKey!!)
+                    assertTrue(m.indices.all { it < m.vertexCount })
+                    assertTrue(m.positions.all { it.isFinite() })
+                }
+            }
+            frames++
+        }
+    }
 }

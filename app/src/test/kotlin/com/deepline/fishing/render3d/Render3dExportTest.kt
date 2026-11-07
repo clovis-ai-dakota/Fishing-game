@@ -194,4 +194,25 @@ class Render3dExportTest {
         val items = base.items.filter { it.meshKey == "fullscreen" && it.program.name == "BACKGROUND" } + extra
         export("fish_gallery", Frame(w, h, base.globals, items))
     }
+
+    /** Game feel particles: the entry splash, a catch's bubbles and glints, a bump in the dark. */
+    @Test
+    fun gameFeel() {
+        fun fxAt(session: CastSession, vararg bursts: com.deepline.fishing.feel.Burst, flash: Float = 0f) =
+            com.deepline.fishing.feel.CastFx(flash = flash, flashColor = com.deepline.fishing.ui.ColorScript.GOLD_FLASH, particles = com.deepline.fishing.feel.Particles.of(bursts.toList(), session.elapsedSeconds))
+        val start = CastSession(RopeSpecs(120f, 10f, 9f), false, World(emptyList(), emptyList()))
+        while (start.elapsedSeconds < 0.2f) start.update(1f / 60f, null)
+        export("juice_splash", SceneBuilder().build(start, 0.3f, w, h, cameraTop = -7f, fx = fxAt(start, com.deepline.fishing.feel.Burst(com.deepline.fishing.feel.BurstKind.ENTRY_SPLASH, com.deepline.fishing.feel.GameFeel.LINE_ENTRY_X, 0f, 0f, 1))))
+
+        val mid = CastSession(RopeSpecs(200f, 20f, 9f), false, World(emptyList(), emptyList()))
+        while (mid.hookDepth < 80f) mid.update(1f / 60f, null)
+        val t = mid.elapsedSeconds
+        val catchBurst = com.deepline.fishing.feel.Burst(com.deepline.fishing.feel.BurstKind.CATCH_BUBBLES, mid.hookX, mid.hookDepth, t - 0.35f, 3, strength = 1.6f, glints = true)
+        val bump = com.deepline.fishing.feel.Burst(com.deepline.fishing.feel.BurstKind.BUMP_PUFF, mid.hookX - 3f, mid.hookDepth + 2f, t - 0.25f, 4, strength = 1.6f)
+        export("juice_rare_catch", SceneBuilder().build(mid, 2f, w, h, fx = fxAt(mid, catchBurst, bump, flash = 0.25f)))
+
+        val dark = deepSession(false)
+        val d = dark.elapsedSeconds
+        export("juice_dark_bump", SceneBuilder().build(dark, 3f, w, h, fx = fxAt(dark, com.deepline.fishing.feel.Burst(com.deepline.fishing.feel.BurstKind.BUMP_PUFF, dark.hookX, dark.hookDepth, d - 0.2f, 5, strength = 1.6f), flash = 0.4f)))
+    }
 }

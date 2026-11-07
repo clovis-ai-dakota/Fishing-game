@@ -44,6 +44,8 @@ class RenderFuzzTest {
         density: Float,
         skins: com.deepline.fishing.ui.Skins = com.deepline.fishing.ui.Skins.CLASSIC,
         detect: Set<String>? = null,
+        /** Also draws the game feel effects (shake, flashes, particles) the way a phone would. */
+        juice: Boolean = false,
     ) {
         val d = Density(density)
         val measurer = TextMeasurer(createFontFamilyResolver(context), d, LayoutDirection.Ltr)
@@ -52,17 +54,21 @@ class RenderFuzzTest {
         val drawScope = CanvasDrawScope()
         val session = CastSession.create(specs, lantern, Random(seed))
         val brain = BotBrain(BotDifficulty.HARD, Random(seed))
+        val feel = if (juice) com.deepline.fishing.feel.GameFeel(com.deepline.fishing.audio.NoAudio, com.deepline.fishing.feel.NoHaptics, com.deepline.fishing.core.InMemoryStore()) else null
+        feel?.onCastStart(session)
         var t = 0f
         var frame = 0
         while (session.phase != CastPhase.SURFACED && frame < 20_000) {
             val dt = 1f / 60f
-            session.update(dt, brain.steer(session, dt))
+            session.update(feel?.simDt(dt, solo = true) ?: dt, brain.steer(session, dt))
+            feel?.onCastFrame(session, session.drainEvents())
+            val fx = feel?.fx(session) ?: com.deepline.fishing.feel.CastFx.NONE
             t += dt
             try {
                 drawScope.draw(d, LayoutDirection.Ltr, canvas, Size(widthPx.toFloat(), heightPx.toFloat())) {
-                    drawCastScene(session, t, measurer, aimX = session.hookX + 1f, skins = skins, detect = detect)
+                    drawCastScene(session, t, measurer, aimX = session.hookX + 1f, skins = skins, detect = detect, fx = fx)
                     // The 2D layer drawn over the 3D renderer.
-                    drawCastOverlay(session, t, measurer, aimX = session.hookX + 1f, detect = detect)
+                    drawCastOverlay(session, t, measurer, aimX = session.hookX + 1f, detect = detect, fx = fx)
                 }
             } catch (e: Throwable) {
                 throw AssertionError(
@@ -115,6 +121,13 @@ class RenderFuzzTest {
                 }
             }
         }
+    }
+
+    /** Screen shake, flashes and particles on every frame, shallow and deep, with the Nightmare look too. */
+    @Test
+    fun gameFeelEffectsDraw() {
+        playAndRenderEveryFrame(rope(2), seed = 31, lantern = false, widthPx = 360, heightPx = 800, density = 1f, juice = true)
+        playAndRenderEveryFrame(rope(10), seed = 32, lantern = true, widthPx = 320, heightPx = 712, density = 0.9f, juice = true, skins = com.deepline.fishing.ui.Skins(atmosphere = com.deepline.fishing.core.Atmosphere.NIGHTMARE))
     }
 
     /** The rare fish detector's markers, deep in the dark (every species counts as uncaught). */

@@ -126,3 +126,9 @@ while usage statistics are allowed (the latest values are sent right after the p
 Other features log their own events through the same facade (daily loop, social, game feel).
 Add a section for each here, in the same format, when they land: the test lists every literal
 `Analytics.event("...")` name it finds in `app/src/main/kotlin`.
+
+### Sound and feel
+
+| Event | Parameters | Why |
+| --- | --- | --- |
+| `settings_change` | `setting` (`master_volume`, `music_volume`, `sfx_volume`, `haptics`, `reduce_motion`), `value` (a percentage for volumes, `true`/`false` for switches) | How many players turn the music, sound or vibration down or off, and how many need reduced motion: tells whether the default mix and the amount of shake are right. |
