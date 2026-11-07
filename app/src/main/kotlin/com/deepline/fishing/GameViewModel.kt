@@ -1059,7 +1059,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /** The title the player wears (shown at home and in battles), or null. */
-    val title: String? get() = progress.equippedSkins[CosmeticSlot.TITLE]?.displayName
+    val title: String? get() = progress.equippedSkins[CosmeticSlot.TITLE]?.displayName // i18n-ignore: the title id (relayed online), shown through titleLabel
 
     /** The frame of the player's title badge (gold unless another is chosen and available). */
     val titleFrame: com.deepline.fishing.core.TitleFrame

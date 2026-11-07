@@ -53,7 +53,7 @@ data class Skins(
         )
 
         /** One full set, as unlocked by a legendary secret. */
-        fun ofSet(setName: String) = of(Cosmetic.entries.filter { it.setName == setName }.associateBy { it.slot })
+        fun ofSet(setName: String) = of(Cosmetic.entries.filter { it.setName == setName }.associateBy { it.slot }) // i18n-ignore: a set id, not shown
     }
 }
 

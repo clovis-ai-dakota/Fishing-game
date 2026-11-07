@@ -35,6 +35,24 @@ class HardcodedTextTest {
     }
 
     @Test
+    fun coreEnglishNamesAreNeverShown() {
+        // Core's English names (displayName, title, setName, tagline, summary, euroLabel) are for the
+        // server and the tests: the app shows CoreText's labels instead (ui/i18n/CoreText.kt).
+        val pattern = Regex("\\.(displayName|setName|tagline|summary|euroLabel)\\b|\\bmode\\.title\\b")
+        val problems = ArrayList<String>()
+        sources.walkTopDown().filter { it.isFile && it.extension == "kt" }.forEach { file ->
+            val path = file.relativeTo(sources).path
+            if (path.startsWith("ui/i18n/") || path in PENDING_CORE_NAMES || path.startsWith("analytics/")) return@forEach
+            file.readLines().forEachIndexed { i, line ->
+                if (pattern.containsMatchIn(line) && "i18n-ignore" !in line && !line.trimStart().startsWith("*") && !line.trimStart().startsWith("//")) {
+                    problems += "$path:${i + 1}: ${line.trim()}"
+                }
+            }
+        }
+        if (problems.isNotEmpty()) fail("Core English names shown in the app (use CoreText's label()/labelText()):\n" + problems.joinToString("\n"))
+    }
+
+    @Test
     fun theCheckCatchesTypicalMistakes() {
         val bad = """
             Text("Cast line")
@@ -102,6 +120,16 @@ class HardcodedTextTest {
             "AccountClient.kt",
             "OnlineConnection.kt",
             "ui/SkinsScreen.kt",
+        )
+
+        /**
+         * Files that still put a core English name inside an English sentence, until their area is
+         * converted (then the sentence becomes a resource and the name an argument or a word of it).
+         * Remove a file from here when you convert it.
+         */
+        val PENDING_CORE_NAMES: Set<String> = setOf(
+            "ui/secrets/FishingSecrets.kt",
+            "daily/Reminders.kt",
         )
 
         /** Calls whose arguments are always text the player reads. */

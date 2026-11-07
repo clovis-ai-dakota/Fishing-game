@@ -85,7 +85,7 @@ fun SkinDex(vm: GameViewModel) {
     val p = vm.progress
     val unlocked = p.unlockedCosmetics.toSet()
     // Legendary sets (earned with secrets); shop pieces have their own group below.
-    val sets = Cosmetic.entries.filterNot { it.fromShop }.map { it.setName }.distinct()
+    val sets = Cosmetic.entries.filterNot { it.fromShop }.map { it.setName }.distinct() // i18n-ignore: set ids (names shown with skinSetLabel)
     val shopGear = Cosmetic.entries.filter { it.fromShop && it in unlocked && it.slot != CosmeticSlot.TITLE }
     val time by rememberInfiniteTransition(label = "skin tiles").animateFloat(
         initialValue = 0f,
@@ -127,7 +127,7 @@ fun SkinDex(vm: GameViewModel) {
             }
         }
         for (set in sets) {
-            val items = Cosmetic.entries.filter { it.setName == set && !it.fromShop }.sortedBy { it.slot.ordinal }
+            val items = Cosmetic.entries.filter { it.setName == set && !it.fromShop }.sortedBy { it.slot.ordinal } // i18n-ignore: set id
             val open = items.any { it in unlocked }
             item(key = "set-$set", span = { GridItemSpan(maxLineSpan) }) {
                 Text(
@@ -177,7 +177,7 @@ private fun SkinTile(c: Cosmetic, unlocked: Boolean, equipped: Boolean, time: Fl
                 contentAlignment = Alignment.Center,
             ) {
                 if (c.slot == CosmeticSlot.TITLE) {
-                    if (unlocked) TitleBadge(c.displayName)
+                    if (unlocked) TitleBadge(c.displayName) // i18n-ignore: the title id, TitleBadge shows its name
                 } else if (unlocked) {
                     Canvas(Modifier.fillMaxSize()) { drawSlotArt(c.slot, c, time) }
                 } else {
