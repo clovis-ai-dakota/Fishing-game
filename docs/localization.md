@@ -137,7 +137,8 @@ Text(message.asString())
   `AppLanguages.localized(context)`: on Android 12 and lower only that context has the game's
   language. Don't keep resolved strings in state that outlives a language change otherwise.
 - Drawing on a canvas (`DrawScope`, e.g. `CastRenderer.drawLabel`): resolve the strings in the
-  composable (`stringResource`) and pass them to the draw function.
+  composable (`stringResource`) and pass them to the draw function (the cast's labels travel as
+  `CastLabels`, from `rememberCastLabels()`).
 - Exceptions shown to the player carry a `UiText` (`AccountClient.AccountException.text`); their
   `message` stays technical (for crash reports, never player text).
 
@@ -200,7 +201,9 @@ The default `Locale` follows the game's language, so these are right outside com
 - Generated club names and strangers' public names on the boards (same for everyone).
 - The brand "Deep Line" (`app_name` is `translatable="false"`), "Google Play", "Google Firebase",
   "CC0", "OpenGameArt.org", "UTC". Credits keep the works' titles and authors.
-- The battle server's English error text, until mapped (see the online area below).
+- The battle server's protocol: it keeps sending English (`ServerMessage.Error`, `MatchOver.reason`)
+  and the app shows its own strings for the texts it knows (`ui/OnlineText.kt`; `OnlineTextTest`
+  reads the server's source and fails on a text without a string). A new server text needs one.
 
 ## 9. Tests and checking your work
 

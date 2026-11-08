@@ -303,7 +303,7 @@ private fun castLine(i: Int, c: BattleCast): UiText {
     val parts = listOfNotNull(
         pointsText(c.points.toLong()),
         UiText.plural(R.plurals.battle_fish, fish),
-        kgText(c.result.totalWeightKg),
+        castWeightText(c.result.totalWeightKg),
         deepest?.let { UiText.res(R.string.common_meters, UiText.number(it)) },
     )
     return UiText.res(R.string.battle_cast_line, i + 1, UiText.join(parts, " · "))

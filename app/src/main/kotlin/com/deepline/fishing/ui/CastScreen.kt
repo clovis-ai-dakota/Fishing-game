@@ -438,10 +438,10 @@ private fun deepestPoint(result: CastResult): Float =
 private fun metersLabel(meters: Int): String = stringResource(R.string.common_meters, formatPoints(meters))
 
 /** A weight with exactly one decimal ("4.0", "4,0" in French), so a changing value keeps its width. */
-internal fun oneDecimal(kg: Float): String = "%.1f".format(kg)
+private fun oneDecimal(kg: Float): String = "%.1f".format(kg)
 
 /** "4.5 kg", with exactly one decimal. */
-internal fun kgText(kg: Float): UiText = UiText.res(R.string.common_kg, oneDecimal(kg))
+internal fun castWeightText(kg: Float): UiText = UiText.res(R.string.common_kg, oneDecimal(kg))
 
 @Composable
 private fun ResultsPanel(result: CastResult, collectLabel: String, onCollect: () -> Unit) {
@@ -465,7 +465,7 @@ private fun ResultsPanel(result: CastResult, collectLabel: String, onCollect: ()
                         stringResource(R.string.cast_results_deepest, metersLabel(deepestPoint(result).roundToInt())),
                         pluralStringResource(R.plurals.cast_results_fish, fish, fish),
                         if (objects > 0) pluralStringResource(R.plurals.cast_results_objects, objects, objects) else null,
-                        kgText(result.totalWeightKg).asString(),
+                        castWeightText(result.totalWeightKg).asString(),
                     ).joinToString(" · "),
                     style = MaterialTheme.typography.bodyMedium,
                 )
@@ -518,7 +518,7 @@ private fun ResultsPanel(result: CastResult, collectLabel: String, onCollect: ()
                                     Text(
                                         listOfNotNull(
                                             metersLabel(c.depth.roundToInt()),
-                                            kgText(c.species.weightKg).asString(),
+                                            castWeightText(c.species.weightKg).asString(),
                                             byLastBump.takeIf { c.byLastBump },
                                         ).joinToString(" · "),
                                         style = MaterialTheme.typography.bodySmall,
