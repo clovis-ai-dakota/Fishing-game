@@ -1,225 +1,225 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Fish species names (the Dex, catches, challenges, leaderboards). Keyed by the species id, which
-    is saved in players' logs and never changes: only the names shown here are translated. The
-    first 16 and the Deep Sovereign (#200) are hand-made; the others are made by core's
-    SpeciesGenerator from an adjective and a kind of fish (e.g. "Speckled" + "Goby"). Translate
-    each word the same way everywhere (glossary in docs/localization.md), in your language's
-    natural order and agreement (e.g. French "Gobie tacheté"), and keep every name unique. Names
-    are labels: shown on their own or after a colon, never inflected inside a sentence.
+    Fish species names (the Dex, catches, challenges, leaderboards), keyed by the species id, which
+    is saved in players' logs and never changes. For now the names stay in English in every
+    language (the developer's choice: they read as proper names), so every string here is
+    translatable="false" and translators leave this file out. To translate them later: remove
+    translatable="false", add strings_species.xml to each language (the guide's "Species words"
+    lists each generated word once), and keep every name unique. Names are labels: shown on their
+    own or after a colon, never inflected inside a sentence.
     English values must stay equal to core's names (CoreTextTest checks it).
 -->
 <resources>
 
     <!-- Hand-made species, shallow to deep. -->
-    <string name="species_silver_sprat">Silver Sprat</string>
-    <string name="species_coral_darter">Coral Darter</string>
-    <string name="species_reed_perch">Reed Perch</string>
-    <string name="species_sun_bream">Sun Bream</string>
-    <string name="species_dusk_snapper">Dusk Snapper</string>
-    <string name="species_ribbon_eel">Ribbon Eel</string>
-    <string name="species_reef_grouper">Reef Grouper</string>
-    <string name="species_veil_ray">Veil Ray</string>
-    <string name="species_ghost_hake">Ghost Hake</string>
-    <string name="species_needle_viper">Needle Viper</string>
-    <string name="species_ink_cuttle">Ink Cuttle</string>
-    <string name="species_iron_sturgeon">Iron Sturgeon</string>
-    <string name="species_glowfin_angler">Glowfin Angler</string>
-    <string name="species_star_drifter">Star Drifter</string>
-    <string name="species_abyss_wyrm">Abyss Wyrm</string>
-    <string name="species_pale_leviathan">Pale Leviathan</string>
+    <string name="species_silver_sprat" translatable="false">Silver Sprat</string>
+    <string name="species_coral_darter" translatable="false">Coral Darter</string>
+    <string name="species_reed_perch" translatable="false">Reed Perch</string>
+    <string name="species_sun_bream" translatable="false">Sun Bream</string>
+    <string name="species_dusk_snapper" translatable="false">Dusk Snapper</string>
+    <string name="species_ribbon_eel" translatable="false">Ribbon Eel</string>
+    <string name="species_reef_grouper" translatable="false">Reef Grouper</string>
+    <string name="species_veil_ray" translatable="false">Veil Ray</string>
+    <string name="species_ghost_hake" translatable="false">Ghost Hake</string>
+    <string name="species_needle_viper" translatable="false">Needle Viper</string>
+    <string name="species_ink_cuttle" translatable="false">Ink Cuttle</string>
+    <string name="species_iron_sturgeon" translatable="false">Iron Sturgeon</string>
+    <string name="species_glowfin_angler" translatable="false">Glowfin Angler</string>
+    <string name="species_star_drifter" translatable="false">Star Drifter</string>
+    <string name="species_abyss_wyrm" translatable="false">Abyss Wyrm</string>
+    <string name="species_pale_leviathan" translatable="false">Pale Leviathan</string>
 
     <!-- Generated species: Sunlit Shallows. -->
-    <string name="species_sunny_goby">Sunny Goby</string>
-    <string name="species_golden_minnow">Golden Minnow</string>
-    <string name="species_speckled_wrasse">Speckled Wrasse</string>
-    <string name="species_banded_chub">Banded Chub</string>
-    <string name="species_lemon_shiner">Lemon Shiner</string>
-    <string name="species_rosy_mullet">Rosy Mullet</string>
-    <string name="species_pebble_blenny">Pebble Blenny</string>
-    <string name="species_minted_damsel">Minted Damsel</string>
-    <string name="species_sandy_tetra">Sandy Tetra</string>
-    <string name="species_copper_gudgeon">Copper Gudgeon</string>
-    <string name="species_minted_goby">Minted Goby</string>
-    <string name="species_sandy_minnow">Sandy Minnow</string>
-    <string name="species_copper_wrasse">Copper Wrasse</string>
-    <string name="species_bright_chub">Bright Chub</string>
-    <string name="species_lagoon_shiner">Lagoon Shiner</string>
-    <string name="species_sunny_mullet">Sunny Mullet</string>
-    <string name="species_golden_blenny">Golden Blenny</string>
-    <string name="species_speckled_damsel">Speckled Damsel</string>
-    <string name="species_banded_tetra">Banded Tetra</string>
-    <string name="species_lemon_gudgeon">Lemon Gudgeon</string>
-    <string name="species_speckled_goby">Speckled Goby</string>
-    <string name="species_banded_minnow">Banded Minnow</string>
-    <string name="species_lemon_wrasse">Lemon Wrasse</string>
-    <string name="species_rosy_chub">Rosy Chub</string>
-    <string name="species_pebble_shiner">Pebble Shiner</string>
-    <string name="species_minted_mullet">Minted Mullet</string>
-    <string name="species_sandy_blenny">Sandy Blenny</string>
-    <string name="species_copper_damsel">Copper Damsel</string>
-    <string name="species_bright_tetra">Bright Tetra</string>
-    <string name="species_lagoon_gudgeon">Lagoon Gudgeon</string>
-    <string name="species_copper_goby">Copper Goby</string>
-    <string name="species_bright_minnow">Bright Minnow</string>
-    <string name="species_lagoon_wrasse">Lagoon Wrasse</string>
-    <string name="species_sunny_chub">Sunny Chub</string>
-    <string name="species_golden_shiner">Golden Shiner</string>
-    <string name="species_speckled_mullet">Speckled Mullet</string>
-    <string name="species_banded_blenny">Banded Blenny</string>
-    <string name="species_lemon_damsel">Lemon Damsel</string>
-    <string name="species_rosy_tetra">Rosy Tetra</string>
-    <string name="species_pebble_gudgeon">Pebble Gudgeon</string>
-    <string name="species_lemon_goby">Lemon Goby</string>
+    <string name="species_sunny_goby" translatable="false">Sunny Goby</string>
+    <string name="species_golden_minnow" translatable="false">Golden Minnow</string>
+    <string name="species_speckled_wrasse" translatable="false">Speckled Wrasse</string>
+    <string name="species_banded_chub" translatable="false">Banded Chub</string>
+    <string name="species_lemon_shiner" translatable="false">Lemon Shiner</string>
+    <string name="species_rosy_mullet" translatable="false">Rosy Mullet</string>
+    <string name="species_pebble_blenny" translatable="false">Pebble Blenny</string>
+    <string name="species_minted_damsel" translatable="false">Minted Damsel</string>
+    <string name="species_sandy_tetra" translatable="false">Sandy Tetra</string>
+    <string name="species_copper_gudgeon" translatable="false">Copper Gudgeon</string>
+    <string name="species_minted_goby" translatable="false">Minted Goby</string>
+    <string name="species_sandy_minnow" translatable="false">Sandy Minnow</string>
+    <string name="species_copper_wrasse" translatable="false">Copper Wrasse</string>
+    <string name="species_bright_chub" translatable="false">Bright Chub</string>
+    <string name="species_lagoon_shiner" translatable="false">Lagoon Shiner</string>
+    <string name="species_sunny_mullet" translatable="false">Sunny Mullet</string>
+    <string name="species_golden_blenny" translatable="false">Golden Blenny</string>
+    <string name="species_speckled_damsel" translatable="false">Speckled Damsel</string>
+    <string name="species_banded_tetra" translatable="false">Banded Tetra</string>
+    <string name="species_lemon_gudgeon" translatable="false">Lemon Gudgeon</string>
+    <string name="species_speckled_goby" translatable="false">Speckled Goby</string>
+    <string name="species_banded_minnow" translatable="false">Banded Minnow</string>
+    <string name="species_lemon_wrasse" translatable="false">Lemon Wrasse</string>
+    <string name="species_rosy_chub" translatable="false">Rosy Chub</string>
+    <string name="species_pebble_shiner" translatable="false">Pebble Shiner</string>
+    <string name="species_minted_mullet" translatable="false">Minted Mullet</string>
+    <string name="species_sandy_blenny" translatable="false">Sandy Blenny</string>
+    <string name="species_copper_damsel" translatable="false">Copper Damsel</string>
+    <string name="species_bright_tetra" translatable="false">Bright Tetra</string>
+    <string name="species_lagoon_gudgeon" translatable="false">Lagoon Gudgeon</string>
+    <string name="species_copper_goby" translatable="false">Copper Goby</string>
+    <string name="species_bright_minnow" translatable="false">Bright Minnow</string>
+    <string name="species_lagoon_wrasse" translatable="false">Lagoon Wrasse</string>
+    <string name="species_sunny_chub" translatable="false">Sunny Chub</string>
+    <string name="species_golden_shiner" translatable="false">Golden Shiner</string>
+    <string name="species_speckled_mullet" translatable="false">Speckled Mullet</string>
+    <string name="species_banded_blenny" translatable="false">Banded Blenny</string>
+    <string name="species_lemon_damsel" translatable="false">Lemon Damsel</string>
+    <string name="species_rosy_tetra" translatable="false">Rosy Tetra</string>
+    <string name="species_pebble_gudgeon" translatable="false">Pebble Gudgeon</string>
+    <string name="species_lemon_goby" translatable="false">Lemon Goby</string>
 
     <!-- Generated species: Twilight Reef. -->
-    <string name="species_amber_snapper">Amber Snapper</string>
-    <string name="species_velvet_grouper">Velvet Grouper</string>
-    <string name="species_crimson_lionfish">Crimson Lionfish</string>
-    <string name="species_twilight_triggerfish">Twilight Triggerfish</string>
-    <string name="species_saffron_parrotfish">Saffron Parrotfish</string>
-    <string name="species_cobalt_tang">Cobalt Tang</string>
-    <string name="species_mauve_barracuda">Mauve Barracuda</string>
-    <string name="species_ember_batfish">Ember Batfish</string>
-    <string name="species_tidal_hogfish">Tidal Hogfish</string>
-    <string name="species_dusk_angelfish">Dusk Angelfish</string>
-    <string name="species_indigo_cardinal">Indigo Cardinal</string>
-    <string name="species_violet_ray">Violet Ray</string>
-    <string name="species_ember_snapper">Ember Snapper</string>
-    <string name="species_tidal_grouper">Tidal Grouper</string>
-    <string name="species_dusk_lionfish">Dusk Lionfish</string>
-    <string name="species_indigo_triggerfish">Indigo Triggerfish</string>
-    <string name="species_violet_parrotfish">Violet Parrotfish</string>
-    <string name="species_amber_tang">Amber Tang</string>
-    <string name="species_velvet_barracuda">Velvet Barracuda</string>
-    <string name="species_crimson_batfish">Crimson Batfish</string>
-    <string name="species_twilight_hogfish">Twilight Hogfish</string>
-    <string name="species_saffron_angelfish">Saffron Angelfish</string>
-    <string name="species_cobalt_cardinal">Cobalt Cardinal</string>
-    <string name="species_mauve_ray">Mauve Ray</string>
-    <string name="species_crimson_snapper">Crimson Snapper</string>
-    <string name="species_twilight_grouper">Twilight Grouper</string>
-    <string name="species_saffron_lionfish">Saffron Lionfish</string>
-    <string name="species_cobalt_triggerfish">Cobalt Triggerfish</string>
-    <string name="species_mauve_parrotfish">Mauve Parrotfish</string>
-    <string name="species_ember_tang">Ember Tang</string>
-    <string name="species_tidal_barracuda">Tidal Barracuda</string>
-    <string name="species_dusk_batfish">Dusk Batfish</string>
-    <string name="species_indigo_hogfish">Indigo Hogfish</string>
-    <string name="species_violet_angelfish">Violet Angelfish</string>
-    <string name="species_amber_cardinal">Amber Cardinal</string>
-    <string name="species_velvet_ray">Velvet Ray</string>
-    <string name="species_indigo_grouper">Indigo Grouper</string>
-    <string name="species_violet_lionfish">Violet Lionfish</string>
-    <string name="species_amber_triggerfish">Amber Triggerfish</string>
-    <string name="species_velvet_parrotfish">Velvet Parrotfish</string>
-    <string name="species_crimson_tang">Crimson Tang</string>
-    <string name="species_twilight_barracuda">Twilight Barracuda</string>
-    <string name="species_saffron_batfish">Saffron Batfish</string>
-    <string name="species_cobalt_hogfish">Cobalt Hogfish</string>
-    <string name="species_mauve_angelfish">Mauve Angelfish</string>
-    <string name="species_ember_cardinal">Ember Cardinal</string>
-    <string name="species_tidal_ray">Tidal Ray</string>
-    <string name="species_saffron_snapper">Saffron Snapper</string>
-    <string name="species_cobalt_grouper">Cobalt Grouper</string>
-    <string name="species_mauve_lionfish">Mauve Lionfish</string>
+    <string name="species_amber_snapper" translatable="false">Amber Snapper</string>
+    <string name="species_velvet_grouper" translatable="false">Velvet Grouper</string>
+    <string name="species_crimson_lionfish" translatable="false">Crimson Lionfish</string>
+    <string name="species_twilight_triggerfish" translatable="false">Twilight Triggerfish</string>
+    <string name="species_saffron_parrotfish" translatable="false">Saffron Parrotfish</string>
+    <string name="species_cobalt_tang" translatable="false">Cobalt Tang</string>
+    <string name="species_mauve_barracuda" translatable="false">Mauve Barracuda</string>
+    <string name="species_ember_batfish" translatable="false">Ember Batfish</string>
+    <string name="species_tidal_hogfish" translatable="false">Tidal Hogfish</string>
+    <string name="species_dusk_angelfish" translatable="false">Dusk Angelfish</string>
+    <string name="species_indigo_cardinal" translatable="false">Indigo Cardinal</string>
+    <string name="species_violet_ray" translatable="false">Violet Ray</string>
+    <string name="species_ember_snapper" translatable="false">Ember Snapper</string>
+    <string name="species_tidal_grouper" translatable="false">Tidal Grouper</string>
+    <string name="species_dusk_lionfish" translatable="false">Dusk Lionfish</string>
+    <string name="species_indigo_triggerfish" translatable="false">Indigo Triggerfish</string>
+    <string name="species_violet_parrotfish" translatable="false">Violet Parrotfish</string>
+    <string name="species_amber_tang" translatable="false">Amber Tang</string>
+    <string name="species_velvet_barracuda" translatable="false">Velvet Barracuda</string>
+    <string name="species_crimson_batfish" translatable="false">Crimson Batfish</string>
+    <string name="species_twilight_hogfish" translatable="false">Twilight Hogfish</string>
+    <string name="species_saffron_angelfish" translatable="false">Saffron Angelfish</string>
+    <string name="species_cobalt_cardinal" translatable="false">Cobalt Cardinal</string>
+    <string name="species_mauve_ray" translatable="false">Mauve Ray</string>
+    <string name="species_crimson_snapper" translatable="false">Crimson Snapper</string>
+    <string name="species_twilight_grouper" translatable="false">Twilight Grouper</string>
+    <string name="species_saffron_lionfish" translatable="false">Saffron Lionfish</string>
+    <string name="species_cobalt_triggerfish" translatable="false">Cobalt Triggerfish</string>
+    <string name="species_mauve_parrotfish" translatable="false">Mauve Parrotfish</string>
+    <string name="species_ember_tang" translatable="false">Ember Tang</string>
+    <string name="species_tidal_barracuda" translatable="false">Tidal Barracuda</string>
+    <string name="species_dusk_batfish" translatable="false">Dusk Batfish</string>
+    <string name="species_indigo_hogfish" translatable="false">Indigo Hogfish</string>
+    <string name="species_violet_angelfish" translatable="false">Violet Angelfish</string>
+    <string name="species_amber_cardinal" translatable="false">Amber Cardinal</string>
+    <string name="species_velvet_ray" translatable="false">Velvet Ray</string>
+    <string name="species_indigo_grouper" translatable="false">Indigo Grouper</string>
+    <string name="species_violet_lionfish" translatable="false">Violet Lionfish</string>
+    <string name="species_amber_triggerfish" translatable="false">Amber Triggerfish</string>
+    <string name="species_velvet_parrotfish" translatable="false">Velvet Parrotfish</string>
+    <string name="species_crimson_tang" translatable="false">Crimson Tang</string>
+    <string name="species_twilight_barracuda" translatable="false">Twilight Barracuda</string>
+    <string name="species_saffron_batfish" translatable="false">Saffron Batfish</string>
+    <string name="species_cobalt_hogfish" translatable="false">Cobalt Hogfish</string>
+    <string name="species_mauve_angelfish" translatable="false">Mauve Angelfish</string>
+    <string name="species_ember_cardinal" translatable="false">Ember Cardinal</string>
+    <string name="species_tidal_ray" translatable="false">Tidal Ray</string>
+    <string name="species_saffron_snapper" translatable="false">Saffron Snapper</string>
+    <string name="species_cobalt_grouper" translatable="false">Cobalt Grouper</string>
+    <string name="species_mauve_lionfish" translatable="false">Mauve Lionfish</string>
 
     <!-- Generated species: Midnight Trench. -->
-    <string name="species_hollow_hake">Hollow Hake</string>
-    <string name="species_ashen_viper">Ashen Viper</string>
-    <string name="species_smoke_hatchetfish">Smoke Hatchetfish</string>
-    <string name="species_gloom_dragonfish">Gloom Dragonfish</string>
-    <string name="species_silent_bristlemouth">Silent Bristlemouth</string>
-    <string name="species_pewter_barreleye">Pewter Barreleye</string>
-    <string name="species_ghost_fangtooth">Ghost Fangtooth</string>
-    <string name="species_ink_sabretooth">Ink Sabretooth</string>
-    <string name="species_iron_snipe_eel">Iron Snipe Eel</string>
-    <string name="species_obsidian_loosejaw">Obsidian Loosejaw</string>
-    <string name="species_phantom_sturgeon">Phantom Sturgeon</string>
-    <string name="species_shadow_cuttle">Shadow Cuttle</string>
-    <string name="species_ink_hake">Ink Hake</string>
-    <string name="species_iron_viper">Iron Viper</string>
-    <string name="species_obsidian_hatchetfish">Obsidian Hatchetfish</string>
-    <string name="species_phantom_dragonfish">Phantom Dragonfish</string>
-    <string name="species_shadow_bristlemouth">Shadow Bristlemouth</string>
-    <string name="species_hollow_barreleye">Hollow Barreleye</string>
-    <string name="species_ashen_fangtooth">Ashen Fangtooth</string>
-    <string name="species_smoke_sabretooth">Smoke Sabretooth</string>
-    <string name="species_gloom_snipe_eel">Gloom Snipe Eel</string>
-    <string name="species_silent_loosejaw">Silent Loosejaw</string>
-    <string name="species_pewter_sturgeon">Pewter Sturgeon</string>
-    <string name="species_ghost_cuttle">Ghost Cuttle</string>
-    <string name="species_smoke_hake">Smoke Hake</string>
-    <string name="species_gloom_viper">Gloom Viper</string>
-    <string name="species_silent_hatchetfish">Silent Hatchetfish</string>
-    <string name="species_pewter_dragonfish">Pewter Dragonfish</string>
-    <string name="species_ghost_bristlemouth">Ghost Bristlemouth</string>
-    <string name="species_ink_barreleye">Ink Barreleye</string>
-    <string name="species_iron_fangtooth">Iron Fangtooth</string>
-    <string name="species_obsidian_sabretooth">Obsidian Sabretooth</string>
-    <string name="species_phantom_snipe_eel">Phantom Snipe Eel</string>
-    <string name="species_shadow_loosejaw">Shadow Loosejaw</string>
-    <string name="species_hollow_sturgeon">Hollow Sturgeon</string>
-    <string name="species_ashen_cuttle">Ashen Cuttle</string>
-    <string name="species_obsidian_hake">Obsidian Hake</string>
-    <string name="species_phantom_viper">Phantom Viper</string>
-    <string name="species_shadow_hatchetfish">Shadow Hatchetfish</string>
-    <string name="species_hollow_dragonfish">Hollow Dragonfish</string>
-    <string name="species_ashen_bristlemouth">Ashen Bristlemouth</string>
-    <string name="species_smoke_barreleye">Smoke Barreleye</string>
-    <string name="species_gloom_fangtooth">Gloom Fangtooth</string>
-    <string name="species_silent_sabretooth">Silent Sabretooth</string>
-    <string name="species_pewter_snipe_eel">Pewter Snipe Eel</string>
-    <string name="species_ghost_loosejaw">Ghost Loosejaw</string>
-    <string name="species_ink_sturgeon">Ink Sturgeon</string>
+    <string name="species_hollow_hake" translatable="false">Hollow Hake</string>
+    <string name="species_ashen_viper" translatable="false">Ashen Viper</string>
+    <string name="species_smoke_hatchetfish" translatable="false">Smoke Hatchetfish</string>
+    <string name="species_gloom_dragonfish" translatable="false">Gloom Dragonfish</string>
+    <string name="species_silent_bristlemouth" translatable="false">Silent Bristlemouth</string>
+    <string name="species_pewter_barreleye" translatable="false">Pewter Barreleye</string>
+    <string name="species_ghost_fangtooth" translatable="false">Ghost Fangtooth</string>
+    <string name="species_ink_sabretooth" translatable="false">Ink Sabretooth</string>
+    <string name="species_iron_snipe_eel" translatable="false">Iron Snipe Eel</string>
+    <string name="species_obsidian_loosejaw" translatable="false">Obsidian Loosejaw</string>
+    <string name="species_phantom_sturgeon" translatable="false">Phantom Sturgeon</string>
+    <string name="species_shadow_cuttle" translatable="false">Shadow Cuttle</string>
+    <string name="species_ink_hake" translatable="false">Ink Hake</string>
+    <string name="species_iron_viper" translatable="false">Iron Viper</string>
+    <string name="species_obsidian_hatchetfish" translatable="false">Obsidian Hatchetfish</string>
+    <string name="species_phantom_dragonfish" translatable="false">Phantom Dragonfish</string>
+    <string name="species_shadow_bristlemouth" translatable="false">Shadow Bristlemouth</string>
+    <string name="species_hollow_barreleye" translatable="false">Hollow Barreleye</string>
+    <string name="species_ashen_fangtooth" translatable="false">Ashen Fangtooth</string>
+    <string name="species_smoke_sabretooth" translatable="false">Smoke Sabretooth</string>
+    <string name="species_gloom_snipe_eel" translatable="false">Gloom Snipe Eel</string>
+    <string name="species_silent_loosejaw" translatable="false">Silent Loosejaw</string>
+    <string name="species_pewter_sturgeon" translatable="false">Pewter Sturgeon</string>
+    <string name="species_ghost_cuttle" translatable="false">Ghost Cuttle</string>
+    <string name="species_smoke_hake" translatable="false">Smoke Hake</string>
+    <string name="species_gloom_viper" translatable="false">Gloom Viper</string>
+    <string name="species_silent_hatchetfish" translatable="false">Silent Hatchetfish</string>
+    <string name="species_pewter_dragonfish" translatable="false">Pewter Dragonfish</string>
+    <string name="species_ghost_bristlemouth" translatable="false">Ghost Bristlemouth</string>
+    <string name="species_ink_barreleye" translatable="false">Ink Barreleye</string>
+    <string name="species_iron_fangtooth" translatable="false">Iron Fangtooth</string>
+    <string name="species_obsidian_sabretooth" translatable="false">Obsidian Sabretooth</string>
+    <string name="species_phantom_snipe_eel" translatable="false">Phantom Snipe Eel</string>
+    <string name="species_shadow_loosejaw" translatable="false">Shadow Loosejaw</string>
+    <string name="species_hollow_sturgeon" translatable="false">Hollow Sturgeon</string>
+    <string name="species_ashen_cuttle" translatable="false">Ashen Cuttle</string>
+    <string name="species_obsidian_hake" translatable="false">Obsidian Hake</string>
+    <string name="species_phantom_viper" translatable="false">Phantom Viper</string>
+    <string name="species_shadow_hatchetfish" translatable="false">Shadow Hatchetfish</string>
+    <string name="species_hollow_dragonfish" translatable="false">Hollow Dragonfish</string>
+    <string name="species_ashen_bristlemouth" translatable="false">Ashen Bristlemouth</string>
+    <string name="species_smoke_barreleye" translatable="false">Smoke Barreleye</string>
+    <string name="species_gloom_fangtooth" translatable="false">Gloom Fangtooth</string>
+    <string name="species_silent_sabretooth" translatable="false">Silent Sabretooth</string>
+    <string name="species_pewter_snipe_eel" translatable="false">Pewter Snipe Eel</string>
+    <string name="species_ghost_loosejaw" translatable="false">Ghost Loosejaw</string>
+    <string name="species_ink_sturgeon" translatable="false">Ink Sturgeon</string>
 
     <!-- Generated species: Abyssal Floor. -->
-    <string name="species_frost_angler">Frost Angler</string>
-    <string name="species_nebula_gulper">Nebula Gulper</string>
-    <string name="species_spectral_grenadier">Spectral Grenadier</string>
-    <string name="species_abyssal_snailfish">Abyssal Snailfish</string>
-    <string name="species_void_seadevil">Void Seadevil</string>
-    <string name="species_ancient_ghostshark">Ancient Ghostshark</string>
-    <string name="species_crystal_tripodfish">Crystal Tripodfish</string>
-    <string name="species_starlit_cusk">Starlit Cusk</string>
-    <string name="species_hadal_tonguefish">Hadal Tonguefish</string>
-    <string name="species_eternal_wyrm">Eternal Wyrm</string>
-    <string name="species_pallid_drifter">Pallid Drifter</string>
-    <string name="species_rune_chimaera">Rune Chimaera</string>
-    <string name="species_starlit_angler">Starlit Angler</string>
-    <string name="species_hadal_gulper">Hadal Gulper</string>
-    <string name="species_eternal_grenadier">Eternal Grenadier</string>
-    <string name="species_pallid_snailfish">Pallid Snailfish</string>
-    <string name="species_rune_seadevil">Rune Seadevil</string>
-    <string name="species_frost_ghostshark">Frost Ghostshark</string>
-    <string name="species_nebula_tripodfish">Nebula Tripodfish</string>
-    <string name="species_spectral_cusk">Spectral Cusk</string>
-    <string name="species_abyssal_tonguefish">Abyssal Tonguefish</string>
-    <string name="species_void_wyrm">Void Wyrm</string>
-    <string name="species_ancient_drifter">Ancient Drifter</string>
-    <string name="species_crystal_chimaera">Crystal Chimaera</string>
-    <string name="species_spectral_angler">Spectral Angler</string>
-    <string name="species_abyssal_gulper">Abyssal Gulper</string>
-    <string name="species_void_grenadier">Void Grenadier</string>
-    <string name="species_ancient_snailfish">Ancient Snailfish</string>
-    <string name="species_crystal_seadevil">Crystal Seadevil</string>
-    <string name="species_starlit_ghostshark">Starlit Ghostshark</string>
-    <string name="species_hadal_tripodfish">Hadal Tripodfish</string>
-    <string name="species_eternal_cusk">Eternal Cusk</string>
-    <string name="species_pallid_tonguefish">Pallid Tonguefish</string>
-    <string name="species_rune_wyrm">Rune Wyrm</string>
-    <string name="species_frost_drifter">Frost Drifter</string>
-    <string name="species_nebula_chimaera">Nebula Chimaera</string>
-    <string name="species_eternal_angler">Eternal Angler</string>
-    <string name="species_pallid_gulper">Pallid Gulper</string>
-    <string name="species_rune_grenadier">Rune Grenadier</string>
-    <string name="species_frost_snailfish">Frost Snailfish</string>
-    <string name="species_nebula_seadevil">Nebula Seadevil</string>
-    <string name="species_spectral_ghostshark">Spectral Ghostshark</string>
-    <string name="species_abyssal_tripodfish">Abyssal Tripodfish</string>
-    <string name="species_void_cusk">Void Cusk</string>
-    <string name="species_ancient_tonguefish">Ancient Tonguefish</string>
+    <string name="species_frost_angler" translatable="false">Frost Angler</string>
+    <string name="species_nebula_gulper" translatable="false">Nebula Gulper</string>
+    <string name="species_spectral_grenadier" translatable="false">Spectral Grenadier</string>
+    <string name="species_abyssal_snailfish" translatable="false">Abyssal Snailfish</string>
+    <string name="species_void_seadevil" translatable="false">Void Seadevil</string>
+    <string name="species_ancient_ghostshark" translatable="false">Ancient Ghostshark</string>
+    <string name="species_crystal_tripodfish" translatable="false">Crystal Tripodfish</string>
+    <string name="species_starlit_cusk" translatable="false">Starlit Cusk</string>
+    <string name="species_hadal_tonguefish" translatable="false">Hadal Tonguefish</string>
+    <string name="species_eternal_wyrm" translatable="false">Eternal Wyrm</string>
+    <string name="species_pallid_drifter" translatable="false">Pallid Drifter</string>
+    <string name="species_rune_chimaera" translatable="false">Rune Chimaera</string>
+    <string name="species_starlit_angler" translatable="false">Starlit Angler</string>
+    <string name="species_hadal_gulper" translatable="false">Hadal Gulper</string>
+    <string name="species_eternal_grenadier" translatable="false">Eternal Grenadier</string>
+    <string name="species_pallid_snailfish" translatable="false">Pallid Snailfish</string>
+    <string name="species_rune_seadevil" translatable="false">Rune Seadevil</string>
+    <string name="species_frost_ghostshark" translatable="false">Frost Ghostshark</string>
+    <string name="species_nebula_tripodfish" translatable="false">Nebula Tripodfish</string>
+    <string name="species_spectral_cusk" translatable="false">Spectral Cusk</string>
+    <string name="species_abyssal_tonguefish" translatable="false">Abyssal Tonguefish</string>
+    <string name="species_void_wyrm" translatable="false">Void Wyrm</string>
+    <string name="species_ancient_drifter" translatable="false">Ancient Drifter</string>
+    <string name="species_crystal_chimaera" translatable="false">Crystal Chimaera</string>
+    <string name="species_spectral_angler" translatable="false">Spectral Angler</string>
+    <string name="species_abyssal_gulper" translatable="false">Abyssal Gulper</string>
+    <string name="species_void_grenadier" translatable="false">Void Grenadier</string>
+    <string name="species_ancient_snailfish" translatable="false">Ancient Snailfish</string>
+    <string name="species_crystal_seadevil" translatable="false">Crystal Seadevil</string>
+    <string name="species_starlit_ghostshark" translatable="false">Starlit Ghostshark</string>
+    <string name="species_hadal_tripodfish" translatable="false">Hadal Tripodfish</string>
+    <string name="species_eternal_cusk" translatable="false">Eternal Cusk</string>
+    <string name="species_pallid_tonguefish" translatable="false">Pallid Tonguefish</string>
+    <string name="species_rune_wyrm" translatable="false">Rune Wyrm</string>
+    <string name="species_frost_drifter" translatable="false">Frost Drifter</string>
+    <string name="species_nebula_chimaera" translatable="false">Nebula Chimaera</string>
+    <string name="species_eternal_angler" translatable="false">Eternal Angler</string>
+    <string name="species_pallid_gulper" translatable="false">Pallid Gulper</string>
+    <string name="species_rune_grenadier" translatable="false">Rune Grenadier</string>
+    <string name="species_frost_snailfish" translatable="false">Frost Snailfish</string>
+    <string name="species_nebula_seadevil" translatable="false">Nebula Seadevil</string>
+    <string name="species_spectral_ghostshark" translatable="false">Spectral Ghostshark</string>
+    <string name="species_abyssal_tripodfish" translatable="false">Abyssal Tripodfish</string>
+    <string name="species_void_cusk" translatable="false">Void Cusk</string>
+    <string name="species_ancient_tonguefish" translatable="false">Ancient Tonguefish</string>
 
     <!-- The legendary fish (#200): it lives at the very bottom. A secret until found. -->
-    <string name="species_deep_sovereign">Deep Sovereign</string>
+    <string name="species_deep_sovereign" translatable="false">Deep Sovereign</string>
 </resources>

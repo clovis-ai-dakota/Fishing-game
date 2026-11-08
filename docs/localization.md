@@ -32,7 +32,7 @@ same setting as the system's per-app language.
 | `strings_common.xml` | `common_` | Buttons (OK, Cancel, Back), units (m, kg, pts), durations, numbers, lists, plurals used everywhere (days, Lanterns). **Reuse these** instead of copying a word into your file. |
 | `strings_shell.xml` | `shell_` | Tabs, Shop pages, Dex sections, dialogs over every screen (AppRoot). |
 | `strings_core.xml` | `core_` | Names and descriptions of what core defines (see section 6). |
-| `strings_species.xml` | `species_` | The 200 species names, by id. |
+| `strings_species.xml` | `species_` | The 200 species names, by id (kept in English for now: `translatable="false"`). |
 | `strings_home.xml` | `home_` | The Fish tab. |
 | `strings_milestones.xml` | `milestones_` | Milestones. |
 | `strings_settings.xml` | `settings_` | Settings and its sections (sound, notifications, language, credits). |
@@ -302,9 +302,14 @@ your language's glossary file). Resource keys show where the term is the label.
 | Club, owner, member, club goal | Clubs (shipping later) | Translate; club names stay as generated |
 | m, kg, m/s, ×, UTC, 00:00 | Units, multiplication sign, the reset time | Keep the symbols; add your language's spacing |
 
-**Species words.** Generated species are an adjective plus a kind of fish, from these fixed lists
-(core `SpeciesGenerator`). Translate each word once and build names from your translations, in
-your language's order and agreement; keep all 200 names unique.
+**Species names stay in English for now** (the developer's choice: they read as proper names).
+`strings_species.xml` is all `translatable="false"`: translators leave it out, and every language
+shows the English names. If they are translated later, remove `translatable="false"` and use the
+word lists below.
+
+**Species words** (for a later translation). Generated species are an adjective plus a kind of
+fish, from these fixed lists (core `SpeciesGenerator`). Translate each word once and build names
+from your translations, in your language's order and agreement; keep all 200 names unique.
 
 - Shallows: Sunny, Golden, Speckled, Banded, Lemon, Rosy, Pebble, Minted, Sandy, Copper, Bright,
   Lagoon / Goby, Minnow, Wrasse, Chub, Shiner, Mullet, Blenny, Damsel, Tetra, Gudgeon

@@ -304,8 +304,9 @@ game in the new language straight away.
   (`app/src/main/res/values/strings_<area>.xml`, with comments for translators). Text built outside
   the screens (messages, the tour) is a `UiText` resolved where it is shown; names of things the
   rules define (zones, tackle, skins, shop items, the 200 species...) come from
-  `ui/i18n/CoreText.kt`, since core keeps its English names for the server. Species names are
-  translated by id: ids never change.
+  `ui/i18n/CoreText.kt`, since core keeps its English names for the server. Species names stay
+  in English in every language for now (they read as proper names); they go through resources by
+  id, so they can be translated later without changing any id.
 - Numbers, prices, units and times follow the language (`ui/Format.kt`).
 - Debug builds have the pseudo-locales English (XA) and AR (XB) in Settings > Language, to spot
   untranslated text, truncation and right-to-left problems.

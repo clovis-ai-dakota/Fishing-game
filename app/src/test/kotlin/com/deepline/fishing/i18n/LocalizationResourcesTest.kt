@@ -188,7 +188,9 @@ class LocalizationResourcesTest {
                 }
             }
             if (language in REQUIRED_LANGUAGES) {
-                val absent = english.keys - files.keys
+                // A file with nothing to translate (e.g. the species names, kept in English) isn't needed.
+                val translatable = english.filterValues { it.keys.size > it.untranslatable.size }.keys
+                val absent = translatable - files.keys
                 if (absent.isNotEmpty()) problems += "$folder is required but has no $absent"
             }
         }

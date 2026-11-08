@@ -299,8 +299,9 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     themes, seasons, boards, species, secret titles...) come from `ui/i18n/CoreText.kt`
     (`zone.label()` / `labelText()`); core keeps its English `displayName`s for the server and
     tests and the app never shows them. New enum entries need a string (exhaustive `when`s); new
-    ids are checked by `CoreTextTest`, whose English must equal core's. Species are translated by
-    id (`strings_species.xml`): ids and the generator never change.
+    ids are checked by `CoreTextTest`, whose English must equal core's. Species names go through
+    `strings_species.xml` by id (ids and the generator never change) and stay in English in every
+    language for now (`translatable="false"`, the developer's choice).
   - Numbers, prices, units and times go through `ui/Format.kt` / `UiText.number`.
   - Never translate analytics names, keys, ids, codes, server paths or names players type.
   - The language picker (Settings > Language, `AppLanguages`): `LocaleManager` on Android 13+ (same
