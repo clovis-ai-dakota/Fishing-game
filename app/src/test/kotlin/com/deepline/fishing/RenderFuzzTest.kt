@@ -49,6 +49,8 @@ class RenderFuzzTest {
     ) {
         val d = Density(density)
         val measurer = TextMeasurer(createFontFamilyResolver(context), d, LayoutDirection.Ltr)
+        // The labels drawn on the water, as the cast screen passes them (text near the edges is what crashed).
+        val labels = com.deepline.fishing.ui.castLabels(context.resources)
         val bitmap = ImageBitmap(widthPx, heightPx)
         val canvas = Canvas(bitmap)
         val drawScope = CanvasDrawScope()
@@ -66,9 +68,9 @@ class RenderFuzzTest {
             t += dt
             try {
                 drawScope.draw(d, LayoutDirection.Ltr, canvas, Size(widthPx.toFloat(), heightPx.toFloat())) {
-                    drawCastScene(session, t, measurer, aimX = session.hookX + 1f, skins = skins, detect = detect, fx = fx)
+                    drawCastScene(session, t, measurer, aimX = session.hookX + 1f, skins = skins, detect = detect, fx = fx, labels = labels)
                     // The 2D layer drawn over the 3D renderer.
-                    drawCastOverlay(session, t, measurer, aimX = session.hookX + 1f, detect = detect, fx = fx)
+                    drawCastOverlay(session, t, measurer, aimX = session.hookX + 1f, detect = detect, fx = fx, labels = labels)
                 }
             } catch (e: Throwable) {
                 throw AssertionError(

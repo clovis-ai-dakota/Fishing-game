@@ -120,6 +120,15 @@ class HardcodedTextTest {
             "AccountClient.kt",
             "OnlineConnection.kt",
             "ui/SkinsScreen.kt",
+            // Area A: casting, battles, online and secrets.
+            "ui/CastScreen.kt",
+            "ui/CastRenderer.kt",
+            "ui/BattleScreen.kt",
+            "ui/BattleSetupScreen.kt",
+            "ui/OnlineLobbyScreen.kt",
+            "ui/OnlineText.kt",
+            "ui/secrets/FishingSecrets.kt",
+            "ui/dex/SecretDex.kt",
         )
 
         /**
@@ -128,7 +137,6 @@ class HardcodedTextTest {
          * Remove a file from here when you convert it.
          */
         val PENDING_CORE_NAMES: Set<String> = setOf(
-            "ui/secrets/FishingSecrets.kt",
             "daily/Reminders.kt",
         )
 

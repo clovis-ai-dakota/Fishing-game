@@ -68,8 +68,9 @@ class SceneRenderTest {
         compose.setContent {
             DeepLineTheme {
                 val measurer = rememberTextMeasurer()
+                val labels = com.deepline.fishing.ui.rememberCastLabels()
                 androidx.compose.foundation.Canvas(Modifier.size(400.dp, 860.dp)) {
-                    drawCastScene(session, time, measurer, skins = skins, cameraTop = cameraTop)
+                    drawCastScene(session, time, measurer, skins = skins, cameraTop = cameraTop, labels = labels)
                 }
             }
         }

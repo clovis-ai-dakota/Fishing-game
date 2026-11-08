@@ -1,6 +1,8 @@
 package com.deepline.fishing.ui.dex
 
+import com.deepline.fishing.R
 import com.deepline.fishing.ui.i18n.asString
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,6 +47,7 @@ import com.deepline.fishing.ui.secrets.FishingSecret
 import com.deepline.fishing.ui.secrets.FishingSecrets
 import com.deepline.fishing.ui.secrets.SecretArt
 import com.deepline.fishing.ui.secrets.SecretDetails
+import com.deepline.fishing.ui.secrets.SecretDiscoveryReward
 
 /**
  * The Secrets section: a numbered card for every secret, coloured by tier. Found ones show their
@@ -64,7 +67,7 @@ fun SecretDex(vm: GameViewModel) {
         item(key = "header", span = { GridItemSpan(maxLineSpan) }) {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(
-                    "Discovered ${found.size} of ${Secrets.all.size}",
+                    stringResource(R.string.secrets_dex_discovered, found.size, Secrets.all.size),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.Bold,
@@ -90,12 +93,10 @@ fun SecretDex(vm: GameViewModel) {
                 text = {
                     Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         SecretDetails(secret)
-                        FishingSecrets.rewardText(id)?.let {
-                            Text("Discovery reward: $it", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                        }
+                        SecretDiscoveryReward(id)
                     }
                 },
-                confirmButton = { TextButton(onClick = { open = null }) { Text("Close") } },
+                confirmButton = { TextButton(onClick = { open = null }) { Text(stringResource(R.string.secrets_dex_close)) } },
             )
         }
     }
@@ -125,7 +126,7 @@ private fun CardTop(number: Int, tier: Int, locked: Boolean) {
             modifier = Modifier.weight(1f),
         )
         if (locked) {
-            Icon(GameIcons.Lock, contentDescription = "Locked", modifier = Modifier.size(14.dp), tint = tierColor(tier))
+            Icon(GameIcons.Lock, contentDescription = stringResource(R.string.secrets_dex_locked), modifier = Modifier.size(14.dp), tint = tierColor(tier))
             Box(Modifier.size(4.dp))
         }
         Text(
@@ -179,7 +180,8 @@ private fun LockedSecretCard(number: Int, id: String) {
                 Icon(GameIcons.Lock, contentDescription = null, tint = tierColor(tier).copy(alpha = 0.35f), modifier = Modifier.size(40.dp))
             }
             Text(
-                FishingSecrets.lockedRewardText(id)?.let { "Reward: $it" } ?: "Reward: the know-how",
+                FishingSecrets.lockedRewardText(id)?.let { stringResource(R.string.secrets_dex_reward, it.asString()) }
+                    ?: stringResource(R.string.secrets_dex_reward_know_how),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 minLines = 2,
