@@ -1,7 +1,5 @@
 package com.deepline.fishing.ui.social
 
-import com.deepline.fishing.ui.i18n.description
-import com.deepline.fishing.ui.i18n.label
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,15 +10,19 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.GameViewModel
+import com.deepline.fishing.R
 import com.deepline.fishing.core.FishCatalog
 import com.deepline.fishing.core.GameConfig
 import com.deepline.fishing.core.Progression
@@ -33,16 +35,23 @@ import com.deepline.fishing.core.social.Leaderboards
 import com.deepline.fishing.core.social.Weeks
 import com.deepline.fishing.ui.SubScreen
 import com.deepline.fishing.ui.formatPoints
+import com.deepline.fishing.ui.i18n.description
+import com.deepline.fishing.ui.i18n.label
+import com.deepline.fishing.ui.pointsLabel
 import com.deepline.fishing.ui.tour.TourTarget
 import com.deepline.fishing.ui.tour.tourTarget
 
 /** How a board's number reads: points, a depth, or a species with its rarity. */
-@androidx.compose.runtime.Composable
+@Composable
 fun boardValue(kind: BoardKind, value: Long, speciesId: String?): String {
     val species = speciesId?.let { FishCatalog.byId(it) }
     return when (kind) {
-        BoardKind.BEST_CAST -> "${formatPoints(value)} pts"
-        BoardKind.DEEPEST -> "${Leaderboards.depthOf(value).toInt()} m" + (species?.let { " · ${it.label()}" } ?: "")
+        BoardKind.BEST_CAST -> pointsLabel(value)
+        BoardKind.DEEPEST -> {
+            val depth = stringResource(R.string.common_meters, formatPoints(Leaderboards.depthOf(value).toInt()))
+            if (species != null) stringResource(R.string.social_leaderboards_deepest_value, depth, species.label()) else depth
+        }
+        // The stars are the species' rarity, as on its Dex card.
         BoardKind.RAREST -> species?.let { "${it.label()} " + "★".repeat(Progression.rarityStars(it)) } ?: "?"
     }
 }
@@ -52,7 +61,7 @@ fun boardValue(kind: BoardKind, value: Long, speciesId: String?): String {
 fun LeaderboardsScreen(vm: GameViewModel) {
     val social = vm.social
     val now = ShopClock.now()
-    SubScreen("Weekly leaderboards", onBack = vm::onBack) {
+    SubScreen(stringResource(R.string.social_leaderboards_title), onBack = vm::onBack) {
         Column(
             Modifier
                 .weight(1f)
@@ -83,36 +92,37 @@ fun LeaderboardsScreen(vm: GameViewModel) {
                 }
             }
             Hint(
-                social.boardKind.description() + " The boards reset on Monday at 00:00 UTC, in " +
-                    "${timeLeft(Weeks.endOf(Weeks.indexAt(now)), now)}. Only casts the server checks itself count: the " +
-                    "weekly tournament and online battles, where everyone uses the same standard rope (level " +
-                    "${OnlineProtocol.TOURNAMENT_ROPE_LEVEL}).",
+                stringResource(
+                    R.string.social_leaderboards_about,
+                    social.boardKind.description(),
+                    timeLeftLabel(Weeks.endOf(Weeks.indexAt(now)), now),
+                    OnlineProtocol.TOURNAMENT_ROPE_LEVEL,
+                ),
             )
             SocialStatus(vm) { social.refreshBoard() }
 
             val board = social.board?.takeIf { it.board == social.boardKind && it.view == social.boardView }
             val me = board?.me
             if (me != null) {
-                SocialCard("Your rank", Modifier.testTag("board_me"), highlighted = true) {
+                SocialCard(stringResource(R.string.social_leaderboards_your_rank), Modifier.testTag("board_me"), highlighted = true) {
                     BoardRow(social.boardKind, me)
-                    Hint(if (board.players == 1) "1 angler on this board." else "${board.players} anglers on this board.")
+                    Hint(pluralStringResource(R.plurals.social_leaderboards_players, board.players, formatPoints(board.players)))
                 }
             }
             SocialCard(
                 when (social.boardView) {
-                    BoardView.GLOBAL -> "Top ${GameConfig.LEADERBOARD_TOP}"
-                    BoardView.LEAGUE -> "Your league"
-                    BoardView.FRIENDS -> "You and your friends"
+                    BoardView.GLOBAL -> stringResource(R.string.social_leaderboards_top, GameConfig.LEADERBOARD_TOP)
+                    BoardView.LEAGUE -> stringResource(R.string.social_leaderboards_league)
+                    BoardView.FRIENDS -> stringResource(R.string.social_leaderboards_friends)
                 },
             ) {
                 when {
-                    board == null -> Hint(if (social.busy) "Loading…" else "The board appears here once the server answers.")
+                    board == null -> Hint(stringResource(if (social.busy) R.string.social_loading else R.string.social_leaderboards_waiting))
                     board.entries.isEmpty() -> Hint(
                         when (social.boardView) {
-                            BoardView.LEAGUE -> "Your league starts with your first score of the week: about " +
-                                "${GameConfig.LEAGUE_SIZE} anglers who started the week at the same time as you."
-                            BoardView.FRIENDS -> "No scores from you or your friends yet this week."
-                            BoardView.GLOBAL -> "No scores yet this week. Fish the weekly tournament or an online battle to be the first."
+                            BoardView.LEAGUE -> pluralStringResource(R.plurals.social_leaderboards_league_empty, GameConfig.LEAGUE_SIZE, GameConfig.LEAGUE_SIZE)
+                            BoardView.FRIENDS -> stringResource(R.string.social_leaderboards_friends_empty)
+                            BoardView.GLOBAL -> stringResource(R.string.social_leaderboards_global_empty)
                         },
                     )
                     else -> board.entries.forEachIndexed { i, entry ->
@@ -121,7 +131,7 @@ fun LeaderboardsScreen(vm: GameViewModel) {
                     }
                 }
                 if (social.boardView == BoardView.GLOBAL) {
-                    Hint("Anglers who aren't your friends are shown with a name made from their player id.")
+                    Hint(stringResource(R.string.social_leaderboards_strangers))
                 }
             }
         }
@@ -136,12 +146,13 @@ fun BoardRow(kind: BoardKind, entry: BoardEntry) {
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         RankLabel(entry.rank)
+        // Strangers' names are generated from their id and the same in every language (never translated).
         PlayerName(entry.name, entry.title, entry.titleFrame, Modifier.weight(1f), you = entry.you)
         Text(
             boardValue(kind, entry.value, entry.speciesId),
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,
-            color = androidx.compose.material3.LocalContentColor.current,
+            color = LocalContentColor.current,
         )
     }
 }

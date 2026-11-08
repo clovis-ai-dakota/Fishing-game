@@ -1,6 +1,5 @@
 package com.deepline.fishing.ui.social
 
-import com.deepline.fishing.ui.i18n.asString
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -33,12 +32,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.deepline.fishing.FeatureFlags
 import com.deepline.fishing.GameViewModel
+import com.deepline.fishing.R
 import com.deepline.fishing.core.TitleFrame
 import com.deepline.fishing.ui.TitleBadge
+import com.deepline.fishing.ui.i18n.asString
+import com.deepline.fishing.ui.rewardTextColor
+import com.deepline.fishing.ui.shop.ShopText
+import com.deepline.fishing.ui.shop.timeLeftLabel
 
 /** A titled glass card, like the other menus' cards. */
 @Composable
@@ -86,16 +92,13 @@ fun SocialStatus(vm: GameViewModel, retry: () -> Unit) {
     social.message?.let { text ->
         SocialCard(null, Modifier.testTag("social_message"), highlighted = true) {
             Text(text.asString(), style = MaterialTheme.typography.bodyMedium)
-            TextButton(onClick = social::dismissMessage, modifier = Modifier.align(Alignment.End)) { Text("OK") }
+            TextButton(onClick = social::dismissMessage, modifier = Modifier.align(Alignment.End)) { Text(stringResource(R.string.common_ok)) }
         }
     }
     if (social.offline) {
-        SocialCard("Can't reach the server", Modifier.testTag("social_offline")) {
-            Hint(
-                "Friends, leaderboards, the tournament and clubs need the battle server. Check your connection, " +
-                    "or the server address in Online battle, then try again. Everything else in the game works offline.",
-            )
-            OutlinedButton(onClick = retry, modifier = Modifier.testTag("social_retry")) { Text("Try again") }
+        SocialCard(stringResource(R.string.social_offline_title), Modifier.testTag("social_offline")) {
+            Hint(stringResource(if (FeatureFlags.clubs) R.string.social_offline_body else R.string.social_offline_body_no_clubs))
+            OutlinedButton(onClick = retry, modifier = Modifier.testTag("social_retry")) { Text(stringResource(R.string.social_offline_retry)) }
         }
     }
 }
@@ -105,7 +108,7 @@ fun SocialStatus(vm: GameViewModel, retry: () -> Unit) {
 fun PlayerName(name: String, title: String?, titleFrame: String?, modifier: Modifier = Modifier, you: Boolean = false) {
     Column(modifier, verticalArrangement = Arrangement.spacedBy(2.dp)) {
         Text(
-            if (you) "$name (you)" else name,
+            if (you) stringResource(R.string.social_player_you, name) else name,
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Bold,
             maxLines = 1,
@@ -125,7 +128,7 @@ fun OnlineLabel(online: Boolean) {
                 .background(if (online) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline, CircleShape),
         )
         Text(
-            if (online) "Online" else "Offline",
+            stringResource(if (online) R.string.social_status_online else R.string.social_status_offline),
             style = MaterialTheme.typography.labelSmall,
             color = if (online) MaterialTheme.colorScheme.primary else LocalHintColor.current ?: MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -136,25 +139,17 @@ fun OnlineLabel(online: Boolean) {
 @Composable
 fun RankLabel(rank: Int) {
     Text(
-        "#$rank",
+        stringResource(R.string.social_rank, rank),
         style = MaterialTheme.typography.titleSmall,
         fontWeight = FontWeight.Black,
-        color = if (rank <= 3) com.deepline.fishing.ui.rewardTextColor() else LocalHintColor.current ?: MaterialTheme.colorScheme.onSurfaceVariant,
+        color = if (rank <= 3) rewardTextColor() else LocalHintColor.current ?: MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.width(44.dp),
     )
 }
 
-/** "3 d 4 h", "5 h 20 min", "12 min": time left until [endMs]. */
-fun timeLeft(endMs: Long, now: Long): String {
-    val minutes = ((endMs - now).coerceAtLeast(0L) / 60_000L)
-    val days = minutes / (24 * 60)
-    val hours = (minutes / 60) % 24
-    return when {
-        days > 0 -> "$days d $hours h"
-        hours > 0 -> "$hours h ${minutes % 60} min"
-        else -> "${minutes.coerceAtLeast(1)} min"
-    }
-}
+/** "3 d 4 h", "5 h 20 min", "12 min": time left until [endMs] (at least a minute). */
+@Composable
+fun timeLeftLabel(endMs: Long, now: Long): String = ShopText.timeLeftLabel((endMs - now).coerceAtLeast(0L))
 
 /** Copies [text] to the clipboard. */
 fun copyText(context: Context, label: String, text: String) {
@@ -172,6 +167,8 @@ fun shareText(context: Context, text: String) {
 fun PlayerIdRow(vm: GameViewModel) {
     val context = LocalContext.current
     val id = vm.playerIdentity.id
+    val clipLabel = stringResource(R.string.social_clip_player_id)
+    val shareMessage = stringResource(R.string.social_share_player_id, id)
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
             id.chunked(4).joinToString(" "),
@@ -181,7 +178,7 @@ fun PlayerIdRow(vm: GameViewModel) {
             color = MaterialTheme.colorScheme.secondary,
             modifier = Modifier.weight(1f).testTag("my_player_id"),
         )
-        OutlinedButton(onClick = { copyText(context, "Deep Line player id", id) }) { Text("Copy") }
-        Button(onClick = { shareText(context, "Add me as a friend in Deep Line: my player id is $id.") }) { Text("Share") }
+        OutlinedButton(onClick = { copyText(context, clipLabel, id) }) { Text(stringResource(R.string.social_copy)) }
+        Button(onClick = { shareText(context, shareMessage) }) { Text(stringResource(R.string.social_share)) }
     }
 }

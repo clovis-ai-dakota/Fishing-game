@@ -38,10 +38,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.GameViewModel
+import com.deepline.fishing.R
+import com.deepline.fishing.ui.hourText
+import com.deepline.fishing.ui.i18n.UiText
 import com.deepline.fishing.ui.i18n.asString
 import com.deepline.fishing.ui.i18n.label
 import com.deepline.fishing.ui.shop.timeLeftLabel
@@ -72,14 +77,12 @@ import com.deepline.fishing.ui.tour.TourTarget
 import com.deepline.fishing.ui.tour.tourTarget
 import kotlin.math.roundToInt
 
-/** "21:00" and "09:00": reminders' quiet hours, from GameConfig. */
-
-/** Reminders' promise, used by the explainer and Settings. */
-val reminderPromise: com.deepline.fishing.ui.i18n.UiText
-    get() = com.deepline.fishing.ui.i18n.UiText.res(
-        com.deepline.fishing.R.string.daily_reminder_promise,
-        com.deepline.fishing.ui.hourText(GameConfig.NOTIFY_QUIET_START_HOUR),
-        com.deepline.fishing.ui.hourText(GameConfig.NOTIFY_QUIET_END_HOUR),
+/** Reminders' promise ("At most one a day, never between 21:00 and 09:00..."), used by the explainer and Settings. */
+val reminderPromise: UiText
+    get() = UiText.res(
+        R.string.daily_reminder_promise,
+        hourText(GameConfig.NOTIFY_QUIET_START_HOUR),
+        hourText(GameConfig.NOTIFY_QUIET_END_HOUR),
     )
 
 /**
@@ -105,18 +108,17 @@ private fun ReminderOptInDialog(vm: GameViewModel, turnOn: () -> Unit) {
     AlertDialog(
         onDismissRequest = { vm.daily.answerOptIn(false) },
         icon = { Icon(DailyIcons.Bell, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
-        title = { Text("Want a reminder?") },
-        text = {
-            Text(
-                "Deep Line can let you know when your daily reward is ready, when your streak is about to end and when a " +
-                    "migration starts. ${reminderPromise.asString()}",
-            )
-        },
+        title = { Text(stringResource(R.string.daily_optin_title)) },
+        text = { Text(stringResource(R.string.daily_optin_body, reminderPromise.asString())) },
         confirmButton = {
-            TextButton(onClick = { vm.daily.answerOptIn(true); turnOn() }, modifier = Modifier.testTag("optin_yes")) { Text("Turn on") }
+            TextButton(onClick = { vm.daily.answerOptIn(true); turnOn() }, modifier = Modifier.testTag("optin_yes")) {
+                Text(stringResource(R.string.daily_optin_yes))
+            }
         },
         dismissButton = {
-            TextButton(onClick = { vm.daily.answerOptIn(false) }, modifier = Modifier.testTag("optin_no")) { Text("Not now") }
+            TextButton(onClick = { vm.daily.answerOptIn(false) }, modifier = Modifier.testTag("optin_no")) {
+                Text(stringResource(R.string.daily_optin_no))
+            }
         },
     )
 }
@@ -133,7 +135,7 @@ private fun DailyMessage(vm: GameViewModel) {
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                 modifier = Modifier.weight(1f).testTag("daily_message"),
             )
-            TextButton(onClick = vm.daily::dismissMessage) { Text(androidx.compose.ui.res.stringResource(com.deepline.fishing.R.string.common_ok)) }
+            TextButton(onClick = vm.daily::dismissMessage) { Text(stringResource(R.string.common_ok)) }
         }
     }
 }
@@ -149,11 +151,7 @@ private fun StreakLine(s: StreakStatus, large: Boolean = false) {
             modifier = Modifier.size(if (large) 28.dp else 18.dp),
         )
         Text(
-            when {
-                s.streak == 1 -> "1-day streak"
-                s.streak > 1 -> "${s.streak}-day streak"
-                else -> "No streak yet"
-            },
+            if (s.streak > 0) pluralStringResource(R.plurals.daily_streak, s.streak, s.streak) else stringResource(R.string.daily_streak_none),
             style = if (large) MaterialTheme.typography.titleLarge else MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.testTag("daily_streak"),
@@ -226,12 +224,12 @@ private fun ClaimOrWait(vm: GameViewModel, s: StreakStatus) {
     val next = DailyText.grants(Daily.nextReward(p), p).asString()
     if (s.canClaim) {
         Button(onClick = vm.daily::claimReward, modifier = Modifier.fillMaxWidth().testTag("daily_claim")) {
-            Text("Claim day ${s.nextCalendarDay}: $next", textAlign = TextAlign.Center)
+            Text(stringResource(R.string.daily_claim_button, s.nextCalendarDay, next), textAlign = TextAlign.Center)
         }
     } else {
         val wait = ShopText.timeLeftLabel(LocalDays.msUntilTomorrow(ShopClock.now()))
         Text(
-            "Today's reward is claimed. Day ${s.nextCalendarDay} ($next) is ready in $wait.",
+            stringResource(R.string.daily_claim_wait, s.nextCalendarDay, next, wait),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -251,18 +249,23 @@ private fun ChallengeRow(vm: GameViewModel, c: DailyChallenge, full: Boolean) {
                 Text(DailyText.challenge(c).asString(), style = MaterialTheme.typography.bodyMedium)
             }
             when {
-                c.claimed -> Text("Done", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Bold)
+                c.claimed -> Text(
+                    stringResource(R.string.daily_challenge_done),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontWeight = FontWeight.Bold,
+                )
                 c.claimable -> FilledTonalButton(
                     onClick = { vm.daily.claimChallenge(c.difficulty) },
                     modifier = Modifier.testTag("challenge_claim_${difficultyTag(c.difficulty)}"),
-                ) { Text("Claim") }
+                ) { Text(stringResource(R.string.daily_challenge_claim)) }
                 full && vm.daily.canReroll(c.difficulty) -> TextButton(
                     onClick = { vm.daily.reroll(c.difficulty) },
                     modifier = Modifier.testTag("challenge_reroll_${difficultyTag(c.difficulty)}"),
                 ) {
                     Icon(DailyIcons.Swap, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.width(4.dp))
-                    Text("Swap")
+                    Text(stringResource(R.string.daily_challenge_swap))
                 }
             }
         }
@@ -293,7 +296,7 @@ fun DailyCard(vm: GameViewModel, modifier: Modifier = Modifier) {
     Card(onClick = vm::openDaily, modifier = modifier.fillMaxWidth().testTag("daily_card")) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Daily", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                Text(stringResource(R.string.daily_title), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
                 StreakLine(s)
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -316,7 +319,7 @@ private fun MigrantRow(vm: GameViewModel, species: FishSpecies) {
         Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .clickable(onClickLabel = "Open its Dex page") { vm.openFishDetail(index) },
+            .clickable(onClickLabel = stringResource(R.string.daily_migrant_open)) { vm.openFishDetail(index) },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
@@ -330,7 +333,7 @@ private fun MigrantRow(vm: GameViewModel, species: FishSpecies) {
                 fontWeight = FontWeight.Bold,
             )
             Text(
-                "${species.zone.label()} · ${species.minDepth.roundToInt()}–${species.maxDepth.roundToInt()} m",
+                stringResource(R.string.daily_migrant_where, species.zone.label(), species.minDepth.roundToInt(), species.maxDepth.roundToInt()),
                 style = MaterialTheme.typography.labelSmall,
                 color = zoneTextColor(species.zone),
             )
@@ -347,9 +350,9 @@ fun MigrationBanner(vm: GameViewModel, modifier: Modifier = Modifier) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Icon(DailyIcons.School, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                 Column(Modifier.weight(1f)) {
-                    Text("Migration under way", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.daily_migration_banner_title), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
                     Text(
-                        "These two are far more common in solo casts for ${ShopText.timeLeftLabel(m.msLeft(ShopClock.now()))}.",
+                        stringResource(R.string.daily_migration_banner_body, ShopText.timeLeftLabel(m.msLeft(ShopClock.now()))),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -368,7 +371,7 @@ fun MigratingNote(species: FishSpecies) {
         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Icon(DailyIcons.School, contentDescription = null, tint = MaterialTheme.colorScheme.onSecondaryContainer)
             Text(
-                "Migrating now: far more common in solo casts for ${ShopText.timeLeftLabel(m.msLeft(ShopClock.now()))}.",
+                stringResource(R.string.daily_migrating_note, ShopText.timeLeftLabel(m.msLeft(ShopClock.now()))),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
             )
@@ -383,7 +386,7 @@ fun DailyScreen(vm: GameViewModel) {
     val s = Daily.status(p, vm.daily.today)
     val turnOn = rememberReminderOptIn(vm, "explainer")
     val turnOnHere = rememberReminderOptIn(vm, "daily_screen")
-    SubScreen("Daily", onBack = vm::onBack) {
+    SubScreen(stringResource(R.string.daily_title), onBack = vm::onBack) {
         Column(
             Modifier
                 .weight(1f)
@@ -396,10 +399,13 @@ fun DailyScreen(vm: GameViewModel) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     StreakLine(s, large = true)
                     Text(
-                        (if (p.dailyBestStreak == 1) "Best streak: 1 day. " else "Best streak: ${p.dailyBestStreak} days. ") +
-                            "Streak shields: ${s.shields} of ${GameConfig.MAX_STREAK_SHIELDS}. " +
-                            "A shield covers a missed day by itself, and day ${DailyRewards.calendar.size} brings a new one. " +
-                            "Missing a day never sets the calendar back.",
+                        stringResource(
+                            R.string.daily_streak_rules,
+                            pluralStringResource(R.plurals.daily_best_streak, p.dailyBestStreak, p.dailyBestStreak),
+                            s.shields,
+                            GameConfig.MAX_STREAK_SHIELDS,
+                            DailyRewards.calendar.size,
+                        ),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -422,14 +428,14 @@ fun DailyScreen(vm: GameViewModel) {
             }
             Card(Modifier.fillMaxWidth().tourTarget(TourTarget.DAILY_CHALLENGES)) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text("Today's challenges", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.daily_challenges_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     for (c in vm.daily.challenges) ChallengeRow(vm, c, full = true)
+                    val left = vm.daily.rerollsLeft
                     Text(
-                        when (val left = vm.daily.rerollsLeft) {
-                            0 -> "No free swaps left today."
-                            1 -> "1 free swap left today for a challenge you don't fancy."
-                            else -> "$left free swaps left today for challenges you don't fancy."
-                        } + " Only solo casts count. New challenges come at midnight, and finished ones are collected for you if you forget.",
+                        stringResource(
+                            R.string.daily_challenges_rules,
+                            if (left > 0) pluralStringResource(R.plurals.daily_swaps_left, left, left) else stringResource(R.string.daily_swaps_none),
+                        ),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -440,7 +446,7 @@ fun DailyScreen(vm: GameViewModel) {
                 OutlinedButton(onClick = turnOnHere, modifier = Modifier.fillMaxWidth().testTag("daily_reminders")) {
                     Icon(DailyIcons.Bell, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text("Remind me when my reward is ready")
+                    Text(stringResource(R.string.daily_remind_button))
                 }
             }
             Spacer(Modifier.height(8.dp))
@@ -459,14 +465,18 @@ private fun MigrationCard(vm: GameViewModel, m: Migration, modifier: Modifier = 
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Icon(DailyIcons.School, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                 Text(
-                    if (live) "Migration: ${ShopText.timeLeftLabel(m.msLeft(now))} left" else "Next migration in ${ShopText.timeLeftLabel(m.msUntilStart(now))}",
+                    if (live) {
+                        stringResource(R.string.daily_migration_live, ShopText.timeLeftLabel(m.msLeft(now)))
+                    } else {
+                        stringResource(R.string.daily_migration_next, ShopText.timeLeftLabel(m.msUntilStart(now)))
+                    },
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                 )
             }
+            val days = GameConfig.MIGRATION_HOURS / 24
             Text(
-                "Every week, for ${GameConfig.MIGRATION_HOURS / 24} days, two less common species become far more common where " +
-                    "they live: one near the surface and one in the deep. Solo casts only: battles never change.",
+                pluralStringResource(R.plurals.daily_migration_about, days, days),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
