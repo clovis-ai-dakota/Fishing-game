@@ -45,12 +45,14 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.GameViewModel
+import com.deepline.fishing.R
 import com.deepline.fishing.core.DepthZone
 import com.deepline.fishing.core.DexState
 import com.deepline.fishing.core.FishCatalog
@@ -89,7 +91,7 @@ fun SpeciesDex(vm: GameViewModel) {
                     .tourTarget(TourTarget.DEX_FILTERS),
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                FilterChip(selected = zone == null, onClick = { zoneName = null }, label = { Text("All") })
+                FilterChip(selected = zone == null, onClick = { zoneName = null }, label = { Text(stringResource(R.string.dex_species_filter_all)) })
                 for (z in DepthZone.entries) {
                     FilterChip(
                         selected = zone == z,
@@ -98,7 +100,11 @@ fun SpeciesDex(vm: GameViewModel) {
                         leadingIcon = { Box(Modifier.size(10.dp).clip(CircleShape).background(zoneColor(z))) },
                     )
                 }
-                FilterChip(selected = caughtOnly, onClick = { caughtOnly = !caughtOnly }, label = { Text("Caught only") })
+                FilterChip(
+                    selected = caughtOnly,
+                    onClick = { caughtOnly = !caughtOnly },
+                    label = { Text(stringResource(R.string.dex_species_filter_caught)) },
+                )
             }
         }
         items(shown, key = { it.value.id }) { (index, species) ->
@@ -107,7 +113,7 @@ fun SpeciesDex(vm: GameViewModel) {
         if (shown.isEmpty()) {
             item(key = "empty", span = { GridItemSpan(maxLineSpan) }) {
                 Text(
-                    "No fish caught here yet. Keep fishing!",
+                    stringResource(R.string.dex_species_empty),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(16.dp),
@@ -137,12 +143,16 @@ private fun DexHeader(p: PlayerProgress) {
                     drawArc(gold.copy(alpha = 0.35f), -90f, 360f * seen / total, false, tl, arcSize, style = Stroke(stroke, cap = StrokeCap.Round))
                     drawArc(gold, -90f, 360f * caught / total, false, tl, arcSize, style = Stroke(stroke, cap = StrokeCap.Round))
                 }
-                Text("${caught * 100 / total}%", fontWeight = FontWeight.Black, style = MaterialTheme.typography.titleMedium)
+                Text(
+                    stringResource(R.string.dex_species_completion, caught * 100 / total),
+                    fontWeight = FontWeight.Black,
+                    style = MaterialTheme.typography.titleMedium,
+                )
             }
             Spacer(Modifier.width(14.dp))
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
-                    "Seen $seen · Caught $caught / $total",
+                    stringResource(R.string.dex_species_counts, seen, caught, total),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                 )
@@ -200,10 +210,20 @@ private fun FishCard(number: Int, species: FishSpecies, p: PlayerProgress, style
                     modifier = Modifier.weight(1f),
                 )
                 if (state == DexState.SEEN) {
-                    Icon(GameIcons.Eye, contentDescription = "Seen", tint = Color.White.copy(alpha = 0.8f), modifier = Modifier.size(12.dp))
+                    Icon(
+                        GameIcons.Eye,
+                        contentDescription = stringResource(R.string.dex_species_cd_seen),
+                        tint = Color.White.copy(alpha = 0.8f),
+                        modifier = Modifier.size(12.dp),
+                    )
                 }
                 if ((entry?.sparklingCaught ?: 0) > 0) {
-                    Icon(GameIcons.Sparkle, contentDescription = "Sparkling caught", tint = SparkleGold, modifier = Modifier.size(12.dp))
+                    Icon(
+                        GameIcons.Sparkle,
+                        contentDescription = stringResource(R.string.dex_cd_sparkling_caught),
+                        tint = SparkleGold,
+                        modifier = Modifier.size(12.dp),
+                    )
                 }
             }
             FishPortrait(species, state, Modifier.fillMaxWidth().aspectRatio(1.5f))

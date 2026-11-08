@@ -9,9 +9,12 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.DexSection
 import com.deepline.fishing.GameViewModel
+import com.deepline.fishing.R
 import com.deepline.fishing.core.FishCatalog
 import com.deepline.fishing.ui.TabScreen
 import com.deepline.fishing.ui.tour.tourTarget
@@ -26,10 +29,10 @@ fun DexScreen(vm: GameViewModel) {
     val sections = vm.availableDexSections
     val section = vm.dexSection.takeIf { it in sections } ?: DexSection.FISH
     TabScreen(
-        title = "Dex",
+        title = stringResource(R.string.shell_tab_dex),
         subtitle = {
             Text(
-                "${FishCatalog.all.size} species to find in the deep",
+                pluralStringResource(R.plurals.dex_subtitle, FishCatalog.all.size, FishCatalog.all.size),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -39,7 +42,7 @@ fun DexScreen(vm: GameViewModel) {
             androidx.compose.material3.TextButton(
                 onClick = vm::openAquarium,
                 modifier = androidx.compose.ui.Modifier.tourTarget(com.deepline.fishing.ui.tour.TourTarget.DEX_AQUARIUM),
-            ) { Text("Aquarium") }
+            ) { Text(stringResource(R.string.dex_aquarium_button)) }
         },
     ) {
         if (sections.size > 1) {
@@ -53,7 +56,7 @@ fun DexScreen(vm: GameViewModel) {
                         selected = s == section,
                         onClick = { vm.openDex(s) },
                         shape = SegmentedButtonDefaults.itemShape(i, sections.size),
-                    ) { Text(androidx.compose.ui.res.stringResource(s.labelRes), maxLines = 1) }
+                    ) { Text(stringResource(s.labelRes), maxLines = 1) }
                 }
             }
         }
