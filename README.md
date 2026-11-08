@@ -280,6 +280,17 @@ steps, returning players get a short "What's new" tour of just those steps
   same, collects nothing and asks nothing. Build releases with
   `-PdeeplinePrivacyPolicyUrl=https://...` (the published policy).
 
+### Play reviews
+
+The game asks for a Google Play rating with Play's own in-app review card, rarely and only at a
+good moment: right after a rare or Sparkling catch, a new species or a battle won by playing,
+once the player has made 25 solo casts over 3 different days, never during a cast, over a dialog
+or within an hour of a setback (a lost battle, a failed purchase, a quit cast, a dropped
+connection), at most once every 120 days and 3 times in all (`GameConfig.Review`, rules in
+`core/.../ReviewPrompts.kt`, app side in `app/.../review/`). No "Rate us" button, no question
+first, nothing given for a review; the game never knows whether the player rated. Research:
+`docs/research/launch.md`.
+
 ### Sound and feel
 
 Casts sound and feel like fishing: a splash when the line hits the water, bubbles on the way
@@ -465,6 +476,7 @@ core/   Pure Kotlin game logic (no Android dependency) + unit tests
         Daily.kt           local days, the login streak and reward calendar, daily challenges
         Migrations.kt      weekly migrations (spawn boosts for solo casts)
         Reminders.kt       when a reminder is due (at most one a day, quiet hours)
+        ReviewPrompts.kt   when to ask for a Play review (happy moments, setbacks, cool-down)
         Showcase.kt        title badge frames, Dex card styles, the aquarium
         Themes.kt          menu themes and the night mode
         Tackle.kt          one-cast tackle (Lantern, detector, charm, lure)
@@ -489,6 +501,7 @@ app/    Android app (Jetpack Compose)
         privacy/           privacy choices, consent sheet, PrivacyController (Settings > Privacy)
         social/            SocialController (state of the social screens) and SocialClient (HTTP)
         billing/           Store: Google Play Billing (PlayStore) and the debug test store
+        review/            Play In-App Review: ReviewController (when) and ReviewPrompter (Play or a fake)
         ui/CastScreen.kt   game loop, HUD, pause, results
         ui/render3d/       3D renderer: procedural meshes, scene builder, GL backend (gl/)
         ui/CastRenderer.kt 2D scene (fallback) and the 2D overlay drawn over the 3D view
@@ -570,7 +583,33 @@ machine as seen from the Android emulator. To ship a build pointing at your depl
 ./gradlew :app:assembleDebug -PdeeplineServerUrl=wss://your-host.example.com/battle
 ```
 
-Players can also change the address in the app (Online battle → Server settings).
+Players can also change the address in the app (Online battle → Server settings). Release builds
+refuse cleartext connections (`res/xml/network_security_config.xml`; debug builds allow them for
+the development server), so the production server must be behind TLS (`wss://`).
+
+### Release builds and the store
+
+```bash
+./gradlew :app:bundleRelease \
+  -PdeeplineServerUrl=wss://your-host/battle -PdeeplinePrivacyPolicyUrl=https://your-site/privacy \
+  -PdeeplineStrictRelease=true      # AAB at app/build/outputs/bundle/release/
+tools/release/check-release.sh      # target SDK, cleartext, 16 KB pages, signature, R8 mapping
+```
+
+- Versions are in `app/version.properties` (+1 `versionCode` for every upload to Play).
+- Signing: the upload key is read from `deeplineUpload*` Gradle properties (in
+  `~/.gradle/gradle.properties`) or `DEEPLINE_UPLOAD_*` environment variables; never commit it.
+  Without it the bundle is built unsigned (fine for CI and checks, refused by Play). Play App
+  Signing keeps the app signing key.
+- R8 shrinks and optimises release builds (`app/proguard-rules.pro`; `-PdeeplineMinify=false` to
+  turn it off). The bundle carries the mapping file for Play's crash reports.
+- A release build prints what isn't ready for Play (unsigned, a `ws://` server, the placeholder
+  privacy policy); `-PdeeplineStrictRelease=true` makes that an error.
+- Every step to production, in order: [`docs/release-checklist.md`](docs/release-checklist.md).
+  Store listing in six languages, rating and audience answers, graphics:
+  [`docs/store/`](docs/store/README.md) (checked by `StoreListingTest`). Store graphics are made
+  from the game (`tools/store-graphics/`), the promo video too (`tools/promo-video/`). Research:
+  [`docs/research/launch.md`](docs/research/launch.md).
 
 The `:app` module is only included when an Android SDK is found (`ANDROID_HOME`,
 `ANDROID_SDK_ROOT`, or `sdk.dir` in `local.properties`), so `:core` can be built anywhere.

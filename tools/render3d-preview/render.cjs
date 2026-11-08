@@ -1,11 +1,14 @@
 // Draws frames exported by Render3dExportTest (app/build/render3d/*.json) with WebGL2 in headless
 // Chromium, using the app's own shaders and the same draw rules as the Android GL backend, and
 // writes a PNG next to each JSON. Usage: node tools/render3d-preview/render.cjs [files...]
-const { chromium } = require('playwright');
+// Other tools (tools/promo-video, tools/store-graphics) reuse drawFrame through module.exports.
 const fs = require('node:fs');
 const path = require('node:path');
 
-(async () => {
+module.exports = { drawFrame };
+
+if (require.main === module) (async () => {
+const { chromium } = require('playwright');
 
 const files = process.argv.slice(2).length ? process.argv.slice(2)
   : fs.readdirSync('app/build/render3d').filter(f => f.endsWith('.json')).map(f => path.join('app/build/render3d', f));
@@ -29,14 +32,21 @@ process.exit(failed ? 1 : 0);
 })();
 
 // Runs in the page. Mirrors app/.../render3d/GlBackend.kt.
+// A frame normally carries its shaders, programs and meshes. A sequence (the promo video) puts
+// them once in window.__deeplineShared ({shaders, programs, meshes}) and keeps the GL context,
+// its programs and static meshes between frames (window.__deeplineGl); frames then carry only
+// their dynamic meshes, which are freed after drawing.
 function drawFrame(frame) {
   const errors = [];
+  const shared = window.__deeplineShared || null;
   const gl = document.getElementById('c').getContext('webgl2', { antialias: true, preserveDrawingBuffer: true, alpha: false });
   if (!gl) return ['no WebGL2'];
-  const programs = {};
-  for (const [name, [vs, fs]] of Object.entries(frame.programs)) {
+  const keep = shared ? (window.__deeplineGl = window.__deeplineGl || { programs: null, vaos: {} }) : null;
+  const shaders = frame.shaders || shared.shaders;
+  let programs = keep && keep.programs ? keep.programs : {};
+  if (!(keep && keep.programs)) for (const [name, [vs, fs]] of Object.entries(frame.programs || shared.programs)) {
     const p = gl.createProgram();
-    for (const [type, src] of [[gl.VERTEX_SHADER, frame.shaders[vs]], [gl.FRAGMENT_SHADER, frame.shaders[fs]]]) {
+    for (const [type, src] of [[gl.VERTEX_SHADER, shaders[vs]], [gl.FRAGMENT_SHADER, shaders[fs]]]) {
       const s = gl.createShader(type);
       gl.shaderSource(s, src);
       gl.compileShader(s);
@@ -51,14 +61,19 @@ function drawFrame(frame) {
     programs[name] = { p, uniforms };
   }
   if (errors.length) return errors;
-  const vaos = {};
+  if (keep) keep.programs = programs;
+  const dynamic = [];
+  const vaos = keep ? keep.vaos : {};
   function vao(key) {
-    if (vaos[key]) return vaos[key];
-    const m = frame.meshes[key];
+    const isDynamic = key.startsWith('dyn:');
+    if (vaos[key] && !(keep && isDynamic)) return vaos[key];
+    const m = (frame.meshes && frame.meshes[key]) || shared.meshes[key];
     const v = gl.createVertexArray();
+    const buffers = [];
     gl.bindVertexArray(v);
     const attr = (loc, data, size) => {
       const b = gl.createBuffer();
+      buffers.push(b);
       gl.bindBuffer(gl.ARRAY_BUFFER, b);
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
       gl.enableVertexAttribArray(loc);
@@ -67,10 +82,13 @@ function drawFrame(frame) {
     attr(0, m.p, 3); attr(1, m.n, 3); attr(2, m.uv, 2); attr(3, m.part, 1);
     if (m.c) attr(4, m.c, 4); else { gl.disableVertexAttribArray(4); gl.vertexAttrib4f(4, 1, 1, 1, 1); }
     const ib = gl.createBuffer();
+    buffers.push(ib);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(m.i), gl.STATIC_DRAW);
     gl.bindVertexArray(null);
-    return (vaos[key] = { v, count: m.i.length, colors: !!m.c });
+    const made = { v, count: m.i.length, colors: !!m.c, buffers };
+    if (keep && isDynamic) { dynamic.push(made); return made; }
+    return (vaos[key] = made);
   }
   const defaults = { uOpacity: [1], uFlags: [0, 0, 0, 0], uSwim: [0, 0, 0, 0], uFish: [0, 0, 0, 0], uFish2: [0, 0, 0, 0], uEye: [0.1, 0.1, 0.15, 1], uBase: [0.5, 0.5, 0.5], uAccent: [0.5, 0.5, 0.5], uExtra: [0.5, 0.5, 0.5], uExtra2: [0.9, 0.9, 0.85], uBoatMode: [0, 0, 0, 0], uSailColor: [0.96, 0.92, 0.85], uFlagColor: [1, 0.5, 0.42], uMaterial: [0], uMode: [0], uAdditive: [0] };
   function set(prog, name, v) {
@@ -95,6 +113,9 @@ function drawFrame(frame) {
   gl.viewport(0, 0, frame.width, frame.height);
   gl.clearColor(0, 0, 0, 1);
   gl.clearDepth(1);
+  // As GlBackend: the last item may have left depth writes off, which would keep glClear from
+  // clearing the depth buffer of a reused context (a sequence's next frame).
+  gl.depthMask(true);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   for (const item of frame.items) {
     const mesh = vao(item.mesh);
@@ -124,6 +145,7 @@ function drawFrame(frame) {
     }
   }
   gl.bindVertexArray(null);
+  for (const d of dynamic) { gl.deleteVertexArray(d.v); d.buffers.forEach(b => gl.deleteBuffer(b)); }
   const e = gl.getError();
   if (e) errors.push('GL error ' + e);
   return errors;

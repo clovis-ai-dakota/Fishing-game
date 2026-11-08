@@ -50,9 +50,10 @@ nothing is collected. These steps switch it on. Background and decisions:
    Reopen the app: the report is sent at the next launch. It appears in the dashboard within a
    few minutes. A non-fatal report is also sent, for example, when the 3D renderer fails and
    the game falls back to 2D.
-3. Release builds aren't minified today (`isMinifyEnabled = false`), so there's no mapping file
-   to upload. If you turn on R8 later, the Crashlytics plugin uploads mapping files
-   automatically for release builds.
+3. Release builds are minified with R8 (`app/proguard-rules.pro`): the Crashlytics plugin
+   uploads the mapping file automatically for release builds once `google-services.json` is
+   there, so crash reports show the original class and method names. (Play Console reads the
+   mapping file from the App Bundle itself for Android vitals.)
 
 ## 4. Check the events in DebugView
 

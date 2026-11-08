@@ -90,6 +90,12 @@ Points purchases are `spend_virtual_currency` with `source` `shop`.
 
 Nothing about the online opponent (name, id, title) is logged.
 
+## Play review prompt
+
+| Event | Parameters | Why |
+| --- | --- | --- |
+| `review_prompt` | `moment` (`rare_catch`, `new_species`, `battle_won`), `ask` (1 for the first ask on this phone, then 2, 3), `casts` (solo casts made so far), `play_days` (different days with a solo cast) | The game asked Google Play for its in-app review card (rules: `core/.../ReviewPrompts.kt`, numbers: `GameConfig.Review`). Counts how often and after which happy moment the game asks, to compare with the ratings in Play Console. Play may not show the card (its own quota) and never tells the app whether the player rated, so this is the ask, not a rating. |
+
 ## Errors (crash reports)
 
 Crashes are reported by Crashlytics automatically (when crash reports are allowed). Handled

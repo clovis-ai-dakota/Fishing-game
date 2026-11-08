@@ -50,12 +50,14 @@ object GameAnalytics {
     const val SEASON_CLAIM = "season_claim"
     const val WEEKEND_EVENT_CLAIM = "weekend_event_claim"
     const val SECRET_DISCOVER = "secret_discover"
+    const val REVIEW_PROMPT = "review_prompt"
 
     /** Every event this object logs (the taxonomy test checks the doc lists them). */
     val EVENTS = listOf(
         TUTORIAL_BEGIN, TUTORIAL_COMPLETE, TUTORIAL_SKIP, LEVEL_START, LEVEL_END, FIRST_CAST, FIRST_CATCH,
         EARN, SPEND, ROPE_UPGRADE, ROPE_DOWNGRADE, STORE_CHECKOUT, STORE_PURCHASE, STORE_PROBLEM,
         BATTLE_START, BATTLE_END, MILESTONE, SEASON_CLAIM, WEEKEND_EVENT_CLAIM, SECRET_DISCOVER,
+        REVIEW_PROMPT,
     )
 
     const val PROP_ROPE_BAND = "rope_band"
@@ -314,6 +316,16 @@ object GameAnalytics {
         is Opponent.Computer -> o.difficulty.name.lowercase()
         Opponent.Friend -> "friend"
         Opponent.Online -> "online"
+    }
+
+    // --- Play review prompt ------------------------------------------------------------------
+
+    /**
+     * The game asked Google Play for its review card (see review/ReviewController.kt). Play may
+     * not show it, and never says whether the player rated: this only counts the asks.
+     */
+    fun reviewPrompt(moment: com.deepline.fishing.core.ReviewMoment, ask: Int, casts: Int, playDays: Int) {
+        Analytics.event(REVIEW_PROMPT, mapOf("moment" to moment.name.lowercase(), "ask" to ask, "casts" to casts, "play_days" to playDays))
     }
 
     // --- Who the player is (user properties) ----------------------------------------------------
