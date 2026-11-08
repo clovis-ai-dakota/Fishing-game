@@ -26,4 +26,91 @@
     <string name="cast_notice_last_bump">"Last bump hooked: %1$s  +%2$s"</string>
     <!-- A timed battle's clock ran out during the cast. -->
     <string name="cast_notice_times_up">Time\'s up!</string>
+
+    <!-- The HUD at the top of the cast screen (CastScreen). Chips are small: keep them short. -->
+    <!-- What the hook is doing: sinking (the descent), reeling up (the ascent), back at the boat. -->
+    <string name="cast_hud_phase_sinking">Sinking</string>
+    <string name="cast_hud_phase_reeling">Reeling up</string>
+    <string name="cast_hud_phase_surfaced">Surfaced</string>
+    <!-- Screen reader label of the pause button (the button itself shows the "II" pause sign). -->
+    <string name="cast_hud_pause">Pause</string>
+    <!-- Next to dots showing the bumps left on the way down. -->
+    <string name="cast_hud_bumps">Bumps</string>
+    <!-- The weight bar. %1$s: kilograms on the line now, with one decimal (e.g. "2.5"); %2$s: the
+         most the rope can carry, in kilograms (e.g. "10"). Both already formatted. Short. -->
+    <string name="cast_hud_load">Load %1$s / %2$s kg</string>
+    <!-- Green chip while the hook is in the bump-free zone. %1$d: the depth (m) below which bumps count. -->
+    <string name="cast_hud_bump_free">Bump-free zone · bumps count below %1$d m</string>
+    <!-- Chip while a Lantern lights the dark water. -->
+    <string name="cast_hud_lantern_lit">Lantern lit</string>
+    <!-- Chip during a battle: whose cast it is. %1$s: the player's name (as typed, or You, Rival
+         (Normal)...); %2$d: the round. -->
+    <string name="cast_hud_battle_round">%1$s · Round %2$d</string>
+    <!-- Same, in a mode with a set number of casts. %2$d: this cast; %3$d: casts per player. -->
+    <string name="cast_hud_battle_cast_of">%1$s · Cast %2$d/%3$d</string>
+    <!-- Same, in a timed mode (no set number of casts). %2$d: this cast. -->
+    <string name="cast_hud_battle_cast">%1$s · Cast %2$d</string>
+    <!-- Stands in for a battle player's name if it is missing. -->
+    <string name="cast_hud_player">Player</string>
+    <!-- Chip during a weekly tournament attempt. %1$d: this attempt; %2$d: attempts a week. -->
+    <string name="cast_hud_tournament_attempt">Tournament · Attempt %1$d of %2$d</string>
+
+    <!-- Hints in the middle of the screen. The first shows for the first seconds of every cast.
+         %1$d: depth (m) of the bump-free zone; %2$d: bumps allowed before the line comes up. -->
+    <string name="cast_hint_steer">Drag to steer: the hook glides to your finger. Below %1$d m, avoid fish heads and objects: %2$d bumps and the line comes up.</string>
+    <!-- On the way up while nothing is caught yet. HEAD is in capitals for emphasis. -->
+    <string name="cast_hint_heads">Nudge fish on the HEAD to hook them. Tails don\'t count.</string>
+
+    <!-- The button that hauls the line straight up once all bumps are used or the line is full.
+         Big button, one line. -->
+    <string name="cast_fast_reel">Reel in fast</string>
+    <!-- Same button when the line can take no more fish. -->
+    <string name="cast_fast_reel_line_full">Line full · Reel in fast</string>
+
+    <!-- The pause dialog. -->
+    <string name="cast_pause_title">Paused</string>
+    <string name="cast_pause_body_solo">Quitting ends this cast without scoring any of the fish on the line.</string>
+    <string name="cast_pause_body_battle">Quitting forfeits the battle. The battle clock is stopped while paused.</string>
+    <string name="cast_pause_body_online">Quitting forfeits the battle. Online, your opponent keeps fishing while you\'re paused.</string>
+    <string name="cast_pause_body_tournament">Quitting scores 0 for this tournament attempt, and it still counts as one of your attempts.</string>
+    <string name="cast_pause_resume">Resume</string>
+    <string name="cast_pause_quit">Quit cast</string>
+    <!-- In a battle: quitting the cast gives the battle away. -->
+    <string name="cast_pause_forfeit">Forfeit battle</string>
+
+    <!-- The results panel at the end of a cast. -->
+    <string name="cast_results_title">Cast complete</string>
+    <!-- The summary line under the title is made of these pieces joined with " · ", e.g.
+         "Deepest point 312 m · 3 fish · 1 object · 4.5 kg". %1$s: meters, already formatted ("312 m"). -->
+    <string name="cast_results_deepest">Deepest point %1$s</string>
+    <plurals name="cast_results_fish">
+        <!-- Fish landed in the cast. -->
+        <item quantity="one">%d fish</item>
+        <item quantity="other">%d fish</item>
+    </plurals>
+    <plurals name="cast_results_objects">
+        <!-- Objects (a rock, driftwood, a jelly cluster) hooked in the cast. -->
+        <item quantity="one">%d object</item>
+        <item quantity="other">%d objects</item>
+    </plurals>
+    <string name="cast_results_nothing">Nothing on the line this time. On the way up, steer into fish so the hook meets their head.</string>
+    <!-- After a catch's depth and weight (joined with " · "): the last bump of the way down hooked it. -->
+    <string name="cast_results_by_last_bump">hooked by the last bump</string>
+    <!-- A Sparkling catch (gold, worth more). %1$s: the species. If the adjective would have to agree
+         with the name in your language, write it so it doesn't need to, e.g. "✦ %1$s (sparkling)". -->
+    <string name="cast_results_sparkling">✦ Sparkling %1$s</string>
+    <!-- A fishing secret pulled off in this cast. %1$s: the secret's name. -->
+    <string name="cast_results_secret">✦ Secret: %1$s</string>
+    <!-- The cast's points in all. %1$s: points, already formatted. The two spaces are on purpose (quoted). -->
+    <string name="cast_results_total">"Total  +%1$s pts"</string>
+    <!-- The button that closes the results: Collect after a solo cast (points go to your balance),
+         Continue in a battle or a tournament. -->
+    <string name="cast_results_collect">Collect</string>
+    <string name="cast_results_continue">Continue</string>
+
+    <!-- Labels drawn on the water during a cast (small, one line). -->
+    <!-- On the dashed green line where bumps start to count. %1$d: its depth in meters. -->
+    <string name="cast_canvas_bump_free_above">Bump-free above %1$d m</string>
+    <!-- On the dashed orange line at the end of the rope. -->
+    <string name="cast_canvas_rope_limit">Rope limit</string>
 </resources>

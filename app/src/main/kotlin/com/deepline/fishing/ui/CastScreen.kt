@@ -1,5 +1,6 @@
 package com.deepline.fishing.ui
 
+import com.deepline.fishing.R
 import com.deepline.fishing.ui.i18n.asString
 import com.deepline.fishing.ui.i18n.secretTitle
 import com.deepline.fishing.ui.i18n.label
@@ -32,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
@@ -46,6 +48,10 @@ import androidx.compose.foundation.systemGestureExclusion
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
@@ -57,6 +63,7 @@ import com.deepline.fishing.core.CastResult
 import com.deepline.fishing.core.CastSession
 import com.deepline.fishing.core.GameConfig
 import com.deepline.fishing.ui.secrets.FishingSecrets
+import com.deepline.fishing.ui.i18n.UiText
 import com.deepline.fishing.ui.secrets.SecretDiscoveredDialog
 import kotlin.math.roundToInt
 
@@ -81,6 +88,7 @@ fun CastScreen(vm: GameViewModel) {
     val steer = remember(session) { SteerInput() }
     var time by remember(session) { mutableFloatStateOf(0f) }
     val textMeasurer = rememberTextMeasurer()
+    val labels = rememberCastLabels()
     val skins = vm.skins
     // The 3D renderer where the phone supports it (and it hasn't failed), otherwise 2D.
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -159,21 +167,21 @@ fun CastScreen(vm: GameViewModel) {
             val detect = vm.detectorTargets
             // Shake, flash and particles (render only: steering and hits never move).
             val fx = vm.feel.fx(session)
-            if (use3d && scene3d.ready) drawCastOverlay(session, time, textMeasurer, aimX = steer.targetX(), detect = detect, fx = fx)
-            else drawCastScene(session, time, textMeasurer, aimX = steer.targetX(), skins = skins, detect = detect, fx = fx)
+            if (use3d && scene3d.ready) drawCastOverlay(session, time, textMeasurer, aimX = steer.targetX(), detect = detect, fx = fx, labels = labels)
+            else drawCastScene(session, time, textMeasurer, aimX = steer.targetX(), skins = skins, detect = detect, fx = fx, labels = labels)
         }
 
         val turn = vm.battleTurn
         val battleLabel = turn?.let { t ->
             val b = vm.battle
-            val name = b?.players?.getOrNull(t.playerIndex)?.name ?: "Player"
+            val name = b?.players?.getOrNull(t.playerIndex)?.name ?: stringResource(R.string.cast_hud_player)
             val perPlayer = b?.mode?.castsPerPlayer
             when {
-                t.round > 0 -> "$name · Round ${t.round}"
-                perPlayer != null -> "$name · Cast ${t.castNumber}/$perPlayer"
-                else -> "$name · Cast ${t.castNumber}"
+                t.round > 0 -> stringResource(R.string.cast_hud_battle_round, name, t.round)
+                perPlayer != null -> stringResource(R.string.cast_hud_battle_cast_of, name, t.castNumber, perPlayer)
+                else -> stringResource(R.string.cast_hud_battle_cast, name, t.castNumber)
             }
-        } ?: vm.tournamentAttempt?.let { "Tournament · Attempt ${it.attempt} of ${com.deepline.fishing.core.GameConfig.TOURNAMENT_ATTEMPTS}" }
+        } ?: vm.tournamentAttempt?.let { stringResource(R.string.cast_hud_tournament_attempt, it.attempt, GameConfig.TOURNAMENT_ATTEMPTS) }
         // Reading [time] subscribes this screen to every frame; the HUD then gets plain values
         // so it recomposes whenever one of them changes.
         @Suppress("UNUSED_VARIABLE")
@@ -184,7 +192,7 @@ fun CastScreen(vm: GameViewModel) {
             notice = vm.notice,
             battleLabel = battleLabel,
             timeLeft = vm.battleTimeLeft(),
-            opponentLive = if (vm.isOnlineBattle) opponentLiveText(vm) else null,
+            opponentLive = if (vm.isOnlineBattle) opponentLiveText(vm)?.asString() else null,
             onPause = vm::pause,
         )
         // All bumps used, or the line is full: offer to haul it straight up (thumb zone).
@@ -198,7 +206,11 @@ fun CastScreen(vm: GameViewModel) {
                     .height(56.dp),
                 shape = RoundedCornerShape(28.dp),
             ) {
-                Text(if (hud.lineFull) "Line full · Reel in fast" else "Reel in fast", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text(
+                    stringResource(if (hud.lineFull) R.string.cast_fast_reel_line_full else R.string.cast_fast_reel),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                )
             }
         }
 
@@ -206,31 +218,31 @@ fun CastScreen(vm: GameViewModel) {
             val inBattle = turn != null
             AlertDialog(
                 onDismissRequest = vm::resume,
-                title = { Text("Paused") },
+                title = { Text(stringResource(R.string.cast_pause_title)) },
                 text = {
                     Text(
-                        if (inBattle) {
-                            if (vm.isOnlineBattle) {
-                                "Quitting forfeits the battle. Online, your opponent keeps fishing while you're paused."
-                            } else {
-                                "Quitting forfeits the battle. The battle clock is stopped while paused."
-                            }
-                        } else if (vm.tournamentAttempt != null) {
-                            "Quitting scores 0 for this tournament attempt, and it still counts as one of your attempts."
-                        } else {
-                            "Quitting ends this cast without scoring any of the fish on the line."
-                        },
+                        stringResource(
+                            when {
+                                inBattle && vm.isOnlineBattle -> R.string.cast_pause_body_online
+                                inBattle -> R.string.cast_pause_body_battle
+                                vm.tournamentAttempt != null -> R.string.cast_pause_body_tournament
+                                else -> R.string.cast_pause_body_solo
+                            },
+                        ),
                     )
                 },
-                confirmButton = { TextButton(onClick = vm::resume) { Text("Resume") } },
+                confirmButton = { TextButton(onClick = vm::resume) { Text(stringResource(R.string.cast_pause_resume)) } },
                 dismissButton = {
-                    TextButton(onClick = vm::abandonCast) { Text(if (inBattle) "Forfeit battle" else "Quit cast") }
+                    TextButton(onClick = vm::abandonCast) {
+                        Text(stringResource(if (inBattle) R.string.cast_pause_forfeit else R.string.cast_pause_quit))
+                    }
                 },
             )
         }
 
         vm.pendingResult?.let {
-            ResultsPanel(it, collectLabel = if (turn != null || vm.tournamentAttempt != null) "Continue" else "Collect", onCollect = vm::collectResult)
+            val collect = if (turn != null || vm.tournamentAttempt != null) R.string.cast_results_continue else R.string.cast_results_collect
+            ResultsPanel(it, collectLabel = stringResource(collect), onCollect = vm::collectResult)
         }
     }
 }
@@ -302,17 +314,22 @@ private fun CastHud(
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            HudChip("${hud.depthM} m")
+            HudChip(metersLabel(hud.depthM))
             HudChip(
-                when (hud.phase) {
-                    CastPhase.DESCENDING -> "Sinking"
-                    CastPhase.ASCENDING -> "Reeling up"
-                    CastPhase.SURFACED -> "Surfaced"
-                },
+                stringResource(
+                    when (hud.phase) {
+                        CastPhase.DESCENDING -> R.string.cast_hud_phase_sinking
+                        CastPhase.ASCENDING -> R.string.cast_hud_phase_reeling
+                        CastPhase.SURFACED -> R.string.cast_hud_phase_surfaced
+                    },
+                ),
             )
             Spacer(Modifier.weight(1f))
-            HudChip("${formatPoints(hud.points)} pts")
-            FilledTonalButton(onClick = onPause) { Text("II", fontWeight = FontWeight.Black) }
+            HudChip(pointsLabel(hud.points.toLong()))
+            val pause = stringResource(R.string.cast_hud_pause)
+            FilledTonalButton(onClick = onPause, modifier = Modifier.semantics { contentDescription = pause }) {
+                Text("II", fontWeight = FontWeight.Black) // i18n-ignore: the pause sign, not a word (read out as cast_hud_pause)
+            }
         }
         Row(
             modifier = Modifier
@@ -321,7 +338,7 @@ private fun CastHud(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
-            Text("Bumps", color = Color.White, style = MaterialTheme.typography.labelMedium)
+            Text(stringResource(R.string.cast_hud_bumps), color = Color.White, style = MaterialTheme.typography.labelMedium)
             repeat(hud.touchLimit) { i ->
                 Box(
                     Modifier
@@ -332,7 +349,7 @@ private fun CastHud(
             }
             Spacer(Modifier.width(10.dp))
             Text(
-                "Load %.1f / %.0f kg".format(hud.carriedKg, hud.maxKg),
+                stringResource(R.string.cast_hud_load, oneDecimal(hud.carriedKg), formatDecimal(hud.maxKg.toDouble(), 0)),
                 color = Color.White,
                 style = MaterialTheme.typography.labelMedium,
             )
@@ -372,7 +389,7 @@ private fun CastHud(
         }
         if (hud.bumpFree) {
             Text(
-                "Bump-free zone · bumps count below ${GameConfig.BUMP_FREE_DEPTH.toInt()} m",
+                stringResource(R.string.cast_hud_bump_free, GameConfig.BUMP_FREE_DEPTH.toInt()),
                 modifier = Modifier
                     .background(Color(0x99003D1F), RoundedCornerShape(50))
                     .padding(horizontal = 12.dp, vertical = 6.dp),
@@ -382,15 +399,14 @@ private fun CastHud(
             )
         }
         if (hud.lanternLit) {
-            HudChip("Lantern lit", Modifier.align(Alignment.Start))
+            HudChip(stringResource(R.string.cast_hud_lantern_lit), Modifier.align(Alignment.Start))
         }
 
         val hint = when {
             hud.elapsedSeconds < 3.5f ->
-                "Drag to steer: the hook glides to your finger. Below ${GameConfig.BUMP_FREE_DEPTH.toInt()} m, " +
-                    "avoid fish heads and objects: ${GameConfig.DESCENT_TOUCH_LIMIT} bumps and the line comes up."
+                stringResource(R.string.cast_hint_steer, GameConfig.BUMP_FREE_DEPTH.toInt(), GameConfig.DESCENT_TOUCH_LIMIT)
             hud.phase == CastPhase.ASCENDING && hud.nothingCaughtYet && notice == null ->
-                "Nudge fish on the HEAD to hook them. Tails don't count."
+                stringResource(R.string.cast_hint_heads)
             else -> null
         }
         val activeNotice = notice?.takeIf { hud.elapsedSeconds - it.shownAtSeconds < 1.8f }
@@ -416,6 +432,17 @@ private fun CastHud(
 private fun deepestPoint(result: CastResult): Float =
     maxOf(result.maxDepth, result.catches.maxOfOrNull { it.depth } ?: 0f, result.snags.maxOfOrNull { it.depth } ?: 0f)
 
+/** "312 m": whole meters. */
+@Composable
+@ReadOnlyComposable
+private fun metersLabel(meters: Int): String = stringResource(R.string.common_meters, formatPoints(meters))
+
+/** A weight with exactly one decimal ("4.0", "4,0" in French), so a changing value keeps its width. */
+internal fun oneDecimal(kg: Float): String = "%.1f".format(kg)
+
+/** "4.5 kg", with exactly one decimal. */
+internal fun kgText(kg: Float): UiText = UiText.res(R.string.common_kg, oneDecimal(kg))
+
 @Composable
 private fun ResultsPanel(result: CastResult, collectLabel: String, onCollect: () -> Unit) {
     Box(
@@ -430,16 +457,22 @@ private fun ResultsPanel(result: CastResult, collectLabel: String, onCollect: ()
                 .padding(24.dp),
         ) {
             Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text("Cast complete", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.cast_results_title), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                val fish = result.catches.size
+                val objects = result.snags.size
                 Text(
-                    "Deepest point ${deepestPoint(result).roundToInt()} m · ${result.catches.size} fish" +
-                        (if (result.snags.isNotEmpty()) " · ${result.snags.size} object" else "") + " · %.1f kg"
-                        .format(result.totalWeightKg),
+                    listOfNotNull(
+                        stringResource(R.string.cast_results_deepest, metersLabel(deepestPoint(result).roundToInt())),
+                        pluralStringResource(R.plurals.cast_results_fish, fish, fish),
+                        if (objects > 0) pluralStringResource(R.plurals.cast_results_objects, objects, objects) else null,
+                        kgText(result.totalWeightKg).asString(),
+                    ).joinToString(" · "),
                     style = MaterialTheme.typography.bodyMedium,
                 )
+                val byLastBump = stringResource(R.string.cast_results_by_last_bump)
                 if (result.catches.isEmpty() && result.snags.isEmpty()) {
                     Text(
-                        "Nothing on the line this time. On the way up, steer into fish so the hook meets their head.",
+                        stringResource(R.string.cast_results_nothing),
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 } else {
@@ -456,7 +489,7 @@ private fun ResultsPanel(result: CastResult, collectLabel: String, onCollect: ()
                                 Column(Modifier.weight(1f)) {
                                     Text(sn.kind.label(), color = com.deepline.fishing.ui.rewardTextColor(), fontWeight = FontWeight.SemiBold)
                                     Text(
-                                        "${sn.depth.roundToInt()} m · hooked by the last bump",
+                                        "${metersLabel(sn.depth.roundToInt())} · $byLastBump",
                                         style = MaterialTheme.typography.bodySmall,
                                     )
                                 }
@@ -478,13 +511,16 @@ private fun ResultsPanel(result: CastResult, collectLabel: String, onCollect: ()
                                 Spacer(Modifier.width(10.dp))
                                 Column(Modifier.weight(1f)) {
                                     Text(
-                                        (if (c.sparkling) "✦ Sparkling " else "") + c.species.label(),
+                                        if (c.sparkling) stringResource(R.string.cast_results_sparkling, c.species.label()) else c.species.label(),
                                         color = if (c.sparkling) rewardTextColor() else MaterialTheme.colorScheme.onSurface,
                                         fontWeight = FontWeight.SemiBold,
                                     )
                                     Text(
-                                        "${c.depth.roundToInt()} m · %.1f kg".format(c.species.weightKg) +
-                                            (if (c.byLastBump) " · hooked by the last bump" else ""),
+                                        listOfNotNull(
+                                            metersLabel(c.depth.roundToInt()),
+                                            kgText(c.species.weightKg).asString(),
+                                            byLastBump.takeIf { c.byLastBump },
+                                        ).joinToString(" · "),
                                         style = MaterialTheme.typography.bodySmall,
                                     )
                                 }
@@ -496,7 +532,7 @@ private fun ResultsPanel(result: CastResult, collectLabel: String, onCollect: ()
                 for (b in result.secretBonuses) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            "✦ Secret: " + secretTitle(b.secretId),
+                            stringResource(R.string.cast_results_secret, secretTitle(b.secretId)),
                             color = com.deepline.fishing.ui.rewardTextColor(),
                             fontWeight = FontWeight.SemiBold,
                             modifier = Modifier.weight(1f),
@@ -505,7 +541,7 @@ private fun ResultsPanel(result: CastResult, collectLabel: String, onCollect: ()
                     }
                 }
                 Text(
-                    "Total  +${formatPoints(result.totalPoints)} pts",
+                    stringResource(R.string.cast_results_total, formatPoints(result.totalPoints)),
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.Bold,
