@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The Fish tab (ui/HomeScreen.kt): the game's hub, with the big Cast line button. Keys start
+    with home_. The tab's title is the game's name (app_name).
+-->
+<resources>
+    <!-- Under the title, until the player has a title badge. -->
+    <string name="home_tagline">Catch every fish in the deep</string>
+    <!-- Screen reader labels of the icons at the top right. -->
+    <string name="home_cd_milestones">Milestones</string>
+    <string name="home_cd_themes">Themes</string>
+    <string name="home_cd_settings">Settings</string>
+    <!-- Screen reader action for tapping the boat (opens the Skins section). -->
+    <string name="home_boat_action">Customise your boat</string>
+
+    <!-- The rope card: how deep the rope reaches. -->
+    <string name="home_rope_title">Your rope</string>
+    <!-- %1$s: the rope's reach in meters, already formatted (e.g. "220 m"); %2$s: the deepest zone it reaches. -->
+    <string name="home_rope_reach">Reaches %1$s · %2$s</string>
+    <!-- %1$s: casts made; %2$s: points earned in total (both already formatted). -->
+    <string name="home_rope_stats">Casts: %1$s · Earned in total: %2$s pts</string>
+    <!-- Same, with the deepest catch. %3$s: meters, already formatted (e.g. "312 m"). -->
+    <string name="home_rope_stats_deepest">Casts: %1$s · Earned in total: %2$s pts · Deepest catch %3$s</string>
+
+    <!-- The Dex card: how much of the collection is done. -->
+    <string name="home_dex_title">Dex</string>
+    <!-- %1$d: species caught; %2$d: species in all. -->
+    <string name="home_dex_caught">Caught %1$d / %2$d</string>
+    <!-- %1$d: species seen (met but maybe not caught). -->
+    <string name="home_dex_seen">Seen %1$d</string>
+    <!-- One zone's progress. %1$s: the zone's short name (Shallows, Reef...); %2$d: caught; %3$d: species there. -->
+    <string name="home_dex_zone">%1$s %2$d/%3$d</string>
+
+    <!-- The milestones card. -->
+    <string name="home_milestones_title">Milestones</string>
+    <plurals name="home_milestones_to_claim">
+        <!-- Milestone rewards ready to claim. -->
+        <item quantity="one">%d to claim!</item>
+        <item quantity="other">%d to claim!</item>
+    </plurals>
+    <!-- %1$s: points earned; %2$s: the next milestone's threshold; %3$s: its reward (e.g. "+500 pts · 1 Lantern"). -->
+    <string name="home_milestones_next">%1$s / %2$s · next: %3$s</string>
+    <string name="home_milestones_done">All milestones reached!</string>
+
+    <!-- The Lantern switch above the Cast line button. %1$d: Lanterns owned. -->
+    <string name="home_lanterns">Lanterns: %1$d</string>
+    <!-- %1$d: depth in meters where the water goes dark. -->
+    <string name="home_lanterns_hint">Light up the dark below %1$d m on the next cast.</string>
+    <!-- Chips for other tackle to switch on for the next cast. %1$d: how many are owned. -->
+    <string name="home_tackle_detector">Detector ×%1$d</string>
+    <string name="home_tackle_charm">Lucky charm ×%1$d</string>
+    <string name="home_tackle_lure">Sparkle lure ×%1$d</string>
+    <!-- The main button: starts fishing (drops the hook from the boat). Short: it's big, but one line. -->
+    <string name="home_cast_button">Cast line</string>
+
+    <!-- The rules, in a dialog. -->
+    <string name="home_rules_title">How to fish</string>
+    <!-- One bullet per line (\n). %1$d: bumps allowed; %2$d: depth of the bump-free zone (m);
+         %3$d: how many times more a Sparkling fish is worth; %4$d: depth where it gets dark (m). -->
+    <string name="home_rules_body">• Drag left and right to steer the hook.\n• Going down: the hook sinks until it has bumped %1$d times or runs out of rope. A bump is touching a fish\'s head, or a rock, driftwood or jelly; brushing a fish\'s body or tail is free. The first %2$d m are bump-free.\n• Coming up: nudge a fish on its head (the pale face by the eye) to hook it. Touching the tail does nothing. The rope can only carry so much weight.\n• Deeper catches are worth more points. Sparkling fish are worth %3$d× more.\n• Below %4$d m it gets dark. A Lantern lights up more of the water.</string>
+</resources>

@@ -1,5 +1,6 @@
 package com.deepline.fishing.ui.social
 
+import com.deepline.fishing.ui.i18n.asString
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -84,7 +85,7 @@ fun SocialStatus(vm: GameViewModel, retry: () -> Unit) {
     if (social.busy) LinearProgressIndicator(Modifier.fillMaxWidth().testTag("social_busy"))
     social.message?.let { text ->
         SocialCard(null, Modifier.testTag("social_message"), highlighted = true) {
-            Text(text, style = MaterialTheme.typography.bodyMedium)
+            Text(text.asString(), style = MaterialTheme.typography.bodyMedium)
             TextButton(onClick = social::dismissMessage, modifier = Modifier.align(Alignment.End)) { Text("OK") }
         }
     }

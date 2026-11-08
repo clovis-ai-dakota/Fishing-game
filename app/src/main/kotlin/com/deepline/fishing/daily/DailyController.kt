@@ -22,7 +22,9 @@ import com.deepline.fishing.core.PlayerProgress
 import com.deepline.fishing.core.ReminderKind
 import com.deepline.fishing.core.ShopClock
 import com.deepline.fishing.core.StreakStatus
+import com.deepline.fishing.R
 import com.deepline.fishing.ui.daily.DailyText
+import com.deepline.fishing.ui.i18n.labelText
 
 /**
  * The daily loop on this phone: claiming the daily reward and challenges, rerolls, and the
@@ -36,7 +38,7 @@ class DailyController(
     private val update: (PlayerProgress) -> Unit,
 ) {
     /** What the last daily action did, shown on the Daily card and screen until dismissed. */
-    var message by mutableStateOf<String?>(null)
+    var message by mutableStateOf<com.deepline.fishing.ui.i18n.UiText?>(null)
         private set
 
     /** The explainer asking whether to turn reminders on is showing. */
@@ -108,7 +110,7 @@ class DailyController(
         val c = challenges.firstOrNull { it.difficulty == difficulty } ?: return
         val next = Daily.claimChallenge(p, difficulty, today) ?: return
         update(next)
-        message = "Challenge complete! You get ${DailyText.grants(DailyRewards.challengeReward(difficulty), p)}."
+        message = com.deepline.fishing.ui.i18n.UiText.res(R.string.daily_challenge_claimed, DailyText.grants(DailyRewards.challengeReward(difficulty), p))
         Analytics.event("daily_challenge_claim", mapOf("kind" to c.kind.name.lowercase(), "difficulty" to difficulty.name.lowercase()))
     }
 
@@ -120,7 +122,7 @@ class DailyController(
         val next = Daily.reroll(progress(), difficulty, today) ?: return
         update(next)
         val fresh = next.dailyChallenges.first { it.difficulty == difficulty }
-        message = "New ${difficulty.label.lowercase()} challenge: ${DailyText.challenge(fresh)}"
+        message = com.deepline.fishing.ui.i18n.UiText.res(R.string.daily_challenge_swapped, difficulty.labelText(), DailyText.challenge(fresh))
         Analytics.event("daily_challenge_reroll", mapOf("difficulty" to difficulty.name.lowercase(), "kind" to fresh.kind.name.lowercase()))
     }
 
@@ -162,7 +164,7 @@ class DailyController(
         if (granted) {
             setEnabled(true, source)
         } else {
-            message = "Reminders stay off: notifications for Deep Line are blocked on this phone. You can allow them in the phone's settings."
+            message = com.deepline.fishing.ui.i18n.UiText.res(R.string.daily_reminders_blocked)
         }
     }
 

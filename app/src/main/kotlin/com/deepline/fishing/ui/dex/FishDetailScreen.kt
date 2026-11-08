@@ -1,5 +1,6 @@
 package com.deepline.fishing.ui.dex
 
+import com.deepline.fishing.ui.i18n.label
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -126,7 +127,7 @@ private fun FishPage(species: FishSpecies, number: Int, state: DexState, entry: 
                 modifier = Modifier.align(Alignment.BottomStart).padding(12.dp),
             ) {
                 Text(
-                    species.zone.displayName,
+                    species.zone.label(),
                     style = MaterialTheme.typography.labelMedium,
                     color = Color.White,
                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
@@ -136,7 +137,7 @@ private fun FishPage(species: FishSpecies, number: Int, state: DexState, entry: 
 
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(
-                if (state == DexState.UNKNOWN) "???" else species.name,
+                if (state == DexState.UNKNOWN) "???" else species.label(),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Black,
             )

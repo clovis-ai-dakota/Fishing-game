@@ -60,7 +60,8 @@ fun TitleBadge(title: String, modifier: Modifier = Modifier, frame: com.deepline
     )
     val look = badgeLook(frame, t)
     Text(
-        look.icon + " " + title,
+        // Titles travel by their English name (online too): shown in the game's language.
+        look.icon + " " + com.deepline.fishing.ui.i18n.titleLabel(title),
         modifier = modifier
             .clip(RoundedCornerShape(50))
             .background(look.fill)
@@ -124,6 +125,7 @@ fun SkinPreview(
         animationSpec = infiniteRepeatable(tween(60_000, easing = LinearEasing)),
         label = "time",
     )
+    val description = clickLabel ?: androidx.compose.ui.res.stringResource(com.deepline.fishing.R.string.core_slot_boat)
     val box = modifier
         .fillMaxWidth()
         .height(height)
@@ -131,7 +133,7 @@ fun SkinPreview(
         .let { m ->
             if (onClick == null) m
             else m.clickable(onClickLabel = clickLabel, role = Role.Button, onClick = onClick)
-                .semantics { contentDescription = clickLabel ?: "Boat" }
+                .semantics { contentDescription = description }
         }
     // 3D where the phone supports it, otherwise (and in tests) the 2D scene.
     com.deepline.fishing.ui.render3d.gl.SkinPreview3d(skins, box) {

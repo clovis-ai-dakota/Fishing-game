@@ -184,9 +184,9 @@ class DexUiTest {
         compose.click("Secrets")
         compose.onNodeWithText("Discovered 4 of ${Secrets.all.size}").assertExists()
         // Found: titles. Locked: never the title, only the tier and the reward.
-        assertTrue(isShowing(FishingSecrets.byId(Secrets.SCHOOLING)!!.title))
+        assertTrue(isShowing(FishingSecrets.byId(Secrets.SCHOOLING)!!.title.text))
         for (id in Secrets.all - vm.progress.discoveredSecrets) {
-            assertTrue("locked secret $id shows its title", !isShowing(FishingSecrets.byId(id)!!.title))
+            assertTrue("locked secret $id shows its title", !isShowing(FishingSecrets.byId(id)!!.title.text))
         }
         compose.shot("52_dex_secrets")
         compose.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("a legendary skin set", substring = true))
@@ -195,8 +195,8 @@ class DexUiTest {
         compose.shot("52b_dex_secrets_locked")
 
         // A found secret opens its explanation.
-        compose.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText(FishingSecrets.byId(Secrets.SCHOOLING)!!.title))
-        compose.click(FishingSecrets.byId(Secrets.SCHOOLING)!!.title)
+        compose.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText(FishingSecrets.byId(Secrets.SCHOOLING)!!.title.text))
+        compose.click(FishingSecrets.byId(Secrets.SCHOOLING)!!.title.text)
         compose.onNodeWithText("Close").assertExists()
         compose.click("Close")
     }

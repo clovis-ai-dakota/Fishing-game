@@ -175,7 +175,7 @@ class ReminderOptInUiTest : DailyUiTestBase() {
         // The system dialog said no (the launcher's answer).
         vm.daily.onPermissionResult(false, "explainer")
         assertFalse(vm.daily.reminders.enabled)
-        assertTrue(vm.daily.message!!.contains("blocked"))
+        assertTrue(vm.daily.message!!.text.contains("blocked"))
         assertTrue(reminderWork().isEmpty())
     }
 }

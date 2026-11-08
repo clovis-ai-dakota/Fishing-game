@@ -97,7 +97,7 @@ class TourUiTest {
             "battle_tackle" to "25b_tour_battle_tackle",
         )
         Tour.steps.forEachIndexed { i, step ->
-            assertEquals("step ${step.id} is showing", true, isShowing(step.title))
+            assertEquals("step ${step.id} is showing", true, isShowing(step.title.text))
             compose.onNodeWithText("${i + 1} / ${Tour.steps.size}").assertExists()
             shots[step.id]?.let { compose.shot(it) }
             compose.click(if (i == Tour.steps.lastIndex) "Finish" else "Next")

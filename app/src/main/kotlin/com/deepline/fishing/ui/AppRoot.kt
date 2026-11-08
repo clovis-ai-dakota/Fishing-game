@@ -27,8 +27,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import com.deepline.fishing.GameViewModel
+import com.deepline.fishing.R
 import com.deepline.fishing.Screen
+import com.deepline.fishing.ui.i18n.asString
+import com.deepline.fishing.ui.i18n.label
 import com.deepline.fishing.ui.dex.FishDetailScreen
 import com.deepline.fishing.ui.secrets.FishingSecrets
 import com.deepline.fishing.ui.secrets.SecretDiscoveredDialog
@@ -77,12 +81,12 @@ fun AppRoot(vm: GameViewModel) {
                 val message = vm.shopMessage
                 if (message != null && isTabScreen(vm.screen) && vm.tour == null) {
                     Snackbar(
-                        action = { TextButton(onClick = vm::dismissShopMessage) { Text("OK") } },
+                        action = { TextButton(onClick = vm::dismissShopMessage) { Text(stringResource(R.string.common_ok)) } },
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .navigationBarsPadding()
                             .padding(start = 12.dp, end = 12.dp, bottom = 88.dp),
-                    ) { Text(message) }
+                    ) { Text(message.asString()) }
                 }
             }
         }
@@ -97,15 +101,10 @@ fun AppRoot(vm: GameViewModel) {
         if (vm.askTourAgain) {
             AlertDialog(
                 onDismissRequest = { vm.answerTourAgain(false) },
-                title = { Text("Show the tour next time?") },
-                text = {
-                    Text(
-                        "Should the tour open again the next time you start Deep Line? You can also take it " +
-                            "any time with the ? button at the top of the Fish tab.",
-                    )
-                },
-                confirmButton = { TextButton(onClick = { vm.answerTourAgain(true) }) { Text("Yes, next time") } },
-                dismissButton = { TextButton(onClick = { vm.answerTourAgain(false) }) { Text("No thanks") } },
+                title = { Text(stringResource(R.string.shell_tour_again_title)) },
+                text = { Text(stringResource(R.string.shell_tour_again_body)) },
+                confirmButton = { TextButton(onClick = { vm.answerTourAgain(true) }) { Text(stringResource(R.string.shell_tour_again_yes)) } },
+                dismissButton = { TextButton(onClick = { vm.answerTourAgain(false) }) { Text(stringResource(R.string.common_no_thanks)) } },
             )
         }
         // Privacy: asked once before anything is collected; the tour waits for the answer.
@@ -118,20 +117,26 @@ fun AppRoot(vm: GameViewModel) {
 private fun TestStoreDialog(item: com.deepline.fishing.core.ShopItem, onAnswer: (TestStore.TestOutcome) -> Unit) {
     AlertDialog(
         onDismissRequest = { onAnswer(TestStore.TestOutcome.CANCEL) },
-        title = { Text("Test store") },
+        title = { Text(stringResource(R.string.shell_test_store_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Pay ${item.euroLabel} for ${item.name}? This is a test build: no real money is charged. Choose how the payment goes.")
+                Text(stringResource(R.string.shell_test_store_body, formatEuros(item.euroCents), item.label()))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(onClick = { onAnswer(TestStore.TestOutcome.PENDING) }, modifier = Modifier.testTag("test_store_pending")) { Text("Pending") }
-                    OutlinedButton(onClick = { onAnswer(TestStore.TestOutcome.FAIL) }, modifier = Modifier.testTag("test_store_fail")) { Text("Fail") }
+                    OutlinedButton(onClick = { onAnswer(TestStore.TestOutcome.PENDING) }, modifier = Modifier.testTag("test_store_pending")) {
+                        Text(stringResource(R.string.shell_test_store_pending))
+                    }
+                    OutlinedButton(onClick = { onAnswer(TestStore.TestOutcome.FAIL) }, modifier = Modifier.testTag("test_store_fail")) {
+                        Text(stringResource(R.string.shell_test_store_fail))
+                    }
                 }
             }
         },
         confirmButton = {
-            TextButton(onClick = { onAnswer(TestStore.TestOutcome.APPROVE) }, modifier = Modifier.testTag("test_store_approve")) { Text("Approve") }
+            TextButton(onClick = { onAnswer(TestStore.TestOutcome.APPROVE) }, modifier = Modifier.testTag("test_store_approve")) {
+                Text(stringResource(R.string.shell_test_store_approve))
+            }
         },
-        dismissButton = { TextButton(onClick = { onAnswer(TestStore.TestOutcome.CANCEL) }) { Text("Cancel") } },
+        dismissButton = { TextButton(onClick = { onAnswer(TestStore.TestOutcome.CANCEL) }) { Text(stringResource(R.string.common_cancel)) } },
     )
 }
 
@@ -150,7 +155,7 @@ fun SubScreen(title: String, onBack: () -> Unit, content: @Composable ColumnScop
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            TextButton(onClick = onBack) { Text("‹ Back") }
+            TextButton(onClick = onBack) { Text(stringResource(R.string.common_back)) }
             Text(
                 title,
                 style = MaterialTheme.typography.titleLarge.copy(brush = headlineBrush()),
@@ -166,15 +171,4 @@ fun SubScreen(title: String, onBack: () -> Unit, content: @Composable ColumnScop
 fun headlineBrush(): androidx.compose.ui.graphics.Brush {
     val colors = com.deepline.fishing.ui.theme.LocalMenuPalette.current.headline
     return androidx.compose.ui.graphics.Brush.horizontalGradient(if (colors.size > 1) colors else colors + colors)
-}
-
-fun formatPoints(value: Long): String = "%,d".format(value)
-
-fun formatPoints(value: Int): String = formatPoints(value.toLong())
-
-/** "950", "5k", "25k", "1.5M": for tight spots such as chips. */
-fun compactPoints(value: Long): String = when {
-    value >= 1_000_000 -> "%.1fM".format(value / 1_000_000.0).replace(".0M", "M")
-    value >= 1_000 -> "%.1fk".format(value / 1_000.0).replace(".0k", "k")
-    else -> value.toString()
 }

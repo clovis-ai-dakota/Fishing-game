@@ -10,9 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.GameViewModel
+import com.deepline.fishing.R
 import com.deepline.fishing.audio.AudioCredits
 
 /** Credits and licences: where every sound and music track comes from (see [AudioCredits]). */
@@ -20,10 +22,9 @@ import com.deepline.fishing.audio.AudioCredits
 @Composable
 fun CreditsSection(vm: GameViewModel) {
     val uri = LocalUriHandler.current
-    SettingsSection("Credits", Modifier.testTag("settings_credits")) {
+    SettingsSection(stringResource(R.string.settings_credits_title), Modifier.testTag("settings_credits")) {
         Text(
-            "All the sounds and music are free works dedicated to the public domain (CC0) and shared on " +
-                "OpenGameArt.org. Thank you to their authors.",
+            stringResource(R.string.settings_credits_body),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -35,11 +36,11 @@ fun CreditsSection(vm: GameViewModel) {
                 verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
                 Text(
-                    if (credit.music) "Music: ${credit.title}" else "Sounds: ${credit.title}",
+                    stringResource(if (credit.music) R.string.settings_credits_music else R.string.settings_credits_sounds, credit.title),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold,
                 )
-                Text("By ${credit.author}. Licence: ${credit.licence}.", style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.settings_credits_by, credit.author, credit.licence), style = MaterialTheme.typography.bodySmall)
                 Text(credit.url, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
             }
         }

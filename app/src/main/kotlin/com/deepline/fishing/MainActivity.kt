@@ -17,8 +17,15 @@ import com.deepline.fishing.ui.DeepLineTheme
 class MainActivity : ComponentActivity() {
     private val viewModel: GameViewModel by viewModels()
 
+    // The game's language (Settings > Language): applied here on Android 12 and lower; on 13+
+    // the system already gives the activity the chosen language (see ui/i18n/AppLanguage.kt).
+    override fun attachBaseContext(newBase: android.content.Context) {
+        super.attachBaseContext(com.deepline.fishing.ui.i18n.AppLanguages.wrap(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        com.deepline.fishing.ui.i18n.AppLanguages.handOverToSystem(this)
         // Analytics and crash reports: Firebase if configured, collecting only after consent.
         com.deepline.fishing.analytics.Telemetry.start(this)
         enableEdgeToEdge()

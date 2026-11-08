@@ -52,7 +52,7 @@ class ShopPointsUiTest : BoatUiTestBase() {
         compose.onNodeWithTag("confirm_points").performClick()
         assertEquals(400_000L - price, vm.progress.pointsBalance)
         assertEquals(2 + count, vm.progress.lanterns)
-        assertTrue(vm.shopMessage!!.contains("$count Lanterns"))
+        assertTrue(vm.shopMessage!!.text.contains("$count Lanterns"))
     }
 }
 
@@ -83,7 +83,7 @@ class ShopStoreUiTest : BoatUiTestBase() {
         compose.onNodeWithTag("buy_eur_lantern_pouch").performClick()
         compose.onNodeWithTag("test_store_pending").performClick()
         assertEquals(2 + count, vm.progress.lanterns)
-        assertTrue(vm.shopMessage!!.contains("waiting for the payment"))
+        assertTrue(vm.shopMessage!!.text.contains("waiting for the payment"))
         vm.restorePurchases()
         compose.waitForIdle()
         assertEquals(2 + 2 * count, vm.progress.lanterns)
@@ -92,7 +92,7 @@ class ShopStoreUiTest : BoatUiTestBase() {
         compose.onNodeWithTag("buy_eur_lantern_pouch").performClick()
         compose.onNodeWithTag("test_store_fail").performClick()
         assertEquals(2 + 2 * count, vm.progress.lanterns)
-        assertTrue(vm.shopMessage!!.startsWith("The payment didn't go through"))
+        assertTrue(vm.shopMessage!!.text.startsWith("The payment didn't go through"))
     }
 
 }
@@ -298,8 +298,8 @@ class GiftUiTest : BoatUiTestBase() {
         compose.onNodeWithTag("gift_pts_${item.id}").performClick()
         assertNull(vm.giftTarget)
         runCatching { compose.waitUntil(timeoutMillis = 15_000) { vm.progress.pointsBalance == 400_000L } }
-        assertEquals("balance ${vm.progress.pointsBalance} msg ${vm.shopMessage}", 400_000L, vm.progress.pointsBalance)
-        assertTrue(vm.shopMessage!!.contains("points were given back"))
+        assertEquals("balance ${vm.progress.pointsBalance} msg ${vm.shopMessage?.text}", 400_000L, vm.progress.pointsBalance)
+        assertTrue(vm.shopMessage!!.text.contains("points were given back"))
         assertTrue(price > 0)
         assertFalse(ShopCatalog.ownsCosmetic(vm.progress, com.deepline.fishing.core.Cosmetic.STAR_TRAIL))
         // The player's id and recovery code are ready for gifts and cloud saves.

@@ -42,8 +42,8 @@ labelled, in the thumb zone), so every main area is one tap away:
 
 - **Fish**: the hub. One dominant **Cast line** button at the bottom with the Lantern switch next
   to it, your rope's reach drawn over the depth zones, Dex and milestone progress. The top bar
-  holds your points, a trophy (with a badge when a milestone can be claimed) that opens
-  Milestones, and **?** to replay the tour.
+  holds your points, a trophy for Milestones (with a badge when one can be claimed), a palette
+  for the themes and a gear for Settings (sound, notifications, language, privacy, and the tour).
 - **Dex**: the collection (see below).
 - **Shop**: rope upgrades and downgrades (points only), then tackle, style, passes and the
   aquarium, each with a euro price and a points price (see below). A dot on the tab means
@@ -252,7 +252,7 @@ numbers in `GameConfig` (the calendar table is in `Daily.kt`).
 On first launch a guided tour walks through the game: it highlights each part of the app and
 explains the tabs, casting, steering, bumps, heads, weight, points, the Shop, Lanterns, the Dex,
 milestones and battles. It can be skipped at any time; when it closes, it asks whether to show
-it again next time. The **?** button at the top of the Fish tab replays it. When new features add tour
+it again next time. Settings (the gear at the top of the Fish tab) replays it. When new features add tour
 steps, returning players get a short "What's new" tour of just those steps
 (`app/.../ui/tour/Tour.kt`).
 
@@ -290,6 +290,31 @@ connection), at most once every 120 days and 3 times in all (`GameConfig.Review`
 `core/.../ReviewPrompts.kt`, app side in `app/.../review/`). No "Rate us" button, no question
 first, nothing given for a review; the game never knows whether the player rated. Research:
 `docs/research/launch.md`.
+
+### Languages
+
+The game speaks **English, French, Spanish, German, Brazilian Portuguese and Turkish** (the
+translations are being written; until a language is complete, its missing text shows in English).
+Settings > Language lists each language in its own words, plus "Phone's language" (the default);
+on Android 13+ it is the same setting as the system's per-app language (Settings > Apps > Deep
+Line > Language), and on older phones the game keeps the choice itself. Changing it redraws the
+game in the new language straight away.
+
+- All player-facing text is in string resources, one file per area
+  (`app/src/main/res/values/strings_<area>.xml`, with comments for translators). Text built outside
+  the screens (messages, the tour) is a `UiText` resolved where it is shown; names of things the
+  rules define (zones, tackle, skins, shop items, the 200 species...) come from
+  `ui/i18n/CoreText.kt`, since core keeps its English names for the server. Species names are
+  translated by id: ids never change.
+- Numbers, prices, units and times follow the language (`ui/Format.kt`).
+- Debug builds have the pseudo-locales English (XA) and AR (XB) in Settings > Language, to spot
+  untranslated text, truncation and right-to-left problems.
+- Quality checks: `LocalizationResourcesTest` (every translation file has every key, the same
+  placeholders and its language's plural forms; escaping; the locale config matches the picker)
+  and `HardcodedTextTest` (no text typed into converted Kotlin files, no core English name shown).
+- Guide for converting screens and translating: [`docs/localization.md`](docs/localization.md)
+  (key naming, plurals, `UiText`, the glossary). Research and decisions:
+  [`docs/research/localization.md`](docs/research/localization.md).
 
 ### Sound and feel
 
@@ -514,6 +539,8 @@ app/    Android app (Jetpack Compose)
         ui/social/         friends and rankings: the hub, friends, leaderboards, tournament, clubs
         ui/theme/          menu themes: palettes (day and night) and the animated sea scene
         ui/GameIcons.kt    icons drawn in code
+        ui/i18n/           localisation: UiText, the language picker's logic (AppLanguage), CoreText
+                           (core names in the game's language); strings in res/values*/strings_*.xml
         ui/*Screen.kt      Fish tab (HomeScreen), milestones, battle setup / hub
 ```
 

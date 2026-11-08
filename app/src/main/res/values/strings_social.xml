@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Friends and rankings: friends, the weekly leaderboards, the weekly tournament and clubs
+    (social/SocialController.kt; the screens in ui/social/). Keys start with social_. Player and
+    club names are never translated: club names are made from fixed English words so every member
+    sees the same name, and strangers' names on the boards come from their player id.
+-->
+<resources>
+    <!-- Messages after an action, shown in a card at the top of the social screens. -->
+    <!-- %1$d: the length of a player id. -->
+    <string name="social_message_bad_id">A player id has %1$d letters and digits.</string>
+    <string name="social_message_own_id">That\'s your own player id. Share it with your friends so they can add you.</string>
+    <!-- %1$s: the friend's name (as they typed it). -->
+    <string name="social_message_now_friends">You\'re now friends with %1$s.</string>
+    <!-- %1$s: the player id the request was sent to. -->
+    <string name="social_message_request_sent">Friend request sent to %1$s. You\'ll be friends once they accept.</string>
+    <!-- %1$s: the friend's name. -->
+    <string name="social_message_removed">%1$s is no longer on your friends list.</string>
+    <!-- Challenging a friend to a battle. %1$s: the friend's name. -->
+    <string name="social_challenge_creating">Creating a room for %1$s…</string>
+    <plurals name="social_challenge_sent">
+        <!-- %1$s: the friend's name; %2$d: minutes the challenge stays open. -->
+        <item quantity="one">Challenge sent to %1$s. They\'ll see it on their Friends screen for %2$d minute.</item>
+        <item quantity="other">Challenge sent to %1$s. They\'ll see it on their Friends screen for %2$d minutes.</item>
+    </plurals>
+    <!-- After an error message (%1$s). -->
+    <string name="social_challenge_not_sent">%1$s The challenge wasn\'t sent: share the room code with your friend instead.</string>
+    <!-- %1$s: the placing (e.g. Top 10%); %2$s: what it gives. -->
+    <string name="social_message_tournament_reward">Tournament reward (%1$s): %2$s.</string>
+    <!-- %1$s: the club's name (never translated); %2$s: its code. -->
+    <string name="social_message_club_created">Welcome to the %1$s! Share the code %2$s to invite anglers.</string>
+    <!-- %1$d: the length of a club code. -->
+    <string name="social_message_bad_club_code">A club code has %1$d letters and digits.</string>
+    <!-- %1$s: the club's name. -->
+    <string name="social_message_club_joined">Welcome to the %1$s!</string>
+    <string name="social_message_club_left">You left the club.</string>
+    <!-- %1$s: a member's name. -->
+    <string name="social_message_member_removed">%1$s was removed from the club.</string>
+    <!-- %1$s: a member's name. -->
+    <string name="social_message_owner_changed">%1$s now owns the club.</string>
+    <!-- %1$s: the club's new name. -->
+    <string name="social_message_club_renamed">The club is now the %1$s.</string>
+    <!-- %1$s: what the rewards give. -->
+    <string name="social_message_club_reward">Club goal reward: %1$s.</string>
+    <string name="social_message_forgotten">Your friends, rankings and club membership were deleted from the server.</string>
+
+    <!-- Problems reported by the server. Full sentences. -->
+    <string name="social_problem_unreachable">Can\'t reach the server. Check your connection and try again.</string>
+    <string name="social_problem_bad_request">The server couldn\'t accept that.</string>
+    <string name="social_problem_wrong_secret">The server doesn\'t recognise this player. Restore your recovery code from the Shop\'s Account button.</string>
+    <string name="social_problem_unknown_player">No angler has that player id yet.</string>
+    <string name="social_problem_unknown_club">No club has that code.</string>
+    <string name="social_problem_clubs_off">Clubs aren\'t open on this server yet.</string>
+    <string name="social_problem_not_friends">You can only challenge your friends.</string>
+    <!-- %1$d: the most friends a player can have. -->
+    <string name="social_problem_friends_full">Your friends list is full (%1$d friends). Remove someone first.</string>
+    <string name="social_problem_their_friends_full">That angler can\'t take more friend requests right now.</string>
+    <string name="social_problem_already_in_club">You\'re already in a club. Leave it first.</string>
+    <string name="social_problem_not_in_club">You\'re not in a club.</string>
+    <string name="social_problem_not_owner">Only the club\'s owner can do that.</string>
+    <!-- %1$d: the most members a club can have. -->
+    <string name="social_problem_club_full">That club is full (%1$d members).</string>
+    <!-- %1$d: hours to wait. -->
+    <string name="social_problem_rejoin_later">You were removed from that club, so you can only rejoin it after %1$d hours.</string>
+    <string name="social_problem_no_attempts">You\'ve used every attempt this week. A new tournament starts on Monday at 00:00 UTC.</string>
+    <string name="social_problem_attempt_expired">That attempt took too long to come back, so it scored 0.</string>
+    <string name="social_problem_cast_rejected">The server couldn\'t accept that attempt, so it scored 0.</string>
+    <string name="social_problem_too_big">That\'s too much for the server.</string>
+    <string name="social_problem_too_many_requests">That\'s a lot at once. Please wait a little and try again.</string>
+</resources>

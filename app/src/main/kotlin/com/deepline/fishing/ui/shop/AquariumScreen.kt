@@ -1,5 +1,6 @@
 package com.deepline.fishing.ui.shop
 
+import com.deepline.fishing.ui.i18n.label
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -86,7 +87,7 @@ fun AquariumScreen(vm: GameViewModel) {
                 FilterChip(
                     selected = d.name !in p.hiddenDecor,
                     onClick = { vm.toggleDecor(d) },
-                    label = { Text(d.displayName, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                    label = { Text(d.label(), maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 )
             }
             item(span = { GridItemSpan(maxLineSpan) }) {
@@ -99,7 +100,7 @@ fun AquariumScreen(vm: GameViewModel) {
                 FilterChip(
                     selected = s.id in inTank,
                     onClick = { vm.toggleTankFish(s.id) },
-                    label = { Text(s.name, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                    label = { Text(s.label(), maxLines = 1, overflow = TextOverflow.Ellipsis) },
                     modifier = Modifier.testTag("tank_${s.id}"),
                 )
             }

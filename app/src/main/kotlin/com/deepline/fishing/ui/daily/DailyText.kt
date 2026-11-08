@@ -1,67 +1,75 @@
 package com.deepline.fishing.ui.daily
 
+import com.deepline.fishing.R
 import com.deepline.fishing.core.ChallengeKind
 import com.deepline.fishing.core.DailyChallenge
 import com.deepline.fishing.core.DailyGrant
 import com.deepline.fishing.core.DailyRewards
 import com.deepline.fishing.core.PlayerProgress
-import com.deepline.fishing.ui.formatPoints
+import com.deepline.fishing.core.Tackle
+import com.deepline.fishing.ui.compactPointsText
+import com.deepline.fishing.ui.i18n.UiText
+import com.deepline.fishing.ui.i18n.labelText
+import com.deepline.fishing.ui.i18n.nameText
+import com.deepline.fishing.ui.pointsText
 import com.deepline.fishing.ui.shop.ShopText
 
-/** What the daily loop says: rewards, challenges and the outcome of a claim (whole sentences). */
+/** What the daily loop says: rewards, challenges and the outcome of a claim (strings_daily.xml). */
 object DailyText {
-    fun grant(g: DailyGrant, p: PlayerProgress): String = when (g) {
-        is DailyGrant.Points -> "${formatPoints(DailyRewards.pointsFor(p, g.casts))} pts"
-        is DailyGrant.Tackle -> "${g.count} ${ShopText.tackleName(g.tackle, g.count)}"
-        DailyGrant.Shield -> "a streak shield"
+    fun grant(g: DailyGrant, p: PlayerProgress): UiText = when (g) {
+        is DailyGrant.Points -> pointsText(DailyRewards.pointsFor(p, g.casts))
+        is DailyGrant.Tackle -> ShopText.tackleCount(g.tackle, g.count)
+        DailyGrant.Shield -> UiText.res(R.string.daily_grant_shield)
     }
 
     /** "200 pts, 1 Lantern and a streak shield". */
-    fun grants(list: List<DailyGrant>, p: PlayerProgress): String {
-        val parts = list.map { grant(it, p) }
-        return if (parts.size <= 1) parts.joinToString() else parts.dropLast(1).joinToString(", ") + " and " + parts.last()
-    }
+    fun grants(list: List<DailyGrant>, p: PlayerProgress): UiText = UiText.list(list.map { grant(it, p) })
 
-    /** A short label for a calendar tile ("200 pts", "Detector", "+ shield"). */
-    fun tile(g: DailyGrant, p: PlayerProgress): String = when (g) {
-        is DailyGrant.Points -> "${com.deepline.fishing.ui.compactPoints(DailyRewards.pointsFor(p, g.casts))} pts"
+    /** A short label for a calendar tile ("200 pts", "Detector", "Shield"). */
+    fun tile(g: DailyGrant, p: PlayerProgress): UiText = when (g) {
+        is DailyGrant.Points -> UiText.res(R.string.common_points, compactPointsText(DailyRewards.pointsFor(p, g.casts)))
         is DailyGrant.Tackle -> when (g.tackle) {
-            com.deepline.fishing.core.Tackle.LANTERN -> "${g.count} × Lantern"
-            com.deepline.fishing.core.Tackle.DETECTOR -> "Detector"
-            com.deepline.fishing.core.Tackle.LUCKY_CHARM -> "Lucky charm"
-            com.deepline.fishing.core.Tackle.SPARKLE_LURE -> "Sparkle lure"
+            Tackle.LANTERN -> UiText.res(R.string.daily_tile_lanterns, g.count)
+            Tackle.DETECTOR -> UiText.res(R.string.daily_tile_detector)
+            Tackle.LUCKY_CHARM -> UiText.res(R.string.daily_tile_charm)
+            Tackle.SPARKLE_LURE -> UiText.res(R.string.daily_tile_lure)
         }
-        DailyGrant.Shield -> "Shield"
+        DailyGrant.Shield -> UiText.res(R.string.daily_tile_shield)
     }
 
-    fun challenge(c: DailyChallenge): String = when (c.kind) {
-        ChallengeKind.CASTS -> "Cast your line ${c.target} times."
-        ChallengeKind.CATCH_FISH -> "Catch ${c.target} fish."
-        ChallengeKind.CATCH_ZONE -> "Catch ${c.target} fish from the ${c.zone?.displayName}."
-        ChallengeKind.REACH_DEPTH -> "Reach ${c.target} m in a cast."
-        ChallengeKind.CATCH_SPECIES -> if (c.target == 1) "Catch a ${c.species?.name}." else "Catch ${c.target} ${c.species?.name}."
-        ChallengeKind.EARN_POINTS -> "Score ${formatPoints(c.target)} points."
-        ChallengeKind.LAND_WEIGHT -> "Land ${c.target} kg of fish."
-        ChallengeKind.SPARKLING -> "Catch ${c.target} Sparkling fish."
-        ChallengeKind.BIG_CAST -> "Land ${c.target} fish in a single cast."
-        ChallengeKind.NEW_SPECIES -> if (c.target == 1) "Catch a species you've never caught." else "Catch ${c.target} species you've never caught."
+    fun challenge(c: DailyChallenge): UiText = when (c.kind) {
+        ChallengeKind.CASTS -> UiText.plural(R.plurals.daily_challenge_casts, c.target)
+        ChallengeKind.CATCH_FISH -> UiText.plural(R.plurals.daily_challenge_catch_fish, c.target)
+        ChallengeKind.CATCH_ZONE -> UiText.plural(R.plurals.daily_challenge_catch_zone, c.target, c.target, c.zone?.labelText() ?: UiText.raw("?"))
+        ChallengeKind.REACH_DEPTH -> UiText.res(R.string.daily_challenge_reach_depth, c.target)
+        ChallengeKind.CATCH_SPECIES -> {
+            val name = c.species?.nameText() ?: UiText.raw("?")
+            if (c.target == 1) UiText.res(R.string.daily_challenge_catch_species_one, name) else UiText.res(R.string.daily_challenge_catch_species, c.target, name)
+        }
+        ChallengeKind.EARN_POINTS -> UiText.res(R.string.daily_challenge_earn_points, UiText.number(c.target))
+        ChallengeKind.LAND_WEIGHT -> UiText.plural(R.plurals.daily_challenge_land_weight, c.target)
+        ChallengeKind.SPARKLING -> UiText.plural(R.plurals.daily_challenge_sparkling, c.target)
+        ChallengeKind.BIG_CAST -> UiText.plural(R.plurals.daily_challenge_big_cast, c.target)
+        ChallengeKind.NEW_SPECIES -> UiText.plural(R.plurals.daily_challenge_new_species, c.target)
     }
 
     /** "2 / 5", or the best so far for single-cast goals. */
-    fun progress(c: DailyChallenge): String = when (c.kind) {
-        ChallengeKind.REACH_DEPTH -> "Deepest: ${c.progress} of ${c.target} m"
-        ChallengeKind.BIG_CAST -> "Best cast: ${c.progress} of ${c.target} fish"
-        ChallengeKind.EARN_POINTS -> "${formatPoints(c.progress)} / ${formatPoints(c.target)}"
-        else -> "${c.progress} / ${c.target}"
+    fun progress(c: DailyChallenge): UiText = when (c.kind) {
+        ChallengeKind.REACH_DEPTH -> UiText.res(R.string.daily_progress_depth, c.progress, c.target)
+        ChallengeKind.BIG_CAST -> UiText.res(R.string.daily_progress_big_cast, c.progress, c.target)
+        else -> UiText.res(R.string.common_progress_of, UiText.number(c.progress), UiText.number(c.target))
     }
 
-    fun claimed(day: Int, rewards: String, streak: Int, shieldsUsed: Int, streakRestarted: Boolean): String = when {
-        shieldsUsed == 1 -> "A streak shield covered the day you missed: your streak is $streak days. Day $day reward: $rewards."
-        shieldsUsed > 1 -> "$shieldsUsed streak shields covered the days you missed: your streak is $streak days. Day $day reward: $rewards."
-        streakRestarted -> "A new streak starts today. Day $day reward: $rewards."
-        streak > 1 -> "$streak days in a row! Day $day reward: $rewards."
-        else -> "Day $day reward: $rewards."
+    fun claimed(day: Int, rewards: UiText, streak: Int, shieldsUsed: Int, streakRestarted: Boolean): UiText {
+        val streakDays = UiText.plural(R.plurals.common_days, streak)
+        return when {
+            shieldsUsed == 1 -> UiText.res(R.string.daily_claimed_one_shield, streakDays, day, rewards)
+            shieldsUsed > 1 -> UiText.res(R.string.daily_claimed_shields, shieldsUsed, streakDays, day, rewards)
+            streakRestarted -> UiText.res(R.string.daily_claimed_restarted, day, rewards)
+            streak > 1 -> UiText.res(R.string.daily_claimed_streak, streak, day, rewards)
+            else -> UiText.res(R.string.daily_claimed, day, rewards)
+        }
     }
 
-    fun collected(rewards: String): String = "Your finished challenges from an earlier day were collected for you: $rewards."
+    fun collected(rewards: UiText): UiText = UiText.res(R.string.daily_collected, rewards)
 }

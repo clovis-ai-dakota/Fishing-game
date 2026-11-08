@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The game's languages, for Android 13+'s per-app language settings (Settings > Apps > Deep Line
+    > Language). Exactly the languages of Settings > Language in the game (AppLanguage.supported;
+    LocalizationResourcesTest checks they match). English is the default (res/values).
+-->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="en" />
+    <locale android:name="fr" />
+    <locale android:name="es" />
+    <locale android:name="de" />
+    <locale android:name="pt-BR" />
+    <locale android:name="tr" />
+</locale-config>

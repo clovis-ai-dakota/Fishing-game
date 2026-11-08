@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Privacy: the consent sheet asked once at first launch (privacy/ConsentSheet.kt), Settings >
+    Privacy (ui/settings/PrivacySettings.kt) and account deletion (privacy/PrivacyController.kt).
+    Keys start with privacy_. These are legal-ish texts: keep them plain, accurate and complete
+    (no softening, no extra promises). "Allow" and "Don't allow" must read as equal choices.
+    Google Firebase is a product name: don't translate it.
+-->
+<resources>
+    <!-- Consent sheet (a dialog that must be answered before anything is collected). -->
+    <string name="privacy_consent_title">Help make Deep Line better?</string>
+    <string name="privacy_consent_body">With your permission, the game sends usage statistics (which screens you open, how your casts and battles go, what you buy) and crash reports to Google Firebase. They help us fix bugs and balance the game.</string>
+    <string name="privacy_consent_promise">They\'re linked to a random ID, never to your name, and never used for ads. Nothing is sent unless you allow it, and you can change your mind at any time in Settings, under Privacy.</string>
+    <!-- Opens the published privacy policy (a web page). -->
+    <string name="privacy_read_policy">Read the privacy policy</string>
+    <!-- Shows the two switches below, to answer separately. -->
+    <string name="privacy_consent_choose">Choose for each</string>
+    <string name="privacy_consent_save">Save my choices</string>
+    <!-- The two answers, side by side and styled the same. -->
+    <string name="privacy_consent_refuse">Don\'t allow</string>
+    <string name="privacy_consent_allow">Allow</string>
+
+    <!-- The two kinds of data, as switches (consent sheet and Settings > Privacy). -->
+    <string name="privacy_analytics_title">Usage statistics</string>
+    <string name="privacy_analytics_subtitle">How the game is played: screens, casts, battles, purchases.</string>
+    <string name="privacy_crash_title">Crash reports</string>
+    <string name="privacy_crash_subtitle">What went wrong when the game crashes or something fails.</string>
+
+    <!-- Settings > Privacy. -->
+    <string name="privacy_settings_title">Privacy</string>
+    <string name="privacy_settings_intro">Usage statistics and crash reports go to Google Firebase, linked to a random ID (never your name), and only if you allow them. They\'re never used for ads.</string>
+    <!-- Builds without Firebase collect nothing. -->
+    <string name="privacy_settings_unavailable">This version of the game doesn\'t send any statistics or crash reports. Your choices are kept for versions that do.</string>
+    <string name="privacy_reset_id">Reset my statistics ID</string>
+    <string name="privacy_account_explainer">Your online account (player ID, cloud backup, gifts waiting) is kept on the game server. Deleting it erases all of that; the progress on this phone stays.</string>
+    <string name="privacy_delete_account">Delete my online account</string>
+    <string name="privacy_deleting">Deleting your account…</string>
+
+    <!-- Confirmation dialog before deleting the online account. -->
+    <string name="privacy_delete_confirm_title">Delete your online account?</string>
+    <string name="privacy_delete_confirm_body">This erases everything the game server keeps for you: your player ID, your cloud backup and gifts waiting for you. Your recovery code stops working, and this can\'t be undone.\n\nYour progress on this phone stays, and your purchases stay with your Google Play account. A Captain\'s Club subscription isn\'t cancelled: manage it in Google Play.</string>
+    <string name="privacy_delete_confirm_yes">Delete my account</string>
+    <string name="privacy_delete_confirm_no">Keep it</string>
+
+    <!-- Messages shown in the Privacy section after an action. -->
+    <string name="privacy_message_reset">The statistics kept on this phone were cleared, and you have a new random ID.</string>
+    <string name="privacy_message_deleted">Your online account was deleted. Your progress on this phone is still here, and the game now uses a new player ID.</string>
+    <!-- %1$s: why it failed (a full sentence, e.g. "Can't reach the server."). -->
+    <string name="privacy_message_not_deleted">Your account wasn\'t deleted: %1$s</string>
+</resources>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The daily loop: daily rewards and the streak, daily challenges, migrations and reminders
+    (DailyText.kt, DailyController.kt; the Daily card and screen in ui/daily/). Keys start with
+    daily_. Reminder notifications go here too (daily_reminder_*).
+-->
+<resources>
+    <!-- How often reminders come; also shown in Settings > Notifications. %1$s and %2$s: times on
+         the hour (start and end of the quiet hours, e.g. 21:00 and 09:00). -->
+    <string name="daily_reminder_promise">At most one a day, never between %1$s and %2$s, and you can turn them off any time in Settings.</string>
+
+    <!-- Rewards, as noun phrases joined into a list ("200 pts, 1 Lantern and a streak shield"). -->
+    <!-- A streak shield covers a missed day so the streak survives (see the glossary). -->
+    <string name="daily_grant_shield">a streak shield</string>
+    <!-- Short labels on the 7-day calendar's tiles (tiny: 10 characters or so). -->
+    <!-- %1$d: number of Lanterns. -->
+    <string name="daily_tile_lanterns">%1$d × Lantern</string>
+    <string name="daily_tile_detector">Detector</string>
+    <string name="daily_tile_charm">Lucky charm</string>
+    <string name="daily_tile_lure">Sparkle lure</string>
+    <string name="daily_tile_shield">Shield</string>
+
+    <!-- Daily challenges: one sentence each, an instruction. -->
+    <plurals name="daily_challenge_casts">
+        <item quantity="one">Cast your line %d time.</item>
+        <item quantity="other">Cast your line %d times.</item>
+    </plurals>
+    <plurals name="daily_challenge_catch_fish">
+        <item quantity="one">Catch %d fish.</item>
+        <item quantity="other">Catch %d fish.</item>
+    </plurals>
+    <plurals name="daily_challenge_catch_zone">
+        <!-- %1$d: how many; %2$s: a depth zone's name, e.g. Twilight Reef. If your language must
+             inflect the zone's name here, write it after a colon instead ("…: %2$s"). -->
+        <item quantity="one">Catch %1$d fish from the %2$s.</item>
+        <item quantity="other">Catch %1$d fish from the %2$s.</item>
+    </plurals>
+    <!-- %1$d: a depth in meters. -->
+    <string name="daily_challenge_reach_depth">Reach %1$d m in a cast.</string>
+    <!-- %1$s: a species' name (e.g. Sun Bream). -->
+    <string name="daily_challenge_catch_species_one">Catch a fish of this species: %1$s.</string>
+    <!-- %1$d: how many (always 2 or more); %2$s: a species' name. -->
+    <string name="daily_challenge_catch_species">Catch %1$d fish of this species: %2$s.</string>
+    <!-- %1$s: points, already formatted. -->
+    <string name="daily_challenge_earn_points">Score %1$s points.</string>
+    <plurals name="daily_challenge_land_weight">
+        <item quantity="one">Land %d kg of fish.</item>
+        <item quantity="other">Land %d kg of fish.</item>
+    </plurals>
+    <plurals name="daily_challenge_sparkling">
+        <!-- Sparkling fish: rare golden fish worth more (see the glossary). -->
+        <item quantity="one">Catch %d Sparkling fish.</item>
+        <item quantity="other">Catch %d Sparkling fish.</item>
+    </plurals>
+    <plurals name="daily_challenge_big_cast">
+        <item quantity="one">Land %d fish in a single cast.</item>
+        <item quantity="other">Land %d fish in a single cast.</item>
+    </plurals>
+    <plurals name="daily_challenge_new_species">
+        <item quantity="one">Catch %d species you\'ve never caught.</item>
+        <item quantity="other">Catch %d species you\'ve never caught.</item>
+    </plurals>
+    <!-- Progress on a challenge whose goal is one cast. %1$d: best so far; %2$d: goal (meters). -->
+    <string name="daily_progress_depth">Deepest: %1$d of %2$d m</string>
+    <!-- %1$d: best so far; %2$d: goal (fish). -->
+    <string name="daily_progress_big_cast">Best cast: %1$d of %2$d fish</string>
+
+    <!-- After claiming the daily reward. %1$d: the calendar day (1 to 7); %2$s: the rewards. -->
+    <string name="daily_claimed">Day %1$d reward: %2$s.</string>
+    <!-- After claiming: the streak went on. %1$d: streak in days (2 or more); %2$d: calendar day; %3$s: rewards. -->
+    <string name="daily_claimed_streak">%1$d days in a row! Day %2$d reward: %3$s.</string>
+    <!-- %1$d: calendar day; %2$s: rewards. -->
+    <string name="daily_claimed_restarted">A new streak starts today. Day %1$d reward: %2$s.</string>
+    <!-- One streak shield covered a missed day. %1$s: the streak (e.g. "5 days"); %2$d: calendar day; %3$s: rewards. -->
+    <string name="daily_claimed_one_shield">A streak shield covered the day you missed: your streak is %1$s. Day %2$d reward: %3$s.</string>
+    <!-- Several shields. %1$d: shields used; %2$s: the streak (e.g. "5 days"); %3$d: calendar day; %4$s: rewards. -->
+    <string name="daily_claimed_shields">%1$d streak shields covered the days you missed: your streak is %2$s. Day %3$d reward: %4$s.</string>
+    <!-- Finished challenges from an earlier day were claimed automatically. %1$s: the rewards. -->
+    <string name="daily_collected">Your finished challenges from an earlier day were collected for you: %1$s.</string>
+    <!-- %1$s: the rewards. -->
+    <string name="daily_challenge_claimed">Challenge complete! You get %1$s.</string>
+    <!-- A challenge swapped for a new one. %1$s: its difficulty (Easy, Medium, Hard); %2$s: the new challenge. -->
+    <string name="daily_challenge_swapped">New challenge (%1$s): %2$s</string>
+    <string name="daily_reminders_blocked">Reminders stay off: notifications for Deep Line are blocked on this phone. You can allow them in the phone\'s settings.</string>
+</resources>

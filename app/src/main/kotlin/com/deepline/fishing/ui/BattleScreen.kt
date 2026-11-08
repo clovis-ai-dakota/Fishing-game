@@ -1,5 +1,9 @@
 package com.deepline.fishing.ui
 
+import com.deepline.fishing.ui.i18n.rules
+import com.deepline.fishing.ui.i18n.asString
+import com.deepline.fishing.ui.i18n.labelText
+import com.deepline.fishing.ui.i18n.label
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -55,14 +59,14 @@ fun BattleScreen(vm: GameViewModel) {
     }
 
     SubScreen(
-        title = b.mode.title,
+        title = b.mode.label(),
         onBack = { if (outcome != null) vm.leaveBattle() else confirmForfeit = true },
     ) {
         LazyColumn(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            item { Text(b.mode.summary, style = MaterialTheme.typography.bodyMedium) }
+            item { Text(b.mode.rules(), style = MaterialTheme.typography.bodyMedium) }
 
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -231,7 +235,7 @@ private data class PlayerView(
     val name: String,
     val title: String?,
     val frame: com.deepline.fishing.core.TitleFrame,
-    val scoreLabel: String,
+    val scoreLabel: com.deepline.fishing.ui.i18n.UiText,
     val totalPoints: Int,
     val timeLeft: Float?,
     val castLines: List<String>,
@@ -247,7 +251,7 @@ private data class BattleView(val players: List<PlayerView>, val rounds: List<Ro
                     name = b.players[i].name,
                     title = titles.getOrNull(i),
                     frame = com.deepline.fishing.core.TitleFrame.of(frames.getOrNull(i)),
-                    scoreLabel = b.score(i).label,
+                    scoreLabel = b.score(i).labelText(b.mode),
                     totalPoints = b.totalPoints(i),
                     timeLeft = b.mode.timeLimitSec?.let { (it - b.timeUsed(i)).coerceAtLeast(0f) },
                     castLines = b.castsOf(i).mapIndexed(::castLine),
@@ -269,7 +273,7 @@ private fun PlayerCard(player: PlayerView, highlighted: Boolean, isMe: Boolean, 
             )
             player.title?.let { TitleBadge(it, frame = player.frame) }
             Text(
-                player.scoreLabel,
+                player.scoreLabel.asString(),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.secondary,
                 fontWeight = FontWeight.Bold,

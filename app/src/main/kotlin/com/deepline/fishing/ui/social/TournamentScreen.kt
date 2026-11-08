@@ -1,5 +1,7 @@
 package com.deepline.fishing.ui.social
 
+import com.deepline.fishing.ui.i18n.label
+import com.deepline.fishing.ui.i18n.asString
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -71,11 +73,11 @@ fun TournamentScreen(vm: GameViewModel) {
             for (r in t?.rewards.orEmpty()) {
                 SocialCard("A reward is waiting", Modifier.testTag("tournament_reward"), highlighted = true) {
                     Text(
-                        "You finished ${ordinal(r.rank)} of ${r.participants} with ${formatPoints(r.best)} pts: ${r.tier.displayName}.",
+                        "You finished ${ordinal(r.rank)} of ${r.participants} with ${formatPoints(r.best)} pts: ${r.tier.label()}.",
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     Text(
-                        "Reward: " + r.tier.grants.joinToString(", ") { ShopText.seasonGrant(it, vm.progress) } + ".",
+                        "Reward: " + ShopText.seasonGrants(r.tier.grants, vm.progress).asString() + ".",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
                     )
@@ -144,7 +146,7 @@ fun TournamentScreen(vm: GameViewModel) {
                     Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(tierRule(tier), style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                         Text(
-                            tier.grants.joinToString(", ") { ShopText.seasonGrant(it, vm.progress) },
+                            ShopText.seasonGrants(tier.grants, vm.progress).asString(),
                             style = MaterialTheme.typography.bodySmall,
                             color = rewardTextColor(),
                             modifier = Modifier.weight(1.4f),

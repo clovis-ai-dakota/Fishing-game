@@ -1,5 +1,7 @@
 package com.deepline.fishing.ui
 
+import com.deepline.fishing.ui.i18n.rules
+import com.deepline.fishing.ui.i18n.label
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -101,8 +103,8 @@ fun BattleSetupScreen(vm: GameViewModel) {
                         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
                             RadioButton(selected = selected, onClick = { mode = m })
                             Column(Modifier.weight(1f)) {
-                                Text(m.title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-                                Text(m.summary, style = MaterialTheme.typography.bodySmall)
+                                Text(m.label(), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                                Text(m.rules(), style = MaterialTheme.typography.bodySmall)
                             }
                         }
                     }
@@ -122,7 +124,7 @@ fun BattleSetupScreen(vm: GameViewModel) {
                         FilterChip(
                             selected = opponentKey == d.name,
                             onClick = { opponentKey = d.name },
-                            label = { Text(d.displayName) },
+                            label = { Text(d.label()) },
                         )
                     }
                 }
@@ -178,10 +180,10 @@ fun BattleSetupScreen(vm: GameViewModel) {
                     val payout = GameConfig.wagerPayout(rival)
                     Text(
                         if (stake > 0) {
-                            "Win and get ${formatPoints((stake * payout).toLong())} pts back (×$payout against ${rival.displayName}); " +
+                            "Win and get ${formatPoints((stake * payout).toLong())} pts back (×$payout against ${rival.label()}); " +
                                 "a draw refunds the stake; losing or forfeiting loses it."
                         } else {
-                            "Stake points on the result: a win against ${rival.displayName} pays ×$payout."
+                            "Stake points on the result: a win against ${rival.label()} pays ×$payout."
                         },
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,

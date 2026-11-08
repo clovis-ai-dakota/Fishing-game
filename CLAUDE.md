@@ -283,6 +283,35 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     properties). Never commit keys. `tools/release/check-release.sh` checks a build.
   - The store listing (`docs/store/listings/<locale>/`, six languages) quotes the game: change it
     with the game (`StoreListingTest` checks limits, banned claims, secret names and numbers).
+- **Localisation** (guide: `docs/localization.md`; research: `docs/research/localization.md`).
+  The game speaks English, French, Spanish, German, Brazilian Portuguese and Turkish:
+  - **All player-facing text is in string resources**, never in Kotlin: one file per area,
+    `res/values/strings_<area>.xml`, starting with a comment for translators; keys
+    `<area>_<screen>_<purpose>`; comments on any string with arguments or a length limit;
+    positional arguments (`%1$s`); `<plurals>` when the count is in the sentence (French, Spanish
+    and Portuguese also need `many`). Never build a sentence from pieces, never change case in code,
+    and only put a name where grammar doesn't touch it (after a colon, in parentheses).
+  - Text built outside composables (view model and controller messages, the tour's steps) is a
+    `UiText` (`ui/i18n/UiText.kt`), resolved where it is shown (`asString()`); text that becomes
+    data or leaves the activity (battle player names, notifications) is resolved with
+    `AppLanguages.localized(context)`. Beware of `"$uiText"` in string templates.
+  - Names of things core defines (zones, rope stats, tackle, modes, skins, boat options, shop items,
+    themes, seasons, boards, species, secret titles...) come from `ui/i18n/CoreText.kt`
+    (`zone.label()` / `labelText()`); core keeps its English `displayName`s for the server and
+    tests and the app never shows them. New enum entries need a string (exhaustive `when`s); new
+    ids are checked by `CoreTextTest`, whose English must equal core's. Species are translated by
+    id (`strings_species.xml`): ids and the generator never change.
+  - Numbers, prices, units and times go through `ui/Format.kt` / `UiText.number`.
+  - Never translate analytics names, keys, ids, codes, server paths or names players type.
+  - The language picker (Settings > Language, `AppLanguages`): `LocaleManager` on Android 13+ (same
+    setting as the system's per-app language, `res/xml/locales_config.xml`), the game's own
+    preference applied in `MainActivity.attachBaseContext` below. The locale config, the picker
+    and `localeFilters` list the same languages (`LocalizationResourcesTest`).
+  - Quality tests: `LocalizationResourcesTest` (translations mirror English file by file:
+    keys, placeholders, plural forms, escaping; `REQUIRED_LANGUAGES` makes a finished language
+    strict) and `HardcodedTextTest` (no text in files listed in `CONVERTED`: add a file once it is
+    converted; no core English name shown). Check new screens with the English (XA) pseudo-locale
+    (debug builds, Settings > Language) and in German and French, the longest languages.
 - All tunable numbers live in `core/.../GameConfig.kt` (plus the tables in `FishSpecies.kt`,
   `Upgrades.kt`, `Secrets.kt` and `Daily.kt`). The tour and HUD read them, so don't hard-code them in UI text.
 - Run `./gradlew :core:test :server:test :app:testDebugUnitTest` before pushing. App UI tests

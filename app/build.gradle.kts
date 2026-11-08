@@ -82,8 +82,19 @@ android {
         language { enableSplit = false }
     }
 
+    androidResources {
+        // The game's languages (see ui/i18n/AppLanguage.kt and docs/localization.md): only these
+        // ship, so library strings (Compose, Material, Play Billing) never show in a language the
+        // game itself doesn't speak. The pseudo-locales are needed here for debug builds to keep them.
+        localeFilters += listOf("en", "fr", "es", "de", "pt-rBR", "tr", "en-rXA", "ar-rXB")
+    }
+
     buildTypes {
         debug {
+            // Pseudo-locales (Settings > Language in debug builds, or the phone's developer
+            // languages): English (XA) shows untranslated text and truncation, AR (XB) mirrors
+            // the layout right to left. See docs/localization.md.
+            isPseudoLocalesEnabled = true
             // Debug builds pay through the in-app test store (approve, decline, fail or leave
             // pending). Build with -PdeeplinePlayBilling=true to test real Google Play billing.
             val play = (project.findProperty("deeplinePlayBilling") as String?)?.toBoolean() ?: false

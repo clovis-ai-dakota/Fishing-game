@@ -22,11 +22,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.deepline.fishing.BuildConfig
+import com.deepline.fishing.R
 import com.deepline.fishing.ui.settings.SettingsSwitchRow
 
 /**
@@ -56,33 +58,24 @@ fun ConsentSheet(onAnswer: (PrivacyChoices) -> Unit) {
                     .padding(20.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                Text("Help make Deep Line better?", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                Text(
-                    "With your permission, the game sends usage statistics (which screens you open, how your casts " +
-                        "and battles go, what you buy) and crash reports to Google Firebase. They help us fix bugs " +
-                        "and balance the game.",
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-                Text(
-                    "They're linked to a random ID, never to your name, and never used for ads. Nothing is sent " +
-                        "unless you allow it, and you can change your mind at any time in Settings, under Privacy.",
-                    style = MaterialTheme.typography.bodyMedium,
-                )
+                Text(stringResource(R.string.privacy_consent_title), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.privacy_consent_body), style = MaterialTheme.typography.bodyMedium)
+                Text(stringResource(R.string.privacy_consent_promise), style = MaterialTheme.typography.bodyMedium)
                 TextButton(
                     onClick = { runCatching { uriHandler.openUri(BuildConfig.PRIVACY_POLICY_URL) } },
                     modifier = Modifier.testTag("consent_policy"),
-                ) { Text("Read the privacy policy") }
+                ) { Text(stringResource(R.string.privacy_read_policy)) }
                 if (choosing) {
                     SettingsSwitchRow(
-                        title = "Usage statistics",
-                        subtitle = "How the game is played: screens, casts, battles, purchases.",
+                        title = stringResource(R.string.privacy_analytics_title),
+                        subtitle = stringResource(R.string.privacy_analytics_subtitle),
                         checked = analytics,
                         onCheckedChange = { analytics = it },
                         tag = "consent_analytics",
                     )
                     SettingsSwitchRow(
-                        title = "Crash reports",
-                        subtitle = "What went wrong when the game crashes or something fails.",
+                        title = stringResource(R.string.privacy_crash_title),
+                        subtitle = stringResource(R.string.privacy_crash_subtitle),
                         checked = crashReports,
                         onCheckedChange = { crashReports = it },
                         tag = "consent_crash_reports",
@@ -90,10 +83,10 @@ fun ConsentSheet(onAnswer: (PrivacyChoices) -> Unit) {
                     Button(
                         onClick = { onAnswer(PrivacyChoices(analytics = analytics, crashReports = crashReports)) },
                         modifier = Modifier.fillMaxWidth().testTag("consent_save"),
-                    ) { Text("Save my choices") }
+                    ) { Text(stringResource(R.string.privacy_consent_save)) }
                 } else {
                     TextButton(onClick = { choosing = true }, modifier = Modifier.testTag("consent_choose")) {
-                        Text("Choose for each")
+                        Text(stringResource(R.string.privacy_consent_choose))
                     }
                 }
                 // The two answers look exactly the same: refusing is as easy as accepting.
@@ -101,11 +94,11 @@ fun ConsentSheet(onAnswer: (PrivacyChoices) -> Unit) {
                     Button(
                         onClick = { onAnswer(PrivacyChoices.NONE) },
                         modifier = Modifier.weight(1f).testTag("consent_refuse"),
-                    ) { Text("Don't allow") }
+                    ) { Text(stringResource(R.string.privacy_consent_refuse)) }
                     Button(
                         onClick = { onAnswer(PrivacyChoices.ALL) },
                         modifier = Modifier.weight(1f).testTag("consent_allow"),
-                    ) { Text("Allow") }
+                    ) { Text(stringResource(R.string.privacy_consent_allow)) }
                 }
             }
         }

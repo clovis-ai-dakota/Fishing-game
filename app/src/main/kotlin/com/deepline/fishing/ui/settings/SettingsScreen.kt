@@ -18,10 +18,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.BuildConfig
 import com.deepline.fishing.GameViewModel
+import com.deepline.fishing.R
 import com.deepline.fishing.ui.SubScreen
 import com.deepline.fishing.ui.tour.TourTarget
 import com.deepline.fishing.ui.tour.tourTarget
@@ -33,7 +35,7 @@ import com.deepline.fishing.ui.tour.tourTarget
  */
 @Composable
 fun SettingsScreen(vm: GameViewModel) {
-    SubScreen("Settings", onBack = vm::onBack) {
+    SubScreen(stringResource(R.string.settings_title), onBack = vm::onBack) {
         Column(
             Modifier
                 .weight(1f)
@@ -41,16 +43,16 @@ fun SettingsScreen(vm: GameViewModel) {
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            SettingsSection("Help") {
+            SettingsSection(stringResource(R.string.settings_help_title)) {
                 Text(
-                    "The tour shows how to play and what everything does.",
+                    stringResource(R.string.settings_help_body),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 OutlinedButton(
                     onClick = vm::startTour,
                     modifier = Modifier.testTag("settings_tour").tourTarget(TourTarget.SETTINGS_TOUR),
-                ) { Text("Take the tour") }
+                ) { Text(stringResource(R.string.settings_help_tour)) }
             }
             SoundSettingsSection(vm)
             NotificationSettingsSection(vm)
@@ -58,7 +60,7 @@ fun SettingsScreen(vm: GameViewModel) {
             PrivacySettingsSection(vm)
             CreditsSection(vm)
             Text(
-                "Deep Line ${BuildConfig.VERSION_NAME}",
+                stringResource(R.string.settings_version, BuildConfig.VERSION_NAME),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(4.dp),

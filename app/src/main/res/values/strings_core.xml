@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Names and descriptions of things the game's rules define (core module): zones, rope stats,
+    tackle, battle modes, skins, boat options, shop items, themes, seasons, boards, secrets...
+    Core keeps its English names for the server and the tests; the app shows these instead, through
+    ui/i18n/CoreText.kt (one mapping per enum or id). Keys: core_<kind>_<id>, with _desc for a
+    description and _short for a short form. Keep a term the same everywhere it appears (see the
+    glossary in docs/localization.md). Names are labels: they appear on their own (chips, titles,
+    lists) or after a colon, never inside a sentence that would have to inflect them.
+-->
+<resources>
+    <!-- Depth zones: the four bands of water, shallow to deep. Proper names of places in the game: translate them, and use the same name everywhere (Dex filters, tour, secrets). -->
+    <string name="core_zone_shallows">Sunlit Shallows</string>
+    <!-- Short form of the zone above, for the Fish tab's Dex progress line. -->
+    <string name="core_zone_shallows_short">Shallows</string>
+    <string name="core_zone_twilight">Twilight Reef</string>
+    <!-- Short form of the zone above, for the Fish tab's Dex progress line. -->
+    <string name="core_zone_twilight_short">Reef</string>
+    <string name="core_zone_midnight">Midnight Trench</string>
+    <!-- Short form of the zone above, for the Fish tab's Dex progress line. -->
+    <string name="core_zone_midnight_short">Trench</string>
+    <string name="core_zone_abyss">Abyssal Floor</string>
+    <!-- Short form of the zone above, for the Fish tab's Dex progress line. -->
+    <string name="core_zone_abyss_short">Floor</string>
+
+    <!-- Things in the water that aren't fish (they cost a bump when touched on the way down). -->
+    <string name="core_obstacle_driftwood">Driftwood</string>
+    <string name="core_obstacle_rock">Rock</string>
+    <string name="core_obstacle_jelly">Jelly cluster</string>
+
+    <!-- Rope upgrades (Shop > Rope). The short form drops "Rope" for the Fish tab's stat captions. -->
+    <string name="core_rope_length">Rope Length</string>
+    <!-- Short form (stat caption under the rope bar). -->
+    <string name="core_rope_length_short">Length</string>
+    <string name="core_rope_length_desc">How deep the hook can go before it turns back.</string>
+    <string name="core_rope_strength">Rope Strength</string>
+    <!-- Short form (stat caption under the rope bar). -->
+    <string name="core_rope_strength_short">Strength</string>
+    <string name="core_rope_strength_desc">Maximum total weight of fish the line can carry.</string>
+    <string name="core_rope_agility">Rope Agility</string>
+    <!-- Short form (stat caption under the rope bar). -->
+    <string name="core_rope_agility_short">Agility</string>
+    <string name="core_rope_agility_desc">How fast you can steer the hook sideways.</string>
+
+    <!-- Tackle: one-cast items switched on before a cast. -->
+    <string name="core_tackle_lantern">Lantern</string>
+    <!-- %1$d: depth in meters where the water goes dark. -->
+    <string name="core_tackle_lantern_desc">Lights up much more of the dark water below %1$d m for one cast.</string>
+    <string name="core_tackle_lucky_charm">Lucky charm</string>
+    <!-- %1$d: bumps with the charm; %2$d: the usual number of bumps. -->
+    <string name="core_tackle_lucky_charm_desc">One extra bump on the way down for one cast (%1$d instead of %2$d).</string>
+    <string name="core_tackle_sparkle_lure">Sparkle lure</string>
+    <!-- %1$d: multiplier (× is the multiplication sign). -->
+    <string name="core_tackle_sparkle_lure_desc">%1$d× as many Sparkling fish in the water for one cast.</string>
+    <string name="core_tackle_detector">Rare fish detector</string>
+    <!-- %1$d: radius in meters. -->
+    <string name="core_tackle_detector_desc">For one cast, marks species you haven\'t caught yet within %1$d m of the hook, even in the dark.</string>
+
+    <!-- Battle modes: the title, then the rules shown on the Battle tab. -->
+    <string name="core_mode_best_of_five">Best of 5</string>
+    <string name="core_mode_best_of_five_rules">One cast each per round. The higher score takes the round. First to 3 rounds wins.</string>
+    <string name="core_mode_time_attack">3-Minute Rush</string>
+    <!-- %1$d: minutes of fishing per player. -->
+    <string name="core_mode_time_attack_rules">%1$d minutes of fishing each. Only your single best cast counts. A cast still running when time is up ends on the spot.</string>
+    <string name="core_mode_heavy_haul">Heavy Haul</string>
+    <!-- %1$d: casts per player. -->
+    <string name="core_mode_heavy_haul_rules">%1$d casts each. Most total kilograms landed wins.</string>
+    <string name="core_mode_species_hunt">Species Hunt</string>
+    <!-- %1$d: casts per player. -->
+    <string name="core_mode_species_hunt_rules">%1$d casts each. Most different species wins. Total points break ties.</string>
+    <string name="core_mode_deep_dive">Deep Dive</string>
+    <!-- %1$d: casts per player. -->
+    <string name="core_mode_deep_dive_rules">%1$d casts each. The single deepest catch wins. Total points break ties.</string>
+
+    <!-- How well the computer rival plays (chips on the Battle tab, "Rival (Normal)"). -->
+    <string name="core_bot_easy">Easy</string>
+    <string name="core_bot_normal">Normal</string>
+    <string name="core_bot_hard">Hard</string>
+
+    <!-- Difficulty of a daily challenge (a small label on the challenge card). -->
+    <string name="core_challenge_easy">Easy</string>
+    <string name="core_challenge_medium">Medium</string>
+    <string name="core_challenge_hard">Hard</string>
+
+    <!-- Where a skin goes: one per slot is worn at a time. Title is the text shown under the player's name. -->
+    <string name="core_slot_hook">Hook</string>
+    <string name="core_slot_line">Line</string>
+    <string name="core_slot_boat">Boat</string>
+    <string name="core_slot_trail">Bubble trail</string>
+    <string name="core_slot_title">Title</string>
+
+    <!-- Skins (cosmetics): legendary sets are unlocked by secrets (only shown once earned), the rest are sold in the Shop. Titles (…_TITLE) are shown under the player's name. -->
+    <string name="core_cosmetic_leviathan_bone_hook">Leviathan bone hook</string>
+    <string name="core_cosmetic_leviathan_bone_hook_desc">Ivory carved from a giant, with runes that pulse cyan.</string>
+    <string name="core_cosmetic_giants_braid_line">Giant\'s braid</string>
+    <string name="core_cosmetic_giants_braid_line_desc">A thick pale braid with a shimmer running down it.</string>
+    <string name="core_cosmetic_giant_slayer_pennant">Giant-slayer pennant</string>
+    <string name="core_cosmetic_giant_slayer_pennant_desc">A tall mast flying a leviathan banner, and a cyan-trimmed hull.</string>
+    <string name="core_cosmetic_tide_trail">Tide trail</string>
+    <string name="core_cosmetic_tide_trail_desc">Cyan bubbles and ripples behind your hook.</string>
+    <string name="core_cosmetic_giant_slayer_title">Giant-slayer</string>
+    <string name="core_cosmetic_giant_slayer_title_desc">Title: you landed a giant on a thin line.</string>
+    <string name="core_cosmetic_prism_hook">Prism hook</string>
+    <string name="core_cosmetic_prism_hook_desc">A crystal hook that cycles through every colour.</string>
+    <string name="core_cosmetic_rainbow_line">Rainbow line</string>
+    <string name="core_cosmetic_rainbow_line_desc">Colours flowing down the whole line.</string>
+    <string name="core_cosmetic_prism_sail">Prism sail</string>
+    <string name="core_cosmetic_prism_sail_desc">A rainbow sail on your boat.</string>
+    <string name="core_cosmetic_prism_trail">Prism trail</string>
+    <string name="core_cosmetic_prism_trail_desc">Rainbow bubbles and sparkles behind your hook.</string>
+    <string name="core_cosmetic_perfectionist_title">Perfectionist</string>
+    <string name="core_cosmetic_perfectionist_title_desc">Title: the perfect cast.</string>
+    <string name="core_cosmetic_crown_hook">Crown hook</string>
+    <string name="core_cosmetic_crown_hook_desc">Solid gold, with a crown at the eye.</string>
+    <string name="core_cosmetic_golden_line">Golden line</string>
+    <string name="core_cosmetic_golden_line_desc">A gold line with glints running down it.</string>
+    <string name="core_cosmetic_royal_boat">Royal boat</string>
+    <string name="core_cosmetic_royal_boat_desc">A gold-trimmed hull and a purple crowned sail.</string>
+    <string name="core_cosmetic_golden_trail">Golden trail</string>
+    <string name="core_cosmetic_golden_trail_desc">Golden sparkles behind your hook.</string>
+    <string name="core_cosmetic_master_angler_title">Master angler</string>
+    <string name="core_cosmetic_master_angler_title_desc">Title: every fish in the log.</string>
+    <string name="core_cosmetic_coral_hook">Coral hook</string>
+    <string name="core_cosmetic_coral_hook_desc">Pink coral with a pearl at the eye.</string>
+    <string name="core_cosmetic_neon_hook">Neon hook</string>
+    <string name="core_cosmetic_neon_hook_desc">Glowing magenta tubing.</string>
+    <string name="core_cosmetic_obsidian_hook">Obsidian hook</string>
+    <string name="core_cosmetic_obsidian_hook_desc">Black glass with a violet sheen.</string>
+    <string name="core_cosmetic_ocean_line">Ocean line</string>
+    <string name="core_cosmetic_ocean_line_desc">Turquoise fading to deep blue.</string>
+    <string name="core_cosmetic_neon_line">Neon line</string>
+    <string name="core_cosmetic_neon_line_desc">A pulsing pink and cyan line.</string>
+    <string name="core_cosmetic_silver_line">Silver line</string>
+    <string name="core_cosmetic_silver_line_desc">Polished silver with a running glint.</string>
+    <string name="core_cosmetic_heart_trail">Heart trail</string>
+    <string name="core_cosmetic_heart_trail_desc">Little hearts instead of bubbles.</string>
+    <string name="core_cosmetic_star_trail">Star trail</string>
+    <string name="core_cosmetic_star_trail_desc">Neon stars instead of bubbles.</string>
+    <string name="core_cosmetic_petal_trail">Petal trail</string>
+    <string name="core_cosmetic_petal_trail_desc">Drifting blossom petals.</string>
+    <string name="core_cosmetic_founder_title">Founder</string>
+    <string name="core_cosmetic_founder_title_desc">Title: you backed Deep Line from the start.</string>
+
+    <!-- Names of skin sets (a legendary set is only named once it is unlocked). -->
+    <string name="core_set_giant_slayer">Giant-slayer</string>
+    <string name="core_set_prismatic">Prismatic</string>
+    <string name="core_set_sovereign">Sovereign</string>
+    <string name="core_set_coral_reef">Coral Reef</string>
+    <string name="core_set_neon_nights">Neon Nights</string>
+
+    <!-- Shop sections (tabs of the Shop). -->
+    <string name="core_shop_section_tackle">Tackle</string>
+    <string name="core_shop_section_style">Style</string>
+    <string name="core_shop_section_passes">Passes</string>
+    <string name="core_shop_section_aquarium">Aquarium</string>
+
+    <!-- Shop items. Items that are a skin, a premade boat, an aquarium decor or a theme use that thing's own name (see CoreText), so they aren't repeated here. -->
+    <string name="core_shop_item_lantern_pouch">Lantern pouch</string>
+    <string name="core_shop_item_lantern_pouch_desc">A pouch of Lanterns.</string>
+    <string name="core_shop_item_lantern_crate">Lantern crate</string>
+    <string name="core_shop_item_lantern_crate_desc">A crate of Lanterns.</string>
+    <string name="core_shop_item_lantern_chest">Lantern chest</string>
+    <string name="core_shop_item_lantern_chest_desc">A chest of Lanterns.</string>
+    <string name="core_shop_item_lantern_barrel">Lantern barrel</string>
+    <string name="core_shop_item_lantern_barrel_desc">A barrel of Lanterns, with a bulk bonus.</string>
+    <string name="core_shop_item_detector_pouch">Detector pouch</string>
+    <string name="core_shop_item_detector_pouch_desc">A pouch of rare fish detectors.</string>
+    <string name="core_shop_item_detector_crate">Detector crate</string>
+    <string name="core_shop_item_detector_crate_desc">A crate of rare fish detectors.</string>
+    <string name="core_shop_item_charm_bag">Charm bag</string>
+    <string name="core_shop_item_charm_bag_desc">A bag of Lucky charms.</string>
+    <string name="core_shop_item_lure_box">Lure box</string>
+    <string name="core_shop_item_lure_box_desc">A box of Sparkle lures.</string>
+    <string name="core_shop_item_paint_flames">Flames paint</string>
+    <string name="core_shop_item_paint_flames_desc">Flames licking up the hull.</string>
+    <string name="core_shop_item_paint_starry">Starry night paint</string>
+    <string name="core_shop_item_paint_starry_desc">Twinkling stars on the hull.</string>
+    <string name="core_shop_item_paint_metallic">Metallic paint</string>
+    <string name="core_shop_item_paint_metallic_desc">A polished metal sheen.</string>
+    <string name="core_shop_item_paint_neon">Neon paint</string>
+    <string name="core_shop_item_paint_neon_desc">Glowing neon bands.</string>
+    <string name="core_shop_item_emblem_crown">Crown emblem</string>
+    <string name="core_shop_item_emblem_crown_desc">A golden crown.</string>
+    <string name="core_shop_item_emblem_skull">Skull emblem</string>
+    <string name="core_shop_item_emblem_skull_desc">A friendly pirate skull.</string>
+    <string name="core_shop_item_emblem_lightning">Lightning emblem</string>
+    <string name="core_shop_item_emblem_lightning_desc">A bolt of lightning.</string>
+    <string name="core_shop_item_emblem_shell">Shell emblem</string>
+    <string name="core_shop_item_emblem_shell_desc">A scallop shell.</string>
+    <string name="core_shop_item_emblem_trident">Trident emblem</string>
+    <string name="core_shop_item_emblem_trident_desc">The sea king\'s trident.</string>
+    <string name="core_shop_item_cloth_stripes">Striped sails</string>
+    <string name="core_shop_item_cloth_stripes_desc">Stripes on the sail and the flag.</string>
+    <string name="core_shop_item_cloth_stars">Starry sails</string>
+    <string name="core_shop_item_cloth_stars_desc">Stars on the sail and the flag.</string>
+    <string name="core_shop_item_cloth_waves">Wave sails</string>
+    <string name="core_shop_item_cloth_waves_desc">Waves on the sail and the flag.</string>
+    <string name="core_shop_item_set_coral_reef">Coral Reef set</string>
+    <string name="core_shop_item_set_coral_reef_desc">The Coral Reef Cruiser with a matching hook, line and trail.</string>
+    <string name="core_shop_item_set_neon_nights">Neon Nights set</string>
+    <string name="core_shop_item_set_neon_nights_desc">The Neon Nights boat with a matching hook, line and trail.</string>
+    <string name="core_shop_item_starter_pack">Starter pack</string>
+    <!-- %1$d: number of Lanterns (always several). -->
+    <string name="core_shop_item_starter_pack_desc">The Coral Reef Cruiser, Metallic paint, a Neon line, a rainbow title badge and %1$d Lanterns.</string>
+    <string name="core_shop_item_captains_club">Captain\'s Club</string>
+    <!-- %1$d: days of membership. -->
+    <string name="core_shop_item_captains_club_desc">%1$d days: the members-only Aurora paint, a club title badge, cloud save, and a free Lantern pouch each month.</string>
+    <string name="core_shop_item_founders_pack">Founder\'s pack</string>
+    <string name="core_shop_item_founders_pack_desc">The Founder title, the Founder\'s Flagship boat and a club badge that never expires.</string>
+    <string name="core_shop_item_season_pass">Season pass</string>
+    <string name="core_shop_item_season_pass_desc">This season\'s premium track: a season badge, the season boat at tier 10 and lots of tackle.</string>
+    <string name="core_shop_item_collector_edition">Collector\'s edition</string>
+    <!-- %1$d: tiers skipped. -->
+    <string name="core_shop_item_collector_edition_desc">The season pass, %1$d tiers straight away, the season boat now and a collector\'s badge.</string>
+    <string name="core_shop_item_event_pass">Weekend event pass</string>
+    <string name="core_shop_item_event_pass_desc">Doubles this weekend\'s event progress and adds a bigger reward with an event badge.</string>
+    <string name="core_shop_item_badge_rainbow">Rainbow title badge</string>
+    <string name="core_shop_item_badge_rainbow_desc">A title badge in shifting rainbow colours.</string>
+    <string name="core_shop_item_badge_ocean">Ocean title badge</string>
+    <string name="core_shop_item_badge_ocean_desc">A title badge with rolling waves.</string>
+    <string name="core_shop_item_badge_ember">Ember title badge</string>
+    <string name="core_shop_item_badge_ember_desc">A title badge with glowing embers.</string>
+    <string name="core_shop_item_card_holo">Holographic Dex cards</string>
+    <string name="core_shop_item_card_holo_desc">Your caught species\' Dex cards in holographic.</string>
+    <string name="core_shop_item_card_gold">Gold foil Dex cards</string>
+    <string name="core_shop_item_card_gold_desc">Your caught species\' Dex cards in gold foil.</string>
+    <string name="core_shop_item_card_night">Starry night Dex cards</string>
+    <string name="core_shop_item_card_night_desc">Your caught species\' Dex cards in starry night.</string>
+    <string name="core_shop_item_card_coral">Coral Dex cards</string>
+    <string name="core_shop_item_card_coral_desc">Your caught species\' Dex cards in coral.</string>
+    <string name="core_shop_item_aquarium_expansion">Bigger aquarium</string>
+    <!-- %1$d: fish in the big tank; %2$d: in the normal one. -->
+    <string name="core_shop_item_aquarium_expansion_desc">Room for %1$d fish instead of %2$d, in a wider tank.</string>
+    <string name="core_shop_item_theme_collection">Every theme</string>
+    <!-- %1$d: number of themes for sale. -->
+    <string name="core_shop_item_theme_collection_desc">All %1$d themes for the menus, day and night.</string>
+    <!-- A menu theme sold in the shop. %1$s: the theme's name (e.g. Kelp Forest). -->
+    <string name="core_shop_item_theme">%1$s theme</string>
+
+    <!-- Small tags on shop cards. -->
+    <!-- Tag on a bundle of matching skins. -->
+    <string name="core_shop_badge_set">Set</string>
+    <!-- Tag on the €9.99 specials. -->
+    <string name="core_shop_badge_special">Special</string>
+
+    <!-- Premade boats (Shop > Style) and season boats: a name, then a one-line description. -->
+    <string name="core_boat_coral_cruiser">Coral Reef Cruiser</string>
+    <string name="core_boat_coral_cruiser_desc">Sunny colours and a rose sail.</string>
+    <string name="core_boat_lagoon_explorer">Lagoon Explorer</string>
+    <string name="core_boat_lagoon_explorer_desc">Polka dots and an anchor, ready for adventure.</string>
+    <string name="core_boat_sunset_racer">Sunset Racer</string>
+    <string name="core_boat_sunset_racer_desc">Flames from bow to stern.</string>
+    <string name="core_boat_midnight_corsair">Midnight Corsair</string>
+    <string name="core_boat_midnight_corsair_desc">A pirate ship with black sails.</string>
+    <string name="core_boat_starlight_voyager">Starlight Voyager</string>
+    <string name="core_boat_starlight_voyager_desc">A night sky painted on the hull.</string>
+    <string name="core_boat_royal_regatta">Royal Regatta</string>
+    <string name="core_boat_royal_regatta_desc">Gold trim and a crowned sail.</string>
+    <string name="core_boat_galaxy_dreamer">Galaxy Dreamer</string>
+    <string name="core_boat_galaxy_dreamer_desc">Violet stars and mint highlights.</string>
+    <string name="core_boat_neon_nights">Neon Nights</string>
+    <string name="core_boat_neon_nights_desc">Glowing tubes and a starry print.</string>
+    <string name="core_boat_founders_flagship">Founder\'s Flagship</string>
+    <string name="core_boat_founders_flagship_desc">Navy and gold, a trident on a starry sail.</string>
+    <string name="core_boat_season_tidecaller">Tidecaller</string>
+    <string name="core_boat_season_tidecaller_desc">Season boat: sea-green waves and a shell on the sail.</string>
+    <string name="core_boat_season_moonbloom">Moonbloom</string>
+    <string name="core_boat_season_moonbloom_desc">Season boat: lilac aurora under a crescent moon.</string>
+    <string name="core_boat_season_frostfin">Frostfin</string>
+    <string name="core_boat_season_frostfin_desc">Season boat: polished ice with a lightning flag.</string>
+    <string name="core_boat_season_goldwake">Goldwake</string>
+    <string name="core_boat_season_goldwake_desc">Season boat: gold neon on midnight, crowned.</string>
+
+    <!-- Boat paint colours (boat editor). -->
+    <string name="core_color_cream">Cream</string>
+    <string name="core_color_sand">Sand</string>
+    <string name="core_color_driftwood">Driftwood</string>
+    <string name="core_color_walnut">Walnut</string>
+    <string name="core_color_pearl">Pearl</string>
+    <string name="core_color_slate">Slate</string>
+    <string name="core_color_charcoal">Charcoal</string>
+    <string name="core_color_lagoon">Lagoon</string>
+    <string name="core_color_teal">Teal</string>
+    <string name="core_color_ocean">Ocean</string>
+    <string name="core_color_navy">Navy</string>
+    <string name="core_color_seafoam">Seafoam</string>
+    <string name="core_color_coral">Coral</string>
+    <string name="core_color_tangerine">Tangerine</string>
+    <string name="core_color_sunflower">Sunflower</string>
+    <string name="core_color_rose">Rose</string>
+    <string name="core_color_berry">Berry</string>
+    <string name="core_color_crimson">Crimson</string>
+    <string name="core_color_lilac">Lilac</string>
+    <string name="core_color_violet">Violet</string>
+    <string name="core_color_mint">Mint</string>
+    <string name="core_color_lime">Lime</string>
+    <string name="core_color_gold">Gold</string>
+    <string name="core_color_midnight">Midnight</string>
+
+    <!-- Boat editor options: hull patterns (paints), sail and flag prints, sails, flags, emblems. -->
+    <string name="core_pattern_solid">Solid</string>
+    <string name="core_pattern_stripe">Racing stripe</string>
+    <string name="core_pattern_two_tone">Two-tone</string>
+    <string name="core_pattern_waves">Waves</string>
+    <string name="core_pattern_dots">Polka dots</string>
+    <string name="core_pattern_checker">Checkers</string>
+    <string name="core_pattern_flames">Flames</string>
+    <string name="core_pattern_starry">Starry night</string>
+    <string name="core_pattern_metallic">Metallic</string>
+    <string name="core_pattern_neon">Neon</string>
+    <string name="core_pattern_aurora">Aurora</string>
+    <string name="core_cloth_plain">Plain</string>
+    <string name="core_cloth_stripes">Stripes</string>
+    <string name="core_cloth_stars">Stars</string>
+    <string name="core_cloth_waves">Waves</string>
+    <string name="core_sail_none">No sail</string>
+    <string name="core_sail_triangle">Triangle sail</string>
+    <string name="core_sail_square">Square sail</string>
+    <string name="core_sail_twin">Twin sails</string>
+    <string name="core_flag_none">No flag</string>
+    <string name="core_flag_pennant">Pennant</string>
+    <string name="core_flag_swallowtail">Swallowtail</string>
+    <string name="core_flag_banner">Banner</string>
+    <string name="core_emblem_none">No emblem</string>
+    <string name="core_emblem_star">Star</string>
+    <string name="core_emblem_anchor">Anchor</string>
+    <string name="core_emblem_fish">Fish</string>
+    <string name="core_emblem_heart">Heart</string>
+    <string name="core_emblem_moon">Moon</string>
+    <string name="core_emblem_wave">Wave</string>
+    <string name="core_emblem_crown">Crown</string>
+    <string name="core_emblem_skull">Skull</string>
+    <string name="core_emblem_lightning">Lightning</string>
+    <string name="core_emblem_shell">Shell</string>
+    <string name="core_emblem_trident">Trident</string>
+
+    <!-- Atmospheres: how the deep water looks (Dex > Skins). Family is gentle, Nightmare is frightening. -->
+    <string name="core_atmosphere_family">Family</string>
+    <string name="core_atmosphere_nightmare">Nightmare</string>
+
+    <!-- Title badge frames (Dex > Skins). -->
+    <string name="core_frame_gold">Gold</string>
+    <string name="core_frame_rainbow">Rainbow</string>
+    <string name="core_frame_ocean">Ocean</string>
+    <string name="core_frame_ember">Ember</string>
+    <string name="core_frame_club">Captain\'s Club</string>
+    <string name="core_frame_club_forever">Founder\'s club</string>
+    <string name="core_frame_season">Season</string>
+    <string name="core_frame_collector">Collector</string>
+    <string name="core_frame_event">Weekend event</string>
+    <string name="core_frame_tournament">Tournament</string>
+
+    <!-- Dex card styles (Dex > Skins). -->
+    <string name="core_card_classic">Classic</string>
+    <string name="core_card_holo">Holographic</string>
+    <string name="core_card_gold">Gold foil</string>
+    <string name="core_card_night">Starry night</string>
+    <string name="core_card_coral">Coral</string>
+
+    <!-- Aquarium decor: a name, then a description. -->
+    <string name="core_decor_plants">Water plants</string>
+    <string name="core_decor_plants_desc">Swaying green plants.</string>
+    <string name="core_decor_pebbles">Pebbles</string>
+    <string name="core_decor_pebbles_desc">Smooth river pebbles.</string>
+    <string name="core_decor_sand_castle">Sand castle</string>
+    <string name="core_decor_sand_castle_desc">A little castle with towers.</string>
+    <string name="core_decor_bubbler">Bubbler</string>
+    <string name="core_decor_bubbler_desc">A treasure diver blowing bubbles.</string>
+    <string name="core_decor_treasure_chest">Treasure chest</string>
+    <string name="core_decor_treasure_chest_desc">A chest that opens to show gold.</string>
+    <string name="core_decor_coral_garden">Coral garden</string>
+    <string name="core_decor_coral_garden_desc">Pink and orange corals.</string>
+    <string name="core_decor_lantern_lights">Lantern lights</string>
+    <string name="core_decor_lantern_lights_desc">A string of glowing lanterns along the top.</string>
+    <string name="core_decor_sunken_ship">Sunken ship</string>
+    <string name="core_decor_sunken_ship_desc">A wreck resting on the sand.</string>
+
+    <!-- Menu themes (the sea scene behind the menus): a name, then a description. -->
+    <string name="core_theme_lagoon">Lagoon</string>
+    <string name="core_theme_lagoon_desc">Sunlit turquoise water, rays of light and rising bubbles.</string>
+    <string name="core_theme_kelp_forest">Kelp Forest</string>
+    <string name="core_theme_kelp_forest_desc">Green-gold light through swaying kelp.</string>
+    <string name="core_theme_sandbar">Sandbar</string>
+    <string name="core_theme_sandbar_desc">Shallow, sandy water with rippling light.</string>
+    <string name="core_theme_coral_reef">Coral Reef</string>
+    <string name="core_theme_coral_reef_desc">Coral pinks and oranges, with a reef below.</string>
+    <string name="core_theme_polar">Polar Waters</string>
+    <string name="core_theme_polar_desc">Icy blues, floating ice and drifting snow.</string>
+    <string name="core_theme_sunset_harbor">Sunset Harbor</string>
+    <string name="core_theme_sunset_harbor_desc">A glowing sky over the harbour, boats on the horizon.</string>
+    <string name="core_theme_koi_pond">Koi Pond</string>
+    <string name="core_theme_koi_pond_desc">Jade water, koi gliding by and lily pads above.</string>
+    <string name="core_theme_treasure_cove">Treasure Cove</string>
+    <string name="core_theme_treasure_cove_desc">Deep blue and gold: coins glinting on the sea floor.</string>
+    <string name="core_theme_glow_tide">Glow Tide</string>
+    <string name="core_theme_glow_tide_desc">Glowing jellyfish and sparkling plankton in a living sea.</string>
+    <string name="core_theme_aurora">Aurora</string>
+    <string name="core_theme_aurora_desc">Northern lights over the water.</string>
+
+    <!-- Night mode of the menu themes. -->
+    <string name="core_night_day">Day</string>
+    <string name="core_night_night">Night</string>
+    <string name="core_night_auto">Like my phone</string>
+
+    <!-- Season names (a new season every few weeks; the names come back in turn). -->
+    <string name="core_season_coral_tides">Coral Tides</string>
+    <string name="core_season_midnight_bloom">Midnight Bloom</string>
+    <string name="core_season_frost_current">Frost Current</string>
+    <string name="core_season_sunken_gold">Sunken Gold</string>
+    <string name="core_season_storm_season">Storm Season</string>
+    <string name="core_season_lantern_festival">Lantern Festival</string>
+
+    <!-- Weekend event goals (an imperative: what to do this weekend). -->
+    <string name="core_goal_sparkling">Catch Sparkling fish</string>
+    <string name="core_goal_fish">Catch fish</string>
+    <string name="core_goal_deep">Reach the Midnight Trench</string>
+    <string name="core_goal_species">Catch different species</string>
+
+    <!-- Final placings of the weekly tournament. -->
+    <string name="core_tier_champion">Champion</string>
+    <string name="core_tier_gold">Top 10%</string>
+    <string name="core_tier_silver">Top 25%</string>
+    <string name="core_tier_bronze">Top 50%</string>
+    <string name="core_tier_took_part">Took part</string>
+
+    <!-- Roles in a club. -->
+    <string name="core_role_owner">Owner</string>
+    <string name="core_role_member">Member</string>
+
+    <!-- Weekly leaderboards: the three boards (a name, then what it ranks) and who is on them. -->
+    <string name="core_board_best_cast">Best cast</string>
+    <string name="core_board_best_cast_desc">The highest-scoring single cast of the week.</string>
+    <string name="core_board_deepest">Deepest catch</string>
+    <string name="core_board_deepest_desc">The deepest fish landed this week.</string>
+    <string name="core_board_rarest">Rarest catch</string>
+    <string name="core_board_rarest_desc">The rarest species landed this week; the deeper catch wins a tie.</string>
+    <string name="core_view_global">Everyone</string>
+    <string name="core_view_league">League</string>
+    <string name="core_view_friends">Friends</string>
+
+    <!-- A battle player's score line, by mode. -->
+    <plurals name="core_score_rounds">
+        <!-- Best of 5: rounds won. -->
+        <item quantity="one">%d round</item>
+        <item quantity="other">%d rounds</item>
+    </plurals>
+    <!-- 3-Minute Rush: the best single cast. %1$s: points, already formatted. -->
+    <string name="core_score_best_cast">%1$s pts best cast</string>
+    <!-- Heavy Haul: kilograms landed. %1$s: a decimal number, already formatted. -->
+    <string name="core_score_kg">%1$s kg</string>
+    <plurals name="core_score_species">
+        <!-- Species Hunt: different species caught. -->
+        <item quantity="one">%d species</item>
+        <item quantity="other">%d species</item>
+    </plurals>
+    <!-- Deep Dive: the deepest catch. %1$s: meters, already formatted. -->
+    <string name="core_score_deepest">deepest catch %1$s m</string>
+
+    <!-- Fishing secrets: hidden tricks, each named once the player has pulled it off (Dex >
+         Secrets, the discovery dialog, cast results). A title is only ever shown after its secret
+         was found, and never appears in the tour. Short, catchy names, like a sports move. -->
+    <string name="core_secret_last_bump">The last bump hooks what it hits</string>
+    <string name="core_secret_free_pass">Free pass</string>
+    <string name="core_secret_schooling">Schooling</string>
+    <string name="core_secret_surface_skim">Surface skim</string>
+    <string name="core_secret_zen_cast">Zen cast</string>
+    <string name="core_secret_pinball">Pinball</string>
+    <string name="core_secret_second_encounter">Second encounter</string>
+    <string name="core_secret_clean_drop">Clean drop</string>
+    <string name="core_secret_rock_bottom">Rock bottom</string>
+    <string name="core_secret_buzzer_beater">Buzzer beater</string>
+    <string name="core_secret_corner_pocket">Corner pocket</string>
+    <string name="core_secret_grand_tour">Grand tour</string>
+    <string name="core_secret_sparkle_snag">Sparkle snag</string>
+    <string name="core_secret_ladder">Ladder</string>
+    <string name="core_secret_perfect_load">Perfect load</string>
+    <string name="core_secret_moonlit_angler">Moonlit angler</string>
+    <string name="core_secret_shutout">Shutout</string>
+    <string name="core_secret_while_it_flees">While it flees</string>
+    <string name="core_secret_blind_drop">Blind drop</string>
+    <string name="core_secret_zone_sweep">Zone sweep</string>
+    <string name="core_secret_grand_slam">Grand slam</string>
+    <string name="core_secret_double_header">Double header</string>
+    <string name="core_secret_crowd_surfer">Crowd surfer</string>
+    <string name="core_secret_david_and_goliath">David and Goliath</string>
+    <string name="core_secret_perfect_cast">Perfect cast</string>
+    <string name="core_secret_master_angler">Master angler</string>
+</resources>

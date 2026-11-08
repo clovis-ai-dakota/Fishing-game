@@ -1,5 +1,6 @@
 package com.deepline.fishing.ui.dex
 
+import com.deepline.fishing.ui.i18n.asString
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -148,7 +149,7 @@ private fun FoundSecretCard(number: Int, secret: FishingSecret, onClick: () -> U
             CardTop(number, tier, locked = false)
             SecretArt(secret, height = 72.dp)
             Text(
-                secret.title,
+                secret.title.asString(),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
                 minLines = 2,

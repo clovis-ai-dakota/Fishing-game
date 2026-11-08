@@ -1,5 +1,7 @@
 package com.deepline.fishing.ui.social
 
+import com.deepline.fishing.ui.i18n.description
+import com.deepline.fishing.ui.i18n.label
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,12 +37,13 @@ import com.deepline.fishing.ui.tour.TourTarget
 import com.deepline.fishing.ui.tour.tourTarget
 
 /** How a board's number reads: points, a depth, or a species with its rarity. */
+@androidx.compose.runtime.Composable
 fun boardValue(kind: BoardKind, value: Long, speciesId: String?): String {
     val species = speciesId?.let { FishCatalog.byId(it) }
     return when (kind) {
         BoardKind.BEST_CAST -> "${formatPoints(value)} pts"
-        BoardKind.DEEPEST -> "${Leaderboards.depthOf(value).toInt()} m" + (species?.let { " · ${it.name}" } ?: "")
-        BoardKind.RAREST -> species?.let { "${it.name} " + "★".repeat(Progression.rarityStars(it)) } ?: "?"
+        BoardKind.DEEPEST -> "${Leaderboards.depthOf(value).toInt()} m" + (species?.let { " · ${it.label()}" } ?: "")
+        BoardKind.RAREST -> species?.let { "${it.label()} " + "★".repeat(Progression.rarityStars(it)) } ?: "?"
     }
 }
 
@@ -63,7 +66,7 @@ fun LeaderboardsScreen(vm: GameViewModel) {
                         FilterChip(
                             selected = social.boardKind == kind,
                             onClick = { social.selectBoard(kind) },
-                            label = { Text(kind.displayName) },
+                            label = { Text(kind.label()) },
                             modifier = Modifier.testTag("board_${kind.name.lowercase()}"),
                         )
                     }
@@ -73,14 +76,14 @@ fun LeaderboardsScreen(vm: GameViewModel) {
                         FilterChip(
                             selected = social.boardView == view,
                             onClick = { social.selectView(view) },
-                            label = { Text(view.displayName) },
+                            label = { Text(view.label()) },
                             modifier = Modifier.testTag("view_${view.name.lowercase()}"),
                         )
                     }
                 }
             }
             Hint(
-                social.boardKind.description + " The boards reset on Monday at 00:00 UTC, in " +
+                social.boardKind.description() + " The boards reset on Monday at 00:00 UTC, in " +
                     "${timeLeft(Weeks.endOf(Weeks.indexAt(now)), now)}. Only casts the server checks itself count: the " +
                     "weekly tournament and online battles, where everyone uses the same standard rope (level " +
                     "${OnlineProtocol.TOURNAMENT_ROPE_LEVEL}).",

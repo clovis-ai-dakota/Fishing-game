@@ -1,5 +1,6 @@
 package com.deepline.fishing.ui.dex
 
+import com.deepline.fishing.ui.i18n.label
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -93,7 +94,7 @@ fun SpeciesDex(vm: GameViewModel) {
                     FilterChip(
                         selected = zone == z,
                         onClick = { zoneName = z.name },
-                        label = { Text(z.displayName) },
+                        label = { Text(z.label()) },
                         leadingIcon = { Box(Modifier.size(10.dp).clip(CircleShape).background(zoneColor(z))) },
                     )
                 }
@@ -151,7 +152,7 @@ private fun DexHeader(p: PlayerProgress) {
                         Box(Modifier.size(8.dp).clip(CircleShape).background(zoneColor(z)))
                         Spacer(Modifier.width(6.dp))
                         Text(
-                            "${z.displayName}  ${inZone.count(p::isDiscovered)}/${inZone.size}",
+                            "${z.label()}  ${inZone.count(p::isDiscovered)}/${inZone.size}",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -207,7 +208,7 @@ private fun FishCard(number: Int, species: FishSpecies, p: PlayerProgress, style
             }
             FishPortrait(species, state, Modifier.fillMaxWidth().aspectRatio(1.5f))
             Text(
-                if (state == DexState.UNKNOWN) "???" else species.name,
+                if (state == DexState.UNKNOWN) "???" else species.label(),
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Bold,
                 color = if (state == DexState.CAUGHT) Color.White else Color.White.copy(alpha = 0.7f),

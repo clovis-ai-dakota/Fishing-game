@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Settings (the gear on the Fish tab) and its sections: help, sound and feel, notifications,
+    language, credits (ui/settings/). Privacy has its own file (strings_privacy.xml). Keys start
+    with settings_<section>_.
+-->
+<resources>
+    <!-- Screen title. -->
+    <string name="settings_title">Settings</string>
+    <!-- The version at the bottom. %1$s: the version number, e.g. 0.1.0. Deep Line is the game's name. -->
+    <string name="settings_version">Deep Line %1$s</string>
+
+    <!-- Help section. -->
+    <string name="settings_help_title">Help</string>
+    <string name="settings_help_body">The tour shows how to play and what everything does.</string>
+    <string name="settings_help_tour">Take the tour</string>
+
+    <!-- Sound and feel section: volumes (sliders with a percentage), vibration and reduced motion. -->
+    <string name="settings_sound_title">Sound and feel</string>
+    <!-- The overall volume. -->
+    <string name="settings_sound_volume">Volume</string>
+    <string name="settings_sound_music">Music</string>
+    <string name="settings_sound_effects">Sound effects</string>
+    <!-- A slider's level. %1$d: 0 to 100. -->
+    <string name="settings_sound_percent">%1$d%%</string>
+    <string name="settings_sound_vibration">Vibration</string>
+    <string name="settings_sound_vibration_on">A light touch for bumps, catches and big wins.</string>
+    <string name="settings_sound_vibration_none">This phone can\'t vibrate.</string>
+    <!-- An accessibility setting, like the phone's own "remove animations". -->
+    <string name="settings_sound_reduce_motion">Reduce motion</string>
+    <string name="settings_sound_reduce_motion_body">No screen shake, slow motion or flashes during casts.</string>
+
+    <!-- Notifications section: local reminders of the daily loop. -->
+    <string name="settings_notif_title">Notifications</string>
+    <string name="settings_notif_reminders">Reminders</string>
+    <!-- %1$s: the promise about how often reminders come (a full sentence, daily_reminder_promise). -->
+    <string name="settings_notif_reminders_body">When your daily reward is ready, your streak is about to end or a migration starts. %1$s</string>
+    <string name="settings_notif_daily">Daily reward ready</string>
+    <!-- %1$s: a time on the hour, e.g. 12:00. -->
+    <string name="settings_notif_daily_body">From %1$s, if you haven\'t opened the game yet that day.</string>
+    <string name="settings_notif_streak">Streak at risk</string>
+    <plurals name="settings_notif_streak_body">
+        <!-- %d: the shortest streak worth a reminder, in days. -->
+        <item quantity="one">In the evening, when a streak of %d day or more would end at midnight.</item>
+        <item quantity="other">In the evening, when a streak of %d days or more would end at midnight.</item>
+    </plurals>
+    <string name="settings_notif_events">Migrations and events</string>
+    <string name="settings_notif_events_body">When a migration or a weekend event starts.</string>
+    <string name="settings_notif_blocked">Notifications for Deep Line are turned off on this phone, so no reminder can arrive.</string>
+    <string name="settings_notif_phone_settings">Open phone settings</string>
+
+    <!-- Language section: the game's language. Language names are shown in their own language
+         (not translated); only "Phone's language" is. -->
+    <string name="settings_language_title">Language</string>
+    <!-- Follow the phone's language (the default). -->
+    <string name="settings_language_system">Phone\'s language</string>
+    <!-- Under "Phone's language": what that is now. %1$s: the phone's language, in that language (e.g. Deutsch). -->
+    <string name="settings_language_system_now">Now: %1$s</string>
+    <string name="settings_language_body">Names typed by players are never translated.</string>
+
+    <!-- Credits section: where the sounds and music come from. -->
+    <string name="settings_credits_title">Credits</string>
+    <!-- CC0 is a licence name and OpenGameArt.org a website: keep both as is. -->
+    <string name="settings_credits_body">All the sounds and music are free works dedicated to the public domain (CC0) and shared on OpenGameArt.org. Thank you to their authors.</string>
+    <!-- %1$s: the title of a music track or sound pack (its original English title). -->
+    <string name="settings_credits_music">Music: %1$s</string>
+    <string name="settings_credits_sounds">Sounds: %1$s</string>
+    <!-- %1$s: the author's name; %2$s: the licence's name (e.g. CC0 1.0). -->
+    <string name="settings_credits_by">By %1$s. Licence: %2$s.</string>
+</resources>

@@ -2,14 +2,15 @@ package com.deepline.fishing.ui.tour
 
 import kotlin.math.roundToInt
 
+import com.deepline.fishing.R
 import com.deepline.fishing.Screen
-import com.deepline.fishing.core.Atmosphere
-import com.deepline.fishing.core.CosmeticSlot
+import com.deepline.fishing.core.BotDifficulty
 import com.deepline.fishing.core.DepthZone
 import com.deepline.fishing.core.FishCatalog
 import com.deepline.fishing.core.GameConfig
-import com.deepline.fishing.core.Tackle
 import com.deepline.fishing.core.online.OnlineProtocol
+import com.deepline.fishing.ui.hourText
+import com.deepline.fishing.ui.i18n.UiText
 
 /** A UI element a tour step can point at (see `Modifier.tourTarget`). */
 enum class TourTarget {
@@ -35,7 +36,7 @@ enum class TourTarget {
     SETTINGS_PRIVACY,
 
     // -- Language targets below.
-
+    SETTINGS_LANGUAGE,
 }
 
 /** A small illustration shown in a tour card. */
@@ -43,13 +44,15 @@ enum class TourArt { STEER, BUMPS, HEADS, WEIGHT, SPARKLING, DARKNESS }
 
 /**
  * One step of the tour. [screen] is shown behind the card and [target], if any, is highlighted.
+ * [title] and [body] are string resources (strings_tour.xml) with the numbers they quote from
+ * [GameConfig] as arguments, resolved in the language shown when the card is drawn.
  * [sinceVersion] is the [Tour.VERSION] that introduced the step: players who already took an
  * older tour are shown just the newer steps as "What's new".
  */
 data class TourStep(
     val id: String,
-    val title: String,
-    val body: String,
+    val title: UiText,
+    val body: UiText,
     val screen: Screen,
     val target: TourTarget? = null,
     val art: TourArt? = null,
@@ -60,13 +63,17 @@ data class TourStep(
     val shopPage: com.deepline.fishing.ShopPage? = null,
 )
 
+/** A step's title and body from strings_tour.xml (`tour_<id>_title`, `tour_<id>_body`). */
+internal fun text(id: Int, vararg args: Any): UiText = UiText.res(id, *args)
+
 /**
  * The guided tour of the app.
  *
  * KEEP THIS UP TO DATE: every new player-facing feature gets a step (or an updated step) here.
  * When adding steps, bump [VERSION] and give the new steps `sinceVersion = VERSION`, so returning
  * players get a short "What's new" tour of just those steps. `TourContentTest` checks that every
- * screen, battle mode and rope upgrade is covered.
+ * screen, battle mode and rope upgrade is covered. Write the text in strings_tour.xml, with the
+ * numbers from [GameConfig] passed as arguments (never typed into the text).
  */
 object Tour {
     /**
@@ -86,109 +93,90 @@ object Tour {
     const val VERSION = 11
 
     private val bumps = GameConfig.DESCENT_TOUCH_LIMIT
-    private val bumpFree = GameConfig.BUMP_FREE_DEPTH.toInt()
-    private val dark = GameConfig.DARK_DEPTH.toInt()
-    private val calendarDays = com.deepline.fishing.core.DailyRewards.calendar.size
-    private fun hour(h: Int) = "%02d:00".format(h)
-    private val skinSlots = (CosmeticSlot.entries - CosmeticSlot.TITLE).map { it.displayName.lowercase() }
-        .let { it.dropLast(1).joinToString(", ") + " and " + it.last() }
+    private val calendarDays get() = UiText.plural(R.plurals.common_days, com.deepline.fishing.core.DailyRewards.calendar.size)
 
     /** Every step, also those of features switched off (see [steps]). */
     private val allSteps: List<TourStep> = listOf(
         TourStep(
             id = "welcome",
-            title = "Welcome to Deep Line!",
-            body = "Catch every fish in the deep. This short tour shows how to play and what everything does. " +
-                "Tap Next, or Skip tour if you already know your way around.",
+            title = text(R.string.tour_welcome_title),
+            body = text(R.string.tour_welcome_body),
             screen = Screen.HOME,
         ),
         TourStep(
             id = "tabs",
-            title = "Four tabs",
-            body = "The bar at the bottom takes you everywhere: Fish is where you cast, the Dex collects every " +
-                "species you meet, the Shop has rope upgrades, tackle and looks for your boat, and Battle is " +
-                "for 1v1 matches.",
+            title = text(R.string.tour_tabs_title),
+            body = text(R.string.tour_tabs_body),
             screen = Screen.HOME,
             target = TourTarget.NAV_BAR,
             sinceVersion = 9,
         ),
         TourStep(
             id = "cast",
-            title = "Cast your line",
-            body = "The big Cast line button at the bottom of the Fish tab drops your hook from the boat.",
+            title = text(R.string.tour_cast_title),
+            body = text(R.string.tour_cast_body),
             screen = Screen.HOME,
             target = TourTarget.HOME_CAST,
             sinceVersion = 5,
         ),
         TourStep(
             id = "steer",
-            title = "Steer the hook",
-            body = "During a cast, drag left and right anywhere on the screen. A ring shows where your finger " +
-                "is: the hook glides over to it and follows it. Rope Agility makes it faster.",
+            title = text(R.string.tour_steer_title),
+            body = text(R.string.tour_steer_body),
             screen = Screen.HOME,
             art = TourArt.STEER,
             sinceVersion = 2,
         ),
         TourStep(
             id = "descent",
-            title = "Going down: dodge",
-            body = "The hook sinks until it has bumped $bumps times or reaches the end of the rope, then it turns " +
-                "back up. On a fish, only the head counts as a bump (the same spot you aim for on the way up); " +
-                "brushing a body or tail is free. Rocks, driftwood and jellies count wherever you touch them. " +
-                "The first $bumpFree m are bump-free.",
+            title = text(R.string.tour_descent_title),
+            body = text(R.string.tour_descent_body, bumps, GameConfig.BUMP_FREE_DEPTH.toInt()),
             screen = Screen.HOME,
             art = TourArt.BUMPS,
             sinceVersion = 7,
         ),
         TourStep(
             id = "ascent",
-            title = "Coming up: aim for heads",
-            body = "On the way up, steer so the hook meets a fish's head: the pale face by its eye. " +
-                "Touching the tail or body does nothing.",
+            title = text(R.string.tour_ascent_title),
+            body = text(R.string.tour_ascent_body),
             screen = Screen.HOME,
             art = TourArt.HEADS,
         ),
         TourStep(
             id = "weight",
-            title = "Mind the weight",
-            body = "Your rope can only carry so much. Watch the Load bar: once it's full, heavier fish slip away.",
+            title = text(R.string.tour_weight_title),
+            body = text(R.string.tour_weight_body),
             screen = Screen.HOME,
             art = TourArt.WEIGHT,
         ),
         TourStep(
             id = "fast_reel",
-            title = "Line full? Reel in fast",
-            body = "As soon as you've used your $bumps bumps, or once nothing more can fit on your line, a Reel " +
-                "in fast button appears on the way up: it hauls the hook to the boat in " +
-                "${GameConfig.FAST_REEL_MAX_SECONDS} seconds at most, wherever you are. Nothing more is caught " +
-                "after that. Handy against the clock in timed battles.",
+            title = text(R.string.tour_fast_reel_title),
+            body = text(R.string.tour_fast_reel_body, bumps, UiText.decimal(GameConfig.FAST_REEL_MAX_SECONDS)),
             screen = Screen.HOME,
             art = TourArt.WEIGHT,
             sinceVersion = 8,
         ),
         TourStep(
             id = "themes",
-            title = "Themes",
-            body = "The palette button at the top changes how the menus look: the Lagoon by default, with a sea scene " +
-                "behind every tab. More themes are in the Shop for euros or points, and the richer ones cost more. " +
-                "The water you fish in never changes.",
+            title = text(R.string.tour_themes_title),
+            body = text(R.string.tour_themes_body),
             screen = Screen.HOME,
             target = TourTarget.HOME_THEMES,
             sinceVersion = 10,
         ),
         TourStep(
             id = "night_mode",
-            title = "Night mode",
-            body = "Every theme has a night version: choose Day, Night, or follow your phone's dark mode.",
+            title = text(R.string.tour_night_mode_title),
+            body = text(R.string.tour_night_mode_body),
             screen = Screen.THEMES,
             target = TourTarget.THEMES_MODE,
             sinceVersion = 10,
         ),
         TourStep(
             id = "points",
-            title = "Score points",
-            body = "Deeper catches are worth more points, shown here at the top. Sparkling fish (gold outline " +
-                "and glints) are worth ${GameConfig.SPARKLING_MULTIPLIER}× more.",
+            title = text(R.string.tour_points_title),
+            body = text(R.string.tour_points_body, GameConfig.SPARKLING_MULTIPLIER),
             screen = Screen.HOME,
             target = TourTarget.HOME_POINTS,
             art = TourArt.SPARKLING,
@@ -196,10 +184,8 @@ object Tour {
         ),
         TourStep(
             id = "upgrades",
-            title = "Upgrade your rope",
-            body = "Spend points in the Shop tab, on its Rope page. Rope Length lets you reach deeper zones and " +
-                "new fish, Rope Strength carries more weight, and Rope Agility steers faster. Changed your mind? " +
-                "Downgrade a level and get back every point it cost.",
+            title = text(R.string.tour_upgrades_title),
+            body = text(R.string.tour_upgrades_body),
             screen = Screen.SHOP,
             target = TourTarget.SHOP_ROPE,
             sinceVersion = 9,
@@ -207,12 +193,8 @@ object Tour {
         ),
         TourStep(
             id = "tackle",
-            title = "Tackle",
-            body = "The Tackle page sells one-cast items to switch on before you cast. Lanterns light the dark, a " +
-                "${Tackle.DETECTOR.displayName} marks species you haven't caught yet within " +
-                "${GameConfig.DETECTOR_RADIUS_M.toInt()} m of the hook, a ${Tackle.LUCKY_CHARM.displayName} gives one " +
-                "extra bump on the way down, and a ${Tackle.SPARKLE_LURE.displayName} brings " +
-                "${GameConfig.SPARKLE_LURE_MULTIPLIER.toInt()}× as many Sparkling fish. Prices grow with your rope's reach.",
+            title = text(R.string.tour_tackle_title),
+            body = text(R.string.tour_tackle_body, GameConfig.DETECTOR_RADIUS_M.toInt(), GameConfig.SPARKLE_LURE_MULTIPLIER.toInt()),
             screen = Screen.SHOP,
             target = TourTarget.SHOP_TACKLE,
             sinceVersion = 9,
@@ -220,11 +202,12 @@ object Tour {
         ),
         TourStep(
             id = "two_prices",
-            title = "Two ways to pay",
-            body = "Everything in the shop has two prices: euros, or points. A points price is about " +
-                "${GameConfig.MINUTES_PER_EURO.toInt()} minutes of fishing per euro at your rope's reach " +
-                "(${(GameConfig.LANTERN_MINUTES_PER_EURO / 60f).toInt()} hour for Lantern packs), so paying only saves " +
-                "time: everything can be earned by playing. Paying with points asks you to confirm first.",
+            title = text(R.string.tour_two_prices_title),
+            body = text(
+                R.string.tour_two_prices_body,
+                GameConfig.MINUTES_PER_EURO.toInt(),
+                UiText.plural(R.plurals.common_hours, (GameConfig.LANTERN_MINUTES_PER_EURO / 60f).toInt()),
+            ),
             screen = Screen.SHOP,
             target = TourTarget.SHOP_PRICES,
             sinceVersion = 9,
@@ -232,11 +215,13 @@ object Tour {
         ),
         TourStep(
             id = "lantern",
-            title = "Lanterns light the deep",
-            body = "Below $dark m the water is dark. Switch this on before a cast to light up much more water " +
-                "around the hook (${GameConfig.VISIBLE_RADIUS_LANTERN.roundToInt()} m instead of " +
-                "${GameConfig.VISIBLE_RADIUS_DARK.roundToInt()} m). One Lantern is used per cast; earn more from " +
-                "milestones or buy them in the Shop.",
+            title = text(R.string.tour_lantern_title),
+            body = text(
+                R.string.tour_lantern_body,
+                GameConfig.DARK_DEPTH.toInt(),
+                GameConfig.VISIBLE_RADIUS_LANTERN.roundToInt(),
+                GameConfig.VISIBLE_RADIUS_DARK.roundToInt(),
+            ),
             screen = Screen.HOME,
             target = TourTarget.HOME_LANTERN,
             art = TourArt.DARKNESS,
@@ -244,61 +229,48 @@ object Tour {
         ),
         TourStep(
             id = "dex",
-            title = "Fill your Dex",
-            body = "${FishCatalog.all.size} species live in ${DepthZone.entries.size} depth zones, some of them " +
-                "rare, and each has a numbered card. A fish that swims close to your hook is marked as Seen: you " +
-                "learn its name and depths. Catch it to fill its card with its weight, points and your records.",
+            title = text(R.string.tour_dex_title),
+            body = text(R.string.tour_dex_body, FishCatalog.all.size, DepthZone.entries.size),
             screen = Screen.DEX,
             target = TourTarget.DEX_HEADER,
             sinceVersion = 5,
         ),
         TourStep(
             id = "dex_filters",
-            title = "Browse by zone",
-            body = "Filter the cards by depth zone, or show only the fish you've caught. Tap a card to open its " +
-                "page, then swipe to flip through the Dex.",
+            title = text(R.string.tour_dex_filters_title),
+            body = text(R.string.tour_dex_filters_body),
             screen = Screen.DEX,
             target = TourTarget.DEX_FILTERS,
             sinceVersion = 5,
         ),
         TourStep(
             id = "milestones",
-            title = "Milestone rewards",
-            body = "Every point you earn counts towards milestone rewards (bonus points and Lanterns), even after " +
-                "you spend it. The trophy at the top of the Fish tab opens them, with a badge when one is ready " +
-                "to claim.",
+            title = text(R.string.tour_milestones_title),
+            body = text(R.string.tour_milestones_body),
             screen = Screen.MILESTONES,
             target = TourTarget.MILESTONES_FIRST,
             sinceVersion = 5,
         ),
         TourStep(
             id = "secrets",
-            title = "Fishing secrets",
-            body = "Some tricks are only found by playing, and they pay off: every time you pull one off it adds " +
-                "a bonus to the cast, in battles too. The first time, it's explained on the spot and earns a " +
-                "discovery reward, and a Secrets section appears in the Dex. The rarest secrets also unlock " +
-                "Skins for your $skinSlots, plus a title shown under your name, in online battles too. They're " +
-                "made to show off: looks only, never an advantage.",
+            title = text(R.string.tour_secrets_title),
+            body = text(R.string.tour_secrets_body),
             screen = Screen.DEX,
             target = TourTarget.TAB_DEX,
             sinceVersion = 5,
         ),
         TourStep(
             id = "boat",
-            title = "Customise your boat",
-            body = "Tap your boat at the top of the Fish tab to open the Skins section of the Dex. Customise boat " +
-                "lets you paint the hull, trim and cabin, and add a pattern, sails, a flag and an emblem. Basic " +
-                "colours are free; the rest unlock with points, or as you catch more species, reach new zones " +
-                "and claim milestones.",
+            title = text(R.string.tour_boat_title),
+            body = text(R.string.tour_boat_body),
             screen = Screen.HOME,
             target = TourTarget.HOME_BOAT,
             sinceVersion = 6,
         ),
         TourStep(
             id = "shop_style",
-            title = "Style",
-            body = "The Style page has premade boats, paints, emblems and sail prints (previewed on your own boat), " +
-                "and new hooks, lines and trails. Like every skin, they only change the look, never the game.",
+            title = text(R.string.tour_shop_style_title),
+            body = text(R.string.tour_shop_style_body),
             screen = Screen.SHOP,
             target = TourTarget.SHOP_STYLE,
             sinceVersion = 9,
@@ -306,9 +278,8 @@ object Tour {
         ),
         TourStep(
             id = "aquarium",
-            title = "Your aquarium",
-            body = "The fish you've caught swim in your aquarium: open it with the Aquarium button in the Dex and " +
-                "pick who swims there. Decor and a bigger tank are on the Shop's Aquarium page.",
+            title = text(R.string.tour_aquarium_title),
+            body = text(R.string.tour_aquarium_body),
             screen = Screen.SHOP,
             target = TourTarget.SHOP_AQUARIUM,
             sinceVersion = 9,
@@ -316,10 +287,8 @@ object Tour {
         ),
         TourStep(
             id = "season",
-            title = "Seasons and weekend events",
-            body = "Each season lasts ${GameConfig.SEASON_WEEKS} weeks. Every solo cast earns season XP and opens tiers " +
-                "of rewards: tackle and points for everyone, and more (a season boat, a badge) with the season pass. " +
-                "Every weekend also brings a fishing goal with its own reward. None of it changes battles.",
+            title = text(R.string.tour_season_title),
+            body = text(R.string.tour_season_body, UiText.plural(R.plurals.common_weeks, GameConfig.SEASON_WEEKS)),
             screen = Screen.SHOP,
             target = TourTarget.SHOP_SEASON,
             sinceVersion = 9,
@@ -327,10 +296,8 @@ object Tour {
         ),
         TourStep(
             id = "passes",
-            title = "Passes",
-            body = "The Captain's Club is a monthly membership: a members-only paint, a club title badge, cloud save " +
-                "and a free Lantern pouch every month. New anglers also get a one-time Starter pack offer for a " +
-                "few days. A dot on the Shop tab means something is waiting for you there.",
+            title = text(R.string.tour_passes_title),
+            body = text(R.string.tour_passes_body),
             screen = Screen.SHOP,
             target = TourTarget.SHOP_PASSES,
             sinceVersion = 9,
@@ -338,9 +305,8 @@ object Tour {
         ),
         TourStep(
             id = "badges",
-            title = "Title badges and Dex cards",
-            body = "Choose the frame of your title badge (shown under your name, online too) and how the Dex " +
-                "shows the species you've caught. More come from the Shop, season passes and events.",
+            title = text(R.string.tour_badges_title),
+            body = text(R.string.tour_badges_body),
             screen = Screen.DEX,
             target = TourTarget.SKINS_BADGE,
             sinceVersion = 9,
@@ -348,10 +314,8 @@ object Tour {
         ),
         TourStep(
             id = "atmosphere",
-            title = "Atmosphere",
-            body = "The water is harmless near the surface and gets spookier the deeper you go. Reach the " +
-                "${DepthZone.ABYSS.displayName} to unlock ${Atmosphere.NIGHTMARE.displayName}, a frightening look " +
-                "for the deep: you see exactly as much as before, only the mood changes.",
+            title = text(R.string.tour_atmosphere_title),
+            body = text(R.string.tour_atmosphere_body),
             screen = Screen.DEX,
             target = TourTarget.SKINS_ATMOSPHERE,
             sinceVersion = 6,
@@ -359,55 +323,50 @@ object Tour {
         ),
         TourStep(
             id = "battle",
-            title = "1v1 battles",
-            body = "Pick a mode: Best of 5, 3-Minute Rush, Heavy Haul, Species Hunt or Deep Dive. " +
-                "Both players fish the very same water, so skill decides.",
+            title = text(R.string.tour_battle_title),
+            body = text(R.string.tour_battle_body),
             screen = Screen.BATTLE_SETUP,
             target = TourTarget.BATTLE_MODES,
         ),
         TourStep(
             id = "opponents",
-            title = "Choose an opponent",
-            body = "Play the computer (Easy, Normal or Hard), a friend on this phone, or someone online: create a " +
-                "room and share its code, or use Quick match. Online, both players use the same tournament rope " +
-                "(level ${OnlineProtocol.TOURNAMENT_ROPE_LEVEL} in every stat).",
+            title = text(R.string.tour_opponents_title),
+            body = text(R.string.tour_opponents_body, OnlineProtocol.TOURNAMENT_ROPE_LEVEL),
             screen = Screen.BATTLE_SETUP,
             target = TourTarget.BATTLE_OPPONENT,
         ),
         TourStep(
             id = "battle_tackle",
-            title = "Tackle in battles",
-            body = "Lanterns and ${Tackle.DETECTOR.displayName}s work in battles too: switch them on here, and each of " +
-                "your casts uses one. Anyone can get them, so they're part of the game. The Lucky charm and the " +
-                "Sparkle lure are for solo casts only.",
+            title = text(R.string.tour_battle_tackle_title),
+            body = text(R.string.tour_battle_tackle_body),
             screen = Screen.BATTLE_SETUP,
             target = TourTarget.BATTLE_TACKLE,
             sinceVersion = 9,
         ),
         TourStep(
             id = "gifts",
-            title = "Gifts and cloud save",
-            body = "After an online battle you can send your opponent a gift: tackle or looks, paid with euros or " +
-                "points. Gifts for you arrive when you open the game. Captain's Club members are backed up on the " +
-                "server: the Shop's Account button shows the recovery code that restores it on a new phone.",
+            title = text(R.string.tour_gifts_title),
+            body = text(R.string.tour_gifts_body),
             screen = Screen.BATTLE_SETUP,
             sinceVersion = 9,
         ),
         TourStep(
             id = "wager",
-            title = "Wager points",
-            body = "Against the computer you can stake points on the result: a win pays the stake back " +
-                "${GameConfig.wagerPayout(com.deepline.fishing.core.BotDifficulty.EASY)}× against Easy, " +
-                "${GameConfig.wagerPayout(com.deepline.fishing.core.BotDifficulty.NORMAL)}× against Normal and " +
-                "${GameConfig.wagerPayout(com.deepline.fishing.core.BotDifficulty.HARD)}× against Hard. A draw refunds it.",
+            title = text(R.string.tour_wager_title),
+            body = text(
+                R.string.tour_wager_body,
+                UiText.decimal(GameConfig.wagerPayout(BotDifficulty.EASY)),
+                UiText.decimal(GameConfig.wagerPayout(BotDifficulty.NORMAL)),
+                UiText.decimal(GameConfig.wagerPayout(BotDifficulty.HARD)),
+            ),
             screen = Screen.BATTLE_SETUP,
             target = TourTarget.BATTLE_WAGER,
             sinceVersion = 8,
         ),
         TourStep(
             id = "settings",
-            title = "Settings",
-            body = "The gear at the top of the Fish tab opens Settings.",
+            title = text(R.string.tour_settings_title),
+            body = text(R.string.tour_settings_body),
             screen = Screen.HOME,
             target = TourTarget.HOME_SETTINGS,
             sinceVersion = VERSION,
@@ -415,10 +374,8 @@ object Tour {
         // -- Game feel (sound, haptics) steps below.
         TourStep(
             id = "sound",
-            title = "Sound and feel",
-            body = "Set the volume, the music and the sound effects separately here. The music follows your " +
-                "hook: calm near the surface, darker in the deep. Vibration adds a light touch to bumps, " +
-                "catches and big wins, and Reduce motion turns off screen shake, slow motion and flashes.",
+            title = text(R.string.tour_sound_title),
+            body = text(R.string.tour_sound_body),
             screen = Screen.SETTINGS,
             target = TourTarget.SETTINGS_SOUND,
             sinceVersion = VERSION,
@@ -427,42 +384,32 @@ object Tour {
         // -- Daily loop steps below.
         TourStep(
             id = "daily",
-            title = "Daily rewards",
-            body = "Claim a reward here once a day: points and tackle, and a bigger one every ${calendarDays}th day. Missing a " +
-                "day never sets the calendar back. Your streak counts the days in a row, and a streak shield covers a missed " +
-                "day by itself: you start with ${GameConfig.STARTING_STREAK_SHIELDS}, and every ${calendarDays}th day brings " +
-                "another (up to ${GameConfig.MAX_STREAK_SHIELDS}).",
+            title = text(R.string.tour_daily_title),
+            body = text(R.string.tour_daily_body, calendarDays, GameConfig.STARTING_STREAK_SHIELDS, GameConfig.MAX_STREAK_SHIELDS),
             screen = Screen.HOME,
             target = TourTarget.HOME_DAILY,
             sinceVersion = VERSION,
         ),
         TourStep(
             id = "daily_challenges",
-            title = "Daily challenges",
-            body = "Every day brings three challenges, easy, medium and hard, matched to your rope, for tackle and points. " +
-                "Don't fancy one? Swap it for free, ${if (GameConfig.DAILY_FREE_REROLLS == 1) "once" else "${GameConfig.DAILY_FREE_REROLLS} times"} a day. " +
-                "Only solo casts count. New ones come at midnight, and " +
-                "finished ones are collected for you if you forget.",
+            title = text(R.string.tour_daily_challenges_title),
+            body = text(R.string.tour_daily_challenges_body, UiText.plural(R.plurals.tour_daily_swaps, GameConfig.DAILY_FREE_REROLLS)),
             screen = Screen.DAILY,
             target = TourTarget.DAILY_CHALLENGES,
             sinceVersion = VERSION,
         ),
         TourStep(
             id = "migrations",
-            title = "Migrations",
-            body = "Every week, for ${GameConfig.MIGRATION_HOURS / 24} days, two less common species migrate: one near the " +
-                "surface and one in the deep, both far more common where they live. A banner shows them on the Fish tab " +
-                "and in the Dex. Migrations are for solo casts: battles never change.",
+            title = text(R.string.tour_migrations_title),
+            body = text(R.string.tour_migrations_body, UiText.plural(R.plurals.common_days, GameConfig.MIGRATION_HOURS / 24)),
             screen = Screen.DAILY,
             target = TourTarget.DAILY_MIGRATION,
             sinceVersion = VERSION,
         ),
         TourStep(
             id = "reminders",
-            title = "Reminders",
-            body = "Want a nudge when your daily reward is ready, your streak is about to end or a migration starts? Turn " +
-                "reminders on in Settings: at most one a day, and never between ${hour(GameConfig.NOTIFY_QUIET_START_HOUR)} " +
-                "and ${hour(GameConfig.NOTIFY_QUIET_END_HOUR)}.",
+            title = text(R.string.tour_reminders_title),
+            body = text(R.string.tour_reminders_body, hourText(GameConfig.NOTIFY_QUIET_START_HOUR), hourText(GameConfig.NOTIFY_QUIET_END_HOUR)),
             screen = Screen.SETTINGS,
             target = TourTarget.SETTINGS_NOTIFICATIONS,
             sinceVersion = VERSION,
@@ -474,21 +421,27 @@ object Tour {
         // -- Privacy steps below.
         TourStep(
             id = "privacy",
-            title = "Your privacy",
-            body = "Usage statistics and crash reports are only sent if you allow them. Change your mind at any " +
-                "time with the two switches in Settings, under Privacy. That's also where you can delete your " +
-                "online account and read the privacy policy.",
+            title = text(R.string.tour_privacy_title),
+            body = text(R.string.tour_privacy_body),
             screen = Screen.SETTINGS,
             target = TourTarget.SETTINGS_PRIVACY,
             sinceVersion = VERSION,
         ),
 
         // -- Language steps below.
+        TourStep(
+            id = "language",
+            title = text(R.string.tour_language_title),
+            body = text(R.string.tour_language_body),
+            screen = Screen.SETTINGS,
+            target = TourTarget.SETTINGS_LANGUAGE,
+            sinceVersion = VERSION,
+        ),
 
         TourStep(
             id = "replay",
-            title = "That's it, good fishing!",
-            body = "You can replay this tour any time from Settings.",
+            title = text(R.string.tour_replay_title),
+            body = text(R.string.tour_replay_body),
             screen = Screen.SETTINGS,
             target = TourTarget.SETTINGS_TOUR,
             sinceVersion = VERSION,

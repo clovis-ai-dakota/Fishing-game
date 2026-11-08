@@ -1,5 +1,7 @@
 package com.deepline.fishing.ui.shop
 
+import com.deepline.fishing.ui.i18n.label
+import com.deepline.fishing.ui.i18n.asString
 import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -70,9 +72,9 @@ fun GiftDialog(vm: GameViewModel) {
                     items(gifts, key = { it.id }) { item ->
                         val points = vm.shopPointsPrice(item)
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Text(item.name, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+                            Text(item.label(), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
                             Button(onClick = { vm.sendGiftWithMoney(item, activity) }, modifier = Modifier.testTag("gift_eur_${item.id}")) {
-                                Text(vm.billing.priceOf(AccountApi.giftProduct(item)) ?: item.euroLabel)
+                                Text(vm.billing.priceOf(AccountApi.giftProduct(item)) ?: com.deepline.fishing.ui.formatEuros(item.euroCents))
                             }
                             OutlinedButton(
                                 onClick = { vm.sendGiftWithPoints(item) },
@@ -148,7 +150,7 @@ fun AccountDialog(vm: GameViewModel, onClose: () -> Unit) {
                     TextButton(onClick = { restoring = true }) { Text("Restore from another phone") }
                 }
                 if (vm.accountBusy) CircularProgressIndicator(Modifier.padding(4.dp))
-                vm.shopMessage?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.secondary) }
+                vm.shopMessage?.let { Text(it.asString(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.secondary) }
             }
         },
         confirmButton = { TextButton(onClick = onClose) { Text("Close") } },

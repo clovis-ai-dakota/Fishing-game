@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.GameViewModel
@@ -81,7 +82,7 @@ fun MainScaffold(vm: GameViewModel) {
                     icon = {
                         BadgedBox(badge = { if (dot) Badge() }) { Icon(tab.icon, contentDescription = null) }
                     },
-                    label = { Text(tab.label, maxLines = 1) },
+                    label = { Text(stringResource(tab.labelRes), maxLines = 1) },
                     alwaysShowLabel = true,
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = MaterialTheme.colorScheme.onPrimary,

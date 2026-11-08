@@ -56,6 +56,10 @@ import com.deepline.fishing.core.online.OnlineProtocol
 import com.deepline.fishing.core.online.ServerMessage
 import com.deepline.fishing.core.online.toDto
 import com.deepline.fishing.ui.Skins
+import com.deepline.fishing.ui.i18n.AppLanguages
+import com.deepline.fishing.ui.i18n.UiText
+import com.deepline.fishing.ui.i18n.labelText
+import com.deepline.fishing.ui.i18n.nameText
 import com.deepline.fishing.ui.shop.ShopText
 import com.deepline.fishing.ui.tour.Tour
 import com.deepline.fishing.ui.tour.TourSession
@@ -79,12 +83,12 @@ enum class Screen {
     SOCIAL, FRIENDS, LEADERBOARDS, TOURNAMENT, CLUBS,
 }
 
-/** The four top-level destinations of the bottom navigation bar, in order. */
-enum class MainTab(val label: String, val screen: Screen) {
-    FISH("Fish", Screen.HOME),
-    DEX("Dex", Screen.DEX),
-    SHOP("Shop", Screen.SHOP),
-    BATTLE("Battle", Screen.BATTLE_SETUP);
+/** The four top-level destinations of the bottom navigation bar, in order. [labelRes]: strings_shell.xml. */
+enum class MainTab(@param:androidx.annotation.StringRes val labelRes: Int, val screen: Screen) {
+    FISH(R.string.shell_tab_fish, Screen.HOME),
+    DEX(R.string.shell_tab_dex, Screen.DEX),
+    SHOP(R.string.shell_tab_shop, Screen.SHOP),
+    BATTLE(R.string.shell_tab_battle, Screen.BATTLE_SETUP);
 
     companion object {
         fun of(screen: Screen): MainTab? = entries.firstOrNull { it.screen == screen }
@@ -95,19 +99,23 @@ enum class MainTab(val label: String, val screen: Screen) {
  * The pages of the Shop tab: rope upgrades (points only), then the shop's sections, where every
  * item has a euro price and a points price. A section only shows once it has items.
  */
-enum class ShopPage(val label: String, val section: ShopSection?) {
-    ROPE("Rope", null),
-    TACKLE("Tackle", ShopSection.TACKLE),
-    STYLE("Style", ShopSection.STYLE),
-    PASSES("Passes", ShopSection.PASSES),
-    AQUARIUM("Aquarium", ShopSection.AQUARIUM),
+enum class ShopPage(@param:androidx.annotation.StringRes val labelRes: Int, val section: ShopSection?) {
+    ROPE(R.string.shell_shop_page_rope, null),
+    TACKLE(R.string.shell_shop_page_tackle, ShopSection.TACKLE),
+    STYLE(R.string.shell_shop_page_style, ShopSection.STYLE),
+    PASSES(R.string.shell_shop_page_passes, ShopSection.PASSES),
+    AQUARIUM(R.string.shell_shop_page_aquarium, ShopSection.AQUARIUM),
 }
 
 /** The sections of the Dex tab. Secrets only appears once one is found; Skins is always there. */
-enum class DexSection(val label: String) { FISH("Species"), SECRETS("Secrets"), SKINS("Skins") }
+enum class DexSection(@param:androidx.annotation.StringRes val labelRes: Int) {
+    FISH(R.string.shell_dex_section_species),
+    SECRETS(R.string.shell_dex_section_secrets),
+    SKINS(R.string.shell_dex_section_skins),
+}
 
 /** A short message flashed over the game screen. */
-data class Notice(val text: String, val shownAtSeconds: Float)
+data class Notice(val text: UiText, val shownAtSeconds: Float)
 
 /** Who the player is battling: the computer at some difficulty, or a friend on the same device. */
 sealed interface Opponent {
@@ -162,7 +170,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
 
     var onlineStatus by mutableStateOf(OnlineStatus.DISCONNECTED)
         private set
-    var onlineError by mutableStateOf<String?>(null)
+    var onlineError by mutableStateOf<UiText?>(null)
         private set
     var roomCode by mutableStateOf<String?>(null)
         private set
@@ -170,7 +178,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         private set
     var onlineMatch by mutableStateOf<OnlineMatch?>(null)
         private set
-    var playerName by mutableStateOf(store.getString(KEY_NAME) ?: "Angler")
+    var playerName by mutableStateOf(store.getString(KEY_NAME) ?: "Angler") // i18n-ignore: the default name, sent online as typed
         private set
     var serverUrl by mutableStateOf(store.getString(KEY_SERVER) ?: BuildConfig.DEFAULT_SERVER_URL)
         private set
@@ -372,7 +380,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         get() = ShopPage.entries.filter { it.section == null || ShopCatalog.inSection(it.section).isNotEmpty() }
 
     /** What just happened in the shop (a purchase, a pending payment...), until dismissed. */
-    var shopMessage by mutableStateOf<String?>(null)
+    var shopMessage by mutableStateOf<UiText?>(null)
         private set
 
     fun dismissShopMessage() {
@@ -389,12 +397,14 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         override fun onProblem(productId: String?, problem: StoreProblem, message: String?) {
             GameAnalytics.storeProblem(productId, problem.name.lowercase(), message)
             if (problem != StoreProblem.PENDING) review.onSetback()
-            val name = productId?.let { ShopCatalog.byId(it)?.name }
+            val name = productId?.let { ShopCatalog.byId(it)?.nameText() }
+            // The store's own explanation (from Google Play) stays as it comes.
+            val detail = message?.takeIf { it.isNotBlank() }
             shopMessage = when (problem) {
-                StoreProblem.CANCELLED -> "Purchase cancelled: nothing was charged."
-                StoreProblem.PENDING -> "${name ?: "Your purchase"} is waiting for the payment to clear. It'll arrive as soon as it does."
-                StoreProblem.FAILED -> "The payment didn't go through" + (message?.takeIf { it.isNotBlank() }?.let { ": $it" } ?: ".")
-                StoreProblem.UNAVAILABLE -> message ?: "${billing.name} isn't available right now."
+                StoreProblem.CANCELLED -> UiText.res(R.string.shop_message_cancelled)
+                StoreProblem.PENDING -> name?.let { UiText.res(R.string.shop_message_pending, it) } ?: UiText.res(R.string.shop_message_pending_unknown)
+                StoreProblem.FAILED -> detail?.let { UiText.res(R.string.shop_message_failed_because, it) } ?: UiText.res(R.string.shop_message_failed)
+                StoreProblem.UNAVAILABLE -> detail?.let(UiText::raw) ?: UiText.res(R.string.shop_message_store_unavailable, billing.name)
             }
         }
     }
@@ -419,7 +429,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
                 rememberToken(purchase.token)
                 val to = pendingGifts.remove(purchase.productId)
                 savePendingGifts()
-                if (to != null) deliverGift(item, to.first, to.second, refundPoints = 0L) else receiveGift(item, "You")
+                if (to != null) deliverGift(item, to.first, to.second, refundPoints = 0L) else receiveGift(item, UiText.res(R.string.shop_gift_from_you))
             }
             billing.finish(purchase)
             return
@@ -430,7 +440,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             if (!owned) {
                 val contents = ShopText.contents(item, progress)
                 update(ShopCatalog.grant(progress, item, ShopClock.now()))
-                shopMessage = "Thank you! ${item.name}: $contents."
+                shopMessage = UiText.res(R.string.shop_message_thanks, item.nameText(), contents)
                 feel.cue(com.deepline.fishing.feel.Cue.PURCHASE)
             }
             rememberToken(purchase.token)
@@ -484,7 +494,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
                 block()
             } catch (e: AccountClient.AccountException) {
                 GameAnalytics.problem("account", e)
-                if (!quiet) shopMessage = e.message
+                if (!quiet) shopMessage = e.text
             } finally {
                 if (!quiet) accountBusy = false
             }
@@ -493,7 +503,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
 
     fun backupNow(quiet: Boolean = false) {
         if (!canCloudSave) {
-            if (!quiet) shopMessage = "Cloud save is a Captain's Club perk."
+            if (!quiet) shopMessage = UiText.res(R.string.shop_cloud_club_only)
             return
         }
         val data = ProgressCodec.encode(progress)
@@ -501,7 +511,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             accounts.save(playerIdentity, data)
             lastBackupMs = ShopClock.now()
             store.putString(KEY_LAST_BACKUP, lastBackupMs.toString())
-            if (!quiet) shopMessage = "Your progress is backed up."
+            if (!quiet) shopMessage = UiText.res(R.string.shop_cloud_backed_up)
         }
     }
 
@@ -514,7 +524,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     fun restoreFromCode(code: String) {
         val who = com.deepline.fishing.core.PlayerId.fromRecoveryCode(code)
         if (who == null) {
-            shopMessage = "That isn't a recovery code: it starts with DL- and has 24 letters and digits."
+            shopMessage = UiText.res(R.string.shop_cloud_bad_code)
             return
         }
         launchAccount {
@@ -523,7 +533,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             playerIdentity = who
             update(ProgressCodec.decode(save.data))
             refreshTackleToggles()
-            shopMessage = "Progress restored."
+            shopMessage = UiText.res(R.string.shop_cloud_restored)
         }
     }
 
@@ -579,16 +589,16 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             try {
                 accounts.sendGift(playerIdentity, fromName, toId, item.id)
-                shopMessage = "${item.name} sent to $toName!"
+                shopMessage = UiText.res(R.string.shop_gift_sent, item.nameText(), toName)
             } catch (e: AccountClient.AccountException) {
                 GameAnalytics.problem("gift", e)
                 if (refundPoints > 0) {
                     update(progress.copy(pointsBalance = progress.pointsBalance + refundPoints))
                     GameAnalytics.earn(refundPoints, "gift_refund")
-                    shopMessage = "${e.message} Your points were given back."
+                    shopMessage = UiText.res(R.string.shop_gift_refunded, e.text)
                 } else {
-                    receiveGift(item, "You")
-                    shopMessage = "${e.message} The ${item.name} is yours instead."
+                    receiveGift(item, UiText.res(R.string.shop_gift_from_you))
+                    shopMessage = UiText.res(R.string.shop_gift_kept, e.text, item.nameText())
                 }
             }
         }
@@ -600,17 +610,17 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     fun checkGifts() = launchAccount(quiet = true) {
         val gifts = accounts.inbox(playerIdentity)
         if (gifts.isEmpty()) return@launchAccount
-        val lines = ArrayList<String>()
+        val lines = ArrayList<UiText>()
         for (g in gifts) {
             if (g.id in grantedGiftIds) continue
             val item = ShopCatalog.byId(g.itemId) ?: continue
-            lines += receiveGift(item, g.fromName)
+            lines += receiveGift(item, UiText.raw(g.fromName))
             grantedGiftIds += g.id
         }
         while (grantedGiftIds.size > MAX_GRANTED_TOKENS) grantedGiftIds.remove(grantedGiftIds.first())
         store.putString(KEY_GIFTS_GRANTED, grantedGiftIds.joinToString(","))
         accounts.ack(playerIdentity, gifts.map { it.id })
-        if (lines.isNotEmpty()) shopMessage = lines.joinToString("\n")
+        if (lines.isNotEmpty()) shopMessage = UiText.lines(lines)
     }
 
     init {
@@ -619,16 +629,16 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /** Gives [item] to this player; something they own already becomes its points price. */
-    private fun receiveGift(item: ShopItem, from: String): String {
+    private fun receiveGift(item: ShopItem, from: UiText): UiText {
         val p = progress
         return if (item.kind == ItemKind.PERMANENT && ShopCatalog.owns(p, item.id)) {
             val points = ShopCatalog.pointsPrice(item, p)
             update(p.copy(pointsBalance = p.pointsBalance + points))
-            "$from sent you ${item.name}. You had it already, so here are ${com.deepline.fishing.ui.formatPoints(points)} pts instead."
+            UiText.res(R.string.shop_gift_received_owned, from, item.nameText(), UiText.number(points))
         } else {
             val contents = ShopText.contents(item, p)
             update(ShopCatalog.grant(p, item, ShopClock.now()))
-            "$from sent you ${item.name}: $contents."
+            UiText.res(R.string.shop_gift_received, from, item.nameText(), contents)
         }
     }
 
@@ -642,7 +652,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         val next = ShopCatalog.buyWithPoints(progress, item, ShopClock.now()) ?: return false
         GameAnalytics.shopPointsPurchase(item, progress, next)
         update(next)
-        shopMessage = "${item.name}: $contents."
+        shopMessage = UiText.res(R.string.shop_message_got, item.nameText(), contents)
         feel.cue(com.deepline.fishing.feel.Cue.PURCHASE)
         return true
     }
@@ -657,7 +667,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Asks the store for purchases not granted yet (a new phone, a payment that cleared). */
     fun restorePurchases() {
-        shopMessage = "Checking ${billing.name} for your purchases…"
+        shopMessage = UiText.res(R.string.shop_message_restoring, billing.name)
         billing.restore()
     }
 
@@ -670,7 +680,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         val contents = ShopText.contents(pouch, progress)
         ShopCatalog.claimClubPouch(progress, ShopClock.now())?.let {
             update(it)
-            shopMessage = "Captain's Club: $contents."
+            shopMessage = UiText.res(R.string.shop_message_club_pouch, contents)
             feel.cue(com.deepline.fishing.feel.Cue.CLAIM)
         }
     }
@@ -686,11 +696,11 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         val now = ShopClock.now()
         val open = com.deepline.fishing.core.Seasons.claimable(progress, now)
         if (open.isEmpty()) return
-        val what = open.flatMap { it.grants }.joinToString(", ") { ShopText.seasonGrant(it, progress) }
+        val what = ShopText.seasonGrants(open.flatMap { it.grants }, progress)
         val next = com.deepline.fishing.core.Seasons.claimAll(progress, now)
         GameAnalytics.seasonClaimed(open.size, open.any { it.premium }, progress, next)
         update(next)
-        shopMessage = "Season rewards: $what."
+        shopMessage = UiText.res(R.string.shop_message_season_rewards, what)
         feel.cue(com.deepline.fishing.feel.Cue.CLAIM)
     }
 
@@ -699,7 +709,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         com.deepline.fishing.core.Seasons.claimEvent(progress, now)?.let {
             GameAnalytics.weekendEventClaimed(progress, it)
             update(it)
-            shopMessage = "Weekend event reward claimed!"
+            shopMessage = UiText.res(R.string.shop_message_event_claimed)
             feel.cue(com.deepline.fishing.feel.Cue.CLAIM)
         }
     }
@@ -888,23 +898,27 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             val text = when (event) {
                 is CastEvent.Touched ->
                     if (event.touchesUsed < GameConfig.DESCENT_TOUCH_LIMIT) {
-                        "Bump! ${GameConfig.DESCENT_TOUCH_LIMIT - event.touchesUsed} left"
+                        UiText.plural(R.plurals.cast_notice_bump, GameConfig.DESCENT_TOUCH_LIMIT - event.touchesUsed)
                     } else {
                         null
                     }
                 is CastEvent.Reversed -> when (event.reason) {
-                    ReverseReason.TOUCH_LIMIT -> if (hooked) null else "Line pulled up! Aim for heads"
-                    ReverseReason.ROPE_END -> "End of the rope! Reel in"
+                    ReverseReason.TOUCH_LIMIT -> if (hooked) null else UiText.res(R.string.cast_notice_pulled_up)
+                    ReverseReason.ROPE_END -> UiText.res(R.string.cast_notice_rope_end)
                 }
-                is CastEvent.Caught -> buildString {
-                    if (event.record.sparkling) append("Sparkling ")
-                    append(event.record.species.name)
-                    append("  +${event.record.points}")
-                }
-                is CastEvent.TooHeavy -> "Too heavy: ${event.species.name}"
+                is CastEvent.Caught -> UiText.res(
+                    if (event.record.sparkling) R.string.cast_notice_caught_sparkling else R.string.cast_notice_caught,
+                    event.record.species.nameText(),
+                    UiText.number(event.record.points),
+                )
+                is CastEvent.TooHeavy -> UiText.res(R.string.cast_notice_too_heavy, event.species.nameText())
                 is CastEvent.LastBumpHooked -> {
                     onSecretTriggered(Secrets.LAST_BUMP)
-                    "Last bump hooked: ${event.name}  +${event.points}"
+                    UiText.res(
+                        R.string.cast_notice_last_bump,
+                        event.fish?.species?.nameText() ?: event.snag!!.kind.labelText(),
+                        UiText.number(event.points),
+                    )
                 }
                 CastEvent.Surfaced -> null
                 CastEvent.FastReel -> null
@@ -914,7 +928,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         val limit = battleTurn?.timeLimitSec
         if (limit != null && s.phase != CastPhase.SURFACED && s.elapsedSeconds >= limit) {
             s.endNow()
-            notice = Notice("Time's up!", s.elapsedSeconds)
+            notice = Notice(UiText.res(R.string.cast_notice_times_up), s.elapsedSeconds)
         }
         if (s.phase == CastPhase.SURFACED) {
             val result = s.result
@@ -1068,7 +1082,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /** The title the player wears (shown at home and in battles), or null. */
-    val title: String? get() = progress.equippedSkins[CosmeticSlot.TITLE]?.displayName
+    val title: String? get() = progress.equippedSkins[CosmeticSlot.TITLE]?.displayName // i18n-ignore: the title id (relayed online), shown through titleLabel
 
     /** The frame of the player's title badge (gold unless another is chosen and available). */
     val titleFrame: com.deepline.fishing.core.TitleFrame
@@ -1168,12 +1182,17 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         if (wager != null) update(wager)
         battleStake = if (wager != null) stake else 0L
         lastWagerResult = null
+        // Names are part of the battle (core): written in the language shown when it starts.
+        val texts = AppLanguages.localized(getApplication())
         val players = when (opponent) {
             is Opponent.Computer -> listOf(
-                BattlePlayer("You"),
-                BattlePlayer("Rival (${opponent.difficulty.displayName})", opponent.difficulty),
+                BattlePlayer(texts.getString(R.string.battle_player_you)),
+                BattlePlayer(UiText.res(R.string.battle_player_rival, opponent.difficulty.labelText()).resolve(texts), opponent.difficulty),
             )
-            Opponent.Friend -> listOf(BattlePlayer("Player 1"), BattlePlayer("Player 2"))
+            Opponent.Friend -> listOf(
+                BattlePlayer(texts.getString(R.string.battle_player_one)),
+                BattlePlayer(texts.getString(R.string.battle_player_two)),
+            )
             Opponent.Online -> return openOnlineLobby(mode)
         }
         battle = Battle(mode, players, Random.nextLong())
@@ -1360,7 +1379,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     fun joinRoom(code: String) {
         val normalized = OnlineProtocol.normalizeRoomCode(code)
         if (normalized.length != OnlineProtocol.ROOM_CODE_LENGTH) {
-            onlineError = "Room codes have ${OnlineProtocol.ROOM_CODE_LENGTH} characters."
+            onlineError = UiText.res(R.string.online_error_code_length, OnlineProtocol.ROOM_CODE_LENGTH)
             return
         }
         sendToServer(ClientMessage.JoinRoom(normalized))
@@ -1411,7 +1430,8 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
                 screen = Screen.BATTLE
             }
             is ServerMessage.Error -> {
-                onlineError = message.message
+                // The server's own words (English): see docs/localization.md for mapping known ones.
+                onlineError = UiText.raw(message.message)
                 if (onlineStatus == OnlineStatus.CONNECTING) onlineStatus = OnlineStatus.CONNECTED
             }
             is ServerMessage.CastRecorded, is ServerMessage.OpponentLive, is ServerMessage.MatchOver -> {
@@ -1421,7 +1441,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    private fun onConnectionClosed(reason: String) {
+    private fun onConnectionClosed(reason: UiText) {
         connection = null
         roomCode = null
         onlineStatus = OnlineStatus.DISCONNECTED
@@ -1431,7 +1451,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         GameAnalytics.problem("online", if (match != null && match.outcome == null) "connection lost in a match" else "connection closed")
         if (match != null && match.outcome == null) {
             review.onSetback()
-            match.connectionLost(reason)
+            match.connectionLost(reason.resolve(AppLanguages.localized(getApplication())))
             if (screen == Screen.CAST && battleTurn != null) {
                 session = null
                 paused = false
