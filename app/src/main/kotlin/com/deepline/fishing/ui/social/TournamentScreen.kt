@@ -1,6 +1,6 @@
 package com.deepline.fishing.ui.social
 
-import android.icu.text.RuleBasedNumberFormat
+import android.icu.text.MessageFormat
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -44,10 +44,11 @@ import java.util.Locale
 
 /**
  * A rank as the language writes ordinal numbers: "1st", "23rd" in English, "1er", "2e" in French,
- * "1." in German and Turkish, "1.º" in Spanish (ICU's ordinal rules, on every supported Android).
+ * "1." in German and Turkish (ICU's ordinal rules, through MessageFormat's `ordinal` argument:
+ * public since Android 7, the game's minimum).
  */
 fun ordinal(n: Int, locale: Locale = Locale.getDefault()): String =
-    runCatching { RuleBasedNumberFormat(locale, RuleBasedNumberFormat.ORDINAL).format(n.toLong()) }.getOrElse { formatPoints(n) }
+    runCatching { MessageFormat("{0,ordinal}", locale).format(arrayOf<Any>(n)) }.getOrElse { formatPoints(n) } // i18n-ignore: an ICU pattern, not text
 
 /** [ordinal] in the language shown now. */
 @Composable

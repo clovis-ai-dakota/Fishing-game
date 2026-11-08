@@ -14,6 +14,7 @@ import com.deepline.fishing.ui.hourText
 import com.deepline.fishing.ui.i18n.UiText
 import com.deepline.fishing.ui.pointsText
 import com.deepline.fishing.ui.shop.ShopText
+import com.deepline.fishing.ui.social.ordinal
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -57,6 +58,14 @@ class UiTextTest {
         assertEquals("25k", compactPointsText(25_000).resolve(resourcesIn("en")))
         assertEquals("1.5M", compactPointsText(1_500_000).resolve(resourcesIn("en")))
         assertEquals("950", compactPointsText(950).resolve(resourcesIn("en")))
+    }
+
+    @Test
+    fun ranksAreTheLanguagesOrdinals() {
+        // Tournament ranks ("You finished 3rd of 40").
+        assertEquals(listOf("1st", "2nd", "3rd", "11th", "23rd"), listOf(1, 2, 3, 11, 23).map { ordinal(it, Locale.ENGLISH) })
+        assertEquals(listOf("1er", "2e"), listOf(1, 2).map { ordinal(it, Locale.FRENCH) })
+        assertEquals("3.", ordinal(3, Locale.GERMAN))
     }
 
     @Test

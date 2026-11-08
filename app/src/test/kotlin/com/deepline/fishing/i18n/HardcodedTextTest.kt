@@ -120,6 +120,16 @@ class HardcodedTextTest {
             "AccountClient.kt",
             "OnlineConnection.kt",
             "ui/SkinsScreen.kt",
+            // Area C: the daily loop, reminders and social.
+            "ui/daily/DailyUi.kt",
+            "daily/Reminders.kt",
+            "social/SocialClient.kt",
+            "ui/social/SocialUi.kt",
+            "ui/social/SocialHubScreen.kt",
+            "ui/social/FriendsScreen.kt",
+            "ui/social/LeaderboardsScreen.kt",
+            "ui/social/TournamentScreen.kt",
+            "ui/social/ClubsScreen.kt",
         )
 
         /**
@@ -129,7 +139,6 @@ class HardcodedTextTest {
          */
         val PENDING_CORE_NAMES: Set<String> = setOf(
             "ui/secrets/FishingSecrets.kt",
-            "daily/Reminders.kt",
         )
 
         /** Calls whose arguments are always text the player reads. */
