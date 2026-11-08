@@ -20,6 +20,7 @@ import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryPurchasesParams
 import com.deepline.fishing.core.ItemKind
 import com.deepline.fishing.core.ShopItem
+import com.deepline.fishing.ui.i18n.UiText
 
 /**
  * Google Play Billing. Every [ShopItem] is a Play product with the same id: tackle packs and
@@ -34,7 +35,7 @@ class PlayStore(
     private val listener: StoreListener,
     private val catalog: () -> List<ShopItem>,
 ) : Store, PurchasesUpdatedListener {
-    override val name = "Google Play"
+    override val name: UiText = UiText.raw("Google Play") // i18n-ignore: a brand, never translated
 
     private val main = Handler(Looper.getMainLooper())
     private val details = HashMap<String, ProductDetails>()
@@ -82,11 +83,11 @@ class PlayStore(
     }
 
     override fun buy(activity: Activity?, item: ShopItem) {
-        if (activity == null) return listener.onProblem(item.id, StoreProblem.UNAVAILABLE, "Google Play needs the game on screen.")
+        if (activity == null) return listener.onProblem(item.id, StoreProblem.UNAVAILABLE, reason = StoreReason.NOT_ON_SCREEN)
         connect {
             onMain {
                 val d = details[item.id]
-                    ?: return@onMain listener.onProblem(item.id, StoreProblem.UNAVAILABLE, "This item isn't on sale in Google Play yet.")
+                    ?: return@onMain listener.onProblem(item.id, StoreProblem.UNAVAILABLE, reason = StoreReason.NOT_ON_SALE)
                 val params = BillingFlowParams.ProductDetailsParams.newBuilder().setProductDetails(d)
                 d.subscriptionOfferDetails?.firstOrNull()?.let { params.setOfferToken(it.offerToken) }
                 val result = client.launchBillingFlow(
