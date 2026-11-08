@@ -34,6 +34,8 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -41,6 +43,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.GameViewModel
+import com.deepline.fishing.R
 import com.deepline.fishing.ShopPage
 import com.deepline.fishing.core.Decor
 import com.deepline.fishing.core.FishCatalog
@@ -63,7 +66,7 @@ fun AquariumScreen(vm: GameViewModel) {
     val p = vm.progress
     val caught = FishCatalog.all.filter { p.isDiscovered(it) }
     val inTank = Showcase.tankFish(p).map { it.id }.toSet()
-    SubScreen(title = "Aquarium", onBack = vm::onBack) {
+    SubScreen(title = stringResource(R.string.shop_aquarium_title), onBack = vm::onBack) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 110.dp),
             contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 24.dp),
@@ -74,14 +77,22 @@ fun AquariumScreen(vm: GameViewModel) {
             item(span = { GridItemSpan(maxLineSpan) }) { AquariumTank(p, height = 260.dp) }
             item(span = { GridItemSpan(maxLineSpan) }) {
                 Text(
-                    "In the tank: ${inTank.size} / ${Showcase.tankSize(p)}" +
-                        if (caught.isEmpty()) ". Catch fish to fill it." else ". Tap a species to add it or take it out.",
+                    stringResource(
+                        if (caught.isEmpty()) R.string.shop_aquarium_count_empty else R.string.shop_aquarium_count,
+                        inTank.size,
+                        Showcase.tankSize(p),
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             item(span = { GridItemSpan(maxLineSpan) }) {
-                Text("Decor", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
+                Text(
+                    stringResource(R.string.shop_aquarium_decor),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(top = 4.dp),
+                )
             }
             items(Decor.entries.filter { Showcase.ownsDecor(p, it) }, key = { "d_" + it.name }) { d ->
                 FilterChip(
@@ -91,10 +102,10 @@ fun AquariumScreen(vm: GameViewModel) {
                 )
             }
             item(span = { GridItemSpan(maxLineSpan) }) {
-                TextButton(onClick = { vm.openShop(ShopPage.AQUARIUM) }) { Text("More decor and a bigger tank in the Shop") }
+                TextButton(onClick = { vm.openShop(ShopPage.AQUARIUM) }) { Text(stringResource(R.string.shop_aquarium_more)) }
             }
             item(span = { GridItemSpan(maxLineSpan) }) {
-                Text("Your catches", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.shop_aquarium_catches), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             }
             items(caught, key = { it.id }) { s ->
                 FilterChip(
@@ -119,12 +130,13 @@ fun AquariumTank(p: PlayerProgress, height: Dp, modifier: Modifier = Modifier, e
     )
     val fish = Showcase.tankFish(p)
     val decor = (Showcase.shownDecor(p) + listOfNotNull(extraDecor)).distinct()
+    val description = pluralStringResource(R.plurals.shop_aquarium_cd_tank, fish.size, fish.size)
     Canvas(
         modifier
             .fillMaxWidth()
             .height(height)
             .clip(RoundedCornerShape(16.dp))
-            .semantics { contentDescription = "Aquarium with ${fish.size} fish" },
+            .semantics { contentDescription = description },
     ) { drawTank(fish, decor, t, big) }
 }
 

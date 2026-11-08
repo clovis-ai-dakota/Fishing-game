@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The Dex tab (ui/dex/): the species cards and each species' page, and the Skins section (what
+    the player wears, their own boat, the atmosphere of the deep, the title badge and Dex card
+    styles). "Dex" is a coined name: keep it (see the glossary). Section names (Species, Secrets,
+    Skins) are in strings_shell.xml; species, zone, skin and set names in strings_core.xml and
+    strings_species.xml. Keys start with dex_.
+-->
+<resources>
+    <!-- The Dex tab's header. -->
+    <plurals name="dex_subtitle">
+        <!-- Under the title. The number of species in the game (e.g. 200). -->
+        <item quantity="one">%d species to find in the deep</item>
+        <item quantity="other">%d species to find in the deep</item>
+    </plurals>
+    <!-- Button at the top right of the Dex: opens the aquarium where caught fish swim. One short word. -->
+    <string name="dex_aquarium_button">Aquarium</string>
+
+    <!-- Secret tiers (secret cards): 1 is easy, 5 is the rarest. Short label in a card's corner. -->
+    <string name="dex_tier_legendary">Legendary</string>
+    <!-- %1$d: the tier, 1 to 4. -->
+    <string name="dex_tier">Tier %1$d</string>
+
+    <!-- Species section: the header card. -->
+    <!-- In the middle of the completion ring: the share of species caught. %1$d: a whole percentage
+         (0 to 100). Write it the way your language writes percentages ("45 %", "%45"). -->
+    <string name="dex_species_completion">%1$d%%</string>
+    <!-- "Seen" = met but not caught yet; "Caught" = caught at least once. %1$d: species seen;
+         %2$d: species caught; %3$d: all species. Tight: one line next to the ring. -->
+    <string name="dex_species_counts">Seen %1$d · Caught %2$d / %3$d</string>
+    <!-- Filter chips above the cards: every zone, and only the species caught. -->
+    <string name="dex_species_filter_all">All</string>
+    <string name="dex_species_filter_caught">Caught only</string>
+    <!-- When the filters show no card. -->
+    <string name="dex_species_empty">No fish caught here yet. Keep fishing!</string>
+    <!-- Screen reader descriptions of the small icons on a card. -->
+    <string name="dex_species_cd_seen">Seen</string>
+    <string name="dex_cd_sparkling_caught">Sparkling caught</string>
+
+    <!-- A species' page (full screen, swipe between species). -->
+    <!-- The screen's title. %1$s: the species' number in the Dex, e.g. #007. -->
+    <string name="dex_fish_title">Dex %1$s</string>
+    <!-- Screen reader descriptions of the arrows under the page. -->
+    <string name="dex_fish_previous">Previous fish</string>
+    <string name="dex_fish_next">Next fish</string>
+    <!-- Under the species' name: how far the player got with it. -->
+    <string name="dex_fish_state_unknown">Not seen yet</string>
+    <string name="dex_fish_state_seen">Seen, not caught yet</string>
+    <string name="dex_fish_state_caught">Caught</string>
+    <!-- Small labels above the species' facts (tiles). -->
+    <string name="dex_fish_depth">Depth</string>
+    <!-- Where it lives. %1$s: shallowest depth; %2$s: deepest depth, both in meters, formatted. -->
+    <string name="dex_fish_depth_range">%1$s–%2$s m</string>
+    <string name="dex_fish_weight">Weight</string>
+    <!-- Points a catch of this species is worth before bonuses. -->
+    <string name="dex_fish_base_points">Base points</string>
+    <string name="dex_fish_rarity">Rarity</string>
+    <!-- The player's own records with this species (a card shown once it is caught). -->
+    <string name="dex_fish_records">Your records</string>
+    <!-- Labels over numbers: how many caught, how many of them Sparkling (golden, worth 3×), the
+         deepest catch, the best score for one catch. -->
+    <string name="dex_fish_record_caught">Caught</string>
+    <string name="dex_fish_record_sparkling">Sparkling</string>
+    <string name="dex_fish_record_deepest">Deepest</string>
+    <string name="dex_fish_record_best">Best</string>
+    <!-- Hints instead of the records. "Seen" species are added when they swim close to the hook. -->
+    <string name="dex_fish_hint_unknown">Fish near these depths to spot it: anything that swims close to your hook is added to the Dex.</string>
+    <string name="dex_fish_hint_seen">Catch one to fill in its weight, points, rarity and your records.</string>
+
+    <!-- Skins section. Skins only change looks, never the game. Locked legendary skins must never
+         hint at the fishing secret that unlocks them: they only show their slot. -->
+    <string name="dex_skins_legendary_title">Legendary skins</string>
+    <!-- Before the player's title badge (a title is text shown under the player's name). -->
+    <string name="dex_skins_your_title">Your title:</string>
+    <!-- %1$d: legendary skins unlocked; %2$d: all legendary skins. -->
+    <string name="dex_skins_note">Skins only change how your gear looks: they never change how the game plays. Legendary skins unlocked: %1$d of %2$d.</string>
+    <!-- Heading over a legendary set of skins. %1$s: the set's name, e.g. Giant-slayer. -->
+    <string name="dex_skins_set">%1$s set</string>
+    <!-- Heading over a set not unlocked yet (its name stays hidden). -->
+    <string name="dex_skins_set_locked">Locked set</string>
+    <!-- Under a skin tile: not unlocked yet (also read by screen readers on the lock icon). -->
+    <string name="dex_skins_locked">Locked</string>
+    <!-- Under a skin tile: worn now. -->
+    <string name="dex_skins_equipped">Equipped ✓</string>
+    <!-- Heading over the skins bought in the Shop, and its button. -->
+    <string name="dex_skins_shop_gear">Shop gear</string>
+    <string name="dex_skins_shop_browse">Browse the Shop</string>
+    <string name="dex_skins_shop_more">More in the Shop</string>
+    <!-- The player's hand-made boat (designed in the boat editor). -->
+    <string name="dex_skins_boat_title">Your boat</string>
+    <!-- Screen reader description of the boat's picture. -->
+    <string name="dex_skins_boat_cd">Your hand-made boat</string>
+    <string name="dex_skins_boat_body">Paint and rig it yourself. Basic options are free; more unlock with points and as you progress.</string>
+    <!-- A button: the hand-made boat is worn; tapping it goes back to the classic boat. -->
+    <string name="dex_skins_boat_worn">Worn ✓ · use the classic boat</string>
+    <string name="dex_skins_boat_wear">Wear my boat</string>
+    <!-- Buttons: open the boat editor; open the Shop's premade boats. Side by side: keep them short. -->
+    <string name="dex_skins_boat_customise">Customise boat</string>
+    <string name="dex_skins_boat_shop">Shop boats</string>
+    <!-- The title badge (the frame around the player's title) and the Dex card styles. -->
+    <string name="dex_skins_badge_title">Title badge</string>
+    <string name="dex_skins_cards_title">Dex cards</string>
+    <string name="dex_skins_badges_more">More badges and card styles in the Shop</string>
+    <!-- The atmosphere of the deep: Family (default) or Nightmare (a scarier look). -->
+    <string name="dex_skins_atmosphere_title">Atmosphere</string>
+    <!-- Before Nightmare is unlocked. "Abyssal Floor" is the deepest zone and "Nightmare" an
+         atmosphere: write them as in core_zone_abyss and core_atmosphere_nightmare. -->
+    <string name="dex_skins_atmosphere_locked">Reach the Abyssal Floor to unlock Nightmare: a frightening look for the deep water.</string>
+    <!-- Under the Family / Nightmare switch, for the one chosen. -->
+    <string name="dex_skins_atmosphere_nightmare">The deep is properly frightening. You still see exactly as much as before: only the mood changes.</string>
+    <string name="dex_skins_atmosphere_family">Harmless at the surface, spookier the deeper you go.</string>
+</resources>

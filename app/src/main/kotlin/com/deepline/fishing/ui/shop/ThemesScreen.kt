@@ -38,12 +38,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.deepline.fishing.GameViewModel
+import com.deepline.fishing.R
 import com.deepline.fishing.ShopPage
 import com.deepline.fishing.core.MenuTheme
 import com.deepline.fishing.core.NightMode
@@ -51,6 +53,8 @@ import com.deepline.fishing.core.ShopCatalog
 import com.deepline.fishing.core.ShopClock
 import com.deepline.fishing.core.ShopItem
 import com.deepline.fishing.ui.SubScreen
+import com.deepline.fishing.ui.i18n.asString
+import com.deepline.fishing.ui.metersText
 import com.deepline.fishing.ui.theme.MenuPalettes
 import com.deepline.fishing.ui.theme.ThemeBackdrop
 import com.deepline.fishing.ui.tour.TourTarget
@@ -65,7 +69,7 @@ fun ThemesScreen(vm: GameViewModel) {
     val night = vm.nightMode.isNight(isSystemInDarkTheme())
     var confirm by remember { mutableStateOf<ShopItem?>(null) }
     val actions = ShopActions(vm, LocalContext.current.findActivity(), onPoints = { confirm = it })
-    SubScreen(title = "Themes", onBack = vm::onBack) {
+    SubScreen(title = stringResource(R.string.shop_themes_title), onBack = vm::onBack) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 156.dp),
             contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 24.dp),
@@ -76,7 +80,7 @@ fun ThemesScreen(vm: GameViewModel) {
             item(key = "mode", span = { GridItemSpan(maxLineSpan) }) {
                 Card(Modifier.fillMaxWidth().tourTarget(TourTarget.THEMES_MODE), shape = RoundedCornerShape(16.dp)) {
                     Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text("Day or night", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.shop_themes_mode_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
                             NightMode.entries.forEachIndexed { i, mode ->
                                 SegmentedButton(
@@ -88,7 +92,7 @@ fun ThemesScreen(vm: GameViewModel) {
                             }
                         }
                         Text(
-                            "Every theme has a day and a night version. The water you fish in never changes: themes are for the menus.",
+                            stringResource(R.string.shop_themes_mode_note),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -117,11 +121,15 @@ private fun ThemeCard(vm: GameViewModel, theme: MenuTheme, night: Boolean, actio
             }
             Text(theme.description(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, minLines = 2, maxLines = 2, overflow = TextOverflow.Ellipsis)
             when {
-                vm.menuTheme == theme -> OwnedRow("In use ✓")
+                vm.menuTheme == theme -> OwnedRow(stringResource(R.string.shop_in_use))
                 theme.isAvailable(p, ShopClock.now()) -> OwnedRow {
-                    TextButton(onClick = { vm.setMenuTheme(theme) }, modifier = Modifier.testTag("use_${theme.name.lowercase()}")) { Text("Use") }
+                    TextButton(onClick = { vm.setMenuTheme(theme) }, modifier = Modifier.testTag("use_${theme.name.lowercase()}")) {
+                        Text(stringResource(R.string.shop_use))
+                    }
                 }
-                theme.clubOnly -> OwnedRow("Captain's Club") { TextButton(onClick = { vm.openShop(ShopPage.PASSES) }) { Text("Join") } }
+                theme.clubOnly -> OwnedRow(stringResource(R.string.core_shop_item_captains_club)) {
+                    TextButton(onClick = { vm.openShop(ShopPage.PASSES) }) { Text(stringResource(R.string.shop_themes_join)) }
+                }
                 item != null -> PriceButtons(item, actions)
             }
         }
@@ -139,7 +147,7 @@ fun ThemePreview(theme: MenuTheme, night: Boolean, modifier: Modifier = Modifier
         ThemeBackdrop(palette, Modifier.fillMaxSize(), animate = false)
         Column(Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
             Text(
-                "Deep Line",
+                stringResource(R.string.app_name),
                 style = TextStyle(brush = Brush.horizontalGradient(palette.headline + palette.headline.last()), fontSize = 15.sp, fontWeight = FontWeight.Black),
             )
             Spacer(Modifier.height(10.dp))
@@ -151,14 +159,15 @@ fun ThemePreview(theme: MenuTheme, night: Boolean, modifier: Modifier = Modifier
                     .padding(6.dp),
                 verticalArrangement = Arrangement.spacedBy(3.dp),
             ) {
-                Text("Your rope", color = palette.onCard, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                Text("Reaches 240 m", color = palette.onCardMuted, fontSize = 9.sp)
+                // The Fish tab in miniature: its rope card and Cast line button, in the home screen's words.
+                Text(stringResource(R.string.home_rope_title), color = palette.onCard, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.shop_themes_preview_reach, metersText(240f).asString()), color = palette.onCardMuted, fontSize = 9.sp)
                 Box(
                     Modifier
                         .clip(RoundedCornerShape(50))
                         .background(palette.primary)
                         .padding(horizontal = 8.dp, vertical = 2.dp),
-                ) { Text("Cast line", color = palette.onPrimary, fontSize = 9.sp, fontWeight = FontWeight.Bold) }
+                ) { Text(stringResource(R.string.home_cast_button), color = palette.onPrimary, fontSize = 9.sp, fontWeight = FontWeight.Bold) }
             }
         }
         Spacer(Modifier.width(1.dp))

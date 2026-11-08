@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     The Shop: messages after a purchase, a gift or a cloud save (GameViewModel), what an item
-    gives (ShopText), account errors (AccountClient). Keys start with shop_. Item names and
-    descriptions are in strings_core.xml (core_shop_item_*). The Shop screens' own text goes here
-    too, under shop_<screen>_<purpose>.
+    gives (ShopText), account errors (AccountClient), and the Shop's screens (ui/shop/): the Shop
+    tab's pages, the gift picker, the account dialog, the season and weekend event cards, the
+    Themes screen, the aquarium, and the stores' own messages (billing/). Keys start with shop_.
+    Item names and descriptions are in strings_core.xml (core_shop_item_*). Points are the game's
+    score and currency ("pts" is their short unit); prices in euros come formatted.
 -->
 <resources>
     <!-- What an item gives (ShopText): short noun phrases, joined with commas into a list, and
@@ -102,4 +104,224 @@
     <string name="shop_account_refused">The server couldn\'t accept that.</string>
     <!-- %1$d: the HTTP status code. -->
     <string name="shop_account_server_problem">The server had a problem (%1$d).</string>
+
+    <!-- ==== The Shop tab (ui/shop/ShopScreen.kt) ==== -->
+    <!-- Under the Shop's title: the points the player can spend. %1$s: the balance, formatted. -->
+    <string name="shop_balance">%1$s pts to spend</string>
+
+    <!-- Buying with points asks first. %1$s: the item's name. -->
+    <string name="shop_confirm_title">Buy %1$s?</string>
+    <!-- %1$s: what the item gives (a list); %2$s: its points price; %3$s: points left after
+         buying. Numbers are formatted already. -->
+    <string name="shop_confirm_body">You get: %1$s.\n\nIt costs %2$s pts; you\'ll have %3$s pts left.</string>
+    <!-- The dialog's button. %1$s: the points price, formatted. -->
+    <string name="shop_confirm_buy">Buy for %1$s pts</string>
+
+    <!-- A banner at the top of the Shop: the Captain's Club's free monthly gift is ready.
+         "Lantern pouch" is a shop item: write it as in core_shop_item_lantern_pouch. -->
+    <string name="shop_club_pouch_title">Captain\'s Club gift</string>
+    <!-- %1$s: what the pouch gives, e.g. "12 Lanterns". -->
+    <string name="shop_club_pouch_body">Your free monthly Lantern pouch is ready: %1$s.</string>
+    <!-- Button: take a reward. Short. -->
+    <string name="shop_claim">Claim</string>
+    <!-- A banner during the Starter pack's limited offer. %1$s: time left, e.g. "2 d 5 h". -->
+    <string name="shop_starter_banner_body">A one-time offer, ends in %1$s.</string>
+    <!-- Button on that banner: go to the pack. Short. -->
+    <string name="shop_starter_banner_see">See it</string>
+    <!-- A discount badge on a bundle (cheaper than buying its pieces separately). %1$d: the saving
+         as a whole percentage, e.g. "-25%". Tight: a small badge. -->
+    <string name="shop_badge_discount">-%1$d%%</string>
+
+    <!-- Instead of the prices, once the player has it (short, on a small tile; ✓ is a check mark). -->
+    <string name="shop_owned">Owned ✓</string>
+    <!-- A boat or a skin the player wears now. -->
+    <string name="shop_worn">Worn ✓</string>
+    <!-- A paint, emblem or print that is on the player's boat now. -->
+    <string name="shop_on_your_boat">On your boat ✓</string>
+    <!-- A theme, title badge frame or card style chosen now. -->
+    <string name="shop_in_use">In use ✓</string>
+    <!-- Items that can't be bought at the moment (a season item out of season...). -->
+    <string name="shop_not_available">Not available right now</string>
+    <!-- Small buttons on owned items: put it on (a boat, a skin), take it off, put it on the
+         player's boat (a paint), choose it (a theme, a badge frame, a card style). -->
+    <string name="shop_wear">Wear</string>
+    <string name="shop_take_off">Take off</string>
+    <string name="shop_apply">Apply</string>
+    <string name="shop_use">Use</string>
+
+    <!-- Rope page: upgrades bought with points. "Rope Length", "Strength" and "Agility" are the
+         rope stats: write them as in core_rope_length, core_rope_strength_short and
+         core_rope_agility_short. -->
+    <string name="shop_rope_title">Rope upgrades</string>
+    <string name="shop_rope_note">Bought with points. Rope Length reaches deeper zones and new fish, Strength carries more weight, Agility steers faster. Changed your mind? Downgrade a level for a full refund.</string>
+    <!-- Lv = level. %1$d: the level now; %2$d: the highest level. Tight. -->
+    <string name="shop_rope_level">Lv %1$d / %2$d</string>
+    <!-- A button. %1$s: the stat one level lower (e.g. "110 m"); %2$s: points given back, formatted. -->
+    <string name="shop_rope_downgrade">Downgrade to %1$s · refund %2$s pts</string>
+    <!-- At the highest level. %1$s: the stat now, e.g. "600 m". -->
+    <string name="shop_rope_maxed">%1$s · maxed out</string>
+
+    <!-- Tackle page: one-cast items. "Lantern" and "detector" (Rare fish detector) are tackle:
+         write them as in core_tackle_lantern and core_tackle_detector. -->
+    <string name="shop_tackle_title">Tackle</string>
+    <string name="shop_tackle_note">One-cast items: switch them on before you cast. The Lantern and the detector also work in battles. Buy one with points, or a pack with euros or points.</string>
+    <!-- How many of this tackle the player has. %1$d: the count. Tight: next to the name. -->
+    <string name="shop_tackle_owned">You have %1$d</string>
+    <!-- A tackle's description followed by where it works. %1$s: the description (full sentences). -->
+    <string name="shop_tackle_desc_battles">%1$s Works in battles too.</string>
+    <string name="shop_tackle_desc_solo">%1$s Solo casts only.</string>
+    <!-- Buying a single piece of tackle (rather than a pack). -->
+    <string name="shop_tackle_single">Just one</string>
+
+    <!-- Style page: looks only. Each heading has a note under it. -->
+    <string name="shop_style_boats_title">Premade boats</string>
+    <string name="shop_style_boats_note">Ready-made designs: wear one as it is, or make it your own in the boat editor. Like every skin, looks only.</string>
+    <string name="shop_style_sets_title">Complete sets</string>
+    <string name="shop_style_sets_note">A premade boat with a matching hook, line and trail.</string>
+    <string name="shop_style_parts_title">Paints, emblems and prints</string>
+    <string name="shop_style_parts_note">Previewed on your own boat. Once bought, they\'re in the boat editor too.</string>
+    <string name="shop_style_gear_title">Hooks, lines and trails</string>
+    <string name="shop_style_gear_note">Same size and hitbox as the classic gear: they only change the look.</string>
+    <string name="shop_style_themes_title">App themes</string>
+    <string name="shop_style_themes_note">The scene and colours of the menus, by day and at night. Richer themes cost more.</string>
+    <string name="shop_style_badges_title">Title badges</string>
+    <string name="shop_style_badges_note">The frame around your title (or your name), shown online too. Season passes, events and the Club add more.</string>
+    <string name="shop_style_cards_title">Dex card styles</string>
+    <string name="shop_style_cards_note">How the Dex shows the species you\'ve caught.</string>
+    <!-- Heading over any other items. -->
+    <string name="shop_style_more_title">More</string>
+    <!-- What a set gives, as a sentence. %1$s: the list of what it gives. -->
+    <string name="shop_set_contents">%1$s.</string>
+
+    <!-- Aquarium page of the Shop. "Dex > Aquarium" is where the aquarium opens: keep the words
+         of shell_tab_dex and dex_aquarium_button. -->
+    <string name="shop_aquarium_page_note">Your caught fish swim in your aquarium (Dex > Aquarium). Decor and a bigger tank only change how it looks.</string>
+    <string name="shop_aquarium_open">Open your aquarium</string>
+
+    <!-- Passes page: seasons, weekend events, the Captain's Club and one-time packs. -->
+    <string name="shop_passes_title">Passes and packs</string>
+    <string name="shop_passes_note">Seasons, weekend events, the Captain\'s Club and one-time packs.</string>
+
+    <!-- A full-width item card. -->
+    <!-- Under a bundle with a discount. %1$s: the price of its pieces bought one by one, e.g. €4.97. -->
+    <string name="shop_item_worth">Worth %1$s bought separately.</string>
+    <!-- The Starter pack's limited offer. %1$s: time left, e.g. "2 d 5 h". -->
+    <string name="shop_item_offer_ends">One time only: ends in %1$s.</string>
+    <!-- The Captain's Club card: the player's membership. -->
+    <string name="shop_club_member_for_life">You\'re a member for life.</string>
+    <plurals name="shop_club_member_until">
+        <!-- %1$s: the date membership ends; %2$d: days of membership one points purchase adds. -->
+        <item quantity="one">Member until %1$s. With euros it renews every month until you cancel; with points it adds %2$d day.</item>
+        <item quantity="other">Member until %1$s. With euros it renews every month until you cancel; with points it adds %2$d days.</item>
+    </plurals>
+    <plurals name="shop_club_how">
+        <!-- Not a member. %d: days of membership one points purchase gives. -->
+        <item quantity="one">With euros it renews every month until you cancel; with points it\'s %d day.</item>
+        <item quantity="other">With euros it renews every month until you cancel; with points it\'s %d days.</item>
+    </plurals>
+
+    <!-- At the bottom of every Shop page but Rope. %1$s: fishing time one euro stands for (e.g.
+         "45 min"); %2$s: the same for Lantern packs (e.g. "1 h"); %3$d and %4$d: the extra
+         percentage the bigger purchases give (e.g. 10 and 20). -->
+    <string name="shop_footer_rates">Points prices: about %1$s of fishing per euro at your rope\'s reach (Lantern packs: %2$s), so paying saves time and never buys anything points can\'t. Bigger purchases give +%3$d%% to +%4$d%% more.</string>
+    <!-- Which store takes payments. %1$s: the store's name (Google Play, or "Test store" in test builds). -->
+    <string name="shop_footer_payments">Payments: %1$s</string>
+    <string name="shop_footer_restore">Restore purchases</string>
+    <!-- Opens the account dialog. -->
+    <string name="shop_footer_account">Account, cloud save and gifts</string>
+
+    <!-- Button: closes a dialog. -->
+    <string name="shop_close">Close</string>
+
+    <!-- ==== Gifts (ui/shop/GiftsUi.kt): picking a gift for an online opponent ==== -->
+    <!-- %1$s: the opponent's name, as they typed it. -->
+    <string name="shop_gift_pick_title">A gift for %1$s</string>
+    <string name="shop_gift_pick_note">They\'ll find it the next time they open the game. Looks only, or tackle for their casts.</string>
+
+    <!-- ==== The account dialog (Shop > Account, cloud save and gifts) ==== -->
+    <string name="shop_account_title">Your account</string>
+    <!-- %1$s: the player's public id (8 letters and digits): never translated. -->
+    <string name="shop_account_player_id">Player id: %1$s</string>
+    <string name="shop_account_gifts_note">Online opponents can send you gifts; they arrive when you open the game or the Shop.</string>
+    <!-- Heading: backing up progress on the game's server (a Captain's Club perk). -->
+    <string name="shop_account_cloud_title">Cloud save</string>
+    <!-- %1$s: the date and time of the last backup. -->
+    <string name="shop_account_last_backup">Last backup: %1$s. Your progress is backed up after your casts.</string>
+    <string name="shop_account_no_backup">Not backed up yet.</string>
+    <string name="shop_account_backup_now">Back up now</string>
+    <string name="shop_account_club_perk">A Captain\'s Club perk: back up your progress and restore it on a new phone.</string>
+    <string name="shop_account_code_note">Your recovery code restores a backup on another phone. Keep it private: it\'s the key to your progress.</string>
+    <!-- The name of the copied text, shown by the phone's clipboard. "Deep Line" is the game's name. -->
+    <string name="shop_account_code_clip">Deep Line recovery code</string>
+    <string name="shop_account_copy_code">Copy the code</string>
+    <string name="shop_account_show_code">Show my recovery code</string>
+    <!-- The label of the field where the player types a recovery code. -->
+    <string name="shop_account_code_field">Recovery code</string>
+    <string name="shop_account_restore_warning">This replaces the progress on this phone with the backup.</string>
+    <string name="shop_account_restore">Restore</string>
+    <string name="shop_account_restore_open">Restore from another phone</string>
+
+    <!-- ==== The season and the weekend event (ui/shop/SeasonUi.kt) ==== -->
+    <!-- %1$d: the season's number; %2$s: its name, e.g. Coral Tides. -->
+    <string name="shop_season_title">Season %1$d · %2$s</string>
+    <!-- %1$s: time left, e.g. "12 d 3 h". -->
+    <string name="shop_season_ends">Ends in %1$s</string>
+    <!-- The same, when the player has the season pass. -->
+    <string name="shop_season_ends_pass">Ends in %1$s · Pass active</string>
+    <!-- %1$d: the tier reached; %2$d: the last tier. Tight. -->
+    <string name="shop_season_tier">Tier %1$d / %2$d</string>
+    <!-- XP = experience points. %1$d: XP per cast; %2$d: per fish caught; %3$d: per fishing secret
+         pulled off; %4$d: XP for one tier. -->
+    <string name="shop_season_xp">Every solo cast earns season XP: %1$d per cast, %2$d per fish and %3$d per secret pulled off. %4$d XP opens a tier.</string>
+    <!-- Under the two rows of rewards: the top one is the season pass's. -->
+    <string name="shop_season_premium_row">Top row: the pass\'s premium track</string>
+    <!-- Button: claim the rewards ready. %1$d: how many. Short. -->
+    <string name="shop_season_claim">Claim %1$d</string>
+    <!-- Between weekend events. -->
+    <string name="shop_event_none_title">Weekend events</string>
+    <!-- %1$s: time until the next one, e.g. "3 d 4 h". -->
+    <string name="shop_event_none_body">Every weekend brings a fishing goal with a reward. The next one starts in %1$s.</string>
+    <!-- %1$s: the event's goal, e.g. "Catch fish". -->
+    <string name="shop_event_title">Weekend event: %1$s</string>
+    <!-- %1$s: time left; %2$s: the reward (a list). -->
+    <string name="shop_event_body">Ends in %1$s. Reward: %2$s.</string>
+    <!-- With the event pass. %1$s: time left; %2$s: the reward; %3$s: the pass's bigger reward. -->
+    <string name="shop_event_body_pass">Ends in %1$s. Reward: %2$s; with your event pass (progress counts double): %3$s.</string>
+    <string name="shop_event_claim">Claim the reward</string>
+
+    <!-- ==== Themes (ui/shop/ThemesScreen.kt): the menus' look ==== -->
+    <string name="shop_themes_title">Themes</string>
+    <!-- Heading over the Day / Night / Like my phone switch. -->
+    <string name="shop_themes_mode_title">Day or night</string>
+    <string name="shop_themes_mode_note">Every theme has a day and a night version. The water you fish in never changes: themes are for the menus.</string>
+    <!-- Button on the Club's theme: go to the Captain's Club in the Shop. Short. -->
+    <string name="shop_themes_join">Join</string>
+    <!-- A tiny preview of the Fish tab in a theme's colours (like home_rope_reach). %1$s: a depth, e.g. "240 m". -->
+    <string name="shop_themes_preview_reach">Reaches %1$s</string>
+
+    <!-- ==== The aquarium (ui/shop/AquariumScreen.kt): caught fish swimming among decor ==== -->
+    <string name="shop_aquarium_title">Aquarium</string>
+    <!-- %1$d: species in the tank; %2$d: how many it holds. -->
+    <string name="shop_aquarium_count_empty">In the tank: %1$d / %2$d. Catch fish to fill it.</string>
+    <string name="shop_aquarium_count">In the tank: %1$d / %2$d. Tap a species to add it or take it out.</string>
+    <!-- Heading over the decor chips (plants, a treasure chest...). -->
+    <string name="shop_aquarium_decor">Decor</string>
+    <string name="shop_aquarium_more">More decor and a bigger tank in the Shop</string>
+    <!-- Heading over the species the player caught (chips to put them in the tank). -->
+    <string name="shop_aquarium_catches">Your catches</string>
+    <plurals name="shop_aquarium_cd_tank">
+        <!-- Screen reader description of the tank. %d: fish swimming in it. -->
+        <item quantity="one">Aquarium with %d fish</item>
+        <item quantity="other">Aquarium with %d fish</item>
+    </plurals>
+
+    <!-- ==== Stores (billing/) ==== -->
+    <!-- Debug builds only: the pretend store's name, shown after "Payments:". -->
+    <string name="shop_store_test_name">Test store</string>
+    <!-- Debug builds only: the pretend store refused the payment (after "The payment didn't go through:"). -->
+    <string name="shop_store_test_declined">The test store declined the card.</string>
+    <!-- Google Play can't open its payment sheet while the game isn't on screen. "Google Play" is a
+         brand: keep it. -->
+    <string name="shop_store_not_on_screen">Google Play needs the game on screen.</string>
+    <string name="shop_store_not_on_sale">This item isn\'t on sale in Google Play yet.</string>
 </resources>

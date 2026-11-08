@@ -29,16 +29,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.GameViewModel
+import com.deepline.fishing.R
 import com.deepline.fishing.core.GameConfig
 import com.deepline.fishing.core.SeasonReward
 import com.deepline.fishing.core.Seasons
 import com.deepline.fishing.core.ShopClock
 import com.deepline.fishing.ui.SparkleGold
+import com.deepline.fishing.ui.formatPoints
 
 /**
  * This season: its name and time left, the tier reached, a button to claim what's open, and the
@@ -56,22 +59,36 @@ fun SeasonCard(vm: GameViewModel, modifier: Modifier = Modifier) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
-                    Text("Season ${season.number} · ${season.name}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Text(
-                        "Ends in ${ShopText.timeLeftLabel(season.msLeft(now))}" + if (pass) " · Pass active" else "",
+                        stringResource(R.string.shop_season_title, season.number, season.label()),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        stringResource(if (pass) R.string.shop_season_ends_pass else R.string.shop_season_ends, ShopText.timeLeftLabel(season.msLeft(now))),
                         style = MaterialTheme.typography.labelMedium,
                         color = if (pass) com.deepline.fishing.ui.rewardTextColor() else MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-                Text("Tier $tier / ${GameConfig.SEASON_TIERS}", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Bold)
+                Text(
+                    stringResource(R.string.shop_season_tier, tier, GameConfig.SEASON_TIERS),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontWeight = FontWeight.Bold,
+                )
             }
             LinearProgressIndicator(
                 progress = { Seasons.xpIntoTier(p, now) / GameConfig.SEASON_XP_PER_TIER.toFloat() },
                 modifier = Modifier.fillMaxWidth(),
             )
             Text(
-                "Every solo cast earns season XP: ${GameConfig.SEASON_XP_PER_CAST} per cast, ${GameConfig.SEASON_XP_PER_FISH} per fish " +
-                    "and ${GameConfig.SEASON_XP_PER_SECRET} per secret pulled off. ${GameConfig.SEASON_XP_PER_TIER} XP opens a tier.",
+                stringResource(
+                    R.string.shop_season_xp,
+                    GameConfig.SEASON_XP_PER_CAST,
+                    GameConfig.SEASON_XP_PER_FISH,
+                    GameConfig.SEASON_XP_PER_SECRET,
+                    GameConfig.SEASON_XP_PER_TIER,
+                ),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -87,9 +104,16 @@ fun SeasonCard(vm: GameViewModel, modifier: Modifier = Modifier) {
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text("Top row: the pass's premium track", style = MaterialTheme.typography.labelSmall, color = com.deepline.fishing.ui.rewardTextColor(), modifier = Modifier.weight(1f))
+                Text(
+                    stringResource(R.string.shop_season_premium_row),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = com.deepline.fishing.ui.rewardTextColor(),
+                    modifier = Modifier.weight(1f),
+                )
                 if (open.isNotEmpty()) {
-                    Button(onClick = vm::claimSeasonRewards, modifier = Modifier.testTag("claim_season")) { Text("Claim ${open.size}") }
+                    Button(onClick = vm::claimSeasonRewards, modifier = Modifier.testTag("claim_season")) {
+                        Text(stringResource(R.string.shop_season_claim, open.size))
+                    }
                 }
             }
         }
@@ -143,10 +167,9 @@ fun EventCard(vm: GameViewModel, modifier: Modifier = Modifier) {
     ) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             if (event == null) {
-                Text("Weekend events", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.shop_event_none_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 Text(
-                    "Every weekend brings a fishing goal with a reward. The next one starts in " +
-                        "${ShopText.timeLeftLabel(Seasons.nextEventStart(now) - now)}.",
+                    stringResource(R.string.shop_event_none_body, ShopText.timeLeftLabel(Seasons.nextEventStart(now) - now)),
                     style = MaterialTheme.typography.bodySmall,
                 )
                 return@Column
@@ -154,17 +177,31 @@ fun EventCard(vm: GameViewModel, modifier: Modifier = Modifier) {
             val p = Seasons.currentEvent(vm.progress, now)
             val pass = Seasons.hasEventPass(p, event)
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Weekend event: ${event.goal.label()}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                Text("${p.eventProgress} / ${event.goal.target}", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.secondary)
+                Text(
+                    stringResource(R.string.shop_event_title, event.goal.label()),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f),
+                )
+                Text(
+                    stringResource(R.string.common_progress_of, formatPoints(p.eventProgress), formatPoints(event.goal.target)),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.secondary,
+                )
             }
             LinearProgressIndicator(progress = { p.eventProgress / event.goal.target.toFloat() }, modifier = Modifier.fillMaxWidth())
+            val ends = ShopText.timeLeftLabel(event.msLeft(now))
+            val reward = ShopText.seasonGrants(Seasons.eventFree, p).asString()
             Text(
-                "Ends in ${ShopText.timeLeftLabel(event.msLeft(now))}. Reward: " + ShopText.seasonGrants(Seasons.eventFree, p).asString() +
-                    if (pass) "; with your event pass (progress counts double): " + ShopText.seasonGrants(Seasons.eventPass, p).asString() + "." else ".",
+                if (pass) {
+                    stringResource(R.string.shop_event_body_pass, ends, reward, ShopText.seasonGrants(Seasons.eventPass, p).asString())
+                } else {
+                    stringResource(R.string.shop_event_body, ends, reward)
+                },
                 style = MaterialTheme.typography.bodySmall,
             )
             if (Seasons.eventClaimable(p, now).isNotEmpty()) {
-                Button(onClick = vm::claimEventReward, modifier = Modifier.testTag("claim_event")) { Text("Claim the reward") }
+                Button(onClick = vm::claimEventReward, modifier = Modifier.testTag("claim_event")) { Text(stringResource(R.string.shop_event_claim)) }
             }
         }
     }
