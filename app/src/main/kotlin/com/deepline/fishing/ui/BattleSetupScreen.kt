@@ -1,5 +1,6 @@
 package com.deepline.fishing.ui
 
+import com.deepline.fishing.R
 import com.deepline.fishing.ui.i18n.rules
 import com.deepline.fishing.ui.i18n.label
 import androidx.compose.foundation.BorderStroke
@@ -21,6 +22,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import com.deepline.fishing.ShopPage
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -40,8 +42,8 @@ import com.deepline.fishing.core.online.OnlineProtocol
 import com.deepline.fishing.ui.tour.TourTarget
 import com.deepline.fishing.ui.tour.tourTarget
 
-private const val FRIEND = "FRIEND"
-private const val ONLINE = "ONLINE"
+private const val FRIEND = "FRIEND" // i18n-ignore: a saved key, not shown
+private const val ONLINE = "ONLINE" // i18n-ignore: a saved key, not shown
 
 /**
  * Switches for the tackle allowed in battles (Lantern, rare fish detector), with what's left. Also
@@ -55,17 +57,17 @@ fun SightTackleChips(vm: GameViewModel, showShopLink: Boolean = false) {
             selected = vm.useLantern && p.lanterns > 0,
             onClick = { vm.toggleLantern(!vm.useLantern) },
             enabled = p.lanterns > 0,
-            label = { Text("Lantern ×${p.lanterns}") },
+            label = { Text(stringResource(R.string.battle_tackle_lantern, p.lanterns)) },
             modifier = Modifier.testTag("battle_lantern"),
         )
         FilterChip(
             selected = vm.useDetector && p.detectors > 0,
             onClick = { vm.toggleDetector(!vm.useDetector) },
             enabled = p.detectors > 0,
-            label = { Text("Detector ×${p.detectors}") },
+            label = { Text(stringResource(R.string.battle_tackle_detector, p.detectors)) },
             modifier = Modifier.testTag("battle_detector"),
         )
-        if (showShopLink) TextButton(onClick = { vm.openShop(ShopPage.TACKLE) }) { Text("Get more") }
+        if (showShopLink) TextButton(onClick = { vm.openShop(ShopPage.TACKLE) }) { Text(stringResource(R.string.battle_tackle_get_more)) }
     }
 }
 
@@ -77,7 +79,7 @@ fun BattleSetupScreen(vm: GameViewModel) {
     var stake by rememberSaveable { mutableStateOf(0L) }
     val p = vm.progress
 
-    TabScreen(title = "1v1 Battle") {
+    TabScreen(title = stringResource(R.string.battle_setup_title)) {
         // A plain scrolling column (not a lazy list) so every section exists for the tour to scroll to.
         Column(
             modifier = Modifier
@@ -89,7 +91,7 @@ fun BattleSetupScreen(vm: GameViewModel) {
             // Friends, the weekly leaderboards and tournament (and clubs) open from here.
             com.deepline.fishing.ui.social.SocialEntryCard(vm)
             Column(Modifier.tourTarget(TourTarget.BATTLE_MODES), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text("Mode", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.battle_setup_mode), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 BattleMode.entries.forEach { m ->
                     val selected = m == mode
                     Card(
@@ -113,13 +115,13 @@ fun BattleSetupScreen(vm: GameViewModel) {
 
             Column(Modifier.tourTarget(TourTarget.BATTLE_OPPONENT), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(
-                    "Opponent",
+                    stringResource(R.string.battle_setup_opponent),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(top = 8.dp),
                 )
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Computer:", style = MaterialTheme.typography.bodyMedium)
+                    Text(stringResource(R.string.battle_setup_computer), style = MaterialTheme.typography.bodyMedium)
                     for (d in BotDifficulty.entries) {
                         FilterChip(
                             selected = opponentKey == d.name,
@@ -131,31 +133,27 @@ fun BattleSetupScreen(vm: GameViewModel) {
                 FilterChip(
                     selected = opponentKey == FRIEND,
                     onClick = { opponentKey = FRIEND },
-                    label = { Text("Friend on this device (pass and play)") },
+                    label = { Text(stringResource(R.string.battle_setup_friend)) },
                 )
                 FilterChip(
                     selected = opponentKey == ONLINE,
                     onClick = { opponentKey = ONLINE },
-                    label = { Text("Online (room code or quick match)") },
+                    label = { Text(stringResource(R.string.battle_setup_online)) },
                 )
             }
 
             Text(
                 if (opponentKey == ONLINE) {
-                    "Online, both players fish at the same time on their own phones, on the very same " +
-                        "water, with the same standard tournament rope (level ${OnlineProtocol.TOURNAMENT_ROPE_LEVEL} " +
-                        "in every stat)."
+                    stringResource(R.string.battle_setup_info_online, OnlineProtocol.TOURNAMENT_ROPE_LEVEL)
                 } else {
-                    "Both players use your current rope and fish the very same water for each cast, " +
-                        "so skill decides."
-                } + " Battle catches don't count for your points or fish log.",
+                    stringResource(R.string.battle_setup_info_local)
+                },
                 style = MaterialTheme.typography.bodySmall,
             )
             Column(Modifier.tourTarget(TourTarget.BATTLE_TACKLE), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text("Tackle for your casts", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.battle_setup_tackle_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 Text(
-                    "Lanterns and detectors work in battles: each of your casts uses one while switched on. " +
-                        "The Lucky charm and the Sparkle lure are for solo casts only.",
+                    stringResource(R.string.battle_setup_tackle_info),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -165,9 +163,9 @@ fun BattleSetupScreen(vm: GameViewModel) {
             val rival = BotDifficulty.entries.firstOrNull { it.name == opponentKey }
             if (rival != null) {
                 Column(Modifier.tourTarget(TourTarget.BATTLE_WAGER), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text("Wager (optional)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.battle_setup_wager_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-                        FilterChip(selected = stake == 0L, onClick = { stake = 0L }, label = { Text("None") })
+                        FilterChip(selected = stake == 0L, onClick = { stake = 0L }, label = { Text(stringResource(R.string.battle_setup_wager_none)) })
                         for (s in GameConfig.WAGER_STAKES) {
                             FilterChip(
                                 selected = stake == s,
@@ -178,12 +176,12 @@ fun BattleSetupScreen(vm: GameViewModel) {
                         }
                     }
                     val payout = GameConfig.wagerPayout(rival)
+                    val multiplier = formatDecimal(payout.toDouble(), 2)
                     Text(
                         if (stake > 0) {
-                            "Win and get ${formatPoints((stake * payout).toLong())} pts back (×$payout against ${rival.label()}); " +
-                                "a draw refunds the stake; losing or forfeiting loses it."
+                            stringResource(R.string.battle_setup_wager_terms, formatPoints((stake * payout).toLong()), multiplier, rival.label())
                         } else {
-                            "Stake points on the result: a win against ${rival.label()} pays ×$payout."
+                            stringResource(R.string.battle_setup_wager_hint, rival.label(), multiplier)
                         },
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -191,7 +189,7 @@ fun BattleSetupScreen(vm: GameViewModel) {
                 }
             }
             Text(
-                "Record vs computer: ${p.battleWins} W · ${p.battleLosses} L · ${p.battleDraws} D",
+                stringResource(R.string.battle_setup_record, p.battleWins, p.battleLosses, p.battleDraws),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.tertiary,
             )
@@ -209,7 +207,7 @@ fun BattleSetupScreen(vm: GameViewModel) {
                     .height(56.dp),
             ) {
                 Text(
-                    if (opponentKey == ONLINE) "Go online" else "Start battle",
+                    stringResource(if (opponentKey == ONLINE) R.string.battle_setup_go_online else R.string.battle_setup_start),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                 )

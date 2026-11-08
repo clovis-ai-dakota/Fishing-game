@@ -1430,8 +1430,8 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
                 screen = Screen.BATTLE
             }
             is ServerMessage.Error -> {
-                // The server's own words (English): see docs/localization.md for mapping known ones.
-                onlineError = UiText.raw(message.message)
+                // The server's own words (English), shown in the player's language when known.
+                onlineError = com.deepline.fishing.ui.OnlineText.error(message.message)
                 if (onlineStatus == OnlineStatus.CONNECTING) onlineStatus = OnlineStatus.CONNECTED
             }
             is ServerMessage.CastRecorded, is ServerMessage.OpponentLive, is ServerMessage.MatchOver -> {
