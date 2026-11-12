@@ -7,10 +7,10 @@ COMMENT ON JOUE
 • Plus un poisson vit profond, plus il rapporte, et les poissons scintillants valent trois fois plus.
 
 200 ESPÈCES À COLLECTIONNER
-Des hauts-fonds ensoleillés jusqu'à la plaine abyssale plongée dans le noir, quatre zones de profondeur abritent 200 espèces, chacune avec sa carte dans votre Dex : des poissons ronds et sympathiques près de la surface, des baudroies lumineuses et des chasseurs épineux tout en bas, et un poisson légendaire au fond du fond. Sous 300 m, l'eau devient noire : allumez une lanterne, ou fiez-vous à vos réflexes.
+Des hauts-fonds ensoleillés jusqu'à la plaine abyssale plongée dans le noir, quatre zones de profondeur abritent 200 espèces, chacune avec sa carte dans votre Dex : des poissons ronds et sympathiques près de la surface, des baudroies lumineuses et des chasseurs épineux tout en bas, et un poisson légendaire au fond du fond. Sous 300 m, l'eau devient noire : allumez une Lanterne, ou fiez-vous à vos réflexes.
 
-AMÉLIOREZ VOTRE LIGNE
-Chaque prise rapporte des points. Dépensez-les pour une ligne plus longue, plus solide et plus agile, et atteignez des zones plus profondes. Chaque amélioration est remboursable : vous pouvez toujours essayer autre chose. Des paliers récompensent toute votre carrière de pêcheur.
+AMÉLIOREZ VOTRE CORDE
+Chaque prise rapporte des points. Dépensez-les pour une corde plus longue, plus solide et plus agile, et atteignez des zones plus profondes. Chaque amélioration est remboursable : vous pouvez toujours essayer autre chose. Des paliers récompensent toute votre carrière de pêcheur.
 
 LES SECRETS DES PROFONDEURS
 Certains lancers valent bien plus qu'ils n'en ont l'air. Des secrets de pêche cachés n'attendent que vous, et personne ne vous dira lesquels.

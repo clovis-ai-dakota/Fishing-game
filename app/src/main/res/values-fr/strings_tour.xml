@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    La visite guidée (ui/tour/) : une carte par étape, avec un titre et un texte. Les noms
+    d'écrans, de boutons, de matériel, de zones et de modes reprennent exactement leurs libellés
+    dans le jeu. Ne jamais laisser deviner un secret de pêche ici.
+    (The guided tour: never hint at a fishing secret.)
+-->
+<resources>
+    <!-- The card's controls. -->
+    <string name="tour_counter">%1$d / %2$d</string>
+    <string name="tour_counter_whats_new">Nouveautés · %1$d / %2$d</string>
+    <string name="tour_skip">Passer la visite</string>
+    <string name="tour_back">Retour</string>
+    <string name="tour_next">Suivant</string>
+    <string name="tour_finish">Terminer</string>
+
+    <string name="tour_welcome_title">Bienvenue dans Deep Line !</string>
+    <string name="tour_welcome_body">Pêchez tous les poissons des profondeurs. Cette courte visite montre comment jouer et à quoi sert chaque chose. Touchez Suivant, ou Passer la visite si vous connaissez déjà le jeu.</string>
+
+    <string name="tour_tabs_title">Quatre onglets</string>
+    <string name="tour_tabs_body">La barre du bas vous emmène partout : Pêche, c\'est là que vous lancez votre ligne ; le Dex rassemble toutes les espèces que vous rencontrez ; la Boutique propose des améliorations de corde, du matériel et des looks pour votre bateau ; et Duel sert aux matchs en 1 contre 1.</string>
+
+    <string name="tour_cast_title">Lancez votre ligne</string>
+    <string name="tour_cast_body">Le grand bouton Lancer la ligne, en bas de l\'onglet Pêche, fait descendre votre hameçon depuis le bateau.</string>
+
+    <string name="tour_steer_title">Dirigez l\'hameçon</string>
+    <string name="tour_steer_body">Pendant un lancer, faites glisser votre doigt à gauche et à droite, n\'importe où sur l\'écran. Un anneau montre où se trouve votre doigt : l\'hameçon file vers lui et le suit. L\'Agilité de corde le rend plus rapide.</string>
+
+    <string name="tour_descent_title">À la descente : esquivez</string>
+    <string name="tour_descent_body">L\'hameçon coule jusqu\'à %1$d chocs ou jusqu\'au bout de la corde, puis il remonte. Sur un poisson, seule la tête compte comme un choc (le même endroit que vous visez à la remontée) ; frôler un corps ou une queue ne coûte rien. Les rochers, le bois flotté et les méduses comptent où que vous les touchiez. Les %2$d premiers mètres sont sans choc.</string>
+
+    <string name="tour_ascent_title">À la remontée : visez les têtes</string>
+    <string name="tour_ascent_body">À la remontée, dirigez l\'hameçon pour qu\'il touche la tête d\'un poisson : la face pâle près de son œil. Toucher la queue ou le corps ne fait rien.</string>
+
+    <string name="tour_weight_title">Attention au poids</string>
+    <string name="tour_weight_body">Votre corde ne peut porter qu\'un certain poids. Surveillez la barre Charge : une fois qu\'elle est pleine, les poissons plus lourds s\'échappent.</string>
+
+    <string name="tour_fast_reel_title">Ligne pleine ? Remontée rapide</string>
+    <string name="tour_fast_reel_body">Dès que vous avez utilisé vos %1$d chocs, ou quand plus rien ne tient sur votre ligne, un bouton Remontée rapide apparaît à la remontée : il ramène l\'hameçon au bateau en %2$s secondes au plus, où que vous soyez. Plus rien n\'est pêché ensuite. Pratique contre la montre dans les duels chronométrés.</string>
+
+    <string name="tour_themes_title">Thèmes</string>
+    <string name="tour_themes_body">Le bouton palette, en haut, change le look des menus : le Lagon par défaut, avec une scène marine derrière chaque onglet. D\'autres thèmes sont dans la Boutique, en euros ou en points, et les plus riches coûtent plus cher. L\'eau où vous pêchez ne change jamais.</string>
+
+    <string name="tour_night_mode_title">Mode nuit</string>
+    <string name="tour_night_mode_body">Chaque thème a une version nuit : choisissez Jour, Nuit, ou suivez le mode sombre de votre téléphone.</string>
+
+    <string name="tour_points_title">Marquez des points</string>
+    <string name="tour_points_body">Plus une prise est profonde, plus elle rapporte de points, affichés ici en haut. Les poissons scintillants (contour doré et reflets) valent %1$d fois plus.</string>
+
+    <string name="tour_upgrades_title">Améliorez votre corde</string>
+    <string name="tour_upgrades_body">Dépensez vos points dans l\'onglet Boutique, sur sa page Corde. Longueur de corde vous fait atteindre des zones plus profondes et de nouveaux poissons, Solidité de corde porte plus de poids et Agilité de corde dirige plus vite. Changé d\'avis ? Redescendez d\'un niveau et récupérez tous les points qu\'il a coûtés.</string>
+
+    <string name="tour_tackle_title">Matériel</string>
+    <string name="tour_tackle_body">La page Matériel vend des objets pour un seul lancer, à activer avant de lancer. Les Lanternes éclairent le noir, un Détecteur de poissons rares signale les espèces que vous n\'avez pas encore pêchées à moins de %1$d m de l\'hameçon, un Porte-bonheur donne un choc de plus à la descente, et un Leurre scintillant apporte %2$d fois plus de poissons scintillants. Les prix augmentent avec la portée de votre corde.</string>
+
+    <string name="tour_two_prices_title">Deux façons de payer</string>
+    <string name="tour_two_prices_body">Tout, dans la boutique, a deux prix : en euros ou en points. Un prix en points correspond à environ %1$d minutes de pêche par euro à la portée de votre corde (%2$s pour les packs de Lanternes) : payer ne fait que gagner du temps, et tout peut s\'obtenir en jouant. Payer en points demande d\'abord une confirmation.</string>
+
+    <string name="tour_lantern_title">Les Lanternes éclairent les profondeurs</string>
+    <string name="tour_lantern_body">Sous %1$d m, l\'eau est noire. Activez ceci avant un lancer pour éclairer bien plus d\'eau autour de l\'hameçon (%2$d m au lieu de %3$d m). Une Lanterne est utilisée par lancer ; gagnez-en grâce aux paliers ou achetez-en dans la Boutique.</string>
+
+    <string name="tour_dex_title">Remplissez votre Dex</string>
+    <string name="tour_dex_body">%1$d espèces vivent dans %2$d zones de profondeur, certaines rares, et chacune a sa carte numérotée. Un poisson qui nage près de votre hameçon est marqué comme Vu : vous découvrez son nom et ses profondeurs. Pêchez-le pour compléter sa carte avec son poids, ses points et vos records.</string>
+
+    <string name="tour_dex_filters_title">Parcourir par zone</string>
+    <string name="tour_dex_filters_body">Filtrez les cartes par zone de profondeur, ou n\'affichez que les poissons que vous avez pêchés. Touchez une carte pour ouvrir sa page, puis balayez l\'écran pour feuilleter le Dex.</string>
+
+    <string name="tour_milestones_title">Récompenses des paliers</string>
+    <string name="tour_milestones_body">Chaque point gagné compte pour les récompenses des paliers (points bonus et Lanternes), même après l\'avoir dépensé. Le trophée en haut de l\'onglet Pêche les ouvre, avec une pastille quand une récompense est prête à être récupérée.</string>
+
+    <string name="tour_secrets_title">Secrets de pêche</string>
+    <!-- Hints that secrets exist, never what they are. -->
+    <string name="tour_secrets_body">Certaines astuces ne se découvrent qu\'en jouant, et elles rapportent : chaque fois que vous en réussissez une, elle ajoute un bonus au lancer, en duel aussi. La première fois, elle vous est expliquée sur le moment et rapporte une récompense de découverte, et une rubrique Secrets apparaît dans le Dex. Les secrets les plus rares débloquent aussi des Apparences pour votre hameçon, votre ligne, votre bateau et votre traînée de bulles, ainsi qu\'un titre affiché sous votre nom, en duel en ligne aussi. De quoi frimer : elles ne changent que le look, sans jamais donner d\'avantage.</string>
+
+    <string name="tour_boat_title">Personnalisez votre bateau</string>
+    <!-- "Personnaliser" is the button's label in the Skins section (dex_skins_boat_customise). -->
+    <string name="tour_boat_body">Touchez votre bateau en haut de l\'onglet Pêche pour ouvrir la rubrique Apparences du Dex. Le bouton Personnaliser vous permet de peindre la coque, le liseré et la cabine, et d\'ajouter un motif, des voiles, un pavillon et un emblème. Les couleurs de base sont gratuites ; le reste se débloque avec des points, ou à mesure que vous pêchez plus d\'espèces, atteignez de nouvelles zones et récupérez des paliers.</string>
+
+    <string name="tour_shop_style_title">Style</string>
+    <string name="tour_shop_style_body">La page Style propose des bateaux tout faits, des peintures, des emblèmes et des imprimés de voile (en aperçu sur votre propre bateau), ainsi que de nouveaux hameçons, lignes et traînées. Comme toutes les apparences, ils ne changent que le look, jamais le jeu.</string>
+
+    <string name="tour_aquarium_title">Votre aquarium</string>
+    <string name="tour_aquarium_body">Les poissons que vous avez pêchés nagent dans votre aquarium : ouvrez-le avec le bouton Aquarium du Dex et choisissez qui y nage. Le décor et un bac plus grand sont sur la page Aquarium de la Boutique.</string>
+
+    <string name="tour_season_title">Saisons et événements du week-end</string>
+    <!-- %1$s: how long a season lasts (e.g. "6 semaines"). -->
+    <string name="tour_season_body">Chaque saison dure %1$s. Chaque lancer en solo rapporte de l\'XP de saison et débloque des niveaux de récompenses : du matériel et des points pour tout le monde, et plus encore (un bateau de saison, un badge) avec le pass saison. Chaque week-end apporte aussi un objectif de pêche avec sa propre récompense. Rien de tout cela ne change les duels.</string>
+
+    <string name="tour_passes_title">Pass</string>
+    <string name="tour_passes_body">Le Club du Capitaine est un abonnement mensuel : une peinture réservée aux membres, un badge de titre du club, la sauvegarde cloud et un Sachet de Lanternes offert chaque mois. Les nouveaux pêcheurs ont aussi droit, pendant quelques jours, à une offre unique : le Pack de démarrage. Un point sur l\'onglet Boutique signale que quelque chose vous y attend.</string>
+
+    <string name="tour_badges_title">Badges de titre et cartes du Dex</string>
+    <string name="tour_badges_body">Choisissez le cadre de votre badge de titre (affiché sous votre nom, en ligne aussi) et la façon dont le Dex affiche les espèces que vous avez pêchées. D\'autres styles viennent de la Boutique, des pass saison et des événements.</string>
+
+    <string name="tour_atmosphere_title">Ambiance</string>
+    <string name="tour_atmosphere_body">L\'eau est inoffensive près de la surface et devient plus inquiétante à mesure que vous descendez. Atteignez la Plaine abyssale pour débloquer Cauchemar, un look effrayant pour les profondeurs : vous voyez exactement autant qu\'avant, seule l\'ambiance change.</string>
+
+    <string name="tour_battle_title">Duels 1 contre 1</string>
+    <string name="tour_battle_body">Choisissez un mode : Au meilleur des 5, Course de 3 minutes, Plus grosse pêche, Chasse aux espèces ou Plongée profonde. Les deux joueurs pêchent dans exactement la même eau : c\'est l\'adresse qui décide.</string>
+
+    <string name="tour_opponents_title">Choisissez un adversaire</string>
+    <string name="tour_opponents_body">Affrontez l\'ordinateur (Facile, Normal ou Difficile), un ami sur ce téléphone, ou quelqu\'un en ligne : créez un salon et partagez son code, ou utilisez Partie rapide. En ligne, les deux joueurs utilisent la même corde de tournoi (niveau %1$d dans chaque stat).</string>
+
+    <string name="tour_battle_tackle_title">Le matériel en duel</string>
+    <string name="tour_battle_tackle_body">Les Lanternes et les Détecteurs de poissons rares fonctionnent aussi en duel : activez-les ici, et chacun de vos lancers en consomme un exemplaire. Tout le monde peut en obtenir : ils font donc partie du jeu. Le Porte-bonheur et le Leurre scintillant sont réservés aux lancers en solo.</string>
+
+    <string name="tour_gifts_title">Cadeaux et sauvegarde cloud</string>
+    <string name="tour_gifts_body">Après un duel en ligne, vous pouvez offrir un cadeau à votre adversaire : du matériel ou des looks, payés en euros ou en points. Les cadeaux qui vous sont destinés arrivent quand vous ouvrez le jeu. Les membres du Club du Capitaine sont sauvegardés sur le serveur : le bouton Compte de la Boutique affiche le code de récupération qui restaure la sauvegarde sur un nouveau téléphone.</string>
+
+    <string name="tour_wager_title">Pariez des points</string>
+    <!-- %1$s, %2$s, %3$s: how many times the stake a win pays back ("1,2"). -->
+    <string name="tour_wager_body">Contre l\'ordinateur, vous pouvez miser des points sur le résultat : une victoire rapporte %1$s fois la mise contre Facile, %2$s fois contre Normal et %3$s fois contre Difficile. Un match nul la rembourse.</string>
+
+    <string name="tour_settings_title">Paramètres</string>
+    <string name="tour_settings_body">La roue dentée en haut de l\'onglet Pêche ouvre les Paramètres.</string>
+
+    <string name="tour_sound_title">Son et sensations</string>
+    <string name="tour_sound_body">Réglez ici séparément le volume, la musique et les effets sonores. La musique suit votre hameçon : calme près de la surface, plus sombre dans les profondeurs. Vibrations ajoute une légère vibration aux chocs, aux prises et aux grosses victoires, et Réduire les animations coupe les tremblements d\'écran, le ralenti et les flashs.</string>
+
+    <string name="tour_daily_title">Récompenses du jour</string>
+    <!-- %1$s: the calendar's length (e.g. "7 jours", used twice). -->
+    <string name="tour_daily_body">Récupérez ici une récompense une fois par jour : des points et du matériel, et une plus grosse tous les %1$s. Manquer un jour ne fait jamais reculer le calendrier. Votre série compte les jours d\'affilée, et un bouclier de série couvre de lui-même un jour manqué : vous commencez avec %2$d, et vous en recevez un autre tous les %1$s (jusqu\'à %3$d).</string>
+
+    <string name="tour_daily_challenges_title">Défis du jour</string>
+    <string name="tour_daily_challenges_body">Chaque jour apporte trois défis, facile, moyen et difficile, adaptés à votre corde, contre du matériel et des points. Un défi ne vous plaît pas ? Changez-le gratuitement (%1$s). Seuls les lancers en solo comptent. De nouveaux défis arrivent à minuit, et ceux que vous avez terminés sont récupérés pour vous si vous oubliez.</string>
+    <plurals name="tour_daily_swaps">
+        <item quantity="one">%d changement par jour</item>
+        <item quantity="many">%d changements par jour</item>
+        <item quantity="other">%d changements par jour</item>
+    </plurals>
+
+    <string name="tour_migrations_title">Migrations</string>
+    <!-- %1$s: how long a migration lasts (e.g. "2 jours"). -->
+    <string name="tour_migrations_body">Chaque semaine, pendant %1$s, deux espèces moins communes migrent : une près de la surface et une dans les profondeurs, toutes deux bien plus fréquentes là où elles vivent. Une bannière les affiche sur l\'onglet Pêche et dans le Dex. Les migrations concernent les lancers en solo : les duels ne changent jamais.</string>
+
+    <string name="tour_reminders_title">Rappels</string>
+    <string name="tour_reminders_body">Envie d\'un petit rappel quand votre récompense du jour est prête, que votre série va s\'arrêter ou qu\'une migration commence ? Activez les rappels dans les Paramètres : au maximum un par jour, et jamais entre %1$s et %2$s.</string>
+
+    <string name="tour_social_title">Amis et classements</string>
+    <string name="tour_social_body">Les amis, les classements hebdomadaires et le tournoi hebdomadaire s\'ouvrent d\'ici. Tout s\'y pêche avec la corde standard des duels en ligne (niveau %1$d dans chaque stat) : c\'est l\'adresse qui compte.</string>
+
+    <string name="tour_friend_code_title">Votre code ami</string>
+    <string name="tour_friend_code_body">Votre identifiant de joueur est votre code ami : partagez-le pour que vos amis puissent vous ajouter. Personne ne peut vous trouver par votre nom, et dans les classements, les inconnus ne voient qu\'un nom tiré de votre identifiant.</string>
+
+    <string name="tour_friends_title">Ajoutez des amis</string>
+    <!-- "Défier" is a button on a friend's card (social_friends_challenge). -->
+    <string name="tour_friends_body">Saisissez l\'identifiant de joueur d\'un ami pour lui envoyer une demande : vous serez amis dès qu\'elle sera acceptée. Les cartes de vos amis indiquent s\'ils sont en ligne et leurs meilleures prises de la semaine, et Défier les invite dans un salon de duel en ligne.</string>
+
+    <string name="tour_leaderboards_title">Classements hebdomadaires</string>
+    <string name="tour_leaderboards_body">Trois classements, meilleur lancer, prise la plus profonde et prise la plus rare, pour tous, votre ligue d\'environ %1$d pêcheurs, ou vos amis. Seuls comptent les lancers que le serveur vérifie lui-même : le tournoi hebdomadaire et les duels en ligne. Tous les classements sont remis à zéro le lundi à 00:00 UTC.</string>
+
+    <string name="tour_tournament_title">Le tournoi hebdomadaire</string>
+    <string name="tour_tournament_body">Toute la semaine, tout le monde pêche dans exactement la même eau, avec %1$d chocs. Vous avez %2$d tentatives et la meilleure compte ; commencer une tentative l\'utilise. À la fin de la semaine, les récompenses dépendent de votre classement final, et les %3$d %% premiers gagnent le badge de titre Tournoi.</string>
+
+    <string name="tour_clubs_title">Clubs</string>
+    <string name="tour_clubs_body">Rejoignez un club avec son code, ou créez-en un avec un nom fait de mots de pêche. Jusqu\'à %1$d pêcheurs pêchent ensemble pour un objectif de la semaine, et chaque participant reçoit chaque récompense atteinte. Il n\'y a pas de messagerie.</string>
+
+    <string name="tour_privacy_title">Votre vie privée</string>
+    <string name="tour_privacy_body">Les statistiques d\'utilisation et les rapports de plantage ne sont envoyés que si vous les autorisez. Changez d\'avis à tout moment avec les deux interrupteurs des Paramètres, rubrique Confidentialité. C\'est aussi là que vous pouvez supprimer votre compte en ligne et lire la politique de confidentialité.</string>
+
+    <string name="tour_language_title">Votre langue</string>
+    <string name="tour_language_body">Deep Line parle anglais, français, espagnol, allemand, portugais du Brésil et turc. Choisissez une langue ici, ou gardez celle de votre téléphone.</string>
+
+    <string name="tour_replay_title">C\'est tout, bonne pêche !</string>
+    <string name="tour_replay_body">Vous pouvez refaire cette visite à tout moment depuis les Paramètres.</string>
+</resources>

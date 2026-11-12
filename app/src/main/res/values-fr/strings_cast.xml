@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Pendant un lancer : les messages éclair sur l'eau, l'interface du lancer, la pause et les
+    résultats. Les messages se lisent en une fraction de seconde : courts et percutants.
+    (During a cast: notices, HUD, pause menu and results.)
+-->
+<resources>
+    <plurals name="cast_notice_bump">
+        <item quantity="one">Choc ! %d restant</item>
+        <item quantity="many">Choc ! %d restants</item>
+        <item quantity="other">Choc ! %d restants</item>
+    </plurals>
+    <string name="cast_notice_pulled_up">Ligne remontée ! Visez les têtes</string>
+    <string name="cast_notice_rope_end">Bout de la corde ! On remonte</string>
+    <!-- The two spaces are kept on purpose (quoted). -->
+    <string name="cast_notice_caught">"%1$s  +%2$s"</string>
+    <string name="cast_notice_caught_sparkling">"%1$s scintillant  +%2$s"</string>
+    <string name="cast_notice_too_heavy">Trop lourd : %1$s</string>
+    <string name="cast_notice_last_bump">"Ferré au dernier choc : %1$s  +%2$s"</string>
+    <string name="cast_notice_times_up">Temps écoulé !</string>
+
+    <!-- HUD chips (short). -->
+    <string name="cast_hud_phase_sinking">Descente</string>
+    <string name="cast_hud_phase_reeling">Remontée</string>
+    <string name="cast_hud_phase_surfaced">En surface</string>
+    <string name="cast_hud_pause">Pause</string>
+    <string name="cast_hud_bumps">Chocs</string>
+    <string name="cast_hud_load">Charge %1$s / %2$s kg</string>
+    <string name="cast_hud_bump_free">Zone sans choc · chocs comptés sous %1$d m</string>
+    <string name="cast_hud_lantern_lit">Lanterne allumée</string>
+    <string name="cast_hud_battle_round">%1$s · Manche %2$d</string>
+    <string name="cast_hud_battle_cast_of">%1$s · Lancer %2$d/%3$d</string>
+    <string name="cast_hud_battle_cast">%1$s · Lancer %2$d</string>
+    <string name="cast_hud_player">Joueur</string>
+    <string name="cast_hud_tournament_attempt">Tournoi · Tentative %1$d sur %2$d</string>
+
+    <!-- Hints in the middle of the screen. -->
+    <string name="cast_hint_steer">Faites glisser pour diriger : l\'hameçon file vers votre doigt. Sous %1$d m, évitez les têtes de poissons et les objets : %2$d chocs et la ligne remonte.</string>
+    <!-- TÊTE is in capitals for emphasis. -->
+    <string name="cast_hint_heads">Touchez les poissons à la TÊTE pour les ferrer. La queue ne compte pas.</string>
+
+    <!-- The fast reel button. -->
+    <string name="cast_fast_reel">Remontée rapide</string>
+    <string name="cast_fast_reel_line_full">Ligne pleine · Remontée rapide</string>
+
+    <!-- The pause dialog. -->
+    <string name="cast_pause_title">Pause</string>
+    <string name="cast_pause_body_solo">Quitter met fin à ce lancer sans compter aucun des poissons sur la ligne.</string>
+    <string name="cast_pause_body_battle">Quitter vous fait perdre le duel par abandon. Le chrono du duel est arrêté pendant la pause.</string>
+    <string name="cast_pause_body_online">Quitter vous fait perdre le duel par abandon. En ligne, votre adversaire continue de pêcher pendant votre pause.</string>
+    <string name="cast_pause_body_tournament">Quitter vous donne 0 pour cette tentative de tournoi, et elle compte quand même parmi vos tentatives.</string>
+    <string name="cast_pause_resume">Reprendre</string>
+    <string name="cast_pause_quit">Quitter le lancer</string>
+    <string name="cast_pause_forfeit">Abandonner le duel</string>
+
+    <!-- The results panel. -->
+    <string name="cast_results_title">Lancer terminé</string>
+    <string name="cast_results_deepest">Profondeur max. %1$s</string>
+    <plurals name="cast_results_fish">
+        <item quantity="one">%d poisson</item>
+        <item quantity="many">%d poissons</item>
+        <item quantity="other">%d poissons</item>
+    </plurals>
+    <plurals name="cast_results_objects">
+        <item quantity="one">%d objet</item>
+        <item quantity="many">%d objets</item>
+        <item quantity="other">%d objets</item>
+    </plurals>
+    <string name="cast_results_nothing">Rien sur la ligne cette fois. À la remontée, dirigez l\'hameçon vers les poissons pour qu\'il touche leur tête.</string>
+    <string name="cast_results_by_last_bump">ferré par le dernier choc</string>
+    <string name="cast_results_sparkling">✦ %1$s (scintillant)</string>
+    <string name="cast_results_secret">✦ Secret : %1$s</string>
+    <string name="cast_results_total">"Total  +%1$s pts"</string>
+    <string name="cast_results_collect">Encaisser</string>
+    <string name="cast_results_continue">Continuer</string>
+
+    <!-- Labels drawn on the water. -->
+    <string name="cast_canvas_bump_free_above">Sans choc au-dessus de %1$d m</string>
+    <string name="cast_canvas_rope_limit">Limite de la corde</string>
+</resources>

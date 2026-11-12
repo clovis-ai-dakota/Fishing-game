@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    L'éditeur de bateau (Dex > Apparences > Personnaliser) : comment se débloque une option
+    verrouillée, et le texte de l'écran de l'éditeur. (The boat editor.)
+-->
+<resources>
+    <!-- Short labels under a locked option (a chip). -->
+    <string name="boat_requirement_free">Gratuit</string>
+    <plurals name="boat_requirement_species">
+        <item quantity="one">Pêchez %d espèce</item>
+        <item quantity="many">Pêchez %d espèces</item>
+        <item quantity="other">Pêchez %d espèces</item>
+    </plurals>
+    <!-- %1$s: the zone's name, written after "la zone" so it needs no article. -->
+    <string name="boat_requirement_zone">Un poisson de la zone %1$s</string>
+    <plurals name="boat_requirement_milestones">
+        <item quantity="one">Récupérez %d palier</item>
+        <item quantity="many">Récupérez %d paliers</item>
+        <item quantity="other">Récupérez %d paliers</item>
+    </plurals>
+    <string name="boat_requirement_shop">En boutique</string>
+
+    <!-- The same, as a whole sentence in the dialog. -->
+    <string name="boat_unlock_free">C\'est gratuit.</string>
+    <string name="boat_unlock_points">Débloquez cette option pour %1$s.</string>
+    <plurals name="boat_unlock_species">
+        <item quantity="one">Pêchez %d espèce pour débloquer cette option.</item>
+        <item quantity="many">Pêchez %d espèces pour débloquer cette option.</item>
+        <item quantity="other">Pêchez %d espèces pour débloquer cette option.</item>
+    </plurals>
+    <string name="boat_unlock_zone">Pêchez un poisson dans la zone %1$s pour débloquer cette option.</string>
+    <plurals name="boat_unlock_milestones">
+        <item quantity="one">Récupérez %d palier pour débloquer cette option.</item>
+        <item quantity="many">Récupérez %d paliers pour débloquer cette option.</item>
+        <item quantity="other">Récupérez %d paliers pour débloquer cette option.</item>
+    </plurals>
+    <string name="boat_unlock_shop">Achetez cette option dans la Boutique pour la débloquer.</string>
+    <string name="boat_unlock_club">Rejoignez le Club du Capitaine pour débloquer cette option.</string>
+
+    <!-- The editor screen. -->
+    <string name="boat_editor_title">Personnaliser le bateau</string>
+    <string name="boat_editor_intro">Vos points : %1$s. Les options de base sont gratuites ; touchez une option verrouillée pour savoir comment la débloquer.</string>
+    <string name="boat_editor_hull_colour">Couleur de la coque</string>
+    <string name="boat_editor_bottom_colour">Couleur du bas de coque</string>
+    <string name="boat_editor_trim_colour">Liseré et emblème</string>
+    <string name="boat_editor_cabin_colour">Cabine</string>
+    <string name="boat_editor_sail_colour">Couleur de la voile</string>
+    <string name="boat_editor_flag_colour">Couleur du pavillon</string>
+    <string name="boat_editor_pattern">Motif de la coque</string>
+    <string name="boat_editor_sail">Voile</string>
+    <string name="boat_editor_flag">Pavillon</string>
+    <string name="boat_editor_emblem">Emblème</string>
+    <string name="boat_editor_swatch_cd">%1$s : %2$s</string>
+    <string name="boat_editor_swatch_cd_locked">%1$s : %2$s (verrouillé)</string>
+    <string name="boat_editor_locked_cd">Verrouillé</string>
+    <string name="boat_editor_save">Enregistrer et équiper</string>
+    <!-- %1$s: the option's name, in quotes so it needs no article. -->
+    <string name="boat_editor_unlock_title">Débloquer « %1$s » ?</string>
+    <plurals name="boat_editor_unlock_body">
+        <item quantity="one">« %1$s » coûte %2$s point, une seule fois. Vous en avez %3$s.</item>
+        <item quantity="many">« %1$s » coûte %2$s de points, une seule fois. Vous en avez %3$s.</item>
+        <item quantity="other">« %1$s » coûte %2$s points, une seule fois. Vous en avez %3$s.</item>
+    </plurals>
+    <plurals name="boat_editor_unlock_body_short">
+        <item quantity="one">« %1$s » coûte %2$s point, une seule fois. Vous en avez %3$s. Continuez à pêcher pour en gagner plus.</item>
+        <item quantity="many">« %1$s » coûte %2$s de points, une seule fois. Vous en avez %3$s. Continuez à pêcher pour en gagner plus.</item>
+        <item quantity="other">« %1$s » coûte %2$s points, une seule fois. Vous en avez %3$s. Continuez à pêcher pour en gagner plus.</item>
+    </plurals>
+    <string name="boat_editor_unlock_buy">Débloquer pour %1$s pts</string>
+    <string name="boat_editor_not_now">Plus tard</string>
+    <string name="boat_editor_locked_title">Option verrouillée : %1$s</string>
+</resources>

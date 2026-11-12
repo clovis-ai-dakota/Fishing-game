@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    L'onglet Pêche (ui/HomeScreen.kt) : le cœur du jeu, avec le grand bouton Lancer la ligne.
+    (The Fish tab: the game's hub, with the big Cast line button.)
+-->
+<resources>
+    <string name="home_tagline">Pêchez tous les poissons des profondeurs</string>
+    <!-- Screen reader labels of the icons at the top right. -->
+    <string name="home_cd_milestones">Paliers</string>
+    <string name="home_cd_themes">Thèmes</string>
+    <string name="home_cd_settings">Paramètres</string>
+    <string name="home_boat_action">Personnaliser votre bateau</string>
+
+    <!-- The rope card. -->
+    <string name="home_rope_title">Votre corde</string>
+    <!-- %1$s: reach in meters; %2$s: the deepest zone it reaches. -->
+    <string name="home_rope_reach">Portée %1$s · %2$s</string>
+    <string name="home_rope_stats">Lancers : %1$s · Total gagné : %2$s pts</string>
+    <string name="home_rope_stats_deepest">Lancers : %1$s · Total gagné : %2$s pts · Prise la plus profonde : %3$s</string>
+
+    <!-- The Dex card (counts of species, feminine in French). -->
+    <string name="home_dex_title">Dex</string>
+    <string name="home_dex_caught">Pêchées %1$d / %2$d</string>
+    <string name="home_dex_seen">Vues %1$d</string>
+    <string name="home_dex_zone">%1$s %2$d/%3$d</string>
+
+    <!-- The milestones card. -->
+    <string name="home_milestones_title">Paliers</string>
+    <plurals name="home_milestones_to_claim">
+        <item quantity="one">%d à récupérer !</item>
+        <item quantity="many">%d à récupérer !</item>
+        <item quantity="other">%d à récupérer !</item>
+    </plurals>
+    <string name="home_milestones_next">%1$s / %2$s · prochain : %3$s</string>
+    <string name="home_milestones_done">Tous les paliers sont atteints !</string>
+
+    <!-- The Lantern switch and tackle chips. -->
+    <string name="home_lanterns">Lanternes : %1$d</string>
+    <string name="home_lanterns_hint">Éclairez le noir sous %1$d m au prochain lancer.</string>
+    <string name="home_tackle_detector">Détecteur ×%1$d</string>
+    <string name="home_tackle_charm">Porte-bonheur ×%1$d</string>
+    <string name="home_tackle_lure">Leurre scintillant ×%1$d</string>
+    <!-- The main button. -->
+    <string name="home_cast_button">Lancer la ligne</string>
+
+    <!-- The rules, in a dialog. -->
+    <string name="home_rules_title">Comment pêcher</string>
+    <string name="home_rules_body">• Faites glisser votre doigt à gauche et à droite pour diriger l\'hameçon.\n• À la descente : l\'hameçon coule jusqu\'à %1$d chocs ou jusqu\'au bout de la corde. Un choc, c\'est toucher la tête d\'un poisson, un rocher, du bois flotté ou une méduse ; frôler le corps ou la queue d\'un poisson ne coûte rien. Les %2$d premiers mètres sont sans choc.\n• À la remontée : touchez un poisson à la tête (la face pâle près de l\'œil) pour le ferrer. Toucher la queue ne fait rien. La corde ne peut porter qu\'un certain poids.\n• Plus une prise est profonde, plus elle rapporte de points. Les poissons scintillants valent %3$d fois plus.\n• Sous %4$d m, il fait noir. Une Lanterne éclaire une plus grande partie de l\'eau.</string>
+</resources>

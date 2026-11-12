@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Confidentialité : la demande de consentement au premier lancement, Paramètres > Confidentialité
+    et la suppression du compte. Textes quasi juridiques : clairs, exacts et complets.
+    (Privacy: the consent sheet, Settings > Privacy and account deletion.)
+-->
+<resources>
+    <!-- Consent sheet. -->
+    <string name="privacy_consent_title">Aider à améliorer Deep Line ?</string>
+    <string name="privacy_consent_body">Avec votre accord, le jeu envoie des statistiques d\'utilisation (les écrans que vous ouvrez, le déroulement de vos lancers et de vos duels, vos achats) et des rapports de plantage à Google Firebase. Ils nous aident à corriger les bugs et à équilibrer le jeu.</string>
+    <string name="privacy_consent_promise">Ils sont liés à un identifiant aléatoire, jamais à votre nom, et ne servent jamais à la publicité. Rien n\'est envoyé sans votre accord, et vous pouvez changer d\'avis à tout moment dans les Paramètres, rubrique Confidentialité.</string>
+    <string name="privacy_read_policy">Lire la politique de confidentialité</string>
+    <string name="privacy_consent_choose">Choisir pour chacun</string>
+    <string name="privacy_consent_save">Enregistrer mes choix</string>
+    <string name="privacy_consent_refuse">Ne pas autoriser</string>
+    <string name="privacy_consent_allow">Autoriser</string>
+
+    <!-- The two kinds of data. -->
+    <string name="privacy_analytics_title">Statistiques d\'utilisation</string>
+    <string name="privacy_analytics_subtitle">Comment on joue au jeu : écrans, lancers, duels, achats.</string>
+    <string name="privacy_crash_title">Rapports de plantage</string>
+    <string name="privacy_crash_subtitle">Ce qui s\'est mal passé quand le jeu plante ou qu\'une action échoue.</string>
+
+    <!-- Settings > Privacy. -->
+    <string name="privacy_settings_title">Confidentialité</string>
+    <string name="privacy_settings_intro">Les statistiques d\'utilisation et les rapports de plantage sont envoyés à Google Firebase, liés à un identifiant aléatoire (jamais à votre nom), et seulement si vous les autorisez. Ils ne servent jamais à la publicité.</string>
+    <string name="privacy_settings_unavailable">Cette version du jeu n\'envoie aucune statistique ni aucun rapport de plantage. Vos choix sont conservés pour les versions qui le font.</string>
+    <string name="privacy_reset_id">Réinitialiser mon identifiant de statistiques</string>
+    <string name="privacy_account_explainer">Votre compte en ligne (identifiant de joueur, sauvegarde cloud, cadeaux en attente) est conservé sur le serveur du jeu. Le supprimer efface tout cela ; la progression sur ce téléphone est conservée.</string>
+    <string name="privacy_delete_account">Supprimer mon compte en ligne</string>
+    <string name="privacy_deleting">Suppression de votre compte…</string>
+
+    <!-- Confirmation dialog. -->
+    <string name="privacy_delete_confirm_title">Supprimer votre compte en ligne ?</string>
+    <string name="privacy_delete_confirm_body">Cela efface tout ce que le serveur du jeu conserve pour vous : votre identifiant de joueur, votre sauvegarde cloud et les cadeaux qui vous attendent. Votre code de récupération cessera de fonctionner, et c\'est irréversible.\n\nVotre progression sur ce téléphone est conservée, et vos achats restent liés à votre compte Google Play. Un abonnement au Club du Capitaine n\'est pas résilié : gérez-le dans Google Play.</string>
+    <string name="privacy_delete_confirm_yes">Supprimer mon compte</string>
+    <string name="privacy_delete_confirm_no">Le garder</string>
+
+    <!-- Messages. -->
+    <string name="privacy_message_reset">Les statistiques conservées sur ce téléphone ont été effacées, et vous avez un nouvel identifiant aléatoire.</string>
+    <string name="privacy_message_deleted">Votre compte en ligne a été supprimé. Votre progression sur ce téléphone est toujours là, et le jeu utilise désormais un nouvel identifiant de joueur.</string>
+    <string name="privacy_message_not_deleted">Votre compte n\'a pas été supprimé : %1$s</string>
+</resources>
