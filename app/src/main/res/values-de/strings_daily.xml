@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Der Tagesablauf: Tagesbelohnungen und Serie, Tagesaufgaben, Wanderungen und Erinnerungen
+    (auch die Benachrichtigungen). (The daily loop. Keys start with daily_.)
+-->
+<resources>
+    <!-- Wie oft Erinnerungen kommen; %1$s und %2$s: volle Stunden (z. B. 21:00 und 09:00). -->
+    <string name="daily_reminder_promise">Höchstens eine pro Tag, nie zwischen %1$s und %2$s Uhr, und du kannst sie jederzeit in den Einstellungen ausschalten.</string>
+
+    <!-- Belohnungen als Nominalgruppen in einer Liste. -->
+    <string name="daily_grant_shield">1 Serienschild</string>
+    <!-- Kurze Beschriftungen auf den Kacheln des 7-Tage-Kalenders (winzig). -->
+    <string name="daily_tile_lanterns">%1$d × Laterne</string>
+    <string name="daily_tile_detector">Detektor</string>
+    <string name="daily_tile_charm">Talisman</string>
+    <string name="daily_tile_lure">Köder</string>
+    <string name="daily_tile_shield">Schild</string>
+
+    <!-- Tagesaufgaben: je ein Satz, eine Aufforderung. -->
+    <plurals name="daily_challenge_casts">
+        <item quantity="one">Wirf %d-mal aus.</item>
+        <item quantity="other">Wirf %d-mal aus.</item>
+    </plurals>
+    <plurals name="daily_challenge_catch_fish">
+        <item quantity="one">Fang %d Fisch.</item>
+        <item quantity="other">Fang %d Fische.</item>
+    </plurals>
+    <plurals name="daily_challenge_catch_zone">
+        <item quantity="one">Fang %1$d Fisch in dieser Zone: %2$s.</item>
+        <item quantity="other">Fang %1$d Fische in dieser Zone: %2$s.</item>
+    </plurals>
+    <string name="daily_challenge_reach_depth">Erreiche in einem Wurf %1$d m.</string>
+    <string name="daily_challenge_catch_species_one">Fang einen Fisch dieser Art: %1$s.</string>
+    <string name="daily_challenge_catch_species">Fang %1$d Fische dieser Art: %2$s.</string>
+    <string name="daily_challenge_earn_points">Sammle %1$s Punkte.</string>
+    <plurals name="daily_challenge_land_weight">
+        <item quantity="one">Fang %d kg Fisch.</item>
+        <item quantity="other">Fang %d kg Fisch.</item>
+    </plurals>
+    <plurals name="daily_challenge_sparkling">
+        <item quantity="one">Fang %d funkelnden Fisch.</item>
+        <item quantity="other">Fang %d funkelnde Fische.</item>
+    </plurals>
+    <plurals name="daily_challenge_big_cast">
+        <item quantity="one">Fang %d Fisch in einem einzigen Wurf.</item>
+        <item quantity="other">Fang %d Fische in einem einzigen Wurf.</item>
+    </plurals>
+    <plurals name="daily_challenge_new_species">
+        <item quantity="one">Fang %d Art, die du noch nie gefangen hast.</item>
+        <item quantity="other">Fang %d Arten, die du noch nie gefangen hast.</item>
+    </plurals>
+    <string name="daily_progress_depth">Am tiefsten: %1$d von %2$d m</string>
+    <string name="daily_progress_big_cast">Bester Wurf: %1$d von %2$d Fischen</string>
+
+    <!-- Nach dem Abholen der Tagesbelohnung. -->
+    <string name="daily_claimed">Belohnung für Tag %1$d: %2$s.</string>
+    <string name="daily_claimed_streak">%1$d Tage am Stück! Belohnung für Tag %2$d: %3$s.</string>
+    <string name="daily_claimed_restarted">Heute beginnt eine neue Serie. Belohnung für Tag %1$d: %2$s.</string>
+    <string name="daily_claimed_one_shield">Ein Serienschild hat den verpassten Tag abgedeckt. Deine Serie: %1$s. Belohnung für Tag %2$d: %3$s.</string>
+    <string name="daily_claimed_shields">%1$d Serienschilde haben die verpassten Tage abgedeckt. Deine Serie: %2$s. Belohnung für Tag %3$d: %4$s.</string>
+    <string name="daily_collected">Deine erledigten Aufgaben von einem früheren Tag wurden für dich abgeholt: %1$s.</string>
+    <string name="daily_challenge_claimed">Aufgabe erledigt! Belohnung: %1$s.</string>
+    <string name="daily_challenge_swapped">Neue Aufgabe (%1$s): %2$s</string>
+    <string name="daily_reminders_blocked">Erinnerungen bleiben aus: Benachrichtigungen für Deep Line sind auf diesem Handy blockiert. Du kannst sie in den Einstellungen des Handys erlauben.</string>
+
+    <!-- Die Karte im Tab „Angeln“ und der Bildschirm „Täglich“. -->
+    <string name="daily_title">Täglich</string>
+    <plurals name="daily_streak">
+        <item quantity="one">Serie: %d Tag</item>
+        <item quantity="other">Serie: %d Tage</item>
+    </plurals>
+    <string name="daily_streak_none">Noch keine Serie</string>
+    <string name="daily_claim_button">Tag %1$d abholen: %2$s</string>
+    <string name="daily_claim_wait">Die heutige Belohnung ist abgeholt. Tag %1$d (%2$s) ist in %3$s bereit.</string>
+    <plurals name="daily_best_streak">
+        <item quantity="one">Beste Serie: %d Tag.</item>
+        <item quantity="other">Beste Serie: %d Tage.</item>
+    </plurals>
+    <string name="daily_streak_rules">%1$s Serienschilde: %2$d von %3$d. Ein Schild deckt einen verpassten Tag von selbst ab, und Tag %4$d bringt einen neuen. Ein verpasster Tag wirft den Kalender nie zurück.</string>
+    <string name="daily_challenges_title">Heutige Aufgaben</string>
+    <string name="daily_challenge_done">Erledigt</string>
+    <string name="daily_challenge_claim">Abholen</string>
+    <string name="daily_challenge_swap">Tauschen</string>
+    <string name="daily_swaps_none">Heute kannst du nicht mehr gratis tauschen.</string>
+    <plurals name="daily_swaps_left">
+        <item quantity="one">Heute kannst du noch %d-mal gratis tauschen, wenn dir eine Aufgabe nicht gefällt.</item>
+        <item quantity="other">Heute kannst du noch %d-mal gratis tauschen, wenn dir eine Aufgabe nicht gefällt.</item>
+    </plurals>
+    <string name="daily_challenges_rules">%1$s Nur Solo-Würfe zählen. Um Mitternacht kommen neue Aufgaben, und erledigte werden für dich abgeholt, falls du es vergisst.</string>
+    <string name="daily_remind_button">Erinnere mich, wenn meine Belohnung bereit ist</string>
+
+    <!-- Erinnerungen einschalten: einmal gezeigt, nach der ersten Tagesbelohnung. -->
+    <string name="daily_optin_title">Möchtest du erinnert werden?</string>
+    <string name="daily_optin_body">Deep Line kann dir Bescheid geben, wenn deine Tagesbelohnung bereit ist, wenn deine Serie bald endet und wenn eine Wanderung beginnt. %1$s</string>
+    <string name="daily_optin_yes">Einschalten</string>
+    <string name="daily_optin_no">Nicht jetzt</string>
+
+    <!-- Wanderungen. -->
+    <string name="daily_migration_banner_title">Wanderung läuft</string>
+    <string name="daily_migration_banner_body">Diese beiden sind in Solo-Würfen noch %1$s lang viel häufiger.</string>
+    <string name="daily_migrating_note">Wandert gerade: in Solo-Würfen noch %1$s lang viel häufiger.</string>
+    <string name="daily_migration_live">Wanderung: noch %1$s</string>
+    <string name="daily_migration_next">Nächste Wanderung in %1$s</string>
+    <plurals name="daily_migration_about">
+        <item quantity="one">Jede Woche werden %d Tag lang zwei weniger häufige Arten dort, wo sie leben, viel häufiger: eine nahe der Oberfläche und eine in der Tiefe. Nur in Solo-Würfen: Duelle ändern sich nie.</item>
+        <item quantity="other">Jede Woche werden %d Tage lang zwei weniger häufige Arten dort, wo sie leben, viel häufiger: eine nahe der Oberfläche und eine in der Tiefe. Nur in Solo-Würfen: Duelle ändern sich nie.</item>
+    </plurals>
+    <string name="daily_migrant_open">Ihre Dex-Seite öffnen</string>
+    <string name="daily_migrant_where">%1$s · %2$d–%3$d m</string>
+
+    <!-- Benachrichtigungskanäle. -->
+    <string name="daily_channel_daily_name">Tagesbelohnung bereit</string>
+    <string name="daily_channel_daily_description">Wenn die heutige Belohnung wartet und du das Spiel noch nicht geöffnet hast.</string>
+    <string name="daily_channel_streak_name">Serie in Gefahr</string>
+    <string name="daily_channel_streak_description">Am Abend, wenn deine Login-Serie um Mitternacht endet, falls du die heutige Belohnung nicht abholst.</string>
+    <string name="daily_channel_events_name">Wanderungen und Events</string>
+    <string name="daily_channel_events_description">Wenn eine Wanderung oder ein Wochenend-Event beginnt.</string>
+
+    <!-- Erinnerungen: kurzer Titel (eine Zeile) und Text. -->
+    <string name="daily_reminder_ready_title_1">Deine Tagesbelohnung wartet</string>
+    <string name="daily_reminder_ready_title_2">Die Fische beißen</string>
+    <string name="daily_reminder_ready_title_3">Am Steg wartet eine Belohnung</string>
+    <string name="daily_reminder_ready_text_1">Tag %1$d deines Belohnungskalenders ist bereit zum Abholen.</string>
+    <string name="daily_reminder_ready_text_2">Die heutige Belohnung und drei neue Aufgaben warten auf dich.</string>
+    <string name="daily_reminder_ready_text_3">Hol dir die heutige Belohnung und sieh dir die heutigen Aufgaben an.</string>
+    <plurals name="daily_reminder_streak_title">
+        <item quantity="one">Halte deine Serie von %d Tag</item>
+        <item quantity="other">Halte deine Serie von %d Tagen</item>
+    </plurals>
+    <string name="daily_reminder_streak_text">Hol dir die heutige Belohnung vor Mitternacht, damit sie weiterläuft.</string>
+    <string name="daily_reminder_streak_text_shield">Hol dir die heutige Belohnung vor Mitternacht. Falls du heute aussetzt, deckt ein Serienschild das ab.</string>
+    <string name="daily_reminder_migration_title">Eine Wanderung hat begonnen</string>
+    <plurals name="daily_reminder_migration_text">
+        <item quantity="one">Ab jetzt %1$d Tag lang sind zwei Arten viel häufiger: %2$s.</item>
+        <item quantity="other">Ab jetzt %1$d Tage lang sind zwei Arten viel häufiger: %2$s.</item>
+    </plurals>
+    <string name="daily_reminder_unknown_species">eine unbekannte Art (%1$s)</string>
+    <string name="daily_reminder_event_title">Das Wochenend-Event hat begonnen</string>
+    <string name="daily_reminder_event_text">Ziel an diesem Wochenende: %1$s (%2$d). Wenn du es erreichst, wartet eine Belohnung.</string>
+</resources>
