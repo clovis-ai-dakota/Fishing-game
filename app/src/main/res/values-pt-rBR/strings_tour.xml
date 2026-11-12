@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Português do Brasil. O tour guiado (ui/tour/): um cartão por etapa sobre a tela que ele
+    explica, com um título e um texto. Chaves: tour_<etapa>_title e tour_<etapa>_body. Os nomes
+    de telas, botões, apetrechos, zonas e modos são iguais aos rótulos do app. Nunca dar pistas
+    de um segredo de pesca aqui: eles são descobertos jogando.
+-->
+<resources>
+    <!-- Os controles do cartão. -->
+    <string name="tour_counter">%1$d / %2$d</string>
+    <string name="tour_counter_whats_new">Novidades · %1$d / %2$d</string>
+    <string name="tour_skip">Pular tour</string>
+    <string name="tour_back">Voltar</string>
+    <string name="tour_next">Próximo</string>
+    <string name="tour_finish">Concluir</string>
+
+    <string name="tour_welcome_title">Boas-vindas ao Deep Line!</string>
+    <string name="tour_welcome_body">Pesque todos os peixes das profundezas. Este tour rápido mostra como jogar e para que serve cada coisa. Toque em Próximo, ou em Pular tour se você já conhece o caminho.</string>
+
+    <string name="tour_tabs_title">Quatro abas</string>
+    <string name="tour_tabs_body">A barra de baixo leva você a todo lugar: Pescar é onde você lança a linha, o Dex reúne todas as espécies que você encontra, a Loja tem melhorias de corda, apetrechos e visuais para o seu barco, e Duelo é para partidas 1v1.</string>
+
+    <string name="tour_cast_title">Lance sua linha</string>
+    <string name="tour_cast_body">O grande botão Lançar linha, embaixo na aba Pescar, solta o anzol do barco.</string>
+
+    <string name="tour_steer_title">Guie o anzol</string>
+    <string name="tour_steer_body">Durante um lançamento, arraste para a esquerda e para a direita em qualquer lugar da tela. Um anel mostra onde está o seu dedo: o anzol desliza até ele e o acompanha. A Agilidade da corda deixa isso mais rápido.</string>
+
+    <string name="tour_descent_title">Descendo: desvie</string>
+    <string name="tour_descent_body">O anzol afunda até bater %1$d vezes ou chegar ao fim da corda, e então volta para cima. Num peixe, só a cabeça conta como batida (o mesmo ponto em que você mira na subida); roçar o corpo ou o rabo não conta. Pedras, troncos e águas-vivas contam onde quer que você encoste. Os primeiros %2$d m são livres de batidas.</string>
+
+    <string name="tour_ascent_title">Subindo: mire nas cabeças</string>
+    <string name="tour_ascent_body">Na subida, guie o anzol até a cabeça de um peixe: a parte clara perto do olho. Encostar no rabo ou no corpo não faz nada.</string>
+
+    <string name="tour_weight_title">Cuidado com o peso</string>
+    <string name="tour_weight_body">Sua corda só aguenta um certo peso. Fique de olho na barra Carga: quando ela enche, os peixes mais pesados escapam.</string>
+
+    <string name="tour_fast_reel_title">Linha cheia? Recolher rápido</string>
+    <string name="tour_fast_reel_body">Assim que você gastar suas %1$d batidas, ou quando não couber mais nada na sua linha, aparece na subida um botão Recolher rápido: ele puxa o anzol até o barco em no máximo %2$s segundos, de onde você estiver. Nada mais é pescado depois disso. Útil contra o relógio nos duelos com tempo.</string>
+
+    <string name="tour_themes_title">Temas</string>
+    <string name="tour_themes_body">O botão da paleta, no alto, muda o visual dos menus: a Lagoa por padrão, com uma cena do mar atrás de cada aba. Há mais temas na Loja, por euros ou pontos, e os mais elaborados custam mais. A água em que você pesca nunca muda.</string>
+
+    <string name="tour_night_mode_title">Modo noturno</string>
+    <string name="tour_night_mode_body">Todo tema tem uma versão noturna: escolha Dia, Noite ou siga o modo escuro do seu celular.</string>
+
+    <string name="tour_points_title">Marque pontos</string>
+    <string name="tour_points_body">Capturas mais fundas valem mais pontos, mostrados aqui no alto. Peixes cintilantes (contorno dourado e brilhos) valem %1$d× mais.</string>
+
+    <string name="tour_upgrades_title">Melhore sua corda</string>
+    <string name="tour_upgrades_body">Gaste pontos na aba Loja, na página Corda. Comprimento da corda deixa você chegar a zonas mais fundas e a peixes novos, Força da corda carrega mais peso e Agilidade da corda guia mais rápido. Mudou de ideia? Volte um nível e receba de volta cada ponto que ele custou.</string>
+
+    <string name="tour_tackle_title">Apetrechos</string>
+    <string name="tour_tackle_body">A página Apetrechos vende itens para um lançamento, que você ativa antes de lançar. Lanternas iluminam o escuro, um Detector de peixes raros marca as espécies que você ainda não capturou a até %1$d m do anzol, um Amuleto da sorte dá uma batida extra na descida e uma Isca cintilante traz %2$d× mais peixes cintilantes. Os preços crescem com o alcance da sua corda.</string>
+
+    <string name="tour_two_prices_title">Duas formas de pagar</string>
+    <string name="tour_two_prices_body">Tudo na loja tem dois preços: em euros ou em pontos. Um preço em pontos equivale a cerca de %1$d minutos de pesca por euro no alcance da sua corda (%2$s para pacotes de Lanternas), então pagar só economiza tempo: tudo pode ser ganho jogando. Pagar com pontos pede confirmação antes.</string>
+
+    <string name="tour_lantern_title">Lanternas iluminam as profundezas</string>
+    <string name="tour_lantern_body">Abaixo de %1$d m a água é escura. Ative isto antes de um lançamento para iluminar muito mais água em volta do anzol (%2$d m em vez de %3$d m). Uma Lanterna é gasta por lançamento; ganhe mais com os marcos ou compre na Loja.</string>
+
+    <string name="tour_dex_title">Complete seu Dex</string>
+    <string name="tour_dex_body">%1$d espécies vivem em %2$d zonas de profundidade, algumas delas raras, e cada uma tem uma carta numerada. Um peixe que nada perto do seu anzol fica marcado como Visto: você descobre o nome e as profundidades dele. Pesque-o para completar a carta com o peso, os pontos e seus recordes.</string>
+
+    <string name="tour_dex_filters_title">Navegue por zona</string>
+    <string name="tour_dex_filters_body">Filtre as cartas por zona de profundidade ou mostre só os peixes que você capturou. Toque numa carta para abrir a página dela e deslize para folhear o Dex.</string>
+
+    <string name="tour_milestones_title">Recompensas dos marcos</string>
+    <string name="tour_milestones_body">Todo ponto que você ganha conta para as recompensas dos marcos (pontos bônus e Lanternas), mesmo depois de gasto. O troféu no alto da aba Pescar abre os marcos, com um aviso quando houver um pronto para resgatar.</string>
+
+    <string name="tour_secrets_title">Segredos de pesca</string>
+    <string name="tour_secrets_body">Alguns truques só são descobertos jogando, e eles compensam: toda vez que você consegue um, ele dá um bônus ao lançamento, nos duelos também. Na primeira vez, ele é explicado na hora e rende uma recompensa de descoberta, e uma seção Segredos aparece no Dex. Os segredos mais raros também desbloqueiam Skins para o seu anzol, linha, barco e rastro de bolhas, além de um título mostrado abaixo do seu nome, nos duelos online também. Eles são feitos para exibir: só visual, nunca uma vantagem.</string>
+
+    <string name="tour_boat_title">Personalize seu barco</string>
+    <string name="tour_boat_body">Toque no seu barco, no alto da aba Pescar, para abrir a seção Skins do Dex. Personalizar barco deixa você pintar o casco, o friso e a cabine e adicionar um padrão, velas, uma bandeira e um emblema. As cores básicas são grátis; o resto é desbloqueado com pontos ou conforme você pesca mais espécies, chega a novas zonas e resgata marcos.</string>
+
+    <string name="tour_shop_style_title">Estilo</string>
+    <string name="tour_shop_style_body">A página Estilo tem barcos prontos, pinturas, emblemas e estampas de vela (visualizados no seu próprio barco), além de novos anzóis, linhas e rastros. Como toda skin, eles só mudam o visual, nunca o jogo.</string>
+
+    <string name="tour_aquarium_title">Seu aquário</string>
+    <string name="tour_aquarium_body">Os peixes que você capturou nadam no seu aquário: abra-o com o botão Aquário no Dex e escolha quem nada ali. A decoração e um tanque maior estão na página Aquário da Loja.</string>
+
+    <string name="tour_season_title">Temporadas e eventos de fim de semana</string>
+    <string name="tour_season_body">Cada temporada dura %1$s. Todo lançamento solo rende XP da temporada e libera níveis de recompensas: apetrechos e pontos para todos, e mais (um barco da temporada, uma insígnia) com o passe de temporada. Todo fim de semana também traz uma meta de pesca com sua própria recompensa. Nada disso muda os duelos.</string>
+
+    <string name="tour_passes_title">Passes</string>
+    <string name="tour_passes_body">O Clube do Capitão é uma assinatura mensal: uma pintura exclusiva para membros, uma insígnia de título do clube, salvamento na nuvem e uma Bolsinha de Lanternas grátis todo mês. Pescadores novos também recebem uma oferta única do Pacote inicial por alguns dias. Um ponto na aba Loja quer dizer que tem algo esperando por você lá.</string>
+
+    <string name="tour_badges_title">Insígnias de título e cartas do Dex</string>
+    <string name="tour_badges_body">Escolha a moldura da sua insígnia de título (mostrada abaixo do seu nome, online também) e como o Dex mostra as espécies que você capturou. Mais opções vêm da Loja, dos passes de temporada e dos eventos.</string>
+
+    <string name="tour_atmosphere_title">Atmosfera</string>
+    <string name="tour_atmosphere_body">A água é inofensiva perto da superfície e fica mais sinistra quanto mais fundo você vai. Chegue à Planície Abissal para desbloquear Pesadelo, um visual assustador para as profundezas: você vê exatamente o mesmo que antes, só o clima muda.</string>
+
+    <string name="tour_battle_title">Duelos 1v1</string>
+    <string name="tour_battle_body">Escolha um modo: Melhor de 5, Corrida de 3 minutos, Pescaria pesada, Caça às espécies ou Mergulho profundo. Os dois jogadores pescam exatamente na mesma água, então quem decide é a habilidade.</string>
+
+    <string name="tour_opponents_title">Escolha um adversário</string>
+    <string name="tour_opponents_body">Jogue contra o computador (Fácil, Normal ou Difícil), um amigo neste celular ou alguém online: crie uma sala e compartilhe o código, ou use a Partida rápida. Online, os dois jogadores usam a mesma corda de torneio (nível %1$d em todos os atributos).</string>
+
+    <string name="tour_battle_tackle_title">Apetrechos nos duelos</string>
+    <string name="tour_battle_tackle_body">Lanternas e Detectores de peixes raros também funcionam nos duelos: ative-os aqui, e cada lançamento seu gasta um. Qualquer um pode consegui-los, então fazem parte do jogo. O Amuleto da sorte e a Isca cintilante são só para lançamentos solo.</string>
+
+    <string name="tour_gifts_title">Presentes e salvamento na nuvem</string>
+    <string name="tour_gifts_body">Depois de um duelo online, você pode enviar um presente ao seu adversário: apetrechos ou visuais, pagos com euros ou pontos. Os presentes para você chegam quando você abre o jogo. Os membros do Clube do Capitão têm backup no servidor: o botão Conta da Loja mostra o código de recuperação que restaura o progresso num celular novo.</string>
+
+    <string name="tour_wager_title">Aposte pontos</string>
+    <string name="tour_wager_body">Contra o computador, você pode apostar pontos no resultado: uma vitória paga a aposta de volta %1$s× no Fácil, %2$s× no Normal e %3$s× no Difícil. Um empate devolve a aposta.</string>
+
+    <string name="tour_settings_title">Configurações</string>
+    <string name="tour_settings_body">A engrenagem no alto da aba Pescar abre as Configurações.</string>
+
+    <string name="tour_sound_title">Som e sensações</string>
+    <string name="tour_sound_body">Ajuste aqui o volume, a música e os efeitos sonoros separadamente. A música acompanha o seu anzol: calma perto da superfície, mais sombria nas profundezas. Vibração adiciona um toque leve às batidas, às capturas e às grandes vitórias, e Reduzir movimento desativa o tremor de tela, a câmera lenta e os clarões.</string>
+
+    <string name="tour_daily_title">Recompensas diárias</string>
+    <string name="tour_daily_body">Resgate uma recompensa aqui uma vez por dia: pontos e apetrechos, e uma maior a cada %1$s. Perder um dia nunca faz o calendário voltar. Sua sequência conta os dias seguidos, e um escudo de sequência cobre sozinho um dia perdido: você começa com %2$d, e a cada %1$s ganha outro (até %3$d).</string>
+
+    <string name="tour_daily_challenges_title">Desafios diários</string>
+    <string name="tour_daily_challenges_body">Todo dia traz três desafios, fácil, médio e difícil, adaptados à sua corda, valendo apetrechos e pontos. Não gostou de um? Troque de graça (%1$s). Só os lançamentos solo contam. Os novos chegam à meia-noite, e os concluídos são resgatados para você se você esquecer.</string>
+    <plurals name="tour_daily_swaps">
+        <item quantity="one">%d troca por dia</item>
+        <item quantity="many">%d de trocas por dia</item>
+        <item quantity="other">%d trocas por dia</item>
+    </plurals>
+
+    <string name="tour_migrations_title">Migrações</string>
+    <string name="tour_migrations_body">Toda semana, por %1$s, duas espécies menos comuns migram: uma perto da superfície e outra nas profundezas, ambas muito mais comuns onde vivem. Um aviso mostra quais são na aba Pescar e no Dex. As migrações valem para os lançamentos solo: os duelos nunca mudam.</string>
+
+    <string name="tour_reminders_title">Lembretes</string>
+    <string name="tour_reminders_body">Quer um aviso quando sua recompensa diária estiver pronta, sua sequência estiver para acabar ou uma migração começar? Ative os lembretes em Configurações: no máximo um por dia, e nunca entre %1$s e %2$s.</string>
+
+    <string name="tour_social_title">Amigos e rankings</string>
+    <string name="tour_social_body">Os amigos, os rankings semanais e o torneio semanal abrem por aqui. Tudo ali é pescado com a corda padrão dos duelos online (nível %1$d em todos os atributos), então o que conta é a habilidade.</string>
+
+    <string name="tour_friend_code_title">Seu código de amigo</string>
+    <string name="tour_friend_code_body">Seu ID de jogador é o seu código de amigo: compartilhe para que seus amigos possam adicionar você. Ninguém consegue encontrar você pelo nome, e os desconhecidos nos rankings só veem um nome criado a partir do seu ID.</string>
+
+    <string name="tour_friends_title">Adicione amigos</string>
+    <string name="tour_friends_body">Digite o ID de jogador de um amigo para enviar um pedido: vocês viram amigos quando ele aceitar. Os cartões dos amigos mostram se eles estão online e as melhores capturas deles na semana, e Desafiar convida o amigo para uma sala de duelo online.</string>
+
+    <string name="tour_leaderboards_title">Rankings semanais</string>
+    <string name="tour_leaderboards_body">Três rankings, melhor lançamento, captura mais funda e captura mais rara, entre todos, na sua liga de cerca de %1$d pescadores ou entre seus amigos. Só contam os lançamentos que o próprio servidor confere: o torneio semanal e os duelos online. Todos os rankings recomeçam na segunda-feira, às 00:00 UTC.</string>
+
+    <string name="tour_tournament_title">O torneio semanal</string>
+    <string name="tour_tournament_body">A semana toda, todo mundo pesca exatamente na mesma água, com %1$d batidas. Você tem %2$d tentativas e a melhor é a que conta; começar uma tentativa já a gasta. Quando a semana acaba, as recompensas dependem da sua posição final, e os %3$d%% melhores ganham a insígnia de título do Torneio.</string>
+
+    <string name="tour_clubs_title">Clubes</string>
+    <string name="tour_clubs_body">Entre num clube com o código dele, ou crie um com um nome feito de palavras de pesca. Até %1$d pescadores pescam juntos por uma meta semanal, e todos que ajudaram ganham cada recompensa alcançada. Não há chat.</string>
+
+    <string name="tour_privacy_title">Sua privacidade</string>
+    <string name="tour_privacy_body">As estatísticas de uso e os relatórios de falhas só são enviados se você permitir. Mude de ideia quando quiser com as duas chaves em Configurações, na seção Privacidade. É lá também que você pode excluir sua conta online e ler a política de privacidade.</string>
+
+    <string name="tour_language_title">Seu idioma</string>
+    <string name="tour_language_body">O Deep Line fala inglês, francês, espanhol, alemão, português do Brasil e turco. Escolha um aqui ou mantenha o idioma do seu celular.</string>
+
+    <string name="tour_replay_title">É isso, boa pescaria!</string>
+    <string name="tour_replay_body">Você pode rever este tour quando quiser em Configurações.</string>
+</resources>
