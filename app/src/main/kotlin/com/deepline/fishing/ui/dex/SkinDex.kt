@@ -55,13 +55,14 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.TextButton
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import com.deepline.fishing.GameViewModel
+import com.deepline.fishing.R
 import com.deepline.fishing.core.Atmosphere
 import com.deepline.fishing.core.Cosmetic
 import com.deepline.fishing.core.CosmeticSlot
-import com.deepline.fishing.core.DepthZone
 import com.deepline.fishing.ui.GameIcons
 import com.deepline.fishing.ui.SkinPreview
 import com.deepline.fishing.ui.TitleBadge
@@ -104,7 +105,7 @@ fun SkinDex(vm: GameViewModel) {
         item(key = "atmosphere", span = { GridItemSpan(maxLineSpan) }) { AtmosphereCard(vm) }
         item(key = "legendary", span = { GridItemSpan(maxLineSpan) }) {
             Text(
-                "Legendary skins",
+                stringResource(R.string.dex_skins_legendary_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(top = 8.dp),
@@ -114,13 +115,12 @@ fun SkinDex(vm: GameViewModel) {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 vm.title?.let { t ->
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("Your title: ")
+                        Text(stringResource(R.string.dex_skins_your_title), modifier = Modifier.padding(end = 4.dp))
                         TitleBadge(t)
                     }
                 }
                 Text(
-                    "Skins only change how your gear looks: they never change how the game plays. " +
-                        "Legendary skins unlocked: ${unlocked.count { !it.fromShop }} of ${Cosmetic.entries.count { !it.fromShop }}.",
+                    stringResource(R.string.dex_skins_note, unlocked.count { !it.fromShop }, Cosmetic.entries.count { !it.fromShop }),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -131,7 +131,7 @@ fun SkinDex(vm: GameViewModel) {
             val open = items.any { it in unlocked }
             item(key = "set-$set", span = { GridItemSpan(maxLineSpan) }) {
                 Text(
-                    if (open) "${skinSetLabel(set)} set" else "Locked set",
+                    if (open) stringResource(R.string.dex_skins_set, skinSetLabel(set)) else stringResource(R.string.dex_skins_set_locked),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = if (open) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant,
@@ -147,8 +147,16 @@ fun SkinDex(vm: GameViewModel) {
         }
         item(key = "shop_gear", span = { GridItemSpan(maxLineSpan) }) {
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 8.dp)) {
-                Text("Shop gear", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary, modifier = Modifier.weight(1f))
-                TextButton(onClick = { vm.openShop(com.deepline.fishing.ShopPage.STYLE) }) { Text(if (shopGear.isEmpty()) "Browse the Shop" else "More in the Shop") }
+                Text(
+                    stringResource(R.string.dex_skins_shop_gear),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.weight(1f),
+                )
+                TextButton(onClick = { vm.openShop(com.deepline.fishing.ShopPage.STYLE) }) {
+                    Text(stringResource(if (shopGear.isEmpty()) R.string.dex_skins_shop_browse else R.string.dex_skins_shop_more))
+                }
             }
         }
         items(shopGear, key = { it.name }) { c ->
@@ -185,7 +193,12 @@ private fun SkinTile(c: Cosmetic, unlocked: Boolean, equipped: Boolean, time: Fl
                     Canvas(Modifier.fillMaxSize()) { drawSilhouette { drawSlotArt(c.slot, null, 0f) } }
                 }
                 if (!unlocked) {
-                    Icon(GameIcons.Lock, contentDescription = "Locked", tint = Color.White.copy(alpha = 0.7f), modifier = Modifier.size(22.dp))
+                    Icon(
+                        GameIcons.Lock,
+                        contentDescription = stringResource(R.string.dex_skins_locked),
+                        tint = Color.White.copy(alpha = 0.7f),
+                        modifier = Modifier.size(22.dp),
+                    )
                 }
             }
             Text(
@@ -200,8 +213,8 @@ private fun SkinTile(c: Cosmetic, unlocked: Boolean, equipped: Boolean, time: Fl
             )
             Text(
                 when {
-                    !unlocked -> "Locked"
-                    equipped -> "Equipped ✓"
+                    !unlocked -> stringResource(R.string.dex_skins_locked)
+                    equipped -> stringResource(R.string.dex_skins_equipped)
                     else -> c.slot.label()
                 },
                 style = MaterialTheme.typography.labelSmall,
@@ -230,30 +243,35 @@ private fun YourBoatCard(vm: GameViewModel, time: Float) {
     val p = vm.progress
     Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) {
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Your boat", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.dex_skins_boat_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                val boatDescription = stringResource(R.string.dex_skins_boat_cd)
                 Canvas(
                     Modifier
                         .size(width = 120.dp, height = 92.dp)
                         .clip(RoundedCornerShape(10.dp))
-                        .semantics { contentDescription = "Your hand-made boat" },
+                        .semantics { contentDescription = boatDescription },
                 ) { drawBoatTile(null, p.boatDesign, time) }
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(
-                        "Paint and rig it yourself. Basic options are free; more unlock with points and as you progress.",
+                        stringResource(R.string.dex_skins_boat_body),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     if (p.customBoatEquipped) {
-                        TextButton(onClick = { vm.equipCustomBoat(false) }) { Text("Worn ✓ · use the classic boat") }
+                        TextButton(onClick = { vm.equipCustomBoat(false) }) { Text(stringResource(R.string.dex_skins_boat_worn)) }
                     } else {
-                        TextButton(onClick = { vm.equipCustomBoat(true) }) { Text("Wear my boat") }
+                        TextButton(onClick = { vm.equipCustomBoat(true) }) { Text(stringResource(R.string.dex_skins_boat_wear)) }
                     }
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = vm::openBoatEditor, modifier = Modifier.weight(1f).tourTarget(TourTarget.SKINS_CUSTOMISE)) { Text("Customise boat") }
-                OutlinedButton(onClick = { vm.openShop(com.deepline.fishing.ShopPage.STYLE) }, modifier = Modifier.weight(1f)) { Text("Shop boats") }
+                Button(onClick = vm::openBoatEditor, modifier = Modifier.weight(1f).tourTarget(TourTarget.SKINS_CUSTOMISE)) {
+                    Text(stringResource(R.string.dex_skins_boat_customise))
+                }
+                OutlinedButton(onClick = { vm.openShop(com.deepline.fishing.ShopPage.STYLE) }, modifier = Modifier.weight(1f)) {
+                    Text(stringResource(R.string.dex_skins_boat_shop))
+                }
             }
         }
     }
@@ -266,20 +284,20 @@ private fun ShowOffCard(vm: GameViewModel) {
     val now = com.deepline.fishing.core.ShopClock.now()
     Card(Modifier.fillMaxWidth().tourTarget(TourTarget.SKINS_BADGE), shape = RoundedCornerShape(14.dp)) {
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Title badge", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.dex_skins_badge_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             TitleBadge(vm.title ?: vm.playerName, frame = vm.titleFrame)
             androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 for (f in com.deepline.fishing.core.TitleFrame.entries.filter { it.isAvailable(p, now) }) {
                     androidx.compose.material3.FilterChip(selected = vm.titleFrame == f, onClick = { vm.setTitleFrame(f) }, label = { Text(f.label()) })
                 }
             }
-            Text("Dex cards", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.dex_skins_cards_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 for (s in com.deepline.fishing.core.CardStyle.entries.filter { it.isAvailable(p) }) {
                     androidx.compose.material3.FilterChip(selected = vm.cardStyle == s, onClick = { vm.setCardStyle(s) }, label = { Text(s.label()) })
                 }
             }
-            TextButton(onClick = { vm.openShop(com.deepline.fishing.ShopPage.STYLE) }) { Text("More badges and card styles in the Shop") }
+            TextButton(onClick = { vm.openShop(com.deepline.fishing.ShopPage.STYLE) }) { Text(stringResource(R.string.dex_skins_badges_more)) }
         }
     }
 }
@@ -291,13 +309,18 @@ private fun AtmosphereCard(vm: GameViewModel) {
     Card(Modifier.fillMaxWidth().tourTarget(TourTarget.SKINS_ATMOSPHERE), shape = RoundedCornerShape(14.dp)) {
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Atmosphere", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                if (!p.atmosphereUnlocked) Icon(GameIcons.Lock, contentDescription = "Locked", modifier = Modifier.size(18.dp))
+                Text(
+                    stringResource(R.string.dex_skins_atmosphere_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f),
+                )
+                if (!p.atmosphereUnlocked) Icon(GameIcons.Lock, contentDescription = stringResource(R.string.dex_skins_locked), modifier = Modifier.size(18.dp))
             }
             if (!p.atmosphereUnlocked) {
                 Text(
-                    "Reach the ${DepthZone.ABYSS.label()} to unlock ${Atmosphere.NIGHTMARE.label()}: a frightening " +
-                        "look for the deep water.",
+                    // The zone and the atmosphere are written into the sentence (they need articles and cases).
+                    stringResource(R.string.dex_skins_atmosphere_locked),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -312,11 +335,9 @@ private fun AtmosphereCard(vm: GameViewModel) {
                     }
                 }
                 Text(
-                    if (p.atmosphere == Atmosphere.NIGHTMARE) {
-                        "The deep is properly frightening. You still see exactly as much as before: only the mood changes."
-                    } else {
-                        "Harmless at the surface, spookier the deeper you go."
-                    },
+                    stringResource(
+                        if (p.atmosphere == Atmosphere.NIGHTMARE) R.string.dex_skins_atmosphere_nightmare else R.string.dex_skins_atmosphere_family,
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

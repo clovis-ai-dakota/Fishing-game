@@ -5,8 +5,7 @@
     screen's own text goes here too, under boat_editor_<purpose>. Keys start with boat_.
 -->
 <resources>
-    <!-- How a locked boat option unlocks: short labels under the option, also used in
-         "<label> to unlock it." -->
+    <!-- How a locked boat option unlocks: short labels under the option (a chip). -->
     <string name="boat_requirement_free">Free</string>
     <plurals name="boat_requirement_species">
         <!-- Unlocked once this many species are caught. -->
@@ -22,4 +21,65 @@
     </plurals>
     <!-- Sold in the Shop. -->
     <string name="boat_requirement_shop">In the shop</string>
+
+    <!-- The same, as a whole sentence in the dialog shown when a locked option is tapped. -->
+    <string name="boat_unlock_free">It\'s free.</string>
+    <!-- %1$s: the points price with its unit, e.g. "1,200 pts". -->
+    <string name="boat_unlock_points">Unlock it for %1$s.</string>
+    <plurals name="boat_unlock_species">
+        <item quantity="one">Catch %d species to unlock it.</item>
+        <item quantity="other">Catch %d species to unlock it.</item>
+    </plurals>
+    <!-- %1$s: the zone's name, e.g. Midnight Trench. -->
+    <string name="boat_unlock_zone">Catch a fish in the %1$s to unlock it.</string>
+    <plurals name="boat_unlock_milestones">
+        <item quantity="one">Claim %d milestone to unlock it.</item>
+        <item quantity="other">Claim %d milestones to unlock it.</item>
+    </plurals>
+    <string name="boat_unlock_shop">Buy it in the Shop to unlock it.</string>
+    <!-- Captain's Club: the monthly membership (see core_shop_item_captains_club). -->
+    <string name="boat_unlock_club">Join the Captain\'s Club to unlock it.</string>
+
+    <!-- The editor screen (ui/boat/BoatEditorScreen.kt). -->
+    <string name="boat_editor_title">Customise boat</string>
+    <!-- Under the boat's preview. %1$s: the player's points, formatted. -->
+    <string name="boat_editor_intro">Your points: %1$s. Basic options are free; tap a locked one to see how to unlock it.</string>
+    <!-- Headings over each row of options: colours (round swatches) and styles (chips). -->
+    <string name="boat_editor_hull_colour">Hull colour</string>
+    <string name="boat_editor_bottom_colour">Bottom colour</string>
+    <string name="boat_editor_trim_colour">Trim and emblem</string>
+    <string name="boat_editor_cabin_colour">Cabin</string>
+    <string name="boat_editor_sail_colour">Sail colour</string>
+    <string name="boat_editor_flag_colour">Flag colour</string>
+    <string name="boat_editor_pattern">Hull pattern</string>
+    <string name="boat_editor_sail">Sail</string>
+    <string name="boat_editor_flag">Flag</string>
+    <string name="boat_editor_emblem">Emblem</string>
+    <!-- Screen reader description of a colour swatch. %1$s: the row's heading (e.g. Hull colour);
+         %2$s: the colour's name (e.g. Ocean). -->
+    <string name="boat_editor_swatch_cd">%1$s: %2$s</string>
+    <string name="boat_editor_swatch_cd_locked">%1$s: %2$s (locked)</string>
+    <!-- Screen reader description of the lock on a locked option. -->
+    <string name="boat_editor_locked_cd">Locked</string>
+    <!-- Button: save the design and wear the boat. -->
+    <string name="boat_editor_save">Save and wear</string>
+    <!-- A locked option that is bought once with points. %1$s: the option's name, e.g. Racing stripe. -->
+    <string name="boat_editor_unlock_title">Unlock %1$s?</string>
+    <plurals name="boat_editor_unlock_body">
+        <!-- %1$s: the option's name; %2$s: its price in points; %3$s: the player's points. Numbers
+             are formatted already; the form follows the price. -->
+        <item quantity="one">%1$s costs %2$s point, once. You have %3$s.</item>
+        <item quantity="other">%1$s costs %2$s points, once. You have %3$s.</item>
+    </plurals>
+    <plurals name="boat_editor_unlock_body_short">
+        <!-- The same, when the player hasn't enough points yet. -->
+        <item quantity="one">%1$s costs %2$s point, once. You have %3$s. Keep fishing to earn more.</item>
+        <item quantity="other">%1$s costs %2$s points, once. You have %3$s. Keep fishing to earn more.</item>
+    </plurals>
+    <!-- The dialog's button. %1$s: the price, formatted. -->
+    <string name="boat_editor_unlock_buy">Unlock for %1$s pts</string>
+    <string name="boat_editor_not_now">Not now</string>
+    <!-- A locked option unlocked by progress or in the Shop. %1$s: the option's name, e.g. Checkers.
+         The dialog's text is one of the boat_unlock_* sentences. -->
+    <string name="boat_editor_locked_title">%1$s is locked</string>
 </resources>

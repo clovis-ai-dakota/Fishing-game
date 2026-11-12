@@ -4,7 +4,9 @@ import android.app.Activity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.deepline.fishing.R
 import com.deepline.fishing.core.ShopItem
+import com.deepline.fishing.ui.i18n.UiText
 import java.util.UUID
 
 /**
@@ -14,7 +16,7 @@ import java.util.UUID
  * button, or the next app start), like a slow card payment on Google Play.
  */
 class TestStore(private val listener: StoreListener) : Store {
-    override val name = "Test store"
+    override val name: UiText = UiText.res(R.string.shop_store_test_name)
 
     /** The purchase waiting for the tester's answer. */
     var request by mutableStateOf<ShopItem?>(null)
@@ -33,7 +35,7 @@ class TestStore(private val listener: StoreListener) : Store {
         when (outcome) {
             TestOutcome.APPROVE -> listener.onPurchased(purchaseOf(item))
             TestOutcome.CANCEL -> listener.onProblem(item.id, StoreProblem.CANCELLED)
-            TestOutcome.FAIL -> listener.onProblem(item.id, StoreProblem.FAILED, "The test store declined the card.")
+            TestOutcome.FAIL -> listener.onProblem(item.id, StoreProblem.FAILED, reason = StoreReason.TEST_DECLINED)
             TestOutcome.PENDING -> {
                 pending += item
                 listener.onProblem(item.id, StoreProblem.PENDING)
@@ -52,10 +54,6 @@ class TestStore(private val listener: StoreListener) : Store {
     // Tokens are unique across app runs: the game ignores a token it has already granted.
     private fun purchaseOf(item: ShopItem) = StorePurchase(item.id, "test-${UUID.randomUUID()}", item.kind)
 
-    enum class TestOutcome(val label: String) {
-        APPROVE("Approve"),
-        CANCEL("Cancel"),
-        FAIL("Fail"),
-        PENDING("Pending"),
-    }
+    /** The tester's choices (the dialog's buttons are in strings_shell.xml, `shell_test_store_*`). */
+    enum class TestOutcome { APPROVE, CANCEL, FAIL, PENDING }
 }

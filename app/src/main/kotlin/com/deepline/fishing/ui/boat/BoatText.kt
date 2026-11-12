@@ -25,6 +25,17 @@ fun requirementText(r: PartRequirement): UiText = when (r) {
     PartRequirement.ClubOnly -> UiText.res(R.string.core_shop_item_captains_club)
 }
 
+/** The same as a whole sentence, for the dialog of a locked option: "Catch 25 species to unlock it." */
+fun unlockHintText(r: PartRequirement): UiText = when (r) {
+    PartRequirement.Free -> UiText.res(R.string.boat_unlock_free)
+    is PartRequirement.Points -> UiText.res(R.string.boat_unlock_points, pointsText(r.cost.toLong()))
+    is PartRequirement.SpeciesCaught -> UiText.plural(R.plurals.boat_unlock_species, r.count)
+    is PartRequirement.FishInZone -> UiText.res(R.string.boat_unlock_zone, r.zone.labelText())
+    is PartRequirement.MilestonesClaimed -> UiText.plural(R.plurals.boat_unlock_milestones, r.count)
+    PartRequirement.PremiumOnly -> UiText.res(R.string.boat_unlock_shop)
+    PartRequirement.ClubOnly -> UiText.res(R.string.boat_unlock_club)
+}
+
 /** The option's name as shown in the editor. */
 fun partName(part: BoatPart): UiText = when (part.kind) {
     BoatPartKind.COLOR -> swatchText(part.id)

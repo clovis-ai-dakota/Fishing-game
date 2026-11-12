@@ -48,6 +48,7 @@ import com.deepline.fishing.billing.Store
 import com.deepline.fishing.billing.StoreListener
 import com.deepline.fishing.billing.StoreProblem
 import com.deepline.fishing.billing.StorePurchase
+import com.deepline.fishing.billing.StoreReason
 import com.deepline.fishing.billing.TestStore
 import com.deepline.fishing.core.online.ClientMessage
 import com.deepline.fishing.core.online.LiveStatus
@@ -394,17 +395,17 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             update(ShopCatalog.onClubSubscriptionActive(progress, ShopClock.now()))
         }
 
-        override fun onProblem(productId: String?, problem: StoreProblem, message: String?) {
-            GameAnalytics.storeProblem(productId, problem.name.lowercase(), message)
+        override fun onProblem(productId: String?, problem: StoreProblem, message: String?, reason: StoreReason?) {
+            GameAnalytics.storeProblem(productId, problem.name.lowercase(), message ?: reason?.name?.lowercase())
             if (problem != StoreProblem.PENDING) review.onSetback()
             val name = productId?.let { ShopCatalog.byId(it)?.nameText() }
-            // The store's own explanation (from Google Play) stays as it comes.
-            val detail = message?.takeIf { it.isNotBlank() }
+            // The game's own reason in the game's language; the store's own explanation (from Google Play) as it comes.
+            val detail = reason?.text ?: message?.takeIf { it.isNotBlank() }?.let(UiText::raw)
             shopMessage = when (problem) {
                 StoreProblem.CANCELLED -> UiText.res(R.string.shop_message_cancelled)
                 StoreProblem.PENDING -> name?.let { UiText.res(R.string.shop_message_pending, it) } ?: UiText.res(R.string.shop_message_pending_unknown)
                 StoreProblem.FAILED -> detail?.let { UiText.res(R.string.shop_message_failed_because, it) } ?: UiText.res(R.string.shop_message_failed)
-                StoreProblem.UNAVAILABLE -> detail?.let(UiText::raw) ?: UiText.res(R.string.shop_message_store_unavailable, billing.name)
+                StoreProblem.UNAVAILABLE -> detail ?: UiText.res(R.string.shop_message_store_unavailable, billing.name)
             }
         }
     }

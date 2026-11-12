@@ -40,6 +40,7 @@ same setting as the system's per-app language.
 | `strings_tour.xml` | `tour_` | The guided tour (`tour_<step id>_title` / `_body`). |
 | `strings_shop.xml` | `shop_` | Shop messages, what items give, account errors; the Shop screens go here. |
 | `strings_boat.xml` | `boat_` | Boat editor. |
+| `strings_dex.xml` | `dex_` | The Dex tab: species cards and pages, secret tiers, the Skins section. |
 | `strings_cast.xml` | `cast_` | Notices during a cast; the cast screen, HUD and results go here. |
 | `strings_battle.xml` | `battle_`, `online_` | Battles, the online lobby and online errors. |
 | `strings_daily.xml` | `daily_` | Daily rewards, challenges, migrations, reminders. |

@@ -56,12 +56,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.annotation.StringRes
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.GameViewModel
+import com.deepline.fishing.R
 import com.deepline.fishing.ShopPage
 import com.deepline.fishing.core.BoatParts
 import com.deepline.fishing.core.Cosmetic
@@ -82,6 +86,7 @@ import com.deepline.fishing.ui.TabScreen
 import com.deepline.fishing.ui.compactPoints
 import com.deepline.fishing.ui.dex.drawSlotArt
 import com.deepline.fishing.ui.drawBoatTile
+import com.deepline.fishing.ui.formatEuros
 import com.deepline.fishing.ui.formatPoints
 import com.deepline.fishing.ui.formatStat
 import com.deepline.fishing.ui.tour.TourTarget
@@ -111,10 +116,10 @@ fun ShopScreen(vm: GameViewModel) {
     val actions = ShopActions(vm, LocalContext.current.findActivity(), onPoints = { confirm = it })
 
     TabScreen(
-        title = "Shop",
+        title = stringResource(R.string.shell_tab_shop),
         subtitle = {
             Text(
-                "${formatPoints(p.pointsBalance)} pts to spend",
+                stringResource(R.string.shop_balance, formatPoints(p.pointsBalance)),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.secondary,
                 fontWeight = FontWeight.Bold,
@@ -133,7 +138,7 @@ fun ShopScreen(vm: GameViewModel) {
                 FilterChip(
                     selected = pg == page,
                     onClick = { vm.selectShopPage(pg) },
-                    label = { Text(androidx.compose.ui.res.stringResource(pg.labelRes)) },
+                    label = { Text(stringResource(pg.labelRes)) },
                     modifier = Modifier.testTag("shop_page_${pg.name.lowercase()}"),
                 )
             }
@@ -167,19 +172,23 @@ internal fun PointsConfirmDialog(vm: GameViewModel, item: ShopItem, onDone: () -
     val price = vm.shopPointsPrice(item)
     AlertDialog(
         onDismissRequest = onDone,
-        title = { Text("Buy ${item.label()}?") },
+        title = { Text(stringResource(R.string.shop_confirm_title, item.label())) },
         text = {
             Text(
-                "You get: ${ShopText.contents(item, p).asString()}.\n\nIt costs ${formatPoints(price)} pts; you'll have " +
-                    "${formatPoints(p.pointsBalance - price)} pts left.",
+                stringResource(
+                    R.string.shop_confirm_body,
+                    ShopText.contents(item, p).asString(),
+                    formatPoints(price),
+                    formatPoints(p.pointsBalance - price),
+                ),
             )
         },
         confirmButton = {
             TextButton(onClick = { vm.buyWithPoints(item); onDone() }, modifier = Modifier.testTag("confirm_points")) {
-                Text("Buy for ${formatPoints(price)} pts")
+                Text(stringResource(R.string.shop_confirm_buy, formatPoints(price)))
             }
         },
-        dismissButton = { TextButton(onClick = onDone) { Text("Cancel") } },
+        dismissButton = { TextButton(onClick = onDone) { Text(stringResource(R.string.common_cancel)) } },
     )
 }
 
@@ -197,14 +206,18 @@ internal fun Context.findActivity(): Activity? = when (this) {
 private fun LazyGridScope.full(key: String, content: @Composable () -> Unit) =
     item(key = key, span = { GridItemSpan(maxLineSpan) }) { content() }
 
-private fun LazyGridScope.header(key: String, title: String, note: String? = null, modifier: Modifier = Modifier) = full(key) {
+private fun LazyGridScope.header(key: String, @StringRes title: Int, @StringRes note: Int? = null, modifier: Modifier = Modifier) = full(key) {
     Column(modifier.padding(top = 6.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        Text(stringResource(title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         if (note != null) {
-            Text(note, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(note), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
+
+/** A bundle's saving as a badge ("-25%"). */
+@Composable
+private fun discountBadge(percent: Int): String = stringResource(R.string.shop_badge_discount, percent)
 
 // ---- Banners: the Club's monthly pouch and the starter pack ------------------------------------
 
@@ -213,21 +226,22 @@ private fun LazyGridScope.banners(vm: GameViewModel, page: ShopPage, actions: Sh
         full("club_pouch") {
             val pouch = ShopCatalog.clubPouch
             Banner(
-                title = "Captain's Club gift",
-                text = "Your free monthly ${pouch.label()} is ready: ${ShopText.contents(pouch, vm.progress).asString()}.",
+                title = stringResource(R.string.shop_club_pouch_title),
+                text = stringResource(R.string.shop_club_pouch_body, ShopText.contents(pouch, vm.progress).asString()),
             ) {
-                Button(onClick = vm::claimClubPouch, modifier = Modifier.testTag("claim_club_pouch")) { Text("Claim") }
+                Button(onClick = vm::claimClubPouch, modifier = Modifier.testTag("claim_club_pouch")) { Text(stringResource(R.string.shop_claim)) }
             }
         }
     }
     val starter = ShopCatalog.byId("starter_pack")
     if (starter != null && vm.starterOfferOpen && page != ShopPage.PASSES) {
         full("starter_banner") {
+            val discount = ShopCatalog.discountPercent(starter, vm.progress)
             Banner(
-                title = "Starter pack" + (ShopCatalog.discountPercent(starter, vm.progress)?.let { " · -$it%" } ?: ""),
-                text = "A one-time offer, ends in ${ShopText.timeLeftLabel(vm.progress.starterOfferEndsMs - ShopClock.now())}.",
+                title = starter.label() + (discount?.let { " · " + discountBadge(it) } ?: ""),
+                text = stringResource(R.string.shop_starter_banner_body, ShopText.timeLeftLabel(vm.progress.starterOfferEndsMs - ShopClock.now())),
             ) {
-                TextButton(onClick = { vm.selectShopPage(ShopPage.PASSES) }) { Text("See it") }
+                TextButton(onClick = { vm.selectShopPage(ShopPage.PASSES) }) { Text(stringResource(R.string.shop_starter_banner_see)) }
             }
         }
     }
@@ -254,7 +268,7 @@ private fun Banner(title: String, text: String, action: @Composable () -> Unit) 
 @Composable
 private fun ClubChip() {
     Text(
-        "Captain's Club",
+        stringResource(R.string.core_shop_item_captains_club),
         modifier = Modifier
             .padding(end = 8.dp)
             .clip(RoundedCornerShape(50))
@@ -281,21 +295,19 @@ internal fun PriceButtons(item: ShopItem, actions: ShopActions, wide: Boolean = 
             onClick = { actions.buyWithMoney(item) },
             contentPadding = PaddingValues(horizontal = 8.dp),
             modifier = Modifier.weight(1f).testTag("buy_eur_${item.id}"),
-        ) { Text(vm.billing.priceOf(item) ?: com.deepline.fishing.ui.formatEuros(item.euroCents), maxLines = 1, fontWeight = FontWeight.Bold) }
+        ) { Text(vm.billing.priceOf(item) ?: formatEuros(item.euroCents), maxLines = 1, fontWeight = FontWeight.Bold) }
         OutlinedButton(
             onClick = { actions.onPoints(item) },
             enabled = vm.progress.pointsBalance >= points,
             contentPadding = PaddingValues(horizontal = 8.dp),
             modifier = Modifier.weight(1f).testTag("buy_pts_${item.id}"),
-        ) { Text("${if (wide) formatPoints(points) else compactPoints(points)} pts", maxLines = 1) }
+        ) { Text(stringResource(R.string.common_points, if (wide) formatPoints(points) else compactPoints(points)), maxLines = 1) }
     }
 }
 
-private fun euros(cents: Int) = "€" + "%d.%02d".format(cents / 100, cents % 100)
-
 /** Shown instead of the prices once a permanent item is owned. */
 @Composable
-internal fun OwnedRow(label: String = "Owned ✓", action: (@Composable () -> Unit)? = null) {
+internal fun OwnedRow(label: String = stringResource(R.string.shop_owned), action: (@Composable () -> Unit)? = null) {
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
         Text(
             label,
@@ -325,12 +337,7 @@ internal fun Badge(text: String) {
 // ---- Rope (points only) ------------------------------------------------------------------------
 
 private fun LazyGridScope.ropePage(vm: GameViewModel) {
-    header(
-        "rope_header",
-        "Rope upgrades",
-        "Bought with points. Rope Length reaches deeper zones and new fish, Strength carries more weight, " +
-            "Agility steers faster. Changed your mind? Downgrade a level for a full refund.",
-    )
+    header("rope_header", R.string.shop_rope_title, R.string.shop_rope_note)
     for (stat in RopeStat.entries) {
         full("rope_${stat.name}") {
             val tagged = if (stat == RopeStat.entries.first()) Modifier.tourTarget(TourTarget.SHOP_ROPE) else Modifier
@@ -348,22 +355,24 @@ private fun RopeCard(vm: GameViewModel, stat: RopeStat, modifier: Modifier) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(stat.label(), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-                Text("Lv $level / ${stat.maxLevel}", style = MaterialTheme.typography.labelLarge)
+                Text(stringResource(R.string.shop_rope_level, level, stat.maxLevel), style = MaterialTheme.typography.labelLarge)
             }
             Text(stat.description(), style = MaterialTheme.typography.bodySmall)
             LinearProgressIndicator(progress = { level.toFloat() / stat.maxLevel }, modifier = Modifier.fillMaxWidth())
             val current = formatStat(stat, stat.valueAt(level))
             Progression.downgradeRefund(p, stat)?.let { refund ->
                 TextButton(onClick = { vm.downgrade(stat) }) {
-                    Text("Downgrade to ${formatStat(stat, stat.valueAt(level - 1))} · refund ${formatPoints(refund)} pts")
+                    Text(stringResource(R.string.shop_rope_downgrade, formatStat(stat, stat.valueAt(level - 1)), formatPoints(refund)))
                 }
             }
             if (cost == null) {
-                Text("$current · maxed out", fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.shop_rope_maxed, current), fontWeight = FontWeight.SemiBold)
             } else {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("$current → ${formatStat(stat, stat.valueAt(level + 1))}", fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
-                    Button(onClick = { vm.buyUpgrade(stat) }, enabled = p.pointsBalance >= cost) { Text("${formatPoints(cost)} pts") }
+                    Button(onClick = { vm.buyUpgrade(stat) }, enabled = p.pointsBalance >= cost) {
+                        Text(stringResource(R.string.common_points, formatPoints(cost)))
+                    }
                 }
             }
         }
@@ -373,12 +382,7 @@ private fun RopeCard(vm: GameViewModel, stat: RopeStat, modifier: Modifier) {
 // ---- Tackle --------------------------------------------------------------------------------------
 
 private fun LazyGridScope.tacklePage(vm: GameViewModel, actions: ShopActions) {
-    header(
-        "tackle_header",
-        "Tackle",
-        "One-cast items: switch them on before you cast. The Lantern and the detector also work in battles. " +
-            "Buy one with points, or a pack with euros or points.",
-    )
+    header("tackle_header", R.string.shop_tackle_title, R.string.shop_tackle_note)
     for (t in Tackle.entries) {
         full("tackle_${t.name}") {
             val tagged = if (t == Tackle.entries.first()) Modifier.tourTarget(TourTarget.SHOP_TACKLE) else Modifier
@@ -398,26 +402,30 @@ private fun TackleCard(vm: GameViewModel, t: Tackle, actions: ShopActions, modif
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(t.label(), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-                Text("You have ${Progression.tackleCount(p, t)}", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.secondary)
+                Text(
+                    stringResource(R.string.shop_tackle_owned, Progression.tackleCount(p, t)),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.secondary,
+                )
             }
             Text(
-                t.description() + if (t.usableInBattles) " Works in battles too." else " Solo casts only.",
+                stringResource(if (t.usableInBattles) R.string.shop_tackle_desc_battles else R.string.shop_tackle_desc_solo, t.description()),
                 style = MaterialTheme.typography.bodySmall,
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Just one", style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
+                Text(stringResource(R.string.shop_tackle_single), style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
                 OutlinedButton(
                     onClick = { vm.buyTackle(t) },
                     enabled = p.pointsBalance >= single,
                     modifier = Modifier.testTag("buy_one_${t.name.lowercase()}"),
-                ) { Text("${formatPoints(single)} pts") }
+                ) { Text(stringResource(R.string.common_points, formatPoints(single))) }
             }
             for (pack in packs) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Column(Modifier.weight(1f)) {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             Text(pack.label(), style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                            pack.badge?.let { Badge(it) }
+                            pack.badgeText()?.let { Badge(it.asString()) }
                         }
                         Text(ShopText.contents(pack, p).asString(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
@@ -440,32 +448,27 @@ private fun LazyGridScope.stylePage(vm: GameViewModel, actions: ShopActions, tim
     val badges = style.filter { (it.grants.singleOrNull() as? Grant.Unlock)?.key?.startsWith("badge:") == true }
     val cards = style.filter { (it.grants.singleOrNull() as? Grant.Unlock)?.key?.startsWith("card:") == true }
     val known = (boats + sets + parts + gear + badges + cards + style.filter { it.id.startsWith("theme_") }).toSet()
-    header(
-        "boats_header",
-        "Premade boats",
-        "Ready-made designs: wear one as it is, or make it your own in the boat editor. Like every skin, looks only.",
-        Modifier.tourTarget(TourTarget.SHOP_STYLE),
-    )
+    header("boats_header", R.string.shop_style_boats_title, R.string.shop_style_boats_note, Modifier.tourTarget(TourTarget.SHOP_STYLE))
     items(boats, key = { it.id }) { BoatTile(vm, it, actions, time) }
     if (sets.isNotEmpty()) {
-        header("sets_header", "Complete sets", "A premade boat with a matching hook, line and trail.")
+        header("sets_header", R.string.shop_style_sets_title, R.string.shop_style_sets_note)
         for (set in sets) full(set.id) { SetCard(vm, set, actions, time) }
     }
-    header("parts_header", "Paints, emblems and prints", "Previewed on your own boat. Once bought, they're in the boat editor too.")
+    header("parts_header", R.string.shop_style_parts_title, R.string.shop_style_parts_note)
     items(parts, key = { it.id }) { PartTile(vm, it, actions, time) }
-    header("gear_header", "Hooks, lines and trails", "Same size and hitbox as the classic gear: they only change the look.")
+    header("gear_header", R.string.shop_style_gear_title, R.string.shop_style_gear_note)
     items(gear, key = { it.id }) { GearTile(vm, it, actions, time) }
     val themeItems = style.filter { it.id.startsWith("theme_") }
-    header("themes_header", "App themes", "The scene and colours of the menus, by day and at night. Richer themes cost more.", Modifier.tourTarget(TourTarget.SHOP_THEMES))
+    header("themes_header", R.string.shop_style_themes_title, R.string.shop_style_themes_note, Modifier.tourTarget(TourTarget.SHOP_THEMES))
     items(themeItems.filter { it.grants.size == 1 }, key = { it.id }) { ThemeTile(vm, it, actions) }
     for (bundle in themeItems.filter { it.grants.size > 1 }) full(bundle.id) { ItemCard(vm, bundle, actions) }
-    header("badges_header", "Title badges", "The frame around your title (or your name), shown online too. Season passes, events and the Club add more.")
+    header("badges_header", R.string.shop_style_badges_title, R.string.shop_style_badges_note)
     items(badges, key = { it.id }) { BadgeTile(vm, it, actions) }
-    header("cards_header", "Dex card styles", "How the Dex shows the species you've caught.")
+    header("cards_header", R.string.shop_style_cards_title, R.string.shop_style_cards_note)
     items(cards, key = { it.id }) { CardStyleTile(vm, it, actions) }
     val others = style - known
     if (others.isNotEmpty()) {
-        header("style_more", "More")
+        header("style_more", R.string.shop_style_more_title)
         for (item in others) full(item.id) { ItemCard(vm, item, actions) }
     }
 }
@@ -499,8 +502,8 @@ private fun BoatTile(vm: GameViewModel, item: ShopItem, actions: ShopActions, ti
     Tile(item.label(), item.badgeText()?.asString(), preview = { Canvas(Modifier.fillMaxSize()) { drawBoatTile(null, skin.design, time) } }) {
         Text(skin.description(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, minLines = 2, maxLines = 2, overflow = TextOverflow.Ellipsis)
         when {
-            vm.isWearingPreset(presetId) -> OwnedRow("Worn ✓")
-            ShopCatalog.ownsPreset(vm.progress, presetId) -> OwnedRow { TextButton(onClick = { vm.wearPreset(presetId) }) { Text("Wear") } }
+            vm.isWearingPreset(presetId) -> OwnedRow(stringResource(R.string.shop_worn))
+            ShopCatalog.ownsPreset(vm.progress, presetId) -> OwnedRow { TextButton(onClick = { vm.wearPreset(presetId) }) { Text(stringResource(R.string.shop_wear)) } }
             else -> PriceButtons(item, actions)
         }
     }
@@ -515,7 +518,7 @@ private fun SetCard(vm: GameViewModel, item: ShopItem, actions: ShopActions, tim
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(item.label(), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                item.badge?.let { Badge(it) }
+                item.badgeText()?.let { Badge(it.asString()) }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 Box(Modifier.weight(1.6f).aspectRatio(1.3f).clip(RoundedCornerShape(10.dp)).background(TileWater)) {
@@ -527,7 +530,11 @@ private fun SetCard(vm: GameViewModel, item: ShopItem, actions: ShopActions, tim
                     }
                 }
             }
-            Text(ShopText.contents(item, vm.progress).asString() + ".", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                stringResource(R.string.shop_set_contents, ShopText.contents(item, vm.progress).asString()),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
             if (ShopCatalog.owns(vm.progress, item.id)) OwnedRow() else PriceButtons(item, actions, wide = true)
         }
     }
@@ -540,9 +547,11 @@ private fun PartTile(vm: GameViewModel, item: ShopItem, actions: ShopActions, ti
     val preview = BoatParts.applyTo(p.boatDesign, part, p)
     Tile(item.label(), item.badgeText()?.asString(), preview = { Canvas(Modifier.fillMaxSize()) { drawBoatTile(null, preview, time) } }) {
         when {
-            vm.isOnBoat(part) -> OwnedRow("On your boat ✓")
+            vm.isOnBoat(part) -> OwnedRow(stringResource(R.string.shop_on_your_boat))
             ShopCatalog.owns(p, item.id) || BoatParts.isAvailable(p, part) ->
-                OwnedRow { TextButton(onClick = { vm.applyBoatPart(part) }, modifier = Modifier.testTag("apply_${item.id}")) { Text("Apply") } }
+                OwnedRow {
+                    TextButton(onClick = { vm.applyBoatPart(part) }, modifier = Modifier.testTag("apply_${item.id}")) { Text(stringResource(R.string.shop_apply)) }
+                }
             else -> PriceButtons(item, actions)
         }
     }
@@ -555,8 +564,10 @@ private fun GearTile(vm: GameViewModel, item: ShopItem, actions: ShopActions, ti
     Tile(item.label(), item.badgeText()?.asString(), preview = { Canvas(Modifier.fillMaxSize()) { drawSlotArt(c.slot, c, time) } }) {
         val worn = p.equippedSkins[c.slot] == c
         when {
-            worn -> OwnedRow("Worn ✓") { TextButton(onClick = { vm.equipSkin(c.slot, null) }) { Text("Take off") } }
-            ShopCatalog.ownsCosmetic(p, c) -> OwnedRow { TextButton(onClick = { vm.equipSkin(c.slot, c) }) { Text("Wear") } }
+            worn -> OwnedRow(stringResource(R.string.shop_worn)) {
+                TextButton(onClick = { vm.equipSkin(c.slot, null) }) { Text(stringResource(R.string.shop_take_off)) }
+            }
+            ShopCatalog.ownsCosmetic(p, c) -> OwnedRow { TextButton(onClick = { vm.equipSkin(c.slot, c) }) { Text(stringResource(R.string.shop_wear)) } }
             else -> PriceButtons(item, actions)
         }
     }
@@ -568,8 +579,8 @@ private fun ThemeTile(vm: GameViewModel, item: ShopItem, actions: ShopActions) {
     val night = vm.nightMode.isNight(androidx.compose.foundation.isSystemInDarkTheme())
     Tile(theme.label(), "★".repeat(theme.tier), preview = { ThemePreview(theme, night, Modifier.fillMaxSize()) }) {
         when {
-            vm.menuTheme == theme -> OwnedRow("In use ✓")
-            ShopCatalog.owns(vm.progress, theme.unlockKey) -> OwnedRow { TextButton(onClick = { vm.setMenuTheme(theme) }) { Text("Use") } }
+            vm.menuTheme == theme -> OwnedRow(stringResource(R.string.shop_in_use))
+            ShopCatalog.owns(vm.progress, theme.unlockKey) -> OwnedRow { TextButton(onClick = { vm.setMenuTheme(theme) }) { Text(stringResource(R.string.shop_use)) } }
             else -> PriceButtons(item, actions)
         }
     }
@@ -585,8 +596,8 @@ private fun BadgeTile(vm: GameViewModel, item: ShopItem, actions: ShopActions) {
         }
     }) {
         when {
-            vm.titleFrame == frame -> OwnedRow("In use ✓")
-            ShopCatalog.owns(vm.progress, key) -> OwnedRow { TextButton(onClick = { vm.setTitleFrame(frame) }) { Text("Use") } }
+            vm.titleFrame == frame -> OwnedRow(stringResource(R.string.shop_in_use))
+            ShopCatalog.owns(vm.progress, key) -> OwnedRow { TextButton(onClick = { vm.setTitleFrame(frame) }) { Text(stringResource(R.string.shop_use)) } }
             else -> PriceButtons(item, actions)
         }
     }
@@ -598,8 +609,8 @@ private fun CardStyleTile(vm: GameViewModel, item: ShopItem, actions: ShopAction
     val style = com.deepline.fishing.core.CardStyle.entries.first { it.unlockKey == key }
     Tile(item.label(), item.badgeText()?.asString(), preview = { com.deepline.fishing.ui.dex.CardStyleSample(style, Modifier.fillMaxSize()) }) {
         when {
-            vm.cardStyle == style -> OwnedRow("In use ✓")
-            ShopCatalog.owns(vm.progress, key) -> OwnedRow { TextButton(onClick = { vm.setCardStyle(style) }) { Text("Use") } }
+            vm.cardStyle == style -> OwnedRow(stringResource(R.string.shop_in_use))
+            ShopCatalog.owns(vm.progress, key) -> OwnedRow { TextButton(onClick = { vm.setCardStyle(style) }) { Text(stringResource(R.string.shop_use)) } }
             else -> PriceButtons(item, actions)
         }
     }
@@ -610,11 +621,11 @@ private fun CardStyleTile(vm: GameViewModel, item: ShopItem, actions: ShopAction
 private fun LazyGridScope.aquariumPage(vm: GameViewModel, actions: ShopActions) {
     val p = vm.progress
     val items = ShopCatalog.inSection(ShopSection.AQUARIUM)
-    header("aquarium_header", "Aquarium", "Your caught fish swim in your aquarium (Dex > Aquarium). Decor and a bigger tank only change how it looks.")
+    header("aquarium_header", R.string.shop_aquarium_title, R.string.shop_aquarium_page_note)
     full("aquarium_tank") {
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             AquariumTank(p, height = 200.dp, modifier = Modifier.tourTarget(TourTarget.SHOP_AQUARIUM))
-            TextButton(onClick = vm::openAquarium, modifier = Modifier.testTag("open_aquarium")) { Text("Open your aquarium") }
+            TextButton(onClick = vm::openAquarium, modifier = Modifier.testTag("open_aquarium")) { Text(stringResource(R.string.shop_aquarium_open)) }
         }
     }
     for (item in items.filter { (it.grants.single() as? Grant.Unlock)?.key == "aquarium:big" }) full(item.id) { ItemCard(vm, item, actions) }
@@ -642,7 +653,7 @@ private fun LazyGridScope.passesPage(vm: GameViewModel, actions: ShopActions) {
             ItemCard(vm, item, actions, tagged)
         }
     }
-    header("passes_header", "Passes and packs", "Seasons, weekend events, the Captain's Club and one-time packs.")
+    header("passes_header", R.string.shop_passes_title, R.string.shop_passes_note)
     // A one-time offer first, then each pass right under what it unlocks.
     passes.filter { it.id == "starter_pack" }.forEach(::card)
     full("season") { SeasonCard(vm, Modifier.tourTarget(TourTarget.SHOP_SEASON)) }
@@ -662,7 +673,8 @@ internal fun ItemCard(vm: GameViewModel, item: ShopItem, actions: ShopActions, m
     val p = vm.progress
     val now = ShopClock.now()
     val owned = item.kind == ItemKind.PERMANENT && ShopCatalog.owns(p, item.id)
-    val badge = ShopCatalog.discountPercent(item, p)?.let { "-$it%" } ?: item.badge
+    val discount = ShopCatalog.discountPercent(item, p)
+    val badge = discount?.let { discountBadge(it) } ?: item.badgeText()?.asString()
     Card(
         Modifier.fillMaxWidth().then(modifier),
         shape = RoundedCornerShape(14.dp),
@@ -675,32 +687,37 @@ internal fun ItemCard(vm: GameViewModel, item: ShopItem, actions: ShopActions, m
                 badge?.let { Badge(it) }
             }
             Text(item.description(), style = MaterialTheme.typography.bodySmall)
-            if (badge != null && badge.startsWith("-")) {
+            if (discount != null) {
                 Text(
-                    "Worth ${euros(ShopCatalog.separateCents(item, p))} bought separately.",
+                    stringResource(R.string.shop_item_worth, formatEuros(ShopCatalog.separateCents(item, p))),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             if (item.id == "starter_pack" && vm.starterOfferOpen) {
                 Text(
-                    "One time only: ends in ${ShopText.timeLeftLabel(p.starterOfferEndsMs - now)}.",
+                    stringResource(R.string.shop_item_offer_ends, ShopText.timeLeftLabel(p.starterOfferEndsMs - now)),
                     style = MaterialTheme.typography.labelMedium,
                     color = com.deepline.fishing.ui.rewardTextColor(),
                 )
             }
             if (item.kind == ItemKind.SUBSCRIPTION) {
+                val days = GameConfig.CLUB_DAYS
                 val status = when {
-                    ShopCatalog.owns(p, "badge:CLUB_FOREVER") -> "You're a member for life."
-                    p.clubUntilMs > now -> "Member until ${DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(p.clubUntilMs))}. " +
-                        "With euros it renews every month until you cancel; with points it adds ${GameConfig.CLUB_DAYS} days."
-                    else -> "With euros it renews every month until you cancel; with points it's ${GameConfig.CLUB_DAYS} days."
+                    ShopCatalog.owns(p, "badge:CLUB_FOREVER") -> stringResource(R.string.shop_club_member_for_life)
+                    p.clubUntilMs > now -> pluralStringResource(
+                        R.plurals.shop_club_member_until,
+                        days,
+                        DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(p.clubUntilMs)),
+                        days,
+                    )
+                    else -> pluralStringResource(R.plurals.shop_club_how, days, days)
                 }
                 Text(status, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.secondary)
             }
             when {
                 owned -> OwnedRow()
-                !ShopCatalog.canBuy(item, p, now) -> OwnedRow("Not available right now")
+                !ShopCatalog.canBuy(item, p, now) -> OwnedRow(stringResource(R.string.shop_not_available))
                 else -> PriceButtons(item, actions, wide = true)
             }
         }
@@ -712,24 +729,27 @@ internal fun ItemCard(vm: GameViewModel, item: ShopItem, actions: ShopActions, m
 private fun LazyGridScope.footer(vm: GameViewModel) = full("footer") {
     Column(Modifier.padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(
-            "Points prices: about ${ShopText.fishingTimeLabel(GameConfig.MINUTES_PER_EURO)} of fishing per euro at your rope's " +
-                "reach (Lantern packs: ${ShopText.fishingTimeLabel(GameConfig.LANTERN_MINUTES_PER_EURO)}), so paying saves time " +
-                "and never buys anything points can't. Bigger purchases give " +
-                "+${((GameConfig.tierBonus(499) - 1f) * 100).roundToInt()}% to +${((GameConfig.tierBonus(999) - 1f) * 100).roundToInt()}% more.",
+            stringResource(
+                R.string.shop_footer_rates,
+                ShopText.fishingTimeLabel(GameConfig.MINUTES_PER_EURO),
+                ShopText.fishingTimeLabel(GameConfig.LANTERN_MINUTES_PER_EURO),
+                ((GameConfig.tierBonus(499) - 1f) * 100).roundToInt(),
+                ((GameConfig.tierBonus(999) - 1f) * 100).roundToInt(),
+            ),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                "Payments: ${vm.billing.name}",
+                stringResource(R.string.shop_footer_payments, vm.billing.name.asString()),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.weight(1f),
             )
-            TextButton(onClick = vm::restorePurchases) { Text("Restore purchases") }
+            TextButton(onClick = vm::restorePurchases) { Text(stringResource(R.string.shop_footer_restore)) }
         }
         var account by remember { mutableStateOf(false) }
-        TextButton(onClick = { account = true }, modifier = Modifier.testTag("open_account")) { Text("Account, cloud save and gifts") }
+        TextButton(onClick = { account = true }, modifier = Modifier.testTag("open_account")) { Text(stringResource(R.string.shop_footer_account)) }
         if (account) AccountDialog(vm, onClose = { account = false })
     }
 }

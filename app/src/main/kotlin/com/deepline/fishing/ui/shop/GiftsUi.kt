@@ -33,14 +33,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.GameViewModel
+import com.deepline.fishing.R
 import com.deepline.fishing.core.ShopSection
 import com.deepline.fishing.core.online.AccountApi
 import com.deepline.fishing.ui.compactPoints
+import com.deepline.fishing.ui.formatEuros
 import java.text.DateFormat
 import java.util.Date
 
@@ -61,32 +64,30 @@ fun GiftDialog(vm: GameViewModel) {
     val gifts = AccountApi.giftable.sortedWith(compareBy({ it.section != ShopSection.TACKLE }, { it.euroCents }))
     AlertDialog(
         onDismissRequest = vm::closeGifts,
-        title = { Text("A gift for ${target.name}") },
+        // The opponent's name as they typed it (never translated).
+        title = { Text(stringResource(R.string.shop_gift_pick_title, target.name)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    "They'll find it the next time they open the game. Looks only, or tackle for their casts.",
-                    style = MaterialTheme.typography.bodySmall,
-                )
+                Text(stringResource(R.string.shop_gift_pick_note), style = MaterialTheme.typography.bodySmall)
                 LazyColumn(Modifier.heightIn(max = 380.dp).testTag("gift_list"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     items(gifts, key = { it.id }) { item ->
                         val points = vm.shopPointsPrice(item)
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             Text(item.label(), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
                             Button(onClick = { vm.sendGiftWithMoney(item, activity) }, modifier = Modifier.testTag("gift_eur_${item.id}")) {
-                                Text(vm.billing.priceOf(AccountApi.giftProduct(item)) ?: com.deepline.fishing.ui.formatEuros(item.euroCents))
+                                Text(vm.billing.priceOf(AccountApi.giftProduct(item)) ?: formatEuros(item.euroCents))
                             }
                             OutlinedButton(
                                 onClick = { vm.sendGiftWithPoints(item) },
                                 enabled = vm.progress.pointsBalance >= points,
                                 modifier = Modifier.testTag("gift_pts_${item.id}"),
-                            ) { Text("${compactPoints(points)} pts") }
+                            ) { Text(stringResource(R.string.common_points, compactPoints(points))) }
                         }
                     }
                 }
             }
         },
-        confirmButton = { TextButton(onClick = vm::closeGifts) { Text("Close") } },
+        confirmButton = { TextButton(onClick = vm::closeGifts) { Text(stringResource(R.string.shop_close)) } },
     )
 }
 
@@ -103,56 +104,70 @@ fun AccountDialog(vm: GameViewModel, onClose: () -> Unit) {
     var code by remember { mutableStateOf("") }
     AlertDialog(
         onDismissRequest = onClose,
-        title = { Text("Your account") },
+        title = { Text(stringResource(R.string.shop_account_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Player id: ${who.id}", fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.shop_account_player_id, who.id), fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.shop_account_gifts_note), style = MaterialTheme.typography.bodySmall)
                 Text(
-                    "Online opponents can send you gifts; they arrive when you open the game or the Shop.",
-                    style = MaterialTheme.typography.bodySmall,
+                    stringResource(R.string.shop_account_cloud_title),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(top = 4.dp),
                 )
-                Text("Cloud save", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
                 if (vm.canCloudSave) {
                     Text(
-                        if (vm.lastBackupMs > 0) "Last backup: ${DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(Date(vm.lastBackupMs))}. " +
-                            "Your progress is backed up after your casts." else "Not backed up yet.",
+                        if (vm.lastBackupMs > 0) {
+                            stringResource(
+                                R.string.shop_account_last_backup,
+                                DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(Date(vm.lastBackupMs)),
+                            )
+                        } else {
+                            stringResource(R.string.shop_account_no_backup)
+                        },
                         style = MaterialTheme.typography.bodySmall,
                     )
-                    Button(onClick = { vm.backupNow() }, enabled = !vm.accountBusy, modifier = Modifier.testTag("backup_now")) { Text("Back up now") }
+                    Button(onClick = { vm.backupNow() }, enabled = !vm.accountBusy, modifier = Modifier.testTag("backup_now")) {
+                        Text(stringResource(R.string.shop_account_backup_now))
+                    }
                 } else {
-                    Text("A Captain's Club perk: back up your progress and restore it on a new phone.", style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.shop_account_club_perk), style = MaterialTheme.typography.bodySmall)
                 }
-                Text(
-                    "Your recovery code restores a backup on another phone. Keep it private: it's the key to your progress.",
-                    style = MaterialTheme.typography.bodySmall,
-                )
+                Text(stringResource(R.string.shop_account_code_note), style = MaterialTheme.typography.bodySmall)
                 if (showCode) {
                     Text(who.recoveryCode, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold, modifier = Modifier.testTag("recovery_code"))
+                    val clipLabel = stringResource(R.string.shop_account_code_clip)
                     TextButton(onClick = {
                         (context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager)
-                            ?.setPrimaryClip(ClipData.newPlainText("Deep Line recovery code", who.recoveryCode))
-                    }) { Text("Copy the code") }
+                            ?.setPrimaryClip(ClipData.newPlainText(clipLabel, who.recoveryCode))
+                    }) { Text(stringResource(R.string.shop_account_copy_code)) }
                 } else {
-                    TextButton(onClick = { showCode = true }) { Text("Show my recovery code") }
+                    TextButton(onClick = { showCode = true }) { Text(stringResource(R.string.shop_account_show_code)) }
                 }
                 if (restoring) {
                     OutlinedTextField(
                         value = code,
                         onValueChange = { code = it.take(40) },
-                        label = { Text("Recovery code") },
+                        label = { Text(stringResource(R.string.shop_account_code_field)) },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters),
                         modifier = Modifier.fillMaxWidth().testTag("restore_code"),
                     )
-                    Text("This replaces the progress on this phone with the backup.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
-                    Button(onClick = { vm.restoreFromCode(code) }, enabled = !vm.accountBusy && code.isNotBlank()) { Text("Restore") }
+                    Text(
+                        stringResource(R.string.shop_account_restore_warning),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                    Button(onClick = { vm.restoreFromCode(code) }, enabled = !vm.accountBusy && code.isNotBlank()) {
+                        Text(stringResource(R.string.shop_account_restore))
+                    }
                 } else {
-                    TextButton(onClick = { restoring = true }) { Text("Restore from another phone") }
+                    TextButton(onClick = { restoring = true }) { Text(stringResource(R.string.shop_account_restore_open)) }
                 }
                 if (vm.accountBusy) CircularProgressIndicator(Modifier.padding(4.dp))
                 vm.shopMessage?.let { Text(it.asString(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.secondary) }
             }
         },
-        confirmButton = { TextButton(onClick = onClose) { Text("Close") } },
+        confirmButton = { TextButton(onClick = onClose) { Text(stringResource(R.string.shop_close)) } },
     )
 }

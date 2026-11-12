@@ -34,7 +34,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.selected
@@ -43,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.DexSection
 import com.deepline.fishing.GameViewModel
+import com.deepline.fishing.R
 import com.deepline.fishing.core.BoatDesign
 import com.deepline.fishing.core.BoatPalette
 import com.deepline.fishing.core.BoatPart
@@ -56,16 +60,17 @@ import com.deepline.fishing.ui.GameIcons
 import com.deepline.fishing.ui.SkinPreview
 import com.deepline.fishing.ui.SubScreen
 import com.deepline.fishing.ui.formatPoints
+import com.deepline.fishing.ui.i18n.swatchLabel
 
 /** One colour slot of the design: its label, and how to read and change it. */
-private class ColorSlot(val label: String, val get: (BoatDesign) -> Int, val set: (BoatDesign, Int) -> BoatDesign)
+private class ColorSlot(@StringRes val label: Int, val get: (BoatDesign) -> Int, val set: (BoatDesign, Int) -> BoatDesign)
 
-private val hullColor = ColorSlot("Hull colour", { it.hull }, { d, i -> d.copy(hull = i) })
-private val bottomColor = ColorSlot("Bottom colour", { it.hullBottom }, { d, i -> d.copy(hullBottom = i) })
-private val trimColor = ColorSlot("Trim and emblem", { it.trim }, { d, i -> d.copy(trim = i) })
-private val cabinColor = ColorSlot("Cabin", { it.cabin }, { d, i -> d.copy(cabin = i) })
-private val sailColor = ColorSlot("Sail colour", { it.sail }, { d, i -> d.copy(sail = i) })
-private val flagColor = ColorSlot("Flag colour", { it.flag }, { d, i -> d.copy(flag = i) })
+private val hullColor = ColorSlot(R.string.boat_editor_hull_colour, { it.hull }, { d, i -> d.copy(hull = i) })
+private val bottomColor = ColorSlot(R.string.boat_editor_bottom_colour, { it.hullBottom }, { d, i -> d.copy(hullBottom = i) })
+private val trimColor = ColorSlot(R.string.boat_editor_trim_colour, { it.trim }, { d, i -> d.copy(trim = i) })
+private val cabinColor = ColorSlot(R.string.boat_editor_cabin_colour, { it.cabin }, { d, i -> d.copy(cabin = i) })
+private val sailColor = ColorSlot(R.string.boat_editor_sail_colour, { it.sail }, { d, i -> d.copy(sail = i) })
+private val flagColor = ColorSlot(R.string.boat_editor_flag_colour, { it.flag }, { d, i -> d.copy(flag = i) })
 
 /**
  * The boat editor: paint and rig your own boat. The editor is free; options unlock with points
@@ -84,12 +89,11 @@ fun BoatEditorScreen(vm: GameViewModel) {
         if (BoatParts.isAvailable(vm.progress, part)) draft = next else asked = part to next
     }
 
-    SubScreen(title = "Customise boat", onBack = vm::onBack) {
+    SubScreen(title = stringResource(R.string.boat_editor_title), onBack = vm::onBack) {
         Column(Modifier.padding(horizontal = 16.dp)) {
             SkinPreview(vm.skins.copy(boat = null, customBoat = draft), height = 190.dp)
             Text(
-                "Your points: ${formatPoints(p.pointsBalance)}. Basic options are free; tap a locked one to see " +
-                    "how to unlock it.",
+                stringResource(R.string.boat_editor_intro, formatPoints(p.pointsBalance)),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(vertical = 8.dp),
@@ -104,14 +108,14 @@ fun BoatEditorScreen(vm: GameViewModel) {
         ) {
             SwatchRow(hullColor, draft, vm, ::choose)
             SwatchRow(bottomColor, draft, vm, ::choose)
-            ChipRow("Hull pattern", HullPattern.entries.map { BoatPart.of(it) to draft.copy(pattern = it) }, BoatPart.of(draft.pattern), vm, ::choose)
+            ChipRow(R.string.boat_editor_pattern, HullPattern.entries.map { BoatPart.of(it) to draft.copy(pattern = it) }, BoatPart.of(draft.pattern), vm, ::choose)
             SwatchRow(trimColor, draft, vm, ::choose)
             SwatchRow(cabinColor, draft, vm, ::choose)
-            ChipRow("Sail", SailStyle.entries.map { BoatPart.of(it) to draft.copy(sailStyle = it) }, BoatPart.of(draft.sailStyle), vm, ::choose)
+            ChipRow(R.string.boat_editor_sail, SailStyle.entries.map { BoatPart.of(it) to draft.copy(sailStyle = it) }, BoatPart.of(draft.sailStyle), vm, ::choose)
             if (draft.sailStyle != SailStyle.NONE) SwatchRow(sailColor, draft, vm, ::choose)
-            ChipRow("Flag", FlagStyle.entries.map { BoatPart.of(it) to draft.copy(flagStyle = it) }, BoatPart.of(draft.flagStyle), vm, ::choose)
+            ChipRow(R.string.boat_editor_flag, FlagStyle.entries.map { BoatPart.of(it) to draft.copy(flagStyle = it) }, BoatPart.of(draft.flagStyle), vm, ::choose)
             if (draft.flagStyle != FlagStyle.NONE) SwatchRow(flagColor, draft, vm, ::choose)
-            ChipRow("Emblem", Emblem.entries.map { BoatPart.of(it) to draft.copy(emblem = it) }, BoatPart.of(draft.emblem), vm, ::choose)
+            ChipRow(R.string.boat_editor_emblem, Emblem.entries.map { BoatPart.of(it) to draft.copy(emblem = it) }, BoatPart.of(draft.emblem), vm, ::choose)
         }
         Row(
             Modifier
@@ -120,11 +124,11 @@ fun BoatEditorScreen(vm: GameViewModel) {
                 .padding(16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            OutlinedButton(onClick = vm::onBack, modifier = Modifier.weight(1f)) { Text("Cancel") }
+            OutlinedButton(onClick = vm::onBack, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.common_cancel)) }
             Button(
                 onClick = { if (vm.saveBoatDesign(draft)) vm.openDex(DexSection.SKINS) },
                 modifier = Modifier.weight(1f),
-            ) { Text("Save and wear") }
+            ) { Text(stringResource(R.string.boat_editor_save)) }
         }
     }
 
@@ -135,11 +139,16 @@ fun BoatEditorScreen(vm: GameViewModel) {
             val affordable = vm.progress.pointsBalance >= r.cost
             AlertDialog(
                 onDismissRequest = { asked = null },
-                title = { Text("Unlock $name?") },
+                title = { Text(stringResource(R.string.boat_editor_unlock_title, name)) },
                 text = {
                     Text(
-                        "$name costs ${formatPoints(r.cost)} points, once. You have ${formatPoints(vm.progress.pointsBalance)}." +
-                            if (affordable) "" else " Keep fishing to earn more.",
+                        pluralStringResource(
+                            if (affordable) R.plurals.boat_editor_unlock_body else R.plurals.boat_editor_unlock_body_short,
+                            r.cost,
+                            name,
+                            formatPoints(r.cost),
+                            formatPoints(vm.progress.pointsBalance),
+                        ),
                     )
                 },
                 confirmButton = {
@@ -149,16 +158,16 @@ fun BoatEditorScreen(vm: GameViewModel) {
                             if (vm.unlockBoatPart(part)) draft = next
                             asked = null
                         },
-                    ) { Text("Unlock for ${formatPoints(r.cost)} pts") }
+                    ) { Text(stringResource(R.string.boat_editor_unlock_buy, formatPoints(r.cost))) }
                 },
-                dismissButton = { TextButton(onClick = { asked = null }) { Text("Not now") } },
+                dismissButton = { TextButton(onClick = { asked = null }) { Text(stringResource(R.string.boat_editor_not_now)) } },
             )
         } else {
             AlertDialog(
                 onDismissRequest = { asked = null },
-                title = { Text("$name is locked") },
-                text = { Text("${requirementText(r).asString()} to unlock it.") },
-                confirmButton = { TextButton(onClick = { asked = null }) { Text("OK") } },
+                title = { Text(stringResource(R.string.boat_editor_locked_title, name)) },
+                text = { Text(unlockHintText(r).asString()) },
+                confirmButton = { TextButton(onClick = { asked = null }) { Text(stringResource(R.string.common_ok)) } },
             )
         }
     }
@@ -167,13 +176,19 @@ fun BoatEditorScreen(vm: GameViewModel) {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun SwatchRow(slot: ColorSlot, draft: BoatDesign, vm: GameViewModel, choose: (BoatPart, BoatDesign) -> Unit) {
+    val slotLabel = stringResource(slot.label)
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(slot.label, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+        Text(slotLabel, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             BoatPalette.swatches.forEachIndexed { i, swatch ->
                 val part = BoatPart.color(i)
                 val unlocked = BoatParts.isAvailable(vm.progress, part)
                 val selected = slot.get(draft) == i
+                val description = stringResource(
+                    if (unlocked) R.string.boat_editor_swatch_cd else R.string.boat_editor_swatch_cd_locked,
+                    slotLabel,
+                    swatchLabel(swatch.name),
+                )
                 Box(
                     Modifier
                         .size(36.dp)
@@ -186,7 +201,7 @@ private fun SwatchRow(slot: ColorSlot, draft: BoatDesign, vm: GameViewModel, cho
                         )
                         .clickable(role = Role.RadioButton) { choose(part, slot.set(draft, i)) }
                         .semantics {
-                            contentDescription = "${slot.label}: ${swatch.name}" + if (unlocked) "" else " (locked)"
+                            contentDescription = description
                             this.selected = selected
                         },
                     contentAlignment = Alignment.Center,
@@ -208,14 +223,14 @@ private fun SwatchRow(slot: ColorSlot, draft: BoatDesign, vm: GameViewModel, cho
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun ChipRow(
-    label: String,
+    @StringRes label: Int,
     options: List<Pair<BoatPart, BoatDesign>>,
     current: BoatPart,
     vm: GameViewModel,
     choose: (BoatPart, BoatDesign) -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(label, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+        Text(stringResource(label), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             // Premium-only options belong to the shop's premade boats.
             for ((part, next) in options.filter { !BoatParts.isPremiumOnly(it.first) }) {
@@ -236,7 +251,7 @@ private fun ChipRow(
                         }
                     },
                     leadingIcon = if (unlocked) null else {
-                        { Icon(GameIcons.Lock, contentDescription = "Locked", modifier = Modifier.size(16.dp)) }
+                        { Icon(GameIcons.Lock, contentDescription = stringResource(R.string.boat_editor_locked_cd), modifier = Modifier.size(16.dp)) }
                     },
                 )
             }

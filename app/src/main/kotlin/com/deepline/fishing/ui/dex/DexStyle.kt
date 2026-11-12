@@ -10,7 +10,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import com.deepline.fishing.R
 import com.deepline.fishing.core.DepthZone
+import com.deepline.fishing.ui.i18n.UiText
+import com.deepline.fishing.ui.i18n.asString
 
 /** Each depth zone's colour (card frames, chips, the depth gauge), from the colour script. */
 fun zoneColor(zone: DepthZone): Color = Color(com.deepline.fishing.ui.ColorScript.zoneAccent(zone))
@@ -37,7 +40,12 @@ fun tierColor(tier: Int): Color = when (tier) {
     else -> Color(0xFFFFD580)
 }
 
-fun tierName(tier: Int): String = if (tier >= 5) "Legendary" else "Tier $tier"
+/** A secret tier's name: "Tier 2", or "Legendary" for the top tier. */
+fun tierNameText(tier: Int): UiText = if (tier >= 5) UiText.res(R.string.dex_tier_legendary) else UiText.res(R.string.dex_tier, tier)
+
+/** [tierNameText] in a composable. */
+@androidx.compose.runtime.Composable
+fun tierName(tier: Int): String = tierNameText(tier).asString()
 
 /** "#007", "#200". */
 fun dexNumberText(number: Int, digits: Int = 3): String = "#" + number.toString().padStart(digits, '0')

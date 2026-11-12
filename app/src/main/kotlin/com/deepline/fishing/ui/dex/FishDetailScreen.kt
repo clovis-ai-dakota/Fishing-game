@@ -33,10 +33,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.GameViewModel
+import com.deepline.fishing.R
 import com.deepline.fishing.core.CollectionEntry
 import com.deepline.fishing.core.DexState
 import com.deepline.fishing.core.FishCatalog
@@ -46,6 +48,9 @@ import com.deepline.fishing.ui.GameIcons
 import com.deepline.fishing.ui.SparkleGold
 import com.deepline.fishing.ui.SubScreen
 import com.deepline.fishing.ui.formatPoints
+import com.deepline.fishing.ui.i18n.asString
+import com.deepline.fishing.ui.metersText
+import com.deepline.fishing.ui.pointsLabel
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -59,7 +64,7 @@ fun FishDetailScreen(vm: GameViewModel) {
     val pager = rememberPagerState(initialPage = vm.dexFishIndex.coerceIn(0, all.lastIndex)) { all.size }
     val scope = rememberCoroutineScope()
     LaunchedEffect(pager.currentPage) { vm.showFishDetail(pager.currentPage) }
-    SubScreen(title = "Dex ${dexNumberText(pager.currentPage + 1)}", onBack = vm::onBack) {
+    SubScreen(title = stringResource(R.string.dex_fish_title, dexNumberText(pager.currentPage + 1)), onBack = vm::onBack) {
         HorizontalPager(state = pager, modifier = Modifier.weight(1f)) { page ->
             FishPage(all[page], page + 1, Progression.dexState(vm.progress, all[page].id), vm.progress.collection[all[page].id])
         }
@@ -72,7 +77,7 @@ fun FishDetailScreen(vm: GameViewModel) {
             IconButton(
                 onClick = { scope.launch { pager.animateScrollToPage(pager.currentPage - 1) } },
                 enabled = pager.currentPage > 0,
-            ) { Icon(GameIcons.ChevronLeft, contentDescription = "Previous fish") }
+            ) { Icon(GameIcons.ChevronLeft, contentDescription = stringResource(R.string.dex_fish_previous)) }
             Text(
                 "${pager.currentPage + 1} / ${all.size}",
                 style = MaterialTheme.typography.labelLarge,
@@ -82,7 +87,7 @@ fun FishDetailScreen(vm: GameViewModel) {
             IconButton(
                 onClick = { scope.launch { pager.animateScrollToPage(pager.currentPage + 1) } },
                 enabled = pager.currentPage < all.lastIndex,
-            ) { Icon(GameIcons.ChevronRight, contentDescription = "Next fish") }
+            ) { Icon(GameIcons.ChevronRight, contentDescription = stringResource(R.string.dex_fish_next)) }
         }
     }
 }
@@ -116,7 +121,7 @@ private fun FishPage(species: FishSpecies, number: Int, state: DexState, entry: 
             if ((entry?.sparklingCaught ?: 0) > 0) {
                 Icon(
                     GameIcons.Sparkle,
-                    contentDescription = "Sparkling caught",
+                    contentDescription = stringResource(R.string.dex_cd_sparkling_caught),
                     tint = SparkleGold,
                     modifier = Modifier.align(Alignment.TopEnd).padding(12.dp).size(20.dp),
                 )
@@ -142,11 +147,13 @@ private fun FishPage(species: FishSpecies, number: Int, state: DexState, entry: 
                 fontWeight = FontWeight.Black,
             )
             Text(
-                when (state) {
-                    DexState.UNKNOWN -> "Not seen yet"
-                    DexState.SEEN -> "Seen, not caught yet"
-                    DexState.CAUGHT -> "Caught"
-                },
+                stringResource(
+                    when (state) {
+                        DexState.UNKNOWN -> R.string.dex_fish_state_unknown
+                        DexState.SEEN -> R.string.dex_fish_state_seen
+                        DexState.CAUGHT -> R.string.dex_fish_state_caught
+                    },
+                ),
                 style = MaterialTheme.typography.labelLarge,
                 color = if (state == DexState.CAUGHT) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -155,14 +162,23 @@ private fun FishPage(species: FishSpecies, number: Int, state: DexState, entry: 
         com.deepline.fishing.ui.daily.MigratingNote(species)
         val caught = state == DexState.CAUGHT
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            StatTile("Depth", "${species.minDepth.roundToInt()}–${species.maxDepth.roundToInt()} m", Modifier.weight(1f))
-            StatTile("Weight", if (caught) "%.1f kg".format(species.weightKg) else "???", Modifier.weight(1f))
+            StatTile(
+                stringResource(R.string.dex_fish_depth),
+                stringResource(R.string.dex_fish_depth_range, formatPoints(species.minDepth.roundToInt()), formatPoints(species.maxDepth.roundToInt())),
+                Modifier.weight(1f),
+            )
+            StatTile(
+                stringResource(R.string.dex_fish_weight),
+                // One decimal always ("2.0 kg"), with the language's decimal separator.
+                if (caught) stringResource(R.string.common_kg, "%.1f".format(species.weightKg)) else "???",
+                Modifier.weight(1f),
+            )
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            StatTile("Base points", if (caught) formatPoints(species.basePoints) else "???", Modifier.weight(1f))
+            StatTile(stringResource(R.string.dex_fish_base_points), if (caught) formatPoints(species.basePoints) else "???", Modifier.weight(1f))
             Card(Modifier.weight(1f)) {
                 Column(Modifier.padding(12.dp)) {
-                    Text("Rarity", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.dex_fish_rarity), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     if (caught) {
                         Stars(Progression.rarityStars(species))
                     } else {
@@ -175,24 +191,20 @@ private fun FishPage(species: FishSpecies, number: Int, state: DexState, entry: 
         if (caught && entry != null) {
             Card(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text("Your records", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.dex_fish_records), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Record("Caught", "${entry.caught}", Modifier.weight(1f))
-                        Record("Sparkling", "${entry.sparklingCaught}", Modifier.weight(1f))
+                        Record(stringResource(R.string.dex_fish_record_caught), formatPoints(entry.caught), Modifier.weight(1f))
+                        Record(stringResource(R.string.dex_fish_record_sparkling), formatPoints(entry.sparklingCaught), Modifier.weight(1f))
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Record("Deepest", "${entry.deepestM.roundToInt()} m", Modifier.weight(1f))
-                        Record("Best", "${formatPoints(entry.bestPoints)} pts", Modifier.weight(1f))
+                        Record(stringResource(R.string.dex_fish_record_deepest), metersText(entry.deepestM).asString(), Modifier.weight(1f))
+                        Record(stringResource(R.string.dex_fish_record_best), pointsLabel(entry.bestPoints.toLong()), Modifier.weight(1f))
                     }
                 }
             }
         } else {
             Text(
-                if (state == DexState.UNKNOWN) {
-                    "Fish near these depths to spot it: anything that swims close to your hook is added to the Dex."
-                } else {
-                    "Catch one to fill in its weight, points, rarity and your records."
-                },
+                stringResource(if (state == DexState.UNKNOWN) R.string.dex_fish_hint_unknown else R.string.dex_fish_hint_seen),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

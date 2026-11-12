@@ -129,6 +129,22 @@ class HardcodedTextTest {
             "ui/OnlineText.kt",
             "ui/secrets/FishingSecrets.kt",
             "ui/dex/SecretDex.kt",
+            // Area B: the Dex, skins, boat editor, shop, themes, aquarium and the stores.
+            "ui/shop/ShopScreen.kt",
+            "ui/shop/GiftsUi.kt",
+            "ui/shop/SeasonUi.kt",
+            "ui/shop/ThemesScreen.kt",
+            "ui/shop/AquariumScreen.kt",
+            "ui/dex/DexScreen.kt",
+            "ui/dex/DexStyle.kt",
+            "ui/dex/SpeciesDex.kt",
+            "ui/dex/FishDetailScreen.kt",
+            "ui/dex/FishPortrait.kt",
+            "ui/dex/SkinDex.kt",
+            "ui/boat/BoatEditorScreen.kt",
+            "billing/Store.kt",
+            "billing/TestStore.kt",
+            "billing/PlayStore.kt",
         )
 
         /**
