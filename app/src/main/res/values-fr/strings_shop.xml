@@ -141,7 +141,7 @@
     <string name="shop_set_contents">%1$s.</string>
 
     <!-- Aquarium page. -->
-    <string name="shop_aquarium_page_note">Vos poissons pêchés nagent dans votre aquarium (Dex > Aquarium). Le décor et un bac plus grand ne changent que son apparence.</string>
+    <string name="shop_aquarium_page_note">Vos poissons pêchés nagent dans votre aquarium (Dex > Aquarium). Le décor et un bac plus grand ne changent que son aspect.</string>
     <string name="shop_aquarium_open">Ouvrir votre aquarium</string>
 
     <!-- Passes page. -->
