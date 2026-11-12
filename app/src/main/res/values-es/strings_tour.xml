@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    La guía (ui/tour/Tour.kt, SocialTour.kt, TourOverlay.kt): una tarjeta por paso sobre la pantalla
+    que explica, con un título y un texto de 2 a 4 frases. Claves: tour_<paso>_title y
+    tour_<paso>_body. Los números llegan como argumentos. Los nombres de pantallas, botones,
+    aparejos, zonas y modos son exactamente sus etiquetas en la app. Nunca se insinúa un secreto
+    de pesca.
+-->
+<resources>
+    <!-- The card's controls. -->
+    <string name="tour_counter">%1$d / %2$d</string>
+    <string name="tour_counter_whats_new">Novedades · %1$d / %2$d</string>
+    <string name="tour_skip">Saltar guía</string>
+    <string name="tour_back">Atrás</string>
+    <string name="tour_next">Siguiente</string>
+    <string name="tour_finish">Terminar</string>
+
+    <string name="tour_welcome_title">¡Te damos la bienvenida a Deep Line!</string>
+    <!-- "Siguiente" and "Saltar guía" are the card's buttons. -->
+    <string name="tour_welcome_body">Pesca todos los peces de las profundidades. Esta breve guía te enseña cómo se juega y para qué sirve cada cosa. Toca Siguiente, o Saltar guía si ya te manejas bien.</string>
+
+    <string name="tour_tabs_title">Cuatro pestañas</string>
+    <string name="tour_tabs_body">La barra inferior te lleva a todas partes: en Pescar lanzas el sedal, el Dex reúne todas las especies que encuentras, la Tienda tiene mejoras de cuerda, aparejos y aspectos para tu barco, y Duelo es para partidas 1 contra 1.</string>
+
+    <string name="tour_cast_title">Lanza el sedal</string>
+    <string name="tour_cast_body">El gran botón Lanzar sedal, abajo en la pestaña Pescar, deja caer tu anzuelo desde el barco.</string>
+
+    <string name="tour_steer_title">Guía el anzuelo</string>
+    <string name="tour_steer_body">Durante un lance, arrastra a izquierda y derecha en cualquier parte de la pantalla. Un aro muestra dónde está tu dedo: el anzuelo se desliza hacia él y lo sigue. La Agilidad de cuerda lo hace más rápido.</string>
+
+    <string name="tour_descent_title">Al bajar: esquiva</string>
+    <!-- %1$d: bumps allowed (4); %2$d: depth of the bump-free zone in meters. -->
+    <string name="tour_descent_body">El anzuelo se hunde hasta que ha dado %1$d golpes o llega al final de la cuerda, y luego vuelve a subir. En un pez, solo la cabeza cuenta como golpe (el mismo punto al que apuntas al subir); rozar el cuerpo o la cola no cuenta. Las rocas, los troncos y las medusas cuentan como golpe las toques por donde las toques. Los primeros %2$d m están libres de golpes.</string>
+
+    <string name="tour_ascent_title">Al subir: apunta a las cabezas</string>
+    <string name="tour_ascent_body">Al subir, guía el anzuelo para que toque la cabeza de un pez: la cara clara junto a su ojo. Tocar la cola o el cuerpo no hace nada.</string>
+
+    <string name="tour_weight_title">Ojo con el peso</string>
+    <!-- "Carga" is the label of the weight bar during a cast. -->
+    <string name="tour_weight_body">Tu cuerda solo aguanta cierto peso. Vigila la barra Carga: cuando se llena, los peces más pesados se escapan.</string>
+
+    <string name="tour_fast_reel_title">¿Sedal lleno? Recoger rápido</string>
+    <!-- %1$d: bumps allowed; %2$s: seconds, a decimal number already formatted. -->
+    <string name="tour_fast_reel_body">En cuanto hayas gastado tus %1$d golpes, o cuando ya no quepa nada más en el sedal, aparece un botón Recoger rápido al subir: lleva el anzuelo al barco en %2$s segundos como mucho, estés donde estés. Después ya no se captura nada más. Muy útil contra el reloj en los duelos con tiempo.</string>
+
+    <string name="tour_themes_title">Temas</string>
+    <!-- Laguna is the default theme's name (core_theme_lagoon). -->
+    <string name="tour_themes_body">El botón de la paleta, arriba, cambia la apariencia de los menús: Laguna por defecto, con una escena marina detrás de cada pestaña. En la Tienda hay más temas por euros o por puntos, y los más elaborados cuestan más. El agua en la que pescas nunca cambia.</string>
+
+    <string name="tour_night_mode_title">Modo noche</string>
+    <!-- Día and Noche are the night mode's choices (core_night_*). -->
+    <string name="tour_night_mode_body">Cada tema tiene una versión de noche: elige Día, Noche o sigue el modo oscuro de tu teléfono.</string>
+
+    <string name="tour_points_title">Gana puntos</string>
+    <!-- %1$d: how many times more a Sparkling fish is worth. -->
+    <string name="tour_points_body">Las capturas más profundas valen más puntos, que se muestran aquí arriba. Los peces brillantes (contorno dorado y destellos) valen %1$d× más.</string>
+
+    <string name="tour_upgrades_title">Mejora tu cuerda</string>
+    <!-- Longitud de cuerda, Fuerza de cuerda and Agilidad de cuerda are the upgrades (core_rope_*). -->
+    <string name="tour_upgrades_body">Gasta puntos en la pestaña Tienda, en su página Cuerda. La Longitud de cuerda te lleva a zonas más profundas y a peces nuevos, la Fuerza de cuerda aguanta más peso y la Agilidad de cuerda guía más rápido. ¿Has cambiado de idea? Baja un nivel y recupera todos los puntos que costó.</string>
+
+    <string name="tour_tackle_title">Aparejos</string>
+    <!-- The four tackle names match core_tackle_*. %1$d: the detector's radius in meters;
+         %2$d: how many times more Sparkling fish the lure brings. -->
+    <string name="tour_tackle_body">La página Aparejos vende objetos de un solo lance que se activan antes de lanzar. Los Faroles iluminan la oscuridad, un Detector de peces raros marca las especies que aún no has capturado a menos de %1$d m del anzuelo, un Amuleto de la suerte da un golpe más al bajar y un Señuelo brillante trae %2$d× más peces brillantes. Los precios suben con el alcance de tu cuerda.</string>
+
+    <string name="tour_two_prices_title">Dos formas de pagar</string>
+    <!-- %1$d: minutes of fishing per euro; %2$s: the time per euro for Lantern packs (e.g. "1 hora"). -->
+    <string name="tour_two_prices_body">Todo en la Tienda tiene dos precios: en euros o en puntos. Un precio en puntos equivale a unos %1$d minutos de pesca por euro con el alcance de tu cuerda (%2$s en los packs de Faroles), así que pagar solo ahorra tiempo: todo se puede conseguir jugando. Antes de pagar con puntos se te pide confirmación.</string>
+
+    <string name="tour_lantern_title">Los Faroles iluminan el fondo</string>
+    <!-- %1$d: depth where the water goes dark; %2$d: the lit radius with a Lantern; %3$d: without (meters). -->
+    <string name="tour_lantern_body">Por debajo de %1$d m el agua está oscura. Activa esto antes de un lance para iluminar mucha más agua alrededor del anzuelo (%2$d m en vez de %3$d m). Se gasta un Farol por lance; consigue más con los hitos o cómpralos en la Tienda.</string>
+
+    <string name="tour_dex_title">Completa tu Dex</string>
+    <!-- %1$d: number of species; %2$d: number of depth zones. "Vista" is a Dex state. -->
+    <string name="tour_dex_body">%1$d especies viven en %2$d zonas de profundidad, algunas de ellas raras, y cada una tiene una carta numerada. Cuando un pez nada cerca de tu anzuelo, su especie queda marcada como Vista: conoces su nombre y sus profundidades. Captura uno para completar su carta con su peso, sus puntos y tus récords.</string>
+
+    <string name="tour_dex_filters_title">Explora por zona</string>
+    <string name="tour_dex_filters_body">Filtra las cartas por zona de profundidad, o muestra solo los peces que has capturado. Toca una carta para abrir su página y desliza para hojear el Dex.</string>
+
+    <string name="tour_milestones_title">Recompensas de los hitos</string>
+    <string name="tour_milestones_body">Cada punto que ganas cuenta para las recompensas de los hitos (puntos extra y Faroles), aunque después lo gastes. El trofeo de la parte superior de la pestaña Pescar las abre, con una marca cuando hay alguna lista para reclamar.</string>
+
+    <string name="tour_secrets_title">Secretos de pesca</string>
+    <!-- Hints that secrets exist, never what they are. The slots match core_slot_*. -->
+    <string name="tour_secrets_body">Algunos trucos solo se descubren jugando, y merecen la pena: cada vez que consigues uno, añade una bonificación al lance, también en los duelos. La primera vez se explica en el momento y da una recompensa por descubrirlo, y aparece una sección Secretos en el Dex. Los secretos más raros también desbloquean Aspectos para tu anzuelo, tu sedal, tu barco y tu estela de burbujas, además de un título que se muestra bajo tu nombre, también en los duelos en línea. Están hechos para presumir: solo cambian la apariencia, nunca dan ventaja.</string>
+
+    <string name="tour_boat_title">Personaliza tu barco</string>
+    <!-- "Personalizar barco" is the button's label in the Skins section. -->
+    <string name="tour_boat_body">Toca tu barco, arriba en la pestaña Pescar, para abrir la sección Aspectos del Dex. Personalizar barco te permite pintar el casco, los ribetes y la cabina, y añadir un diseño, velas, una bandera y un emblema. Los colores básicos son gratis; el resto se desbloquea con puntos, o a medida que capturas más especies, llegas a zonas nuevas y reclamas hitos.</string>
+
+    <string name="tour_shop_style_title">Estilo</string>
+    <string name="tour_shop_style_body">La página Estilo tiene barcos prediseñados, pinturas, emblemas y estampados de vela (que se previsualizan en tu propio barco), además de nuevos anzuelos, sedales y estelas. Como todos los aspectos, solo cambian la apariencia, nunca el juego.</string>
+
+    <string name="tour_aquarium_title">Tu acuario</string>
+    <string name="tour_aquarium_body">Los peces que has capturado nadan en tu acuario: ábrelo con el botón Acuario del Dex y elige quién nada en él. La decoración y una pecera más grande están en la página Acuario de la Tienda.</string>
+
+    <string name="tour_season_title">Temporadas y eventos de fin de semana</string>
+    <!-- %1$s: how long a season lasts (e.g. "6 semanas"). -->
+    <string name="tour_season_body">Cada temporada dura %1$s. Cada lance en solitario da XP de temporada y abre niveles de recompensas: aparejos y puntos para todos, y más cosas (un barco de temporada, una insignia) con el pase de temporada. Además, cada fin de semana trae un objetivo de pesca con su propia recompensa. Nada de esto cambia los duelos.</string>
+
+    <string name="tour_passes_title">Pases</string>
+    <!-- Club del Capitán and Pack de inicio are shop items (core_shop_item_*). -->
+    <string name="tour_passes_body">El Club del Capitán es una membresía mensual: una pintura exclusiva para socios, una insignia de título del club, guardado en la nube y una Bolsa de Faroles gratis cada mes. Los pescadores nuevos también reciben, durante unos días, una oferta única del Pack de inicio. Un punto en la pestaña Tienda indica que algo te espera allí.</string>
+
+    <string name="tour_badges_title">Insignias de título y cartas del Dex</string>
+    <string name="tour_badges_body">Elige el marco de tu insignia de título (que se muestra bajo tu nombre, también en línea) y cómo muestra el Dex las especies que has capturado. Hay más en la Tienda, en los pases de temporada y en los eventos.</string>
+
+    <string name="tour_atmosphere_title">Atmósfera</string>
+    <!-- Llanura Abisal (core_zone_abyss) and Pesadilla (core_atmosphere_nightmare). -->
+    <string name="tour_atmosphere_body">El agua es inofensiva cerca de la superficie y da más miedo cuanto más bajas. Llega a la Llanura Abisal para desbloquear Pesadilla, una estética aterradora para las profundidades: ves exactamente lo mismo que antes, solo cambia el ambiente.</string>
+
+    <string name="tour_battle_title">Duelos 1 contra 1</string>
+    <!-- The five battle modes' names match core_mode_*. -->
+    <string name="tour_battle_body">Elige un modo: Al mejor de 5, Carrera de 3 minutos, Captura pesada, Caza de especies o Inmersión profunda. Ambos jugadores pescan en exactamente la misma agua, así que gana la habilidad.</string>
+
+    <string name="tour_opponents_title">Elige rival</string>
+    <!-- Fácil, Normal and Difícil match core_bot_*; "Partida rápida" is a button. %1$d: the rope's level in every stat. -->
+    <string name="tour_opponents_body">Juega contra la máquina (Fácil, Normal o Difícil), contra un amigo en este teléfono o contra alguien en línea: crea una sala y comparte su código, o usa Partida rápida. En línea, ambos jugadores usan la misma cuerda de torneo (nivel %1$d en cada estadística).</string>
+
+    <string name="tour_battle_tackle_title">Aparejos en los duelos</string>
+    <string name="tour_battle_tackle_body">Los Faroles y los Detectores de peces raros también funcionan en los duelos: actívalos aquí y cada uno de tus lances gastará uno. Cualquiera puede conseguirlos, así que forman parte del juego. El Amuleto de la suerte y el Señuelo brillante son solo para lances en solitario.</string>
+
+    <string name="tour_gifts_title">Regalos y guardado en la nube</string>
+    <string name="tour_gifts_body">Después de un duelo en línea puedes enviar un regalo a tu rival: aparejos o aspectos, pagados con euros o con puntos. Los regalos para ti llegan cuando abres el juego. Los miembros del Club del Capitán tienen copia de seguridad en el servidor: el botón Cuenta de la Tienda muestra el código de recuperación que la restaura en un teléfono nuevo.</string>
+
+    <string name="tour_wager_title">Apuesta puntos</string>
+    <!-- %1$s, %2$s, %3$s: how many times the stake a win pays back against each difficulty. -->
+    <string name="tour_wager_body">Contra la máquina puedes apostar puntos al resultado: una victoria te devuelve la apuesta ×%1$s en nivel Fácil, ×%2$s en nivel Normal y ×%3$s en nivel Difícil. Un empate te la devuelve.</string>
+
+    <string name="tour_settings_title">Ajustes</string>
+    <string name="tour_settings_body">El engranaje de la parte superior de la pestaña Pescar abre Ajustes.</string>
+
+    <string name="tour_sound_title">Sonido y sensaciones</string>
+    <!-- Volumen, Música, Efectos de sonido, Vibración and Reducir movimiento are the settings (settings_sound_*). -->
+    <string name="tour_sound_body">Ajusta aquí por separado el volumen, la música y los efectos de sonido. La música sigue a tu anzuelo: tranquila cerca de la superficie, más oscura en las profundidades. Vibración añade un toque suave a los golpes, las capturas y las grandes victorias, y Reducir movimiento quita los temblores de pantalla, la cámara lenta y los destellos.</string>
+
+    <string name="tour_daily_title">Recompensas diarias</string>
+    <!-- %1$s: the calendar's length (e.g. "7 días", used twice); %2$d: shields a new player starts
+         with; %3$d: the most shields one can hold. -->
+    <string name="tour_daily_body">Reclama aquí una recompensa una vez al día: puntos y aparejos, y una mayor cada %1$s. Perderte un día nunca hace retroceder el calendario. Tu racha cuenta los días seguidos, y un escudo de racha cubre por sí solo un día perdido: empiezas con %2$d, y cada %1$s recibes otro (hasta %3$d).</string>
+
+    <string name="tour_daily_challenges_title">Retos diarios</string>
+    <!-- %1$s: free swaps a day (tour_daily_swaps, e.g. "1 cambio al día"). -->
+    <string name="tour_daily_challenges_body">Cada día trae tres retos (fácil, intermedio y difícil) adaptados a tu cuerda, a cambio de aparejos y puntos. ¿No te apetece uno? Cámbialo gratis (%1$s). Solo cuentan los lances en solitario. Los nuevos llegan a medianoche, y los terminados se reclaman por ti si se te olvida.</string>
+    <plurals name="tour_daily_swaps">
+        <item quantity="one">%d cambio al día</item>
+        <item quantity="many">%d de cambios al día</item>
+        <item quantity="other">%d cambios al día</item>
+    </plurals>
+
+    <string name="tour_migrations_title">Migraciones</string>
+    <!-- %1$s: how long a migration lasts (e.g. "2 días"). -->
+    <string name="tour_migrations_body">Cada semana, durante %1$s, migran dos especies poco comunes: una cerca de la superficie y otra en las profundidades, las dos mucho más comunes donde viven. Un aviso las muestra en la pestaña Pescar y en el Dex. Las migraciones son para lances en solitario: los duelos nunca cambian.</string>
+
+    <string name="tour_reminders_title">Recordatorios</string>
+    <!-- %1$s and %2$s: times on the hour, start and end of the quiet hours. -->
+    <string name="tour_reminders_body">¿Quieres un aviso cuando tu recompensa diaria esté lista, tu racha esté a punto de terminar o empiece una migración? Activa los recordatorios en Ajustes: como mucho uno al día, y nunca entre las %1$s y las %2$s.</string>
+
+    <string name="tour_social_title">Amigos y clasificaciones</string>
+    <!-- %1$d: the standard rope's level in every stat. -->
+    <string name="tour_social_body">Desde aquí se abren los amigos, las clasificaciones semanales y el torneo semanal. Allí todo se pesca con la cuerda estándar de los duelos en línea (nivel %1$d en cada estadística), así que lo que cuenta es la habilidad.</string>
+
+    <string name="tour_friend_code_title">Tu código de amigo</string>
+    <string name="tour_friend_code_body">Tu ID de jugador es tu código de amigo: compártelo para que tus amigos puedan añadirte. Nadie puede encontrarte por tu nombre, y los desconocidos de las clasificaciones solo ven un nombre creado a partir de tu ID.</string>
+
+    <string name="tour_friends_title">Añade amigos</string>
+    <!-- "Desafiar" is a button on a friend's card. -->
+    <string name="tour_friends_body">Escribe el ID de jugador de un amigo para enviarle una solicitud: la amistad queda confirmada cuando la acepta. Sus tarjetas muestran si está en línea y sus mejores capturas de la semana, y Desafiar le envía una invitación a una sala de duelo en línea.</string>
+
+    <string name="tour_leaderboards_title">Clasificaciones semanales</string>
+    <!-- Boards and views match core_board_* and core_view_*. %1$d: anglers in a league. 00:00 UTC: keep it. -->
+    <string name="tour_leaderboards_body">Tres clasificaciones (mejor lance, captura más profunda y captura más rara) para todos, para tu liga de unos %1$d pescadores o para tus amigos. Solo cuentan los lances que comprueba el propio servidor: el torneo semanal y los duelos en línea. Todas las clasificaciones se reinician el lunes a las 00:00 UTC.</string>
+
+    <string name="tour_tournament_title">El torneo semanal</string>
+    <!-- %1$d: bumps; %2$d: attempts a week; %3$d: the percentage of players who win the badge. -->
+    <string name="tour_tournament_body">Durante toda la semana, todo el mundo pesca en exactamente la misma agua con %1$d golpes. Tienes %2$d intentos y cuenta el mejor; empezar un intento lo gasta. Cuando termina la semana, las recompensas se reparten según tu puesto final, y el %3$d %% mejor gana la insignia de título Torneo.</string>
+
+    <string name="tour_clubs_title">Clubes</string>
+    <!-- %1$d: the most members a club can have. -->
+    <string name="tour_clubs_body">Únete a un club con su código, o crea uno con un nombre hecho de palabras de pesca. Hasta %1$d pescadores pescan juntos para un objetivo semanal, y todos los que han ayudado reciben cada recompensa alcanzada. No hay chat.</string>
+
+    <string name="tour_privacy_title">Tu privacidad</string>
+    <string name="tour_privacy_body">Las estadísticas de uso y los informes de errores solo se envían si los permites. Cambia de opinión cuando quieras con los dos interruptores de Ajustes, en Privacidad. Ahí también puedes eliminar tu cuenta en línea y leer la política de privacidad.</string>
+
+    <string name="tour_language_title">Tu idioma</string>
+    <string name="tour_language_body">Deep Line habla inglés, francés, español, alemán, portugués de Brasil y turco. Elige uno aquí o mantén el idioma de tu teléfono.</string>
+
+    <string name="tour_replay_title">¡Eso es todo, buena pesca!</string>
+    <string name="tour_replay_body">Puedes volver a ver esta guía cuando quieras desde Ajustes.</string>
+</resources>
