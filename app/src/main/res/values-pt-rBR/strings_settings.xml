@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Português do Brasil. Configurações (a engrenagem da aba Pescar) e suas seções: ajuda, som e
+    sensações, notificações, idioma, créditos (ui/settings/). Chaves começam com
+    settings_<seção>_.
+-->
+<resources>
+    <string name="settings_title">Configurações</string>
+    <string name="settings_version">Deep Line %1$s</string>
+
+    <!-- Ajuda. -->
+    <string name="settings_help_title">Ajuda</string>
+    <string name="settings_help_body">O tour mostra como jogar e para que serve cada coisa.</string>
+    <string name="settings_help_tour">Fazer o tour</string>
+
+    <!-- Som e sensações. -->
+    <string name="settings_sound_title">Som e sensações</string>
+    <string name="settings_sound_volume">Volume</string>
+    <string name="settings_sound_music">Música</string>
+    <string name="settings_sound_effects">Efeitos sonoros</string>
+    <string name="settings_sound_percent">%1$d%%</string>
+    <string name="settings_sound_vibration">Vibração</string>
+    <string name="settings_sound_vibration_on">Um toque leve nas batidas, nas capturas e nas grandes vitórias.</string>
+    <string name="settings_sound_vibration_none">Este celular não vibra.</string>
+    <string name="settings_sound_reduce_motion">Reduzir movimento</string>
+    <string name="settings_sound_reduce_motion_body">Sem tremor de tela, câmera lenta nem clarões durante os lançamentos.</string>
+
+    <!-- Notificações. -->
+    <string name="settings_notif_title">Notificações</string>
+    <string name="settings_notif_reminders">Lembretes</string>
+    <string name="settings_notif_reminders_body">Quando sua recompensa diária estiver pronta, sua sequência estiver para acabar ou uma migração começar. %1$s</string>
+    <string name="settings_notif_daily">Recompensa diária pronta</string>
+    <string name="settings_notif_daily_body">A partir das %1$s, se você ainda não tiver aberto o jogo naquele dia.</string>
+    <string name="settings_notif_streak">Sequência em risco</string>
+    <plurals name="settings_notif_streak_body">
+        <item quantity="one">À noite, quando uma sequência de %d dia ou mais acabaria à meia-noite.</item>
+        <item quantity="many">À noite, quando uma sequência de %d de dias ou mais acabaria à meia-noite.</item>
+        <item quantity="other">À noite, quando uma sequência de %d dias ou mais acabaria à meia-noite.</item>
+    </plurals>
+    <string name="settings_notif_events">Migrações e eventos</string>
+    <string name="settings_notif_events_body">Quando começa uma migração ou um evento de fim de semana.</string>
+    <string name="settings_notif_blocked">As notificações do Deep Line estão desativadas neste celular, então nenhum lembrete pode chegar.</string>
+    <string name="settings_notif_phone_settings">Abrir configurações do celular</string>
+
+    <!-- Idioma. Os nomes dos idiomas aparecem na própria língua. -->
+    <string name="settings_language_title">Idioma</string>
+    <string name="settings_language_system">Idioma do celular</string>
+    <string name="settings_language_system_now">Agora: %1$s</string>
+    <string name="settings_language_body">Os nomes digitados pelos jogadores nunca são traduzidos.</string>
+
+    <!-- Créditos. -->
+    <string name="settings_credits_title">Créditos</string>
+    <string name="settings_credits_body">Todos os sons e músicas são obras livres dedicadas ao domínio público (CC0) e compartilhadas no OpenGameArt.org. Obrigado aos seus autores.</string>
+    <string name="settings_credits_music">Música: %1$s</string>
+    <string name="settings_credits_sounds">Sons: %1$s</string>
+    <string name="settings_credits_by">Por %1$s. Licença: %2$s.</string>
+</resources>
