@@ -123,7 +123,7 @@
     </plurals>
 
     <string name="tour_migrations_title">Wanderungen</string>
-    <string name="tour_migrations_body">Jede Woche wandern %1$s lang zwei weniger häufige Arten: eine nahe der Oberfläche und eine in der Tiefe, beide dort, wo sie leben, dann viel häufiger. Ein Banner zeigt sie im Tab „Angeln“ und im Dex. Wanderungen gelten nur für Solo-Würfe: Duelle ändern sich nie.</string>
+    <string name="tour_migrations_body">Jede Woche wandern %1$s lang zwei weniger häufige Arten, eine nahe der Oberfläche und eine in der Tiefe: Dort, wo sie leben, sind sie dann viel häufiger. Ein Banner zeigt sie im Tab „Angeln“ und im Dex. Wanderungen gelten nur für Solo-Würfe: Duelle ändern sich nie.</string>
 
     <string name="tour_reminders_title">Erinnerungen</string>
     <string name="tour_reminders_body">Möchtest du einen Hinweis, wenn deine Tagesbelohnung bereit ist, deine Serie bald endet oder eine Wanderung beginnt? Schalte Erinnerungen in den Einstellungen ein: höchstens eine pro Tag und nie zwischen %1$s und %2$s Uhr.</string>
