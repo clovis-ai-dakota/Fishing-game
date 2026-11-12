@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Während eines Wurfs: kurze Meldungen über dem Wasser, das HUD, das Pausenmenü und die
+    Ergebnisse. Meldungen werden in einem Sekundenbruchteil gelesen: kurz und knackig.
+    (During a cast. Keys start with cast_.)
+-->
+<resources>
+    <plurals name="cast_notice_bump">
+        <item quantity="one">Stoß! Noch %d</item>
+        <item quantity="other">Stoß! Noch %d</item>
+    </plurals>
+    <string name="cast_notice_pulled_up">Schnur kehrt um! Ziel auf Köpfe</string>
+    <string name="cast_notice_rope_end">Seilende! Jetzt einholen</string>
+    <string name="cast_notice_caught">"%1$s  +%2$s"</string>
+    <string name="cast_notice_caught_sparkling">"Funkelnd: %1$s  +%2$s"</string>
+    <string name="cast_notice_too_heavy">Zu schwer: %1$s</string>
+    <string name="cast_notice_last_bump">"Letzter Stoß fängt: %1$s  +%2$s"</string>
+    <string name="cast_notice_times_up">Zeit abgelaufen!</string>
+
+    <!-- Das HUD oben im Wurf-Bildschirm. Chips sind klein. -->
+    <string name="cast_hud_phase_sinking">Sinkt</string>
+    <string name="cast_hud_phase_reeling">Steigt auf</string>
+    <string name="cast_hud_phase_surfaced">Aufgetaucht</string>
+    <string name="cast_hud_pause">Pause</string>
+    <string name="cast_hud_bumps">Stöße</string>
+    <string name="cast_hud_load">Last %1$s / %2$s kg</string>
+    <string name="cast_hud_bump_free">Stoßfreie Zone · Stöße zählen unter %1$d m</string>
+    <string name="cast_hud_lantern_lit">Laterne an</string>
+    <string name="cast_hud_battle_round">%1$s · Runde %2$d</string>
+    <string name="cast_hud_battle_cast_of">%1$s · Wurf %2$d/%3$d</string>
+    <string name="cast_hud_battle_cast">%1$s · Wurf %2$d</string>
+    <string name="cast_hud_player">Spieler</string>
+    <string name="cast_hud_tournament_attempt">Turnier · Versuch %1$d von %2$d</string>
+
+    <!-- Hinweise in der Bildschirmmitte. -->
+    <string name="cast_hint_steer">Zieh zum Lenken: Der Haken gleitet zu deinem Finger. Weich unter %1$d m Fischköpfen und Objekten aus: Nach %2$d Stößen kommt die Schnur hoch.</string>
+    <string name="cast_hint_heads">Tippe Fische am KOPF an, um sie zu fangen. Schwanzflossen zählen nicht.</string>
+
+    <!-- Der Button, der die Schnur direkt hochholt. Groß, eine Zeile. -->
+    <string name="cast_fast_reel">Schnell einholen</string>
+    <string name="cast_fast_reel_line_full">Schnur voll · Schnell einholen</string>
+
+    <!-- Der Pausendialog. -->
+    <string name="cast_pause_title">Pausiert</string>
+    <string name="cast_pause_body_solo">Wenn du aufhörst, endet dieser Wurf, und kein Fisch an der Schnur wird gewertet.</string>
+    <string name="cast_pause_body_battle">Wenn du aufhörst, gibst du das Duell auf. Die Duelluhr steht, solange pausiert ist.</string>
+    <string name="cast_pause_body_online">Wenn du aufhörst, gibst du das Duell auf. Online angelt dein Gegner weiter, während du pausierst.</string>
+    <string name="cast_pause_body_tournament">Wenn du aufhörst, bekommst du für diesen Turnierversuch 0 Punkte, und er zählt trotzdem als einer deiner Versuche.</string>
+    <string name="cast_pause_resume">Weiter</string>
+    <string name="cast_pause_quit">Wurf beenden</string>
+    <string name="cast_pause_forfeit">Duell aufgeben</string>
+
+    <!-- Die Ergebnisse am Ende eines Wurfs. -->
+    <string name="cast_results_title">Wurf beendet</string>
+    <string name="cast_results_deepest">Tiefster Punkt: %1$s</string>
+    <plurals name="cast_results_fish">
+        <item quantity="one">%d Fisch</item>
+        <item quantity="other">%d Fische</item>
+    </plurals>
+    <plurals name="cast_results_objects">
+        <item quantity="one">%d Objekt</item>
+        <item quantity="other">%d Objekte</item>
+    </plurals>
+    <string name="cast_results_nothing">Diesmal nichts an der Schnur. Lenk beim Aufstieg auf Fische zu, damit der Haken ihren Kopf trifft.</string>
+    <string name="cast_results_by_last_bump">vom letzten Stoß gefangen</string>
+    <string name="cast_results_sparkling">✦ %1$s (funkelnd)</string>
+    <string name="cast_results_secret">✦ Geheimnis: %1$s</string>
+    <string name="cast_results_total">"Gesamt  +%1$s Punkte"</string>
+    <string name="cast_results_collect">Einsammeln</string>
+    <string name="cast_results_continue">Weiter</string>
+
+    <!-- Beschriftungen auf dem Wasser (klein, eine Zeile). -->
+    <string name="cast_canvas_bump_free_above">Stoßfrei bis %1$d m</string>
+    <string name="cast_canvas_rope_limit">Seilende</string>
+</resources>
