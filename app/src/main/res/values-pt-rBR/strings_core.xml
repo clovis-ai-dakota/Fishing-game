@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Português do Brasil. Nomes e descrições do que as regras do jogo definem (módulo core): zonas,
+    atributos da corda, apetrechos, modos de duelo, skins, opções de barco, itens da loja, temas,
+    temporadas, rankings, segredos... Chaves: core_<tipo>_<id>, com _desc para uma descrição e
+    _short para a forma curta. Os nomes são rótulos: aparecem sozinhos ou depois de dois-pontos,
+    nunca dentro de uma frase que precisaria flexioná-los.
+-->
+<resources>
+    <!-- Zonas de profundidade (nomes de lugares). -->
+    <string name="core_zone_shallows">Baixios Ensolarados</string>
+    <string name="core_zone_shallows_short">Baixios</string>
+    <string name="core_zone_twilight">Recife do Crepúsculo</string>
+    <string name="core_zone_twilight_short">Recife</string>
+    <string name="core_zone_midnight">Fossa da Meia-Noite</string>
+    <string name="core_zone_midnight_short">Fossa</string>
+    <string name="core_zone_abyss">Planície Abissal</string>
+    <string name="core_zone_abyss_short">Planície</string>
+
+    <!-- Coisas na água que não são peixes. -->
+    <string name="core_obstacle_driftwood">Tronco</string>
+    <string name="core_obstacle_rock">Pedra</string>
+    <string name="core_obstacle_jelly">Enxame de águas-vivas</string>
+
+    <!-- Melhorias da corda (Loja > Corda). -->
+    <string name="core_rope_length">Comprimento da corda</string>
+    <string name="core_rope_length_short">Comprimento</string>
+    <string name="core_rope_length_desc">Até que profundidade o anzol pode ir antes de voltar.</string>
+    <string name="core_rope_strength">Força da corda</string>
+    <string name="core_rope_strength_short">Força</string>
+    <string name="core_rope_strength_desc">Peso total máximo de peixes que a linha aguenta.</string>
+    <string name="core_rope_agility">Agilidade da corda</string>
+    <string name="core_rope_agility_short">Agilidade</string>
+    <string name="core_rope_agility_desc">A rapidez com que você move o anzol para os lados.</string>
+
+    <!-- Apetrechos: itens para um lançamento. -->
+    <string name="core_tackle_lantern">Lanterna</string>
+    <string name="core_tackle_lantern_desc">Ilumina muito mais da água escura abaixo de %1$d m por um lançamento.</string>
+    <string name="core_tackle_lucky_charm">Amuleto da sorte</string>
+    <string name="core_tackle_lucky_charm_desc">Uma batida extra na descida por um lançamento (%1$d em vez de %2$d).</string>
+    <string name="core_tackle_sparkle_lure">Isca cintilante</string>
+    <string name="core_tackle_sparkle_lure_desc">%1$d× mais peixes cintilantes na água por um lançamento.</string>
+    <string name="core_tackle_detector">Detector de peixes raros</string>
+    <string name="core_tackle_detector_desc">Por um lançamento, marca as espécies que você ainda não capturou a até %1$d m do anzol, mesmo no escuro.</string>
+
+    <!-- Modos de duelo: o nome e as regras. -->
+    <string name="core_mode_best_of_five">Melhor de 5</string>
+    <string name="core_mode_best_of_five_rules">Um lançamento de cada por rodada. A maior pontuação leva a rodada. Vence quem ganhar 3 rodadas primeiro.</string>
+    <string name="core_mode_time_attack">Corrida de 3 minutos</string>
+    <string name="core_mode_time_attack_rules">%1$d minutos de pesca para cada um. Só conta o seu melhor lançamento. Um lançamento que ainda estiver rolando quando o tempo acabar termina na hora.</string>
+    <string name="core_mode_heavy_haul">Pescaria pesada</string>
+    <string name="core_mode_heavy_haul_rules">%1$d lançamentos para cada um. Vence quem pescar mais quilos no total.</string>
+    <string name="core_mode_species_hunt">Caça às espécies</string>
+    <string name="core_mode_species_hunt_rules">%1$d lançamentos para cada um. Vence quem pescar mais espécies diferentes. Em caso de empate, decide o total de pontos.</string>
+    <string name="core_mode_deep_dive">Mergulho profundo</string>
+    <string name="core_mode_deep_dive_rules">%1$d lançamentos para cada um. Vence a captura mais funda. Em caso de empate, decide o total de pontos.</string>
+
+    <!-- Níveis do rival do computador. -->
+    <string name="core_bot_easy">Fácil</string>
+    <string name="core_bot_normal">Normal</string>
+    <string name="core_bot_hard">Difícil</string>
+
+    <!-- Dificuldade de um desafio diário. -->
+    <string name="core_challenge_easy">Fácil</string>
+    <string name="core_challenge_medium">Médio</string>
+    <string name="core_challenge_hard">Difícil</string>
+
+    <!-- Onde vai cada skin. -->
+    <string name="core_slot_hook">Anzol</string>
+    <string name="core_slot_line">Linha</string>
+    <string name="core_slot_boat">Barco</string>
+    <string name="core_slot_trail">Rastro de bolhas</string>
+    <string name="core_slot_title">Título</string>
+
+    <!-- Skins. -->
+    <string name="core_cosmetic_leviathan_bone_hook">Anzol de osso de leviatã</string>
+    <string name="core_cosmetic_leviathan_bone_hook_desc">Marfim entalhado de um gigante, com runas que pulsam em ciano.</string>
+    <string name="core_cosmetic_giants_braid_line">Trança do gigante</string>
+    <string name="core_cosmetic_giants_braid_line_desc">Uma trança grossa e clara, com um brilho que corre por ela.</string>
+    <string name="core_cosmetic_giant_slayer_pennant">Flâmula mata-gigantes</string>
+    <string name="core_cosmetic_giant_slayer_pennant_desc">Um mastro alto com um estandarte de leviatã e um casco com friso ciano.</string>
+    <string name="core_cosmetic_tide_trail">Rastro de maré</string>
+    <string name="core_cosmetic_tide_trail_desc">Bolhas e ondulações em ciano atrás do seu anzol.</string>
+    <string name="core_cosmetic_giant_slayer_title">Mata-gigantes</string>
+    <string name="core_cosmetic_giant_slayer_title_desc">Título: você pescou um gigante com uma linha fina.</string>
+    <string name="core_cosmetic_prism_hook">Anzol prisma</string>
+    <string name="core_cosmetic_prism_hook_desc">Um anzol de cristal que passa por todas as cores.</string>
+    <string name="core_cosmetic_rainbow_line">Linha arco-íris</string>
+    <string name="core_cosmetic_rainbow_line_desc">Cores fluindo pela linha inteira.</string>
+    <string name="core_cosmetic_prism_sail">Vela prisma</string>
+    <string name="core_cosmetic_prism_sail_desc">Uma vela arco-íris no seu barco.</string>
+    <string name="core_cosmetic_prism_trail">Rastro prisma</string>
+    <string name="core_cosmetic_prism_trail_desc">Bolhas e faíscas arco-íris atrás do seu anzol.</string>
+    <string name="core_cosmetic_perfectionist_title">Perfeccionista</string>
+    <string name="core_cosmetic_perfectionist_title_desc">Título: o lançamento perfeito.</string>
+    <string name="core_cosmetic_crown_hook">Anzol coroa</string>
+    <string name="core_cosmetic_crown_hook_desc">Ouro maciço, com uma coroa no olhal.</string>
+    <string name="core_cosmetic_golden_line">Linha dourada</string>
+    <string name="core_cosmetic_golden_line_desc">Uma linha de ouro com reflexos que correm por ela.</string>
+    <string name="core_cosmetic_royal_boat">Barco real</string>
+    <string name="core_cosmetic_royal_boat_desc">Um casco com friso dourado e uma vela roxa com coroa.</string>
+    <string name="core_cosmetic_golden_trail">Rastro dourado</string>
+    <string name="core_cosmetic_golden_trail_desc">Faíscas douradas atrás do seu anzol.</string>
+    <string name="core_cosmetic_master_angler_title">Mestre pescador</string>
+    <string name="core_cosmetic_master_angler_title_desc">Título: todos os peixes no registro.</string>
+    <string name="core_cosmetic_coral_hook">Anzol de coral</string>
+    <string name="core_cosmetic_coral_hook_desc">Coral rosa com uma pérola no olhal.</string>
+    <string name="core_cosmetic_neon_hook">Anzol neon</string>
+    <string name="core_cosmetic_neon_hook_desc">Um tubo neon magenta brilhante.</string>
+    <string name="core_cosmetic_obsidian_hook">Anzol de obsidiana</string>
+    <string name="core_cosmetic_obsidian_hook_desc">Vidro negro com reflexo violeta.</string>
+    <string name="core_cosmetic_ocean_line">Linha oceano</string>
+    <string name="core_cosmetic_ocean_line_desc">Turquesa que vai se fundindo num azul profundo.</string>
+    <string name="core_cosmetic_neon_line">Linha neon</string>
+    <string name="core_cosmetic_neon_line_desc">Uma linha rosa e ciano que pulsa.</string>
+    <string name="core_cosmetic_silver_line">Linha prateada</string>
+    <string name="core_cosmetic_silver_line_desc">Prata polida com um reflexo que corre por ela.</string>
+    <string name="core_cosmetic_heart_trail">Rastro de corações</string>
+    <string name="core_cosmetic_heart_trail_desc">Coraçõezinhos no lugar das bolhas.</string>
+    <string name="core_cosmetic_star_trail">Rastro de estrelas</string>
+    <string name="core_cosmetic_star_trail_desc">Estrelas neon no lugar das bolhas.</string>
+    <string name="core_cosmetic_petal_trail">Rastro de pétalas</string>
+    <string name="core_cosmetic_petal_trail_desc">Pétalas de flores flutuando.</string>
+    <string name="core_cosmetic_founder_title">Fundador</string>
+    <string name="core_cosmetic_founder_title_desc">Título: você apoiou o Deep Line desde o começo.</string>
+
+    <!-- Nomes dos conjuntos de skins. -->
+    <string name="core_set_giant_slayer">Mata-gigantes</string>
+    <string name="core_set_prismatic">Prismático</string>
+    <string name="core_set_sovereign">Soberano</string>
+    <string name="core_set_coral_reef">Recife de Coral</string>
+    <string name="core_set_neon_nights">Noites Neon</string>
+
+    <!-- Seções da Loja. -->
+    <string name="core_shop_section_tackle">Apetrechos</string>
+    <string name="core_shop_section_style">Estilo</string>
+    <string name="core_shop_section_passes">Passes</string>
+    <string name="core_shop_section_aquarium">Aquário</string>
+
+    <!-- Itens da Loja. -->
+    <string name="core_shop_item_lantern_pouch">Bolsinha de Lanternas</string>
+    <string name="core_shop_item_lantern_pouch_desc">Uma bolsinha de Lanternas.</string>
+    <string name="core_shop_item_lantern_crate">Caixote de Lanternas</string>
+    <string name="core_shop_item_lantern_crate_desc">Um caixote de Lanternas.</string>
+    <string name="core_shop_item_lantern_chest">Baú de Lanternas</string>
+    <string name="core_shop_item_lantern_chest_desc">Um baú de Lanternas.</string>
+    <string name="core_shop_item_lantern_barrel">Barril de Lanternas</string>
+    <string name="core_shop_item_lantern_barrel_desc">Um barril de Lanternas, com bônus por quantidade.</string>
+    <string name="core_shop_item_detector_pouch">Bolsinha de detectores</string>
+    <string name="core_shop_item_detector_pouch_desc">Uma bolsinha de detectores de peixes raros.</string>
+    <string name="core_shop_item_detector_crate">Caixote de detectores</string>
+    <string name="core_shop_item_detector_crate_desc">Um caixote de detectores de peixes raros.</string>
+    <string name="core_shop_item_charm_bag">Saquinho de amuletos</string>
+    <string name="core_shop_item_charm_bag_desc">Um saquinho de Amuletos da sorte.</string>
+    <string name="core_shop_item_lure_box">Caixa de iscas</string>
+    <string name="core_shop_item_lure_box_desc">Uma caixa de Iscas cintilantes.</string>
+    <string name="core_shop_item_paint_flames">Pintura de chamas</string>
+    <string name="core_shop_item_paint_flames_desc">Chamas lambendo o casco.</string>
+    <string name="core_shop_item_paint_starry">Pintura noite estrelada</string>
+    <string name="core_shop_item_paint_starry_desc">Estrelas piscando no casco.</string>
+    <string name="core_shop_item_paint_metallic">Pintura metálica</string>
+    <string name="core_shop_item_paint_metallic_desc">Um brilho de metal polido.</string>
+    <string name="core_shop_item_paint_neon">Pintura neon</string>
+    <string name="core_shop_item_paint_neon_desc">Faixas de neon brilhante.</string>
+    <string name="core_shop_item_emblem_crown">Emblema de coroa</string>
+    <string name="core_shop_item_emblem_crown_desc">Uma coroa dourada.</string>
+    <string name="core_shop_item_emblem_skull">Emblema de caveira</string>
+    <string name="core_shop_item_emblem_skull_desc">Uma caveira pirata simpática.</string>
+    <string name="core_shop_item_emblem_lightning">Emblema de raio</string>
+    <string name="core_shop_item_emblem_lightning_desc">Um raio.</string>
+    <string name="core_shop_item_emblem_shell">Emblema de concha</string>
+    <string name="core_shop_item_emblem_shell_desc">Uma concha de vieira.</string>
+    <string name="core_shop_item_emblem_trident">Emblema de tridente</string>
+    <string name="core_shop_item_emblem_trident_desc">O tridente do rei dos mares.</string>
+    <string name="core_shop_item_cloth_stripes">Velas listradas</string>
+    <string name="core_shop_item_cloth_stripes_desc">Listras na vela e na bandeira.</string>
+    <string name="core_shop_item_cloth_stars">Velas estreladas</string>
+    <string name="core_shop_item_cloth_stars_desc">Estrelas na vela e na bandeira.</string>
+    <string name="core_shop_item_cloth_waves">Velas de ondas</string>
+    <string name="core_shop_item_cloth_waves_desc">Ondas na vela e na bandeira.</string>
+    <string name="core_shop_item_set_coral_reef">Conjunto Recife de Coral</string>
+    <string name="core_shop_item_set_coral_reef_desc">O Cruzeiro Recife de Coral com anzol, linha e rastro combinando.</string>
+    <string name="core_shop_item_set_neon_nights">Conjunto Noites Neon</string>
+    <string name="core_shop_item_set_neon_nights_desc">O barco Noites Neon com anzol, linha e rastro combinando.</string>
+    <string name="core_shop_item_starter_pack">Pacote inicial</string>
+    <string name="core_shop_item_starter_pack_desc">O Cruzeiro Recife de Coral, a Pintura metálica, uma Linha neon, uma insígnia de título arco-íris e %1$d Lanternas.</string>
+    <string name="core_shop_item_captains_club">Clube do Capitão</string>
+    <string name="core_shop_item_captains_club_desc">%1$d dias: a pintura Aurora, exclusiva para membros, uma insígnia de título do clube, salvamento na nuvem e uma Bolsinha de Lanternas grátis todo mês.</string>
+    <string name="core_shop_item_founders_pack">Pacote do fundador</string>
+    <string name="core_shop_item_founders_pack_desc">O título Fundador, o barco Capitânia do Fundador e uma insígnia do clube que nunca expira.</string>
+    <string name="core_shop_item_season_pass">Passe de temporada</string>
+    <string name="core_shop_item_season_pass_desc">A trilha premium desta temporada: uma insígnia da temporada, o barco da temporada no nível 10 e muitos apetrechos.</string>
+    <string name="core_shop_item_collector_edition">Edição de colecionador</string>
+    <string name="core_shop_item_collector_edition_desc">O passe de temporada, %1$d níveis na hora, o barco da temporada agora e uma insígnia de colecionador.</string>
+    <string name="core_shop_item_event_pass">Passe do evento de fim de semana</string>
+    <string name="core_shop_item_event_pass_desc">Dobra o progresso no evento deste fim de semana e adiciona uma recompensa maior, com uma insígnia do evento.</string>
+    <string name="core_shop_item_badge_rainbow">Insígnia de título arco-íris</string>
+    <string name="core_shop_item_badge_rainbow_desc">Uma insígnia de título com as cores do arco-íris em movimento.</string>
+    <string name="core_shop_item_badge_ocean">Insígnia de título oceano</string>
+    <string name="core_shop_item_badge_ocean_desc">Uma insígnia de título com ondas rolando.</string>
+    <string name="core_shop_item_badge_ember">Insígnia de título brasa</string>
+    <string name="core_shop_item_badge_ember_desc">Uma insígnia de título com brasas acesas.</string>
+    <string name="core_shop_item_card_holo">Cartas do Dex holográficas</string>
+    <string name="core_shop_item_card_holo_desc">As cartas do Dex das espécies que você capturou, em versão holográfica.</string>
+    <string name="core_shop_item_card_gold">Cartas do Dex folha de ouro</string>
+    <string name="core_shop_item_card_gold_desc">As cartas do Dex das espécies que você capturou, em folha de ouro.</string>
+    <string name="core_shop_item_card_night">Cartas do Dex noite estrelada</string>
+    <string name="core_shop_item_card_night_desc">As cartas do Dex das espécies que você capturou, em noite estrelada.</string>
+    <string name="core_shop_item_card_coral">Cartas do Dex coral</string>
+    <string name="core_shop_item_card_coral_desc">As cartas do Dex das espécies que você capturou, em coral.</string>
+    <string name="core_shop_item_aquarium_expansion">Aquário maior</string>
+    <string name="core_shop_item_aquarium_expansion_desc">Espaço para %1$d peixes em vez de %2$d, num tanque mais largo.</string>
+    <string name="core_shop_item_theme_collection">Todos os temas</string>
+    <string name="core_shop_item_theme_collection_desc">Todos os %1$d temas para os menus, de dia e de noite.</string>
+    <string name="core_shop_item_theme">Tema %1$s</string>
+
+    <!-- Etiquetas nos cartões da Loja. -->
+    <string name="core_shop_badge_set">Conjunto</string>
+    <string name="core_shop_badge_special">Especial</string>
+
+    <!-- Barcos prontos e barcos de temporada. -->
+    <string name="core_boat_coral_cruiser">Cruzeiro Recife de Coral</string>
+    <string name="core_boat_coral_cruiser_desc">Cores ensolaradas e uma vela rosa.</string>
+    <string name="core_boat_lagoon_explorer">Explorador da Lagoa</string>
+    <string name="core_boat_lagoon_explorer_desc">Bolinhas e uma âncora, pronto para a aventura.</string>
+    <string name="core_boat_sunset_racer">Corredor do Pôr do Sol</string>
+    <string name="core_boat_sunset_racer_desc">Chamas da proa à popa.</string>
+    <string name="core_boat_midnight_corsair">Corsário da Meia-Noite</string>
+    <string name="core_boat_midnight_corsair_desc">Um navio pirata de velas negras.</string>
+    <string name="core_boat_starlight_voyager">Viajante das Estrelas</string>
+    <string name="core_boat_starlight_voyager_desc">Um céu noturno pintado no casco.</string>
+    <string name="core_boat_royal_regatta">Regata Real</string>
+    <string name="core_boat_royal_regatta_desc">Friso dourado e uma vela com coroa.</string>
+    <string name="core_boat_galaxy_dreamer">Sonhador Galáctico</string>
+    <string name="core_boat_galaxy_dreamer_desc">Estrelas violeta e detalhes em menta.</string>
+    <string name="core_boat_neon_nights">Noites Neon</string>
+    <string name="core_boat_neon_nights_desc">Tubos brilhantes e uma estampa estrelada.</string>
+    <string name="core_boat_founders_flagship">Capitânia do Fundador</string>
+    <string name="core_boat_founders_flagship_desc">Azul-marinho e dourado, com um tridente numa vela estrelada.</string>
+    <string name="core_boat_season_tidecaller">Chama-Marés</string>
+    <string name="core_boat_season_tidecaller_desc">Barco da temporada: ondas verde-mar e uma concha na vela.</string>
+    <string name="core_boat_season_moonbloom">Flor da Lua</string>
+    <string name="core_boat_season_moonbloom_desc">Barco da temporada: aurora lilás sob uma lua crescente.</string>
+    <string name="core_boat_season_frostfin">Barbatana de Gelo</string>
+    <string name="core_boat_season_frostfin_desc">Barco da temporada: gelo polido com uma bandeira de raio.</string>
+    <string name="core_boat_season_goldwake">Esteira Dourada</string>
+    <string name="core_boat_season_goldwake_desc">Barco da temporada: neon dourado sobre azul meia-noite, com coroa.</string>
+
+    <!-- Cores de pintura do barco. -->
+    <string name="core_color_cream">Creme</string>
+    <string name="core_color_sand">Areia</string>
+    <string name="core_color_driftwood">Madeira</string>
+    <string name="core_color_walnut">Nogueira</string>
+    <string name="core_color_pearl">Pérola</string>
+    <string name="core_color_slate">Ardósia</string>
+    <string name="core_color_charcoal">Carvão</string>
+    <string name="core_color_lagoon">Lagoa</string>
+    <string name="core_color_teal">Verde-azulado</string>
+    <string name="core_color_ocean">Oceano</string>
+    <string name="core_color_navy">Azul-marinho</string>
+    <string name="core_color_seafoam">Espuma do mar</string>
+    <string name="core_color_coral">Coral</string>
+    <string name="core_color_tangerine">Tangerina</string>
+    <string name="core_color_sunflower">Girassol</string>
+    <string name="core_color_rose">Rosa</string>
+    <string name="core_color_berry">Amora</string>
+    <string name="core_color_crimson">Carmesim</string>
+    <string name="core_color_lilac">Lilás</string>
+    <string name="core_color_violet">Violeta</string>
+    <string name="core_color_mint">Menta</string>
+    <string name="core_color_lime">Verde-limão</string>
+    <string name="core_color_gold">Dourado</string>
+    <string name="core_color_midnight">Meia-noite</string>
+
+    <!-- Opções do editor de barco. -->
+    <string name="core_pattern_solid">Sólido</string>
+    <string name="core_pattern_stripe">Faixa de corrida</string>
+    <string name="core_pattern_two_tone">Duas cores</string>
+    <string name="core_pattern_waves">Ondas</string>
+    <string name="core_pattern_dots">Bolinhas</string>
+    <string name="core_pattern_checker">Xadrez</string>
+    <string name="core_pattern_flames">Chamas</string>
+    <string name="core_pattern_starry">Noite estrelada</string>
+    <string name="core_pattern_metallic">Metálico</string>
+    <string name="core_pattern_neon">Neon</string>
+    <string name="core_pattern_aurora">Aurora</string>
+    <string name="core_cloth_plain">Lisa</string>
+    <string name="core_cloth_stripes">Listras</string>
+    <string name="core_cloth_stars">Estrelas</string>
+    <string name="core_cloth_waves">Ondas</string>
+    <string name="core_sail_none">Sem vela</string>
+    <string name="core_sail_triangle">Vela triangular</string>
+    <string name="core_sail_square">Vela quadrada</string>
+    <string name="core_sail_twin">Velas duplas</string>
+    <string name="core_flag_none">Sem bandeira</string>
+    <string name="core_flag_pennant">Flâmula</string>
+    <string name="core_flag_swallowtail">Rabo de andorinha</string>
+    <string name="core_flag_banner">Estandarte</string>
+    <string name="core_emblem_none">Sem emblema</string>
+    <string name="core_emblem_star">Estrela</string>
+    <string name="core_emblem_anchor">Âncora</string>
+    <string name="core_emblem_fish">Peixe</string>
+    <string name="core_emblem_heart">Coração</string>
+    <string name="core_emblem_moon">Lua</string>
+    <string name="core_emblem_wave">Onda</string>
+    <string name="core_emblem_crown">Coroa</string>
+    <string name="core_emblem_skull">Caveira</string>
+    <string name="core_emblem_lightning">Raio</string>
+    <string name="core_emblem_shell">Concha</string>
+    <string name="core_emblem_trident">Tridente</string>
+
+    <!-- Atmosferas: Família é suave, Pesadelo é assustadora. -->
+    <string name="core_atmosphere_family">Família</string>
+    <string name="core_atmosphere_nightmare">Pesadelo</string>
+
+    <!-- Molduras da insígnia de título. -->
+    <string name="core_frame_gold">Ouro</string>
+    <string name="core_frame_rainbow">Arco-íris</string>
+    <string name="core_frame_ocean">Oceano</string>
+    <string name="core_frame_ember">Brasa</string>
+    <string name="core_frame_club">Clube do Capitão</string>
+    <string name="core_frame_club_forever">Clube do fundador</string>
+    <string name="core_frame_season">Temporada</string>
+    <string name="core_frame_collector">Colecionador</string>
+    <string name="core_frame_event">Evento de fim de semana</string>
+    <string name="core_frame_tournament">Torneio</string>
+
+    <!-- Estilos de carta do Dex. -->
+    <string name="core_card_classic">Clássica</string>
+    <string name="core_card_holo">Holográfica</string>
+    <string name="core_card_gold">Folha de ouro</string>
+    <string name="core_card_night">Noite estrelada</string>
+    <string name="core_card_coral">Coral</string>
+
+    <!-- Decoração do aquário. -->
+    <string name="core_decor_plants">Plantas aquáticas</string>
+    <string name="core_decor_plants_desc">Plantas verdes balançando.</string>
+    <string name="core_decor_pebbles">Seixos</string>
+    <string name="core_decor_pebbles_desc">Seixos lisos de rio.</string>
+    <string name="core_decor_sand_castle">Castelo de areia</string>
+    <string name="core_decor_sand_castle_desc">Um castelinho com torres.</string>
+    <string name="core_decor_bubbler">Borbulhador</string>
+    <string name="core_decor_bubbler_desc">Um mergulhador caça-tesouros soltando bolhas.</string>
+    <string name="core_decor_treasure_chest">Baú do tesouro</string>
+    <string name="core_decor_treasure_chest_desc">Um baú que se abre e mostra ouro.</string>
+    <string name="core_decor_coral_garden">Jardim de corais</string>
+    <string name="core_decor_coral_garden_desc">Corais rosa e laranja.</string>
+    <string name="core_decor_lantern_lights">Luzes de lanterna</string>
+    <string name="core_decor_lantern_lights_desc">Um cordão de lanternas acesas no alto.</string>
+    <string name="core_decor_sunken_ship">Navio naufragado</string>
+    <string name="core_decor_sunken_ship_desc">Um naufrágio repousando na areia.</string>
+
+    <!-- Temas dos menus. -->
+    <string name="core_theme_lagoon">Lagoa</string>
+    <string name="core_theme_lagoon_desc">Água turquesa ensolarada, raios de luz e bolhas subindo.</string>
+    <string name="core_theme_kelp_forest">Floresta de Algas</string>
+    <string name="core_theme_kelp_forest_desc">Luz verde e dourada entre algas que balançam.</string>
+    <string name="core_theme_sandbar">Banco de Areia</string>
+    <string name="core_theme_sandbar_desc">Água rasa e arenosa, com luz ondulante.</string>
+    <string name="core_theme_coral_reef">Recife de Coral</string>
+    <string name="core_theme_coral_reef_desc">Rosas e laranjas de coral, com um recife lá embaixo.</string>
+    <string name="core_theme_polar">Águas Polares</string>
+    <string name="core_theme_polar_desc">Azuis gelados, gelo flutuante e neve caindo.</string>
+    <string name="core_theme_sunset_harbor">Porto do Pôr do Sol</string>
+    <string name="core_theme_sunset_harbor_desc">Um céu brilhante sobre o porto, com barcos no horizonte.</string>
+    <string name="core_theme_koi_pond">Lago das Carpas</string>
+    <string name="core_theme_koi_pond_desc">Água cor de jade, carpas deslizando e vitórias-régias no alto.</string>
+    <string name="core_theme_treasure_cove">Enseada do Tesouro</string>
+    <string name="core_theme_treasure_cove_desc">Azul profundo e dourado: moedas reluzindo no fundo do mar.</string>
+    <string name="core_theme_glow_tide">Maré Luminosa</string>
+    <string name="core_theme_glow_tide_desc">Águas-vivas brilhantes e plâncton faiscante num mar cheio de vida.</string>
+    <string name="core_theme_aurora">Aurora</string>
+    <string name="core_theme_aurora_desc">Aurora boreal sobre a água.</string>
+
+    <!-- Modo noturno dos temas. -->
+    <string name="core_night_day">Dia</string>
+    <string name="core_night_night">Noite</string>
+    <string name="core_night_auto">Como no celular</string>
+
+    <!-- Nomes das temporadas. -->
+    <string name="core_season_coral_tides">Marés de Coral</string>
+    <string name="core_season_midnight_bloom">Florada da Meia-Noite</string>
+    <string name="core_season_frost_current">Corrente Gélida</string>
+    <string name="core_season_sunken_gold">Ouro Submerso</string>
+    <string name="core_season_storm_season">Temporada de Tempestades</string>
+    <string name="core_season_lantern_festival">Festival das Lanternas</string>
+
+    <!-- Metas dos eventos de fim de semana (no imperativo). -->
+    <string name="core_goal_sparkling">Pesque peixes cintilantes</string>
+    <string name="core_goal_fish">Pesque peixes</string>
+    <string name="core_goal_deep">Chegue à Fossa da Meia-Noite</string>
+    <string name="core_goal_species">Pesque espécies diferentes</string>
+
+    <!-- Colocações finais do torneio semanal. -->
+    <string name="core_tier_champion">Campeão</string>
+    <string name="core_tier_gold">Top 10%</string>
+    <string name="core_tier_silver">Top 25%</string>
+    <string name="core_tier_bronze">Top 50%</string>
+    <string name="core_tier_took_part">Participou</string>
+
+    <!-- Papéis num clube. -->
+    <string name="core_role_owner">Dono</string>
+    <string name="core_role_member">Membro</string>
+
+    <!-- Rankings semanais e suas visões. -->
+    <string name="core_board_best_cast">Melhor lançamento</string>
+    <string name="core_board_best_cast_desc">O lançamento com mais pontos da semana.</string>
+    <string name="core_board_deepest">Captura mais funda</string>
+    <string name="core_board_deepest_desc">O peixe mais fundo pescado nesta semana.</string>
+    <string name="core_board_rarest">Captura mais rara</string>
+    <string name="core_board_rarest_desc">A espécie mais rara pescada nesta semana; em caso de empate, vence a captura mais funda.</string>
+    <string name="core_view_global">Todos</string>
+    <string name="core_view_league">Liga</string>
+    <string name="core_view_friends">Amigos</string>
+
+    <!-- A linha de pontuação de um jogador no duelo, por modo. -->
+    <plurals name="core_score_rounds">
+        <item quantity="one">%d rodada</item>
+        <item quantity="many">%d de rodadas</item>
+        <item quantity="other">%d rodadas</item>
+    </plurals>
+    <string name="core_score_best_cast">%1$s pts no melhor lançamento</string>
+    <string name="core_score_kg">%1$s kg</string>
+    <plurals name="core_score_species">
+        <item quantity="one">%d espécie</item>
+        <item quantity="many">%d de espécies</item>
+        <item quantity="other">%d espécies</item>
+    </plurals>
+    <string name="core_score_deepest">captura mais funda: %1$s m</string>
+
+    <!-- Segredos de pesca: nomes curtos e marcantes, como lances de esporte. Só aparecem depois
+         que o segredo é descoberto, nunca no tour. -->
+    <string name="core_secret_last_bump">A última batida fisga o que acerta</string>
+    <string name="core_secret_free_pass">Passe livre</string>
+    <string name="core_secret_schooling">Cardume</string>
+    <string name="core_secret_surface_skim">Rasante na superfície</string>
+    <string name="core_secret_zen_cast">Lançamento zen</string>
+    <string name="core_secret_pinball">Pinball</string>
+    <string name="core_secret_second_encounter">Segundo encontro</string>
+    <string name="core_secret_clean_drop">Descida limpa</string>
+    <string name="core_secret_rock_bottom">Fundo do poço</string>
+    <string name="core_secret_buzzer_beater">No apagar das luzes</string>
+    <string name="core_secret_corner_pocket">Caçapa do canto</string>
+    <string name="core_secret_grand_tour">Grande turnê</string>
+    <string name="core_secret_sparkle_snag">Fisgada cintilante</string>
+    <string name="core_secret_ladder">Escadinha</string>
+    <string name="core_secret_perfect_load">Carga perfeita</string>
+    <string name="core_secret_moonlit_angler">Pescador ao luar</string>
+    <string name="core_secret_shutout">De lavada</string>
+    <string name="core_secret_while_it_flees">Enquanto foge</string>
+    <string name="core_secret_blind_drop">Descida às cegas</string>
+    <string name="core_secret_zone_sweep">Varredura de zonas</string>
+    <string name="core_secret_grand_slam">Grand slam</string>
+    <string name="core_secret_double_header">Dobradinha</string>
+    <string name="core_secret_crowd_surfer">Surfando na multidão</string>
+    <string name="core_secret_david_and_goliath">Davi e Golias</string>
+    <string name="core_secret_perfect_cast">Lançamento perfeito</string>
+    <string name="core_secret_master_angler">Mestre pescador</string>
+</resources>
