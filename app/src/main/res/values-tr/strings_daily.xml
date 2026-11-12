@@ -97,10 +97,10 @@
     <string name="daily_challenge_done">Bitti</string>
     <string name="daily_challenge_claim">Al</string>
     <string name="daily_challenge_swap">Değiştir</string>
-    <string name="daily_swaps_none">Bugün bedava değiştirme hakkın kalmadı.</string>
+    <string name="daily_swaps_none">Bugün ücretsiz değiştirme hakkın kalmadı.</string>
     <plurals name="daily_swaps_left">
-        <item quantity="one">Beğenmediğin bir görev için bugün %d bedava değiştirme hakkın kaldı.</item>
-        <item quantity="other">Beğenmediğin görevler için bugün %d bedava değiştirme hakkın kaldı.</item>
+        <item quantity="one">Beğenmediğin bir görev için bugün %d ücretsiz değiştirme hakkın kaldı.</item>
+        <item quantity="other">Beğenmediğin görevler için bugün %d ücretsiz değiştirme hakkın kaldı.</item>
     </plurals>
     <!-- %1$s: the free swaps left (a whole sentence). -->
     <string name="daily_challenges_rules">%1$s Yalnızca solo atışlar sayılır. Yeni görevler gece yarısı gelir; bitirdiklerini almayı unutursan senin yerine toplanır.</string>

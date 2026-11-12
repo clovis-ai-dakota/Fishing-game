@@ -81,7 +81,7 @@
 
     <string name="tour_boat_title">Tekneni özelleştir</string>
     <!-- "Tekneyi özelleştir" is the button's label in the Skins section. -->
-    <string name="tour_boat_body">Dex\'in Görünümler bölümünü açmak için Balık sekmesinin üstündeki teknene dokun. Tekneyi özelleştir düğmesiyle gövdeyi, süslemeleri ve kabini boyayabilir; desen, yelken, bayrak ve amblem ekleyebilirsin. Temel renkler bedava; geri kalanların kilidi puanla ya da daha çok tür yakaladıkça, yeni bölgelere ulaştıkça ve kilometre taşlarını aldıkça açılır.</string>
+    <string name="tour_boat_body">Dex\'in Görünümler bölümünü açmak için Balık sekmesinin üstündeki teknene dokun. Tekneyi özelleştir düğmesiyle gövdeyi, süslemeleri ve kabini boyayabilir; desen, yelken, bayrak ve amblem ekleyebilirsin. Temel renkler ücretsiz; geri kalanların kilidi puanla ya da daha çok tür yakaladıkça, yeni bölgelere ulaştıkça ve kilometre taşlarını aldıkça açılır.</string>
 
     <string name="tour_shop_style_title">Stil</string>
     <string name="tour_shop_style_body">Stil sayfasında hazır tekneler, boyalar, amblemler ve yelken desenleri (kendi teknende önizlenir), ayrıca yeni iğneler, misinalar ve izler var. Her görünüm gibi bunlar da yalnızca görüntüyü değiştirir, oyunu asla.</string>
@@ -134,7 +134,7 @@
 
     <string name="tour_daily_challenges_title">Günlük görevler</string>
     <!-- %1$s: free swaps a day (tour_daily_swaps). -->
-    <string name="tour_daily_challenges_body">Her gün halatına uygun kolay, orta ve zor üç görev gelir; ödülleri ekipman ve puan. Birini beğenmedin mi? Bedavaya değiştir (%1$s). Yalnızca solo atışlar sayılır. Yenileri gece yarısı gelir; bitirdiklerini almayı unutursan senin yerine toplanır.</string>
+    <string name="tour_daily_challenges_body">Her gün halatına uygun kolay, orta ve zor üç görev gelir; ödülleri ekipman ve puan. Birini beğenmedin mi? Ücretsiz değiştir (%1$s). Yalnızca solo atışlar sayılır. Yenileri gece yarısı gelir; bitirdiklerini almayı unutursan senin yerine toplanır.</string>
     <plurals name="tour_daily_swaps">
         <item quantity="one">günde %d değiştirme hakkı</item>
         <item quantity="other">günde %d değiştirme hakkı</item>

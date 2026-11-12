@@ -60,7 +60,7 @@
     <string name="dex_skins_shop_more">Mağaza\'da daha fazlası</string>
     <string name="dex_skins_boat_title">Teknen</string>
     <string name="dex_skins_boat_cd">Kendi tasarladığın tekne</string>
-    <string name="dex_skins_boat_body">Onu kendin boya ve donat. Temel seçenekler bedava; daha fazlası puanla ve ilerledikçe açılır.</string>
+    <string name="dex_skins_boat_body">Onu kendin boya ve donat. Temel seçenekler ücretsiz; daha fazlası puanla ve ilerledikçe açılır.</string>
     <string name="dex_skins_boat_worn">Takılı ✓ · klasik tekneyi kullan</string>
     <string name="dex_skins_boat_wear">Teknemi kullan</string>
     <string name="dex_skins_boat_customise">Tekneyi özelleştir</string>
