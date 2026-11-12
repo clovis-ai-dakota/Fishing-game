@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Paliers (ui/MilestonesScreen.kt, ouverts par le trophée de l'onglet Pêche) : récompenses pour
+    le total des points gagnés. (Milestones: rewards for the lifetime total of points earned.)
+-->
+<resources>
+    <string name="milestones_title">Paliers</string>
+    <string name="milestones_earned">Total gagné : %1$s pts</string>
+    <string name="milestones_explainer">Les paliers comptent chaque point gagné grâce aux poissons, même après l\'avoir dépensé en améliorations.</string>
+    <string name="milestones_threshold">%1$s pts</string>
+    <string name="milestones_claimed">Récupéré ✓</string>
+    <string name="milestones_claim">Récupérer</string>
+    <string name="milestones_reward_points">+%1$s pts</string>
+</resources>

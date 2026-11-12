@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Paramètres (la roue dentée de l'onglet Pêche) et leurs rubriques : aide, son et sensations,
+    notifications, langue, crédits. (Settings and its sections.)
+-->
+<resources>
+    <string name="settings_title">Paramètres</string>
+    <string name="settings_version">Deep Line %1$s</string>
+
+    <!-- Help section. -->
+    <string name="settings_help_title">Aide</string>
+    <string name="settings_help_body">La visite montre comment jouer et à quoi sert chaque chose.</string>
+    <string name="settings_help_tour">Faire la visite</string>
+
+    <!-- Sound and feel section. -->
+    <string name="settings_sound_title">Son et sensations</string>
+    <string name="settings_sound_volume">Volume</string>
+    <string name="settings_sound_music">Musique</string>
+    <string name="settings_sound_effects">Effets sonores</string>
+    <string name="settings_sound_percent">%1$d %%</string>
+    <string name="settings_sound_vibration">Vibrations</string>
+    <string name="settings_sound_vibration_on">Une légère vibration pour les chocs, les prises et les grosses victoires.</string>
+    <string name="settings_sound_vibration_none">Ce téléphone ne peut pas vibrer.</string>
+    <string name="settings_sound_reduce_motion">Réduire les animations</string>
+    <string name="settings_sound_reduce_motion_body">Pas de tremblement d\'écran, de ralenti ni de flash pendant les lancers.</string>
+
+    <!-- Notifications section. -->
+    <string name="settings_notif_title">Notifications</string>
+    <string name="settings_notif_reminders">Rappels</string>
+    <string name="settings_notif_reminders_body">Quand votre récompense du jour est prête, que votre série va s\'arrêter ou qu\'une migration commence. %1$s</string>
+    <string name="settings_notif_daily">Récompense du jour prête</string>
+    <string name="settings_notif_daily_body">À partir de %1$s, si vous n\'avez pas encore ouvert le jeu ce jour-là.</string>
+    <string name="settings_notif_streak">Série en danger</string>
+    <plurals name="settings_notif_streak_body">
+        <item quantity="one">Le soir, quand une série d\'au moins %d jour s\'arrêterait à minuit.</item>
+        <item quantity="many">Le soir, quand une série d\'au moins %d jours s\'arrêterait à minuit.</item>
+        <item quantity="other">Le soir, quand une série d\'au moins %d jours s\'arrêterait à minuit.</item>
+    </plurals>
+    <string name="settings_notif_events">Migrations et événements</string>
+    <string name="settings_notif_events_body">Quand une migration ou un événement du week-end commence.</string>
+    <string name="settings_notif_blocked">Les notifications de Deep Line sont désactivées sur ce téléphone : aucun rappel ne peut arriver.</string>
+    <string name="settings_notif_phone_settings">Ouvrir les réglages du téléphone</string>
+
+    <!-- Language section. -->
+    <string name="settings_language_title">Langue</string>
+    <string name="settings_language_system">Langue du téléphone</string>
+    <string name="settings_language_system_now">Actuellement : %1$s</string>
+    <string name="settings_language_body">Les noms saisis par les joueurs ne sont jamais traduits.</string>
+
+    <!-- Credits section. -->
+    <string name="settings_credits_title">Crédits</string>
+    <string name="settings_credits_body">Tous les sons et toutes les musiques sont des œuvres libres versées dans le domaine public (CC0) et partagées sur OpenGameArt.org. Merci à leurs auteurs.</string>
+    <string name="settings_credits_music">Musique : %1$s</string>
+    <string name="settings_credits_sounds">Sons : %1$s</string>
+    <string name="settings_credits_by">Par %1$s. Licence : %2$s.</string>
+</resources>

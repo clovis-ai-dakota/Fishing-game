@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    L'onglet Dex (ui/dex/) : les cartes des espèces, la page de chaque espèce et la rubrique
+    Apparences. « Dex » est un nom inventé : on le garde. (The Dex tab.)
+-->
+<resources>
+    <!-- The Dex tab's header. -->
+    <plurals name="dex_subtitle">
+        <item quantity="one">%d espèce à découvrir dans les profondeurs</item>
+        <item quantity="many">%d d\'espèces à découvrir dans les profondeurs</item>
+        <item quantity="other">%d espèces à découvrir dans les profondeurs</item>
+    </plurals>
+    <string name="dex_aquarium_button">Aquarium</string>
+
+    <!-- Secret tiers. -->
+    <string name="dex_tier_legendary">Légendaire</string>
+    <string name="dex_tier">Niveau %1$d</string>
+
+    <!-- Species section: the header card. -->
+    <string name="dex_species_completion">%1$d %%</string>
+    <!-- Counts of species (feminine plural). -->
+    <string name="dex_species_counts">Vues %1$d · Pêchées %2$d / %3$d</string>
+    <string name="dex_species_filter_all">Tout</string>
+    <string name="dex_species_filter_caught">Déjà pêchées</string>
+    <string name="dex_species_empty">Aucun poisson pêché ici pour l\'instant. Continuez à pêcher !</string>
+    <string name="dex_species_cd_seen">Vu</string>
+    <string name="dex_cd_sparkling_caught">Scintillant pêché</string>
+
+    <!-- A species' page. -->
+    <string name="dex_fish_title">Dex %1$s</string>
+    <string name="dex_fish_previous">Poisson précédent</string>
+    <string name="dex_fish_next">Poisson suivant</string>
+    <string name="dex_fish_state_unknown">Pas encore vu</string>
+    <string name="dex_fish_state_seen">Vu, pas encore pêché</string>
+    <string name="dex_fish_state_caught">Pêché</string>
+    <string name="dex_fish_depth">Profondeur</string>
+    <string name="dex_fish_depth_range">%1$s–%2$s m</string>
+    <string name="dex_fish_weight">Poids</string>
+    <string name="dex_fish_base_points">Points de base</string>
+    <string name="dex_fish_rarity">Rareté</string>
+    <string name="dex_fish_records">Vos records</string>
+    <string name="dex_fish_record_caught">Pêchés</string>
+    <string name="dex_fish_record_sparkling">Scintillants</string>
+    <string name="dex_fish_record_deepest">Plus profond</string>
+    <string name="dex_fish_record_best">Meilleur</string>
+    <string name="dex_fish_hint_unknown">Pêchez vers ces profondeurs pour le repérer : tout ce qui nage près de votre hameçon est ajouté au Dex.</string>
+    <string name="dex_fish_hint_seen">Pêchez-en un pour découvrir son poids, ses points, sa rareté et vos records.</string>
+
+    <!-- Skins section. -->
+    <string name="dex_skins_legendary_title">Apparences légendaires</string>
+    <string name="dex_skins_your_title">Votre titre :</string>
+    <string name="dex_skins_note">Les apparences ne changent que le look de votre équipement : jamais la façon dont le jeu se joue. Apparences légendaires débloquées : %1$d sur %2$d.</string>
+    <string name="dex_skins_set">Ensemble %1$s</string>
+    <string name="dex_skins_set_locked">Ensemble verrouillé</string>
+    <string name="dex_skins_locked">Verrouillé</string>
+    <string name="dex_skins_equipped">Équipé ✓</string>
+    <string name="dex_skins_shop_gear">Équipement de la boutique</string>
+    <string name="dex_skins_shop_browse">Parcourir la Boutique</string>
+    <string name="dex_skins_shop_more">Plus de choix dans la Boutique</string>
+    <string name="dex_skins_boat_title">Votre bateau</string>
+    <string name="dex_skins_boat_cd">Votre bateau fait main</string>
+    <string name="dex_skins_boat_body">Peignez-le et gréez-le vous-même. Les options de base sont gratuites ; d\'autres se débloquent avec des points et au fil de votre progression.</string>
+    <string name="dex_skins_boat_worn">Équipé ✓ · revenir au bateau classique</string>
+    <string name="dex_skins_boat_wear">Utiliser mon bateau</string>
+    <!-- Side by side: short. -->
+    <string name="dex_skins_boat_customise">Personnaliser</string>
+    <string name="dex_skins_boat_shop">Bateaux en boutique</string>
+    <string name="dex_skins_badge_title">Badge de titre</string>
+    <string name="dex_skins_cards_title">Cartes du Dex</string>
+    <string name="dex_skins_badges_more">Plus de badges et de styles de cartes dans la Boutique</string>
+    <string name="dex_skins_atmosphere_title">Ambiance</string>
+    <string name="dex_skins_atmosphere_locked">Atteignez la Plaine abyssale pour débloquer Cauchemar : un look effrayant pour les eaux profondes.</string>
+    <string name="dex_skins_atmosphere_nightmare">Les profondeurs font vraiment peur. Vous voyez toujours exactement autant qu\'avant : seule l\'ambiance change.</string>
+    <string name="dex_skins_atmosphere_family">L\'eau est inoffensive en surface, puis de plus en plus inquiétante à mesure que vous descendez.</string>
+</resources>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    La structure de l'application : onglets du bas, pages de la Boutique, rubriques du Dex et
+    boîtes de dialogue communes à tous les écrans.
+    (The app shell: bottom tabs, Shop pages, Dex sections and dialogs over every screen.)
+-->
+<resources>
+    <!-- Bottom navigation tabs (~10 characters at most). -->
+    <string name="shell_tab_fish">Pêche</string>
+    <string name="shell_tab_dex">Dex</string>
+    <string name="shell_tab_shop">Boutique</string>
+    <string name="shell_tab_battle">Duel</string>
+
+    <!-- Pages of the Shop tab. -->
+    <string name="shell_shop_page_rope">Corde</string>
+    <string name="shell_shop_page_tackle">Matériel</string>
+    <string name="shell_shop_page_style">Style</string>
+    <string name="shell_shop_page_passes">Pass</string>
+    <string name="shell_shop_page_aquarium">Aquarium</string>
+
+    <!-- Sections of the Dex tab. -->
+    <string name="shell_dex_section_species">Espèces</string>
+    <string name="shell_dex_section_secrets">Secrets</string>
+    <string name="shell_dex_section_skins">Apparences</string>
+
+    <!-- Asked when the guided tour closes. -->
+    <string name="shell_tour_again_title">Revoir la visite la prochaine fois ?</string>
+    <string name="shell_tour_again_body">Faut-il rouvrir la visite au prochain lancement de Deep Line ? Vous pouvez aussi la refaire à tout moment depuis les Paramètres, avec la roue dentée en haut de l\'onglet Pêche.</string>
+    <string name="shell_tour_again_yes">Oui, la prochaine fois</string>
+
+    <!-- Debug builds only. %1$s: the price; %2$s: the item's name. -->
+    <string name="shell_test_store_title">Boutique de test</string>
+    <string name="shell_test_store_body">Payer %1$s pour « %2$s » ? Ceci est une version de test : aucun argent réel n\'est débité. Choisissez l\'issue du paiement.</string>
+    <string name="shell_test_store_pending">En attente</string>
+    <string name="shell_test_store_fail">Échec</string>
+    <string name="shell_test_store_approve">Valider</string>
+</resources>
