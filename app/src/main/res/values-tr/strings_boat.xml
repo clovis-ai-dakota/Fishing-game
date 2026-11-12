@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The boat editor (Dex > Skins > Customise boat): how a locked option unlocks, and the editor
+    screen's own text. Option names are in strings_core.xml. Keys start with boat_.
+-->
+<resources>
+    <!-- How a locked boat option unlocks: short labels under the option. -->
+    <string name="boat_requirement_free">Bedava</string>
+    <plurals name="boat_requirement_species">
+        <item quantity="one">%d tür yakala</item>
+        <item quantity="other">%d tür yakala</item>
+    </plurals>
+    <!-- %1$s: the zone's name, e.g. Gece Yarısı Çukuru (followed by "bölgesinde"). -->
+    <string name="boat_requirement_zone">%1$s bölgesinde balık yakala</string>
+    <plurals name="boat_requirement_milestones">
+        <item quantity="one">%d kilometre taşı al</item>
+        <item quantity="other">%d kilometre taşı al</item>
+    </plurals>
+    <string name="boat_requirement_shop">Mağaza\'da</string>
+
+    <!-- The same, as a whole sentence in the dialog shown when a locked option is tapped. -->
+    <string name="boat_unlock_free">Bedava.</string>
+    <!-- %1$s: the points price with its unit, e.g. "1.200 puan". -->
+    <string name="boat_unlock_points">%1$s karşılığında kilidini aç.</string>
+    <plurals name="boat_unlock_species">
+        <item quantity="one">Kilidini açmak için %d tür yakala.</item>
+        <item quantity="other">Kilidini açmak için %d tür yakala.</item>
+    </plurals>
+    <string name="boat_unlock_zone">Kilidini açmak için %1$s bölgesinde bir balık yakala.</string>
+    <plurals name="boat_unlock_milestones">
+        <item quantity="one">Kilidini açmak için %d kilometre taşı al.</item>
+        <item quantity="other">Kilidini açmak için %d kilometre taşı al.</item>
+    </plurals>
+    <string name="boat_unlock_shop">Kilidini açmak için Mağaza\'dan satın al.</string>
+    <string name="boat_unlock_club">Kilidini açmak için Kaptan Kulübü\'ne katıl.</string>
+
+    <!-- The editor screen (ui/boat/BoatEditorScreen.kt). -->
+    <string name="boat_editor_title">Tekneyi özelleştir</string>
+    <!-- %1$s: the player's points, formatted. -->
+    <string name="boat_editor_intro">Puanın: %1$s. Temel seçenekler bedava; nasıl açılacağını görmek için kilitli birine dokun.</string>
+    <string name="boat_editor_hull_colour">Gövde rengi</string>
+    <string name="boat_editor_bottom_colour">Alt gövde rengi</string>
+    <string name="boat_editor_trim_colour">Süsleme ve amblem</string>
+    <string name="boat_editor_cabin_colour">Kabin</string>
+    <string name="boat_editor_sail_colour">Yelken rengi</string>
+    <string name="boat_editor_flag_colour">Bayrak rengi</string>
+    <string name="boat_editor_pattern">Gövde deseni</string>
+    <string name="boat_editor_sail">Yelken</string>
+    <string name="boat_editor_flag">Bayrak</string>
+    <string name="boat_editor_emblem">Amblem</string>
+    <!-- %1$s: the row's heading; %2$s: the colour's name. -->
+    <string name="boat_editor_swatch_cd">%1$s: %2$s</string>
+    <string name="boat_editor_swatch_cd_locked">%1$s: %2$s (kilitli)</string>
+    <string name="boat_editor_locked_cd">Kilitli</string>
+    <string name="boat_editor_save">Kaydet ve kullan</string>
+    <!-- %1$s: the option's name, e.g. Yarış şeritli. -->
+    <string name="boat_editor_unlock_title">%1$s açılsın mı?</string>
+    <plurals name="boat_editor_unlock_body">
+        <!-- %1$s: the option's name; %2$s: its price in points; %3$s: the player's points. -->
+        <item quantity="one">%1$s: bir kerelik %2$s puan. Puanın: %3$s.</item>
+        <item quantity="other">%1$s: bir kerelik %2$s puan. Puanın: %3$s.</item>
+    </plurals>
+    <plurals name="boat_editor_unlock_body_short">
+        <item quantity="one">%1$s: bir kerelik %2$s puan. Puanın: %3$s. Daha fazla kazanmak için balık tutmaya devam et.</item>
+        <item quantity="other">%1$s: bir kerelik %2$s puan. Puanın: %3$s. Daha fazla kazanmak için balık tutmaya devam et.</item>
+    </plurals>
+    <!-- %1$s: the price, formatted. -->
+    <string name="boat_editor_unlock_buy">%1$s puana aç</string>
+    <string name="boat_editor_not_now">Şimdi değil</string>
+    <!-- %1$s: the option's name, e.g. Damalı. -->
+    <string name="boat_editor_locked_title">%1$s kilitli</string>
+</resources>

@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The Shop: messages after a purchase, a gift or a cloud save, what an item gives, account
+    errors, and the Shop's screens (ui/shop/). Keys start with shop_. Item names and descriptions
+    are in strings_core.xml (core_shop_item_*). "puan" is the points unit.
+-->
+<resources>
+    <!-- What an item gives: short noun phrases, joined with commas, used after a colon. -->
+    <plurals name="shop_grant_detectors">
+        <item quantity="one">%d nadir balık dedektörü</item>
+        <item quantity="other">%d nadir balık dedektörü</item>
+    </plurals>
+    <plurals name="shop_grant_lucky_charms">
+        <item quantity="one">%d Şans tılsımı</item>
+        <item quantity="other">%d Şans tılsımı</item>
+    </plurals>
+    <plurals name="shop_grant_sparkle_lures">
+        <item quantity="one">%d Parıltı yemi</item>
+        <item quantity="other">%d Parıltı yemi</item>
+    </plurals>
+    <plurals name="shop_grant_club_days">
+        <item quantity="one">%d günlük Kaptan Kulübü üyeliği</item>
+        <item quantity="other">%d günlük Kaptan Kulübü üyeliği</item>
+    </plurals>
+    <string name="shop_grant_a_boat">bir tekne</string>
+    <!-- %1$s: the title, e.g. Kurucu. -->
+    <string name="shop_grant_title">%1$s unvanı</string>
+    <!-- %1$s: the boat's name, e.g. Gelgit Çağıran. -->
+    <string name="shop_grant_season_boat">%1$s teknesi</string>
+    <!-- %1$s: the option's name (hull patterns are adjectives: Metalik, Alevli...). -->
+    <string name="shop_grant_paint">%1$s gövde boyası</string>
+    <string name="shop_grant_emblem">%1$s amblemi</string>
+    <string name="shop_grant_sail_print">%1$s yelken deseni</string>
+    <string name="shop_grant_season_pass">bu sezonun premium ödülleri: bir sezon rozeti, 10. kademede sezon teknesi ve bolca ekipman</string>
+    <!-- %1$d: tiers skipped. -->
+    <string name="shop_grant_collector_edition">sezon bileti, anında %1$d kademe, sezon teknesi hemen ve bir koleksiyoncu rozeti</string>
+    <string name="shop_grant_event_pass">bu hafta sonunun etkinliğinde iki kat ilerleme ve etkinlik rozetli daha büyük bir ödül</string>
+    <string name="shop_unlock_badge_rainbow">bir gökkuşağı unvan rozeti</string>
+    <string name="shop_unlock_badge_club_forever">süresi hiç dolmayan bir Kulüp rozeti</string>
+    <string name="shop_unlock_badge_season">bir sezon rozeti</string>
+    <string name="shop_unlock_badge_collector">bir koleksiyoncu rozeti</string>
+    <string name="shop_unlock_badge_event">bir etkinlik rozeti</string>
+    <string name="shop_unlock_badge_tournament">Turnuva unvan rozeti</string>
+    <!-- %1$s: the frame's name, e.g. Okyanus. -->
+    <string name="shop_unlock_badge_frame">%1$s unvan rozeti</string>
+
+    <!-- Messages after buying. -->
+    <!-- %1$s: the item; %2$s: what it gives. -->
+    <string name="shop_message_thanks">Teşekkürler! %1$s: %2$s.</string>
+    <string name="shop_message_got">%1$s: %2$s.</string>
+    <string name="shop_message_cancelled">Satın alma iptal edildi: hiçbir ücret alınmadı.</string>
+    <!-- %1$s: the item. -->
+    <string name="shop_message_pending">%1$s için ödemenin onaylanması bekleniyor. Onaylanır onaylanmaz gelecek.</string>
+    <string name="shop_message_pending_unknown">Satın alımın için ödemenin onaylanması bekleniyor. Onaylanır onaylanmaz gelecek.</string>
+    <string name="shop_message_failed">Ödeme gerçekleşmedi.</string>
+    <string name="shop_message_failed_because">Ödeme gerçekleşmedi: %1$s</string>
+    <!-- %1$s: the store's name (Google Play). -->
+    <string name="shop_message_store_unavailable">%1$s şu anda kullanılamıyor.</string>
+    <string name="shop_message_restoring">Satın alımların %1$s üzerinde kontrol ediliyor…</string>
+    <string name="shop_message_club_pouch">Kaptan Kulübü: %1$s.</string>
+    <string name="shop_message_season_rewards">Sezon ödülleri: %1$s.</string>
+    <string name="shop_message_event_claimed">Hafta sonu etkinliği ödülü alındı!</string>
+
+    <!-- Gifts to and from online opponents. Names are placed where Turkish needs no suffix. -->
+    <!-- %1$s: the item; %2$s: the friend's name (as they typed it). -->
+    <string name="shop_gift_sent">%1$s, %2$s adlı oyuncuya gönderildi!</string>
+    <string name="shop_gift_refunded">%1$s Puanların iade edildi.</string>
+    <!-- %2$s: the item. -->
+    <string name="shop_gift_kept">%1$s Bunun yerine %2$s senin oldu.</string>
+    <!-- %1$s: who sent it (a player's name, or "Sen"); %2$s: the item; %3$s: what it gives. -->
+    <string name="shop_gift_received">Hediyen geldi: %2$s (%3$s). Gönderen: %1$s.</string>
+    <!-- %1$s: who sent it; %2$s: the item; %3$s: points given instead, already formatted. -->
+    <string name="shop_gift_received_owned">Hediyen geldi: %2$s. Gönderen: %1$s. Bu sende zaten vardı, bunun yerine %3$s puan aldın.</string>
+    <!-- Who a gift is from when the player bought it for themselves (after "Gönderen:"). -->
+    <string name="shop_gift_from_you">Sen</string>
+
+    <!-- Cloud save and restoring progress with a recovery code. -->
+    <string name="shop_cloud_club_only">Bulut kaydı bir Kaptan Kulübü ayrıcalığıdır.</string>
+    <string name="shop_cloud_backed_up">İlerlemen yedeklendi.</string>
+    <string name="shop_cloud_bad_code">Bu bir kurtarma kodu değil: kurtarma kodları DL- ile başlar ve 24 harf ve rakamdan oluşur.</string>
+    <string name="shop_cloud_restored">İlerleme geri yüklendi.</string>
+
+    <!-- Errors talking to the game server. -->
+    <string name="shop_account_unreachable">Sunucuya ulaşılamıyor. Bağlantını kontrol edip tekrar dene.</string>
+    <string name="shop_account_wrong_code">Bu kurtarma kodu bu oyuncuyla eşleşmiyor.</string>
+    <string name="shop_account_nothing_saved">Bu oyuncu için henüz kaydedilmiş bir şey yok.</string>
+    <string name="shop_account_too_large">Bu, sunucu için fazla büyük.</string>
+    <string name="shop_account_refused">Sunucu bunu kabul edemedi.</string>
+    <!-- %1$d: the HTTP status code. -->
+    <string name="shop_account_server_problem">Sunucuda bir sorun oluştu (%1$d).</string>
+
+    <!-- ==== The Shop tab (ui/shop/ShopScreen.kt) ==== -->
+    <!-- %1$s: the balance, formatted. -->
+    <string name="shop_balance">Harcayabileceğin puan: %1$s</string>
+
+    <!-- %1$s: the item's name. -->
+    <string name="shop_confirm_title">%1$s satın alınsın mı?</string>
+    <!-- %1$s: what the item gives; %2$s: its points price; %3$s: points left after buying. -->
+    <string name="shop_confirm_body">Alacakların: %1$s.\n\nFiyatı %2$s puan; geriye %3$s puanın kalacak.</string>
+    <string name="shop_confirm_buy">%1$s puana satın al</string>
+
+    <string name="shop_club_pouch_title">Kaptan Kulübü hediyesi</string>
+    <string name="shop_club_pouch_body">Ücretsiz aylık Fener kesen hazır: %1$s.</string>
+    <string name="shop_claim">Al</string>
+    <!-- %1$s: time left, e.g. "2 g 5 sa". -->
+    <string name="shop_starter_banner_body">Tek seferlik teklif, %1$s sonra bitiyor.</string>
+    <string name="shop_starter_banner_see">Göz at</string>
+    <!-- Turkish writes the percent sign before the number: -%25. -->
+    <string name="shop_badge_discount">-%%%1$d</string>
+
+    <string name="shop_owned">Sende var ✓</string>
+    <string name="shop_worn">Takılı ✓</string>
+    <string name="shop_on_your_boat">Teknende ✓</string>
+    <string name="shop_in_use">Kullanımda ✓</string>
+    <string name="shop_not_available">Şu anda mevcut değil</string>
+    <string name="shop_wear">Tak</string>
+    <string name="shop_take_off">Çıkar</string>
+    <string name="shop_apply">Uygula</string>
+    <string name="shop_use">Kullan</string>
+
+    <!-- Rope page. "Halat Uzunluğu", "Güç" and "Çeviklik" are the rope stats (core_rope_*). -->
+    <string name="shop_rope_title">Halat geliştirmeleri</string>
+    <string name="shop_rope_note">Puanla alınır. Halat Uzunluğu daha derin bölgelere ve yeni balıklara ulaştırır, Güç daha fazla ağırlık taşır, Çeviklik daha hızlı yönlendirir. Fikrin mi değişti? Bir seviye düşür, puanın tamamen iade edilsin.</string>
+    <!-- Sv. = seviye (level). -->
+    <string name="shop_rope_level">Sv. %1$d / %2$d</string>
+    <!-- %1$s: the stat one level lower (e.g. "110 m"); %2$s: points given back. -->
+    <string name="shop_rope_downgrade">Düşür: %1$s · %2$s puan iade</string>
+    <string name="shop_rope_maxed">%1$s · en üst seviye</string>
+
+    <!-- Tackle page. -->
+    <string name="shop_tackle_title">Ekipman</string>
+    <string name="shop_tackle_note">Tek atışlık eşyalar: atıştan önce aç. Fener ve dedektör düellolarda da çalışır. Tekini puanla, paketleri euro ya da puanla al.</string>
+    <string name="shop_tackle_owned">Sende: %1$d</string>
+    <string name="shop_tackle_desc_battles">%1$s Düellolarda da çalışır.</string>
+    <string name="shop_tackle_desc_solo">%1$s Yalnızca solo atışlarda.</string>
+    <string name="shop_tackle_single">Tek bir tane</string>
+
+    <!-- Style page. -->
+    <string name="shop_style_boats_title">Hazır tekneler</string>
+    <string name="shop_style_boats_note">Hazır tasarımlar: olduğu gibi kullan ya da tekne düzenleyicide kendine göre değiştir. Her görünüm gibi yalnızca görüntüyü değiştirir.</string>
+    <string name="shop_style_sets_title">Tam setler</string>
+    <string name="shop_style_sets_note">Hazır bir tekne ve ona uygun bir iğne, misina ve iz.</string>
+    <string name="shop_style_parts_title">Boyalar, amblemler ve desenler</string>
+    <string name="shop_style_parts_note">Kendi teknende önizlenir. Satın aldıktan sonra tekne düzenleyicide de bulunur.</string>
+    <string name="shop_style_gear_title">İğneler, misinalar ve izler</string>
+    <string name="shop_style_gear_note">Klasik takımla aynı boyut ve isabet alanı: yalnızca görüntüyü değiştirirler.</string>
+    <string name="shop_style_themes_title">Uygulama temaları</string>
+    <string name="shop_style_themes_note">Menülerin manzarası ve renkleri, gündüz ve gece. Daha zengin temalar daha pahalı.</string>
+    <string name="shop_style_badges_title">Unvan rozetleri</string>
+    <string name="shop_style_badges_note">Unvanının (ya da adının) çevresindeki çerçeve, çevrim içi oyunda da görünür. Sezon biletleri, etkinlikler ve Kulüp daha fazlasını ekler.</string>
+    <string name="shop_style_cards_title">Dex kart stilleri</string>
+    <string name="shop_style_cards_note">Dex\'in yakaladığın türleri nasıl gösterdiği.</string>
+    <string name="shop_style_more_title">Diğer</string>
+    <string name="shop_set_contents">%1$s.</string>
+
+    <!-- Aquarium page of the Shop. "Dex > Akvaryum" uses shell_tab_dex and dex_aquarium_button. -->
+    <string name="shop_aquarium_page_note">Yakaladığın balıklar akvaryumunda yüzer (Dex > Akvaryum). Dekorlar ve daha büyük bir tank yalnızca görünümünü değiştirir.</string>
+    <string name="shop_aquarium_open">Akvaryumunu aç</string>
+
+    <!-- Passes page. -->
+    <string name="shop_passes_title">Biletler ve paketler</string>
+    <string name="shop_passes_note">Sezonlar, hafta sonu etkinlikleri, Kaptan Kulübü ve tek seferlik paketler.</string>
+
+    <!-- A full-width item card. -->
+    <!-- %1$s: the price of its pieces bought one by one, e.g. 4,97 €. -->
+    <string name="shop_item_worth">Ayrı ayrı alındığında değeri %1$s.</string>
+    <string name="shop_item_offer_ends">Tek seferlik: %1$s sonra bitiyor.</string>
+    <string name="shop_club_member_for_life">Ömür boyu üyesin.</string>
+    <plurals name="shop_club_member_until">
+        <!-- %1$s: the date membership ends; %2$d: days of membership one points purchase adds. -->
+        <item quantity="one">Üyeliğin %1$s tarihine kadar geçerli. Euro ile her ay sen iptal edene kadar yenilenir; puanla %2$d gün ekler.</item>
+        <item quantity="other">Üyeliğin %1$s tarihine kadar geçerli. Euro ile her ay sen iptal edene kadar yenilenir; puanla %2$d gün ekler.</item>
+    </plurals>
+    <plurals name="shop_club_how">
+        <item quantity="one">Euro ile her ay sen iptal edene kadar yenilenir; puanla %d gün sürer.</item>
+        <item quantity="other">Euro ile her ay sen iptal edene kadar yenilenir; puanla %d gün sürer.</item>
+    </plurals>
+
+    <!-- %1$s: fishing time one euro stands for (e.g. "45 dk"); %2$s: the same for Lantern packs
+         (e.g. "1 sa"); %3$d and %4$d: the extra percentage the bigger purchases give. -->
+    <string name="shop_footer_rates">Puan fiyatları: halatının erişiminde euro başına yaklaşık %1$s balık tutma (Fener paketleri: %2$s); yani para ödemek yalnızca zaman kazandırır ve puanla alınamayacak hiçbir şey satın almaz. Büyük alımlar +%%%3$d ile +%%%4$d arası fazladan verir.</string>
+    <string name="shop_footer_payments">Ödemeler: %1$s</string>
+    <string name="shop_footer_restore">Satın alımları geri yükle</string>
+    <string name="shop_footer_account">Hesap, bulut kaydı ve hediyeler</string>
+
+    <string name="shop_close">Kapat</string>
+
+    <!-- ==== Gifts (ui/shop/GiftsUi.kt) ==== -->
+    <!-- %1$s: the opponent's name, as they typed it. -->
+    <string name="shop_gift_pick_title">%1$s için bir hediye</string>
+    <string name="shop_gift_pick_note">Oyunu bir sonraki açışında bulacak. Yalnızca görünüm ya da atışları için ekipman.</string>
+
+    <!-- ==== The account dialog ==== -->
+    <string name="shop_account_title">Hesabın</string>
+    <!-- %1$s: the player's public id: never translated. -->
+    <string name="shop_account_player_id">Oyuncu kimliği: %1$s</string>
+    <string name="shop_account_gifts_note">Çevrim içi rakiplerin sana hediye gönderebilir; oyunu ya da Mağaza\'yı açtığında ulaşırlar.</string>
+    <string name="shop_account_cloud_title">Bulut kaydı</string>
+    <!-- %1$s: the date and time of the last backup. -->
+    <string name="shop_account_last_backup">Son yedek: %1$s. İlerlemen atışlarından sonra yedeklenir.</string>
+    <string name="shop_account_no_backup">Henüz yedeklenmedi.</string>
+    <string name="shop_account_backup_now">Şimdi yedekle</string>
+    <string name="shop_account_club_perk">Bir Kaptan Kulübü ayrıcalığı: ilerlemeni yedekle ve yeni bir telefonda geri yükle.</string>
+    <string name="shop_account_code_note">Kurtarma kodun, yedeği başka bir telefonda geri yükler. Onu gizli tut: ilerlemenin anahtarıdır.</string>
+    <string name="shop_account_code_clip">Deep Line kurtarma kodu</string>
+    <string name="shop_account_copy_code">Kodu kopyala</string>
+    <string name="shop_account_show_code">Kurtarma kodumu göster</string>
+    <string name="shop_account_code_field">Kurtarma kodu</string>
+    <string name="shop_account_restore_warning">Bu işlem, bu telefondaki ilerlemenin yerine yedektekini koyar.</string>
+    <string name="shop_account_restore">Geri yükle</string>
+    <string name="shop_account_restore_open">Başka bir telefondan geri yükle</string>
+
+    <!-- ==== The season and the weekend event (ui/shop/SeasonUi.kt) ==== -->
+    <!-- %1$d: the season's number; %2$s: its name. -->
+    <string name="shop_season_title">Sezon %1$d · %2$s</string>
+    <!-- %1$s: time left, e.g. "12 g 3 sa". -->
+    <string name="shop_season_ends">%1$s sonra bitiyor</string>
+    <string name="shop_season_ends_pass">%1$s sonra bitiyor · Bilet etkin</string>
+    <string name="shop_season_tier">Kademe %1$d / %2$d</string>
+    <!-- XP: experience points. %1$d: XP per cast; %2$d: per fish caught; %3$d: per fishing secret
+         pulled off; %4$d: XP for one tier. -->
+    <string name="shop_season_xp">Her solo atış sezon XP\'si kazandırır: atış başına %1$d, balık başına %2$d ve başarılan sır başına %3$d. %4$d XP bir kademe açar.</string>
+    <string name="shop_season_premium_row">Üst sıra: biletin premium ödülleri</string>
+    <!-- %1$d: how many rewards are ready. Short. -->
+    <string name="shop_season_claim">%1$d ödülü al</string>
+    <string name="shop_event_none_title">Hafta sonu etkinlikleri</string>
+    <!-- %1$s: time until the next one. -->
+    <string name="shop_event_none_body">Her hafta sonu ödüllü bir balıkçılık hedefi getirir. Bir sonraki %1$s sonra başlıyor.</string>
+    <!-- %1$s: the event's goal. -->
+    <string name="shop_event_title">Hafta sonu etkinliği: %1$s</string>
+    <string name="shop_event_body">%1$s sonra bitiyor. Ödül: %2$s.</string>
+    <string name="shop_event_body_pass">%1$s sonra bitiyor. Ödül: %2$s; etkinlik biletinle (ilerleme iki kat sayılır): %3$s.</string>
+    <string name="shop_event_claim">Ödülü al</string>
+
+    <!-- ==== Themes (ui/shop/ThemesScreen.kt) ==== -->
+    <string name="shop_themes_title">Temalar</string>
+    <string name="shop_themes_mode_title">Gündüz ya da gece</string>
+    <string name="shop_themes_mode_note">Her temanın bir gündüz ve bir gece sürümü var. Balık tuttuğun su asla değişmez: temalar menüler içindir.</string>
+    <string name="shop_themes_join">Katıl</string>
+    <!-- Like home_rope_reach. %1$s: a depth, e.g. "240 m". -->
+    <string name="shop_themes_preview_reach">Erişim: %1$s</string>
+
+    <!-- ==== The aquarium (ui/shop/AquariumScreen.kt) ==== -->
+    <string name="shop_aquarium_title">Akvaryum</string>
+    <string name="shop_aquarium_count_empty">Tankta: %1$d / %2$d. Doldurmak için balık yakala.</string>
+    <string name="shop_aquarium_count">Tankta: %1$d / %2$d. Eklemek ya da çıkarmak için bir türe dokun.</string>
+    <string name="shop_aquarium_decor">Dekor</string>
+    <string name="shop_aquarium_more">Mağaza\'da daha fazla dekor ve daha büyük bir tank</string>
+    <string name="shop_aquarium_catches">Avların</string>
+    <plurals name="shop_aquarium_cd_tank">
+        <item quantity="one">%d balıklı akvaryum</item>
+        <item quantity="other">%d balıklı akvaryum</item>
+    </plurals>
+
+    <!-- ==== Stores (billing/) ==== -->
+    <string name="shop_store_test_name">Test mağazası</string>
+    <string name="shop_store_test_declined">Test mağazası kartı reddetti.</string>
+    <string name="shop_store_not_on_screen">Google Play için oyunun ekranda olması gerekiyor.</string>
+    <string name="shop_store_not_on_sale">Bu ürün henüz Google Play\'de satışta değil.</string>
+</resources>
