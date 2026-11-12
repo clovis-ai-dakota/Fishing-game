@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    La boucle quotidienne : récompenses du jour et série, défis du jour, migrations et rappels
+    (notifications daily_reminder_*). (The daily loop.)
+-->
+<resources>
+    <!-- %1$s and %2$s: times on the hour (quiet hours). -->
+    <string name="daily_reminder_promise">Au maximum un par jour, jamais entre %1$s et %2$s, et vous pouvez les désactiver à tout moment dans les Paramètres.</string>
+
+    <!-- Rewards, as noun phrases joined into a list. -->
+    <string name="daily_grant_shield">un bouclier de série</string>
+    <!-- Tiny labels on the 7-day calendar's tiles. -->
+    <string name="daily_tile_lanterns">%1$d × Lanterne</string>
+    <string name="daily_tile_detector">Détecteur</string>
+    <string name="daily_tile_charm">Porte-bonheur</string>
+    <string name="daily_tile_lure">Leurre</string>
+    <string name="daily_tile_shield">Bouclier</string>
+
+    <!-- Daily challenges: one sentence each, an instruction. -->
+    <plurals name="daily_challenge_casts">
+        <item quantity="one">Lancez la ligne %d fois.</item>
+        <item quantity="many">Lancez la ligne %d fois.</item>
+        <item quantity="other">Lancez la ligne %d fois.</item>
+    </plurals>
+    <plurals name="daily_challenge_catch_fish">
+        <item quantity="one">Pêchez %d poisson.</item>
+        <item quantity="many">Pêchez %d poissons.</item>
+        <item quantity="other">Pêchez %d poissons.</item>
+    </plurals>
+    <plurals name="daily_challenge_catch_zone">
+        <!-- %2$s: the zone's name, after "la zone" so it needs no article. -->
+        <item quantity="one">Pêchez %1$d poisson dans la zone %2$s.</item>
+        <item quantity="many">Pêchez %1$d poissons dans la zone %2$s.</item>
+        <item quantity="other">Pêchez %1$d poissons dans la zone %2$s.</item>
+    </plurals>
+    <string name="daily_challenge_reach_depth">Atteignez %1$d m en un lancer.</string>
+    <string name="daily_challenge_catch_species_one">Pêchez un poisson de cette espèce : %1$s.</string>
+    <string name="daily_challenge_catch_species">Pêchez %1$d poissons de cette espèce : %2$s.</string>
+    <string name="daily_challenge_earn_points">Marquez %1$s points.</string>
+    <plurals name="daily_challenge_land_weight">
+        <item quantity="one">Ramenez %d kg de poissons.</item>
+        <item quantity="many">Ramenez %d kg de poissons.</item>
+        <item quantity="other">Ramenez %d kg de poissons.</item>
+    </plurals>
+    <plurals name="daily_challenge_sparkling">
+        <item quantity="one">Pêchez %d poisson scintillant.</item>
+        <item quantity="many">Pêchez %d poissons scintillants.</item>
+        <item quantity="other">Pêchez %d poissons scintillants.</item>
+    </plurals>
+    <plurals name="daily_challenge_big_cast">
+        <item quantity="one">Ramenez %d poisson en un seul lancer.</item>
+        <item quantity="many">Ramenez %d poissons en un seul lancer.</item>
+        <item quantity="other">Ramenez %d poissons en un seul lancer.</item>
+    </plurals>
+    <plurals name="daily_challenge_new_species">
+        <item quantity="one">Pêchez %d espèce que vous n\'avez jamais pêchée.</item>
+        <item quantity="many">Pêchez %d espèces que vous n\'avez jamais pêchées.</item>
+        <item quantity="other">Pêchez %d espèces que vous n\'avez jamais pêchées.</item>
+    </plurals>
+    <string name="daily_progress_depth">Plus profond : %1$d sur %2$d m</string>
+    <string name="daily_progress_big_cast">Meilleur lancer : %1$d sur %2$d poissons</string>
+
+    <!-- After claiming the daily reward. -->
+    <string name="daily_claimed">Récompense du jour %1$d : %2$s.</string>
+    <string name="daily_claimed_streak">%1$d jours d\'affilée ! Récompense du jour %2$d : %3$s.</string>
+    <string name="daily_claimed_restarted">Une nouvelle série commence aujourd\'hui. Récompense du jour %1$d : %2$s.</string>
+    <!-- %1$s: the streak (e.g. "5 jours"). -->
+    <string name="daily_claimed_one_shield">Un bouclier de série a couvert le jour manqué : votre série est de %1$s. Récompense du jour %2$d : %3$s.</string>
+    <string name="daily_claimed_shields">%1$d boucliers de série ont couvert les jours manqués : votre série est de %2$s. Récompense du jour %3$d : %4$s.</string>
+    <string name="daily_collected">Vos défis terminés d\'un jour précédent ont été récupérés pour vous : %1$s.</string>
+    <string name="daily_challenge_claimed">Défi réussi ! Vous obtenez %1$s.</string>
+    <string name="daily_challenge_swapped">Nouveau défi (%1$s) : %2$s</string>
+    <string name="daily_reminders_blocked">Les rappels restent désactivés : les notifications de Deep Line sont bloquées sur ce téléphone. Vous pouvez les autoriser dans les réglages du téléphone.</string>
+
+    <!-- The Daily card and screen. -->
+    <string name="daily_title">Quotidien</string>
+    <plurals name="daily_streak">
+        <item quantity="one">Série de %d jour</item>
+        <item quantity="many">Série de %d jours</item>
+        <item quantity="other">Série de %d jours</item>
+    </plurals>
+    <string name="daily_streak_none">Pas encore de série</string>
+    <string name="daily_claim_button">Récupérer le jour %1$d : %2$s</string>
+    <string name="daily_claim_wait">La récompense d\'aujourd\'hui est récupérée. Le jour %1$d (%2$s) sera prêt dans %3$s.</string>
+    <plurals name="daily_best_streak">
+        <item quantity="one">Meilleure série : %d jour.</item>
+        <item quantity="many">Meilleure série : %d jours.</item>
+        <item quantity="other">Meilleure série : %d jours.</item>
+    </plurals>
+    <string name="daily_streak_rules">%1$s Boucliers de série : %2$d sur %3$d. Un bouclier couvre de lui-même un jour manqué, et le jour %4$d en apporte un nouveau. Manquer un jour ne fait jamais reculer le calendrier.</string>
+    <string name="daily_challenges_title">Défis du jour</string>
+    <string name="daily_challenge_done">Terminé</string>
+    <string name="daily_challenge_claim">Récupérer</string>
+    <string name="daily_challenge_swap">Changer</string>
+    <string name="daily_swaps_none">Plus aucun changement gratuit aujourd\'hui.</string>
+    <plurals name="daily_swaps_left">
+        <item quantity="one">%d changement gratuit restant aujourd\'hui pour un défi qui ne vous plaît pas.</item>
+        <item quantity="many">%d changements gratuits restants aujourd\'hui pour les défis qui ne vous plaisent pas.</item>
+        <item quantity="other">%d changements gratuits restants aujourd\'hui pour les défis qui ne vous plaisent pas.</item>
+    </plurals>
+    <string name="daily_challenges_rules">%1$s Seuls les lancers en solo comptent. De nouveaux défis arrivent à minuit, et ceux que vous avez terminés sont récupérés pour vous si vous oubliez.</string>
+    <string name="daily_remind_button">Me prévenir quand ma récompense est prête</string>
+
+    <!-- Turning reminders on. -->
+    <string name="daily_optin_title">Un petit rappel ?</string>
+    <string name="daily_optin_body">Deep Line peut vous prévenir quand votre récompense du jour est prête, quand votre série va s\'arrêter et quand une migration commence. %1$s</string>
+    <string name="daily_optin_yes">Activer</string>
+    <string name="daily_optin_no">Plus tard</string>
+
+    <!-- Migrations. -->
+    <string name="daily_migration_banner_title">Migration en cours</string>
+    <string name="daily_migration_banner_body">Ces deux espèces sont bien plus fréquentes dans les lancers en solo, encore pendant %1$s.</string>
+    <string name="daily_migrating_note">En migration : bien plus fréquente dans les lancers en solo, encore pendant %1$s.</string>
+    <string name="daily_migration_live">Migration : encore %1$s</string>
+    <string name="daily_migration_next">Prochaine migration dans %1$s</string>
+    <plurals name="daily_migration_about">
+        <item quantity="one">Chaque semaine, pendant %d jour, deux espèces peu communes deviennent bien plus fréquentes là où elles vivent : une près de la surface et une dans les profondeurs. Lancers en solo uniquement : les duels ne changent jamais.</item>
+        <item quantity="many">Chaque semaine, pendant %d jours, deux espèces peu communes deviennent bien plus fréquentes là où elles vivent : une près de la surface et une dans les profondeurs. Lancers en solo uniquement : les duels ne changent jamais.</item>
+        <item quantity="other">Chaque semaine, pendant %d jours, deux espèces peu communes deviennent bien plus fréquentes là où elles vivent : une près de la surface et une dans les profondeurs. Lancers en solo uniquement : les duels ne changent jamais.</item>
+    </plurals>
+    <string name="daily_migrant_open">Ouvrir sa page du Dex</string>
+    <string name="daily_migrant_where">%1$s · %2$d–%3$d m</string>
+
+    <!-- Notification channels. -->
+    <string name="daily_channel_daily_name">Récompense du jour prête</string>
+    <string name="daily_channel_daily_description">Quand la récompense du jour vous attend et que vous n\'avez pas encore ouvert le jeu.</string>
+    <string name="daily_channel_streak_name">Série en danger</string>
+    <string name="daily_channel_streak_description">Le soir, quand votre série de connexions s\'arrête à minuit si vous ne récupérez pas la récompense du jour.</string>
+    <string name="daily_channel_events_name">Migrations et événements</string>
+    <string name="daily_channel_events_description">Quand une migration ou un événement du week-end commence.</string>
+
+    <!-- Reminder notifications. -->
+    <string name="daily_reminder_ready_title_1">Votre récompense du jour vous attend</string>
+    <string name="daily_reminder_ready_title_2">Ça mord !</string>
+    <string name="daily_reminder_ready_title_3">Une récompense vous attend au ponton</string>
+    <string name="daily_reminder_ready_text_1">Le jour %1$d de votre calendrier de récompenses est prêt.</string>
+    <string name="daily_reminder_ready_text_2">La récompense du jour et trois nouveaux défis vous attendent.</string>
+    <string name="daily_reminder_ready_text_3">Récupérez la récompense du jour et découvrez les défis d\'aujourd\'hui.</string>
+    <plurals name="daily_reminder_streak_title">
+        <item quantity="one">Gardez votre série de %d jour</item>
+        <item quantity="many">Gardez votre série de %d jours</item>
+        <item quantity="other">Gardez votre série de %d jours</item>
+    </plurals>
+    <string name="daily_reminder_streak_text">Récupérez la récompense du jour avant minuit pour prolonger votre série.</string>
+    <string name="daily_reminder_streak_text_shield">Récupérez la récompense du jour avant minuit. Si vous manquez cette journée, un bouclier de série la couvrira.</string>
+    <string name="daily_reminder_migration_title">Une migration a commencé</string>
+    <plurals name="daily_reminder_migration_text">
+        <item quantity="one">Pendant %1$d jour, deux espèces sont bien plus fréquentes : %2$s.</item>
+        <item quantity="many">Pendant les %1$d prochains jours, deux espèces sont bien plus fréquentes : %2$s.</item>
+        <item quantity="other">Pendant les %1$d prochains jours, deux espèces sont bien plus fréquentes : %2$s.</item>
+    </plurals>
+    <string name="daily_reminder_unknown_species">une espèce inconnue (%1$s)</string>
+    <string name="daily_reminder_event_title">L\'événement du week-end a commencé</string>
+    <!-- %1$s: the event's goal (an infinitive, e.g. "Pêcher des poissons scintillants"). -->
+    <string name="daily_reminder_event_text">Objectif de ce week-end : %1$s (%2$d). Une récompense vous attend quand vous l\'atteignez.</string>
+</resources>
