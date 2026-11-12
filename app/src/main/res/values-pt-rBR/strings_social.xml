@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Português do Brasil. Amigos e rankings: amigos, rankings semanais, torneio semanal e clubes
+    (social/SocialController.kt, ui/social/). Chaves começam com social_. Nomes de jogadores e de
+    clubes nunca são traduzidos (os nomes de clube são gerados com palavras fixas em inglês) e
+    ficam onde não precisam de flexão: "o clube %1$s", entre parênteses ou depois de dois-pontos.
+-->
+<resources>
+    <!-- Mensagens depois de uma ação. -->
+    <string name="social_message_bad_id">Um ID de jogador tem %1$d letras e números.</string>
+    <string name="social_message_own_id">Esse é o seu próprio ID de jogador. Compartilhe com seus amigos para eles adicionarem você.</string>
+    <string name="social_message_now_friends">Agora você e %1$s são amigos.</string>
+    <string name="social_message_request_sent">Pedido de amizade enviado para %1$s. Vocês serão amigos assim que o pedido for aceito.</string>
+    <string name="social_message_removed">%1$s não está mais na sua lista de amigos.</string>
+    <string name="social_challenge_creating">Criando uma sala para %1$s…</string>
+    <plurals name="social_challenge_sent">
+        <item quantity="one">Desafio enviado para %1$s. Ele vai aparecer na tela Amigos dessa pessoa por %2$d minuto.</item>
+        <item quantity="many">Desafio enviado para %1$s. Ele vai aparecer na tela Amigos dessa pessoa por %2$d de minutos.</item>
+        <item quantity="other">Desafio enviado para %1$s. Ele vai aparecer na tela Amigos dessa pessoa por %2$d minutos.</item>
+    </plurals>
+    <string name="social_challenge_not_sent">%1$s O desafio não foi enviado: em vez disso, compartilhe o código da sala com seu amigo.</string>
+    <string name="social_message_tournament_reward">Recompensa do torneio (%1$s): %2$s.</string>
+    <string name="social_message_club_created">Boas-vindas ao clube %1$s! Compartilhe o código %2$s para convidar pescadores.</string>
+    <string name="social_message_bad_club_code">Um código de clube tem %1$d letras e números.</string>
+    <string name="social_message_club_joined">Boas-vindas ao clube %1$s!</string>
+    <string name="social_message_club_left">Você saiu do clube.</string>
+    <string name="social_message_member_removed">%1$s não faz mais parte do clube.</string>
+    <string name="social_message_owner_changed">Agora o clube pertence a %1$s.</string>
+    <string name="social_message_club_renamed">Agora o clube se chama %1$s.</string>
+    <string name="social_message_club_reward">Recompensa da meta do clube: %1$s.</string>
+    <string name="social_message_forgotten">Seus amigos, seus rankings e sua participação em clube foram excluídos do servidor.</string>
+
+    <!-- Problemas informados pelo servidor. -->
+    <string name="social_problem_unreachable">Não foi possível conectar ao servidor. Verifique sua conexão e tente de novo.</string>
+    <string name="social_problem_bad_request">O servidor não pôde aceitar isso.</string>
+    <string name="social_problem_wrong_secret">O servidor não reconhece este jogador. Restaure seu código de recuperação pelo botão Conta da Loja.</string>
+    <string name="social_problem_unknown_player">Nenhum pescador tem esse ID de jogador ainda.</string>
+    <string name="social_problem_unknown_club">Nenhum clube tem esse código.</string>
+    <string name="social_problem_clubs_off">Os clubes ainda não estão abertos neste servidor.</string>
+    <string name="social_problem_not_friends">Você só pode desafiar seus amigos.</string>
+    <string name="social_problem_friends_full">Sua lista de amigos está cheia (%1$d amigos). Remova alguém primeiro.</string>
+    <string name="social_problem_their_friends_full">Esse pescador não pode receber mais pedidos de amizade agora.</string>
+    <string name="social_problem_already_in_club">Você já está em um clube. Saia dele primeiro.</string>
+    <string name="social_problem_not_in_club">Você não está em um clube.</string>
+    <string name="social_problem_not_owner">Só o dono do clube pode fazer isso.</string>
+    <string name="social_problem_club_full">Esse clube está cheio (%1$d membros).</string>
+    <string name="social_problem_rejoin_later">Quem é removido de um clube só pode voltar para ele depois de %1$d horas.</string>
+    <string name="social_problem_no_attempts">Você já usou todas as tentativas desta semana. Um novo torneio começa na segunda-feira, às 00:00 UTC.</string>
+    <string name="social_problem_attempt_expired">Essa tentativa demorou demais para voltar, então valeu 0.</string>
+    <string name="social_problem_cast_rejected">O servidor não pôde aceitar essa tentativa, então ela valeu 0.</string>
+    <string name="social_problem_too_big">Isso é demais para o servidor.</string>
+    <string name="social_problem_too_many_requests">É muita coisa ao mesmo tempo. Espere um pouco e tente de novo.</string>
+
+    <!-- Comum a todas as telas sociais. -->
+    <string name="social_offline_title">Sem conexão com o servidor</string>
+    <string name="social_offline_body">Amigos, rankings, o torneio e os clubes precisam do servidor de duelos. Verifique sua conexão ou o endereço do servidor em Duelo online e tente de novo. Todo o resto do jogo funciona offline.</string>
+    <string name="social_offline_body_no_clubs">Amigos, rankings e o torneio precisam do servidor de duelos. Verifique sua conexão ou o endereço do servidor em Duelo online e tente de novo. Todo o resto do jogo funciona offline.</string>
+    <string name="social_offline_retry">Tentar de novo</string>
+    <string name="social_player_you">%1$s (você)</string>
+    <string name="social_status_online">Online</string>
+    <string name="social_status_offline">Offline</string>
+    <string name="social_rank">%1$dº</string>
+    <string name="social_copy">Copiar</string>
+    <string name="social_share">Compartilhar</string>
+    <string name="social_clip_player_id">ID de jogador do Deep Line</string>
+    <string name="social_share_player_id">Me adicione como amigo no Deep Line: meu ID de jogador é %1$s.</string>
+    <string name="social_loading">Carregando…</string>
+
+    <!-- O centro de amigos e rankings. -->
+    <string name="social_hub_title">Amigos e rankings</string>
+    <string name="social_entry_body">Adicione amigos, suba nos rankings semanais, pesque no torneio semanal e entre num clube.</string>
+    <string name="social_entry_body_no_clubs">Adicione amigos, suba nos rankings semanais e pesque no torneio semanal.</string>
+    <string name="social_entry_open">Abrir amigos e rankings</string>
+    <string name="social_hub_id_title">Seu ID de jogador</string>
+    <string name="social_hub_id_body">Este é o seu código de amigo: compartilhe para que seus amigos possam adicionar você, e peça o deles. Ninguém pode ser encontrado pelo nome. Seus amigos veem o nome que você usa online, seu título e se você está online.</string>
+    <string name="social_hub_friends_unknown">Os amigos que você adicionar aparecem aqui, com as melhores capturas deles na semana.</string>
+    <string name="social_hub_friends_none">Nenhum amigo ainda. Adicione um com o ID de jogador dele.</string>
+    <plurals name="social_hub_friend_count">
+        <item quantity="one">Você tem %d amigo.</item>
+        <item quantity="many">Você tem %d de amigos.</item>
+        <item quantity="other">Você tem %d amigos.</item>
+    </plurals>
+    <plurals name="social_hub_requests_waiting">
+        <item quantity="one">%d pedido de amizade está esperando sua resposta.</item>
+        <item quantity="many">%d de pedidos de amizade estão esperando sua resposta.</item>
+        <item quantity="other">%d pedidos de amizade estão esperando sua resposta.</item>
+    </plurals>
+    <plurals name="social_hub_challenges_waiting">
+        <item quantity="one">%d desafio está esperando por você.</item>
+        <item quantity="many">%d de desafios estão esperando por você.</item>
+        <item quantity="other">%d desafios estão esperando por você.</item>
+    </plurals>
+    <string name="social_hub_friends_button">Amigos</string>
+    <string name="social_hub_leaderboards_body">Melhor lançamento, captura mais funda e captura mais rara da semana, entre todos, na sua liga e entre seus amigos. Os rankings recomeçam na segunda-feira, às 00:00 UTC, daqui a %1$s.</string>
+    <string name="social_hub_leaderboards_button">Rankings</string>
+    <plurals name="social_hub_attempts_left">
+        <item quantity="one">%d tentativa restante nesta semana.</item>
+        <item quantity="many">%d de tentativas restantes nesta semana.</item>
+        <item quantity="other">%d tentativas restantes nesta semana.</item>
+    </plurals>
+    <string name="social_hub_best">Sua melhor pontuação: %1$s.</string>
+    <string name="social_hub_best_ranked">Sua melhor pontuação: %1$s, posição %2$s de %3$s.</string>
+    <string name="social_hub_reward_waiting">Uma recompensa está esperando por você.</string>
+    <plurals name="social_hub_tournament_about">
+        <item quantity="one">Todos pescam na mesma água a semana inteira, com %d tentativa cada. Sua melhor tentativa é a que conta.</item>
+        <item quantity="many">Todos pescam na mesma água a semana inteira, com %d de tentativas cada. Sua melhor tentativa é a que conta.</item>
+        <item quantity="other">Todos pescam na mesma água a semana inteira, com %d tentativas cada. Sua melhor tentativa é a que conta.</item>
+    </plurals>
+    <string name="social_hub_tournament_button">Torneio</string>
+    <plurals name="social_hub_club_body">
+        <item quantity="one">Você está no clube %1$s: vocês pescaram %2$s peixe juntos nesta semana.</item>
+        <item quantity="many">Você está no clube %1$s: vocês pescaram %2$s de peixes juntos nesta semana.</item>
+        <item quantity="other">Você está no clube %1$s: vocês pescaram %2$s peixes juntos nesta semana.</item>
+    </plurals>
+    <string name="social_hub_clubs_body">Entre num clube com o código dele, ou crie um, e pesquem juntos por uma meta semanal.</string>
+    <string name="social_hub_clubs_button">Clubes</string>
+    <string name="social_forget_button">Excluir meus dados sociais do servidor</string>
+    <string name="social_forget_title">Excluir seus dados sociais?</string>
+    <string name="social_forget_body">Isso remove do servidor seus amigos (dos dois lados), pedidos de amizade, registros nos rankings e no torneio e sua participação em clube. Seu progresso, suas compras e seus presentes continuam neste celular.</string>
+    <string name="social_forget_confirm">Excluir</string>
+
+    <!-- Amigos. -->
+    <string name="social_friends_title">Amigos</string>
+    <string name="social_friends_add_title">Adicionar um amigo</string>
+    <string name="social_friends_id_label">ID de jogador do amigo</string>
+    <string name="social_friends_send">Enviar</string>
+    <string name="social_friends_add_body">A pessoa vai ver seu pedido na próxima vez que abrir Amigos, e vocês serão amigos assim que ela aceitar. Seu ID é %1$s.</string>
+    <string name="social_friends_challenges_title">Desafios</string>
+    <string name="social_friends_challenged">%1$s desafiou você: %2$s.</string>
+    <string name="social_friends_room_closes">A sala fecha em %1$s.</string>
+    <string name="social_friends_join">Entrar</string>
+    <string name="social_friends_requests_title">Pedidos</string>
+    <string name="social_friends_request_in">Quer ser seu amigo (%1$s).</string>
+    <string name="social_friends_accept">Aceitar</string>
+    <string name="social_friends_decline">Recusar</string>
+    <string name="social_friends_request_out">Esperando %1$s aceitar.</string>
+    <string name="social_friends_list_title">Seus amigos</string>
+    <string name="social_friends_list_title_count">Seus amigos (%1$d de %2$d)</string>
+    <string name="social_friends_list_waiting">Seus amigos aparecem aqui assim que o servidor responder.</string>
+    <string name="social_friends_list_none">Nenhum amigo ainda. Compartilhe seu ID de jogador ou peça o deles.</string>
+    <string name="social_friends_challenge">Desafiar</string>
+    <string name="social_friends_challenge_title">Desafiar %1$s</string>
+    <plurals name="social_friends_challenge_body">
+        <item quantity="one">Escolha um modo: uma sala de duelo é aberta e %1$s recebe seu desafio, que vale por %2$d minuto. Vocês dois usam a corda padrão de torneio.</item>
+        <item quantity="many">Escolha um modo: uma sala de duelo é aberta e %1$s recebe seu desafio, que vale por %2$d de minutos. Vocês dois usam a corda padrão de torneio.</item>
+        <item quantity="other">Escolha um modo: uma sala de duelo é aberta e %1$s recebe seu desafio, que vale por %2$d minutos. Vocês dois usam a corda padrão de torneio.</item>
+    </plurals>
+    <string name="social_friends_remove_title">Remover %1$s?</string>
+    <string name="social_friends_remove_body">Vocês não serão mais amigos. A pessoa não é avisada, e vocês podem se adicionar de novo depois.</string>
+    <string name="social_friends_remove">Remover</string>
+    <string name="social_friends_keep">Manter</string>
+    <string name="social_friends_week">Esta semana: %1$s.</string>
+    <string name="social_friends_week_best_cast">melhor lançamento %1$s</string>
+    <string name="social_friends_week_deepest">captura mais funda %1$s</string>
+    <string name="social_friends_week_tournament">torneio %1$s</string>
+    <string name="social_friends_week_none">Nenhuma pontuação nesta semana ainda.</string>
+
+    <!-- Rankings semanais. -->
+    <string name="social_leaderboards_title">Rankings semanais</string>
+    <string name="social_leaderboards_about">%1$s Os rankings recomeçam na segunda-feira, às 00:00 UTC, daqui a %2$s. Só contam os lançamentos que o próprio servidor confere: o torneio semanal e os duelos online, em que todos usam a mesma corda padrão (nível %3$d).</string>
+    <string name="social_leaderboards_your_rank">Sua posição</string>
+    <plurals name="social_leaderboards_players">
+        <item quantity="one">%1$s pescador neste ranking.</item>
+        <item quantity="many">%1$s de pescadores neste ranking.</item>
+        <item quantity="other">%1$s pescadores neste ranking.</item>
+    </plurals>
+    <string name="social_leaderboards_top">Top %1$d</string>
+    <string name="social_leaderboards_league">Sua liga</string>
+    <string name="social_leaderboards_friends">Você e seus amigos</string>
+    <string name="social_leaderboards_waiting">O ranking aparece aqui assim que o servidor responder.</string>
+    <plurals name="social_leaderboards_league_empty">
+        <item quantity="one">Sua liga começa com sua primeira pontuação da semana: cerca de %d pescador que começou a semana junto com você.</item>
+        <item quantity="many">Sua liga começa com sua primeira pontuação da semana: cerca de %d de pescadores que começaram a semana junto com você.</item>
+        <item quantity="other">Sua liga começa com sua primeira pontuação da semana: cerca de %d pescadores que começaram a semana junto com você.</item>
+    </plurals>
+    <string name="social_leaderboards_friends_empty">Nenhuma pontuação sua ou dos seus amigos nesta semana ainda.</string>
+    <string name="social_leaderboards_global_empty">Nenhuma pontuação nesta semana ainda. Pesque no torneio semanal ou num duelo online para ser o primeiro.</string>
+    <string name="social_leaderboards_strangers">Os pescadores que não são seus amigos aparecem com um nome criado a partir do ID de jogador deles.</string>
+    <string name="social_leaderboards_deepest_value">%1$s · %2$s</string>
+
+    <!-- O torneio semanal. -->
+    <string name="social_tournament_title">Torneio semanal</string>
+    <string name="social_tournament_reward_title">Uma recompensa está esperando</string>
+    <string name="social_tournament_reward_body">Você terminou em %1$s de %2$s com %3$s: %4$s.</string>
+    <string name="social_tournament_reward_grants">Recompensa: %1$s.</string>
+    <string name="social_tournament_claim">Resgatar</string>
+    <string name="social_tournament_water_title">A água desta semana</string>
+    <string name="social_tournament_water_body">Todos pescam exatamente na mesma água a semana inteira, com a corda padrão (nível %1$d em todos os atributos) e %2$d batidas. Você tem %3$d tentativas e a melhor é a que conta. Começar uma tentativa já a gasta, mesmo que você saia. Lanternas e detectores funcionam, como nos duelos; o que você pesca no torneio não conta para seus pontos nem para seu registro de peixes.</string>
+    <string name="social_tournament_attempts_left">Tentativas restantes</string>
+    <string name="social_tournament_attempts_value">%1$d de %2$d</string>
+    <string name="social_tournament_ends_in">Termina em</string>
+    <string name="social_tournament_your_best">Melhor pontuação</string>
+    <string name="social_tournament_no_score">Sem pontuação ainda</string>
+    <string name="social_tournament_your_rank">Sua posição</string>
+    <string name="social_tournament_rank_value">%1$s de %2$s</string>
+    <string name="social_tournament_not_ranked">Sem posição ainda</string>
+    <string name="social_tournament_start">Começar tentativa %1$d de %2$d</string>
+    <string name="social_tournament_no_attempts">Sem tentativas restantes: até segunda-feira</string>
+    <string name="social_tournament_waiting">Suas tentativas e sua melhor pontuação aparecem aqui assim que o servidor responder.</string>
+    <string name="social_tournament_attempt_title">Tentativa %1$d</string>
+    <string name="social_tournament_attempt_points">%1$s.</string>
+    <string name="social_tournament_attempt_best">Sua melhor pontuação nesta semana: %1$s, %2$s de %3$s.</string>
+    <string name="social_tournament_standings_title">Classificação</string>
+    <string name="social_tournament_standings_none">Nenhuma pontuação nesta semana ainda: a sua pode ser a primeira.</string>
+    <string name="social_tournament_rewards_title">Recompensas</string>
+    <string name="social_tournament_rewards_body">As recompensas dependem da sua posição final quando a semana acaba, e são resgatadas aqui.</string>
+    <string name="social_tournament_tier_champion">O vencedor e o top 1%</string>
+    <string name="social_tournament_tier_gold">O top 10%</string>
+    <string name="social_tournament_tier_silver">O top 25%</string>
+    <string name="social_tournament_tier_bronze">A metade de cima</string>
+    <string name="social_tournament_tier_took_part">Todos os outros que participaram</string>
+
+    <!-- Clubes (chegam numa atualização futura). -->
+    <string name="social_clubs_title">Clubes</string>
+    <string name="social_clubs_other_names">Outros nomes</string>
+    <string name="social_clubs_top_title">Clubes mais ativos da semana</string>
+    <string name="social_clubs_yours">%1$s (seu)</string>
+    <plurals name="social_clubs_members">
+        <item quantity="one">%d membro</item>
+        <item quantity="many">%d de membros</item>
+        <item quantity="other">%d membros</item>
+    </plurals>
+    <plurals name="social_clubs_fish">
+        <item quantity="one">%1$s peixe</item>
+        <item quantity="many">%1$s de peixes</item>
+        <item quantity="other">%1$s peixes</item>
+    </plurals>
+    <string name="social_clubs_join_title">Entrar num clube</string>
+    <string name="social_clubs_code">Código do clube</string>
+    <string name="social_clubs_join">Entrar</string>
+    <string name="social_clubs_join_body">Peça aos membros de um clube o código de %1$d caracteres. Um clube tem até %2$d pescadores, que pescam juntos por uma meta semanal. Não há chat.</string>
+    <string name="social_clubs_start_title">Criar um clube</string>
+    <string name="social_clubs_start_body">Escolha um nome: os nomes de clube são feitos com palavras de pesca, então são amigáveis para todos.</string>
+    <string name="social_clubs_start_button">Criar o clube %1$s</string>
+    <string name="social_clip_club_code">Código de clube do Deep Line</string>
+    <string name="social_clubs_share">Entre no meu clube no Deep Line (%1$s): o código é %2$s.</string>
+    <plurals name="social_clubs_member_count">
+        <item quantity="one">%1$d de %2$d membro.</item>
+        <item quantity="many">%1$d de %2$d de membros.</item>
+        <item quantity="other">%1$d de %2$d membros.</item>
+    </plurals>
+    <string name="social_clubs_you_own">Você é o dono deste clube.</string>
+    <string name="social_clubs_goal_title">Meta desta semana</string>
+    <plurals name="social_clubs_goal_body">
+        <item quantity="one">%1$s peixe pescado em conjunto. A meta recomeça na segunda-feira, às 00:00 UTC, daqui a %2$s.</item>
+        <item quantity="many">%1$s de peixes pescados em conjunto. A meta recomeça na segunda-feira, às 00:00 UTC, daqui a %2$s.</item>
+        <item quantity="other">%1$s peixes pescados em conjunto. A meta recomeça na segunda-feira, às 00:00 UTC, daqui a %2$s.</item>
+    </plurals>
+    <plurals name="social_clubs_goal_rules">
+        <item quantity="one">Os peixes dos seus lançamentos solo contam, até %d por dia. Todo membro que ajudou ganha cada recompensa alcançada.</item>
+        <item quantity="many">Os peixes dos seus lançamentos solo contam, até %d por dia. Todo membro que ajudou ganha cada recompensa alcançada.</item>
+        <item quantity="other">Os peixes dos seus lançamentos solo contam, até %d por dia. Todo membro que ajudou ganha cada recompensa alcançada.</item>
+    </plurals>
+    <plurals name="social_clubs_claim">
+        <item quantity="one">Resgatar %d recompensa</item>
+        <item quantity="many">Resgatar %d de recompensas</item>
+        <item quantity="other">Resgatar %d recompensas</item>
+    </plurals>
+    <string name="social_clubs_members_title">Membros nesta semana</string>
+    <string name="social_clubs_manage">Gerenciar</string>
+    <string name="social_clubs_rename">Renomear</string>
+    <string name="social_clubs_rename_title">Renomear o clube</string>
+    <string name="social_clubs_leave">Sair do clube</string>
+    <string name="social_clubs_leave_title">Sair do clube %1$s?</string>
+    <string name="social_clubs_leave_owner">O membro mais antigo do clube passa a ser o dono. Seus peixes desta semana continuam na meta do clube.</string>
+    <string name="social_clubs_leave_last">Você é o último membro, então o clube será fechado.</string>
+    <string name="social_clubs_leave_member">Seus peixes desta semana continuam na meta do clube. Você pode entrar em outro clube na hora.</string>
+    <string name="social_clubs_leave_confirm">Sair</string>
+    <string name="social_clubs_stay">Ficar</string>
+    <plurals name="social_clubs_manage_body">
+        <item quantity="one">Torne %1$s dono do clube (você vira membro) ou remova essa pessoa do clube. Um membro removido pode voltar depois de %2$d hora.</item>
+        <item quantity="many">Torne %1$s dono do clube (você vira membro) ou remova essa pessoa do clube. Um membro removido pode voltar depois de %2$d de horas.</item>
+        <item quantity="other">Torne %1$s dono do clube (você vira membro) ou remova essa pessoa do clube. Um membro removido pode voltar depois de %2$d horas.</item>
+    </plurals>
+    <string name="social_clubs_make_owner">Tornar dono</string>
+    <string name="social_clubs_remove">Remover</string>
+</resources>

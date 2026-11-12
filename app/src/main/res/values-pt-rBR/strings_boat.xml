@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Português do Brasil. O editor de barco (Dex > Skins > Personalizar barco): como uma opção
+    bloqueada é desbloqueada, e os textos da tela do editor. Os nomes das opções estão em
+    strings_core.xml. Chaves começam com boat_.
+-->
+<resources>
+    <!-- Como uma opção bloqueada é desbloqueada: rótulos curtos. -->
+    <string name="boat_requirement_free">Grátis</string>
+    <plurals name="boat_requirement_species">
+        <item quantity="one">Pesque %d espécie</item>
+        <item quantity="many">Pesque %d de espécies</item>
+        <item quantity="other">Pesque %d espécies</item>
+    </plurals>
+    <string name="boat_requirement_zone">Pesque um peixe na zona %1$s</string>
+    <plurals name="boat_requirement_milestones">
+        <item quantity="one">Resgate %d marco</item>
+        <item quantity="many">Resgate %d de marcos</item>
+        <item quantity="other">Resgate %d marcos</item>
+    </plurals>
+    <string name="boat_requirement_shop">Na loja</string>
+
+    <!-- O mesmo, como frase completa na caixa de diálogo. -->
+    <string name="boat_unlock_free">É grátis.</string>
+    <string name="boat_unlock_points">Desbloqueie por %1$s.</string>
+    <plurals name="boat_unlock_species">
+        <item quantity="one">Pesque %d espécie para desbloquear.</item>
+        <item quantity="many">Pesque %d de espécies para desbloquear.</item>
+        <item quantity="other">Pesque %d espécies para desbloquear.</item>
+    </plurals>
+    <string name="boat_unlock_zone">Pesque um peixe na zona %1$s para desbloquear.</string>
+    <plurals name="boat_unlock_milestones">
+        <item quantity="one">Resgate %d marco para desbloquear.</item>
+        <item quantity="many">Resgate %d de marcos para desbloquear.</item>
+        <item quantity="other">Resgate %d marcos para desbloquear.</item>
+    </plurals>
+    <string name="boat_unlock_shop">Compre na Loja para desbloquear.</string>
+    <string name="boat_unlock_club">Entre no Clube do Capitão para desbloquear.</string>
+
+    <!-- A tela do editor. -->
+    <string name="boat_editor_title">Personalizar barco</string>
+    <string name="boat_editor_intro">Seus pontos: %1$s. As opções básicas são grátis; toque numa bloqueada para ver como desbloqueá-la.</string>
+    <string name="boat_editor_hull_colour">Cor do casco</string>
+    <string name="boat_editor_bottom_colour">Cor do fundo</string>
+    <string name="boat_editor_trim_colour">Friso e emblema</string>
+    <string name="boat_editor_cabin_colour">Cabine</string>
+    <string name="boat_editor_sail_colour">Cor da vela</string>
+    <string name="boat_editor_flag_colour">Cor da bandeira</string>
+    <string name="boat_editor_pattern">Padrão do casco</string>
+    <string name="boat_editor_sail">Vela</string>
+    <string name="boat_editor_flag">Bandeira</string>
+    <string name="boat_editor_emblem">Emblema</string>
+    <string name="boat_editor_swatch_cd">%1$s: %2$s</string>
+    <string name="boat_editor_swatch_cd_locked">%1$s: %2$s (bloqueada)</string>
+    <string name="boat_editor_locked_cd">Bloqueado</string>
+    <string name="boat_editor_save">Salvar e usar</string>
+    <string name="boat_editor_unlock_title">Desbloquear %1$s?</string>
+    <plurals name="boat_editor_unlock_body">
+        <item quantity="one">%1$s custa %2$s ponto, uma única vez. Você tem %3$s.</item>
+        <item quantity="many">%1$s custa %2$s de pontos, uma única vez. Você tem %3$s.</item>
+        <item quantity="other">%1$s custa %2$s pontos, uma única vez. Você tem %3$s.</item>
+    </plurals>
+    <plurals name="boat_editor_unlock_body_short">
+        <item quantity="one">%1$s custa %2$s ponto, uma única vez. Você tem %3$s. Continue pescando para ganhar mais.</item>
+        <item quantity="many">%1$s custa %2$s de pontos, uma única vez. Você tem %3$s. Continue pescando para ganhar mais.</item>
+        <item quantity="other">%1$s custa %2$s pontos, uma única vez. Você tem %3$s. Continue pescando para ganhar mais.</item>
+    </plurals>
+    <string name="boat_editor_unlock_buy">Desbloquear por %1$s pts</string>
+    <string name="boat_editor_not_now">Agora não</string>
+    <string name="boat_editor_locked_title">Bloqueado: %1$s</string>
+</resources>

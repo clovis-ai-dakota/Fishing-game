@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Português do Brasil. A estrutura do app: as abas de baixo, as páginas da Loja, as seções do
+    Dex e as caixas de diálogo que aparecem sobre qualquer tela. Chaves começam com shell_.
+-->
+<resources>
+    <!-- Abas de navegação (uma palavra curta cada). -->
+    <string name="shell_tab_fish">Pescar</string>
+    <string name="shell_tab_dex">Dex</string>
+    <string name="shell_tab_shop">Loja</string>
+    <string name="shell_tab_battle">Duelo</string>
+
+    <!-- Páginas da Loja. -->
+    <string name="shell_shop_page_rope">Corda</string>
+    <string name="shell_shop_page_tackle">Apetrechos</string>
+    <string name="shell_shop_page_style">Estilo</string>
+    <string name="shell_shop_page_passes">Passes</string>
+    <string name="shell_shop_page_aquarium">Aquário</string>
+
+    <!-- Seções do Dex. -->
+    <string name="shell_dex_section_species">Espécies</string>
+    <string name="shell_dex_section_secrets">Segredos</string>
+    <string name="shell_dex_section_skins">Skins</string>
+
+    <!-- Pergunta quando o tour termina. -->
+    <string name="shell_tour_again_title">Mostrar o tour da próxima vez?</string>
+    <string name="shell_tour_again_body">O tour deve abrir de novo na próxima vez que você iniciar o Deep Line? Você também pode fazê-lo quando quiser em Configurações, pela engrenagem no alto da aba Pescar.</string>
+    <string name="shell_tour_again_yes">Sim, da próxima vez</string>
+
+    <!-- Só em versões de teste: uma tela de pagamento falsa. -->
+    <string name="shell_test_store_title">Loja de teste</string>
+    <string name="shell_test_store_body">Pagar %1$s por %2$s? Esta é uma versão de teste: nenhum dinheiro de verdade é cobrado. Escolha como o pagamento vai terminar.</string>
+    <string name="shell_test_store_pending">Pendente</string>
+    <string name="shell_test_store_fail">Falhar</string>
+    <string name="shell_test_store_approve">Aprovar</string>
+</resources>

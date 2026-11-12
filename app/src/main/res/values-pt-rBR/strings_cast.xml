@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Português do Brasil. Durante um lançamento: os avisos rápidos sobre a água, o HUD da tela de
+    lançamento, a pausa e os resultados. Chaves começam com cast_. Os avisos são lidos num piscar
+    de olhos: curtos e diretos.
+-->
+<resources>
+    <plurals name="cast_notice_bump">
+        <item quantity="one">Batida! Resta %d</item>
+        <item quantity="many">Batida! Restam %d</item>
+        <item quantity="other">Batida! Restam %d</item>
+    </plurals>
+    <string name="cast_notice_pulled_up">A linha subiu! Mire nas cabeças</string>
+    <string name="cast_notice_rope_end">Fim da corda! Hora de subir</string>
+    <string name="cast_notice_caught">"%1$s  +%2$s"</string>
+    <string name="cast_notice_caught_sparkling">"%1$s cintilante  +%2$s"</string>
+    <string name="cast_notice_too_heavy">Pesado demais: %1$s</string>
+    <string name="cast_notice_last_bump">"Última batida fisgou: %1$s  +%2$s"</string>
+    <string name="cast_notice_times_up">Acabou o tempo!</string>
+
+    <!-- O HUD no alto da tela de lançamento. -->
+    <string name="cast_hud_phase_sinking">Afundando</string>
+    <string name="cast_hud_phase_reeling">Subindo</string>
+    <string name="cast_hud_phase_surfaced">Na superfície</string>
+    <string name="cast_hud_pause">Pausar</string>
+    <string name="cast_hud_bumps">Batidas</string>
+    <string name="cast_hud_load">Carga %1$s / %2$s kg</string>
+    <string name="cast_hud_bump_free">Zona livre de batidas · batidas contam abaixo de %1$d m</string>
+    <string name="cast_hud_lantern_lit">Lanterna acesa</string>
+    <string name="cast_hud_battle_round">%1$s · Rodada %2$d</string>
+    <string name="cast_hud_battle_cast_of">%1$s · Lançamento %2$d/%3$d</string>
+    <string name="cast_hud_battle_cast">%1$s · Lançamento %2$d</string>
+    <string name="cast_hud_player">Jogador</string>
+    <string name="cast_hud_tournament_attempt">Torneio · Tentativa %1$d de %2$d</string>
+
+    <!-- Dicas no meio da tela. -->
+    <string name="cast_hint_steer">Arraste para guiar: o anzol desliza até o seu dedo. Abaixo de %1$d m, evite cabeças de peixe e objetos: com %2$d batidas, a linha sobe.</string>
+    <string name="cast_hint_heads">Encoste na CABEÇA dos peixes para fisgá-los. O rabo não conta.</string>
+
+    <!-- O botão que puxa a linha direto para cima. -->
+    <string name="cast_fast_reel">Recolher rápido</string>
+    <string name="cast_fast_reel_line_full">Linha cheia · Recolher rápido</string>
+
+    <!-- A pausa. -->
+    <string name="cast_pause_title">Pausado</string>
+    <string name="cast_pause_body_solo">Sair encerra este lançamento sem pontuar nenhum dos peixes que estão na linha.</string>
+    <string name="cast_pause_body_battle">Sair significa desistir do duelo. O relógio do duelo fica parado durante a pausa.</string>
+    <string name="cast_pause_body_online">Sair significa desistir do duelo. Online, seu adversário continua pescando enquanto você está em pausa.</string>
+    <string name="cast_pause_body_tournament">Sair vale 0 ponto nesta tentativa do torneio, e ela ainda conta como uma das suas tentativas.</string>
+    <string name="cast_pause_resume">Continuar</string>
+    <string name="cast_pause_quit">Sair do lançamento</string>
+    <string name="cast_pause_forfeit">Desistir do duelo</string>
+
+    <!-- Os resultados no fim de um lançamento. -->
+    <string name="cast_results_title">Lançamento concluído</string>
+    <string name="cast_results_deepest">Ponto mais fundo %1$s</string>
+    <plurals name="cast_results_fish">
+        <item quantity="one">%d peixe</item>
+        <item quantity="many">%d de peixes</item>
+        <item quantity="other">%d peixes</item>
+    </plurals>
+    <plurals name="cast_results_objects">
+        <item quantity="one">%d objeto</item>
+        <item quantity="many">%d de objetos</item>
+        <item quantity="other">%d objetos</item>
+    </plurals>
+    <string name="cast_results_nothing">Nada na linha desta vez. Na subida, guie o anzol até os peixes para ele encontrar a cabeça deles.</string>
+    <string name="cast_results_by_last_bump">fisgado pela última batida</string>
+    <string name="cast_results_sparkling">✦ %1$s cintilante</string>
+    <string name="cast_results_secret">✦ Segredo: %1$s</string>
+    <string name="cast_results_total">"Total  +%1$s pts"</string>
+    <string name="cast_results_collect">Coletar</string>
+    <string name="cast_results_continue">Continuar</string>
+
+    <!-- Rótulos desenhados na água. -->
+    <string name="cast_canvas_bump_free_above">Livre de batidas acima de %1$d m</string>
+    <string name="cast_canvas_rope_limit">Limite da corda</string>
+</resources>

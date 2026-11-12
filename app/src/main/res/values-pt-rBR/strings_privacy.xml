@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Português do Brasil. Privacidade: o pedido de consentimento na primeira abertura, Configurações >
+    Privacidade e a exclusão da conta. Chaves começam com privacy_. Textos quase jurídicos:
+    simples, exatos e completos. "Permitir" e "Não permitir" são escolhas equivalentes.
+    Google Firebase é nome de produto.
+-->
+<resources>
+    <!-- Pedido de consentimento. -->
+    <string name="privacy_consent_title">Quer ajudar a melhorar o Deep Line?</string>
+    <string name="privacy_consent_body">Com a sua permissão, o jogo envia estatísticas de uso (quais telas você abre, como vão seus lançamentos e duelos, o que você compra) e relatórios de falhas para o Google Firebase. Eles nos ajudam a corrigir bugs e a equilibrar o jogo.</string>
+    <string name="privacy_consent_promise">Eles ficam ligados a um ID aleatório, nunca ao seu nome, e nunca são usados para anúncios. Nada é enviado sem a sua permissão, e você pode mudar de ideia a qualquer momento em Configurações, na seção Privacidade.</string>
+    <string name="privacy_read_policy">Ler a política de privacidade</string>
+    <string name="privacy_consent_choose">Escolher um por um</string>
+    <string name="privacy_consent_save">Salvar minhas escolhas</string>
+    <string name="privacy_consent_refuse">Não permitir</string>
+    <string name="privacy_consent_allow">Permitir</string>
+
+    <!-- Os dois tipos de dados. -->
+    <string name="privacy_analytics_title">Estatísticas de uso</string>
+    <string name="privacy_analytics_subtitle">Como o jogo é jogado: telas, lançamentos, duelos, compras.</string>
+    <string name="privacy_crash_title">Relatórios de falhas</string>
+    <string name="privacy_crash_subtitle">O que deu errado quando o jogo trava ou algo falha.</string>
+
+    <!-- Configurações > Privacidade. -->
+    <string name="privacy_settings_title">Privacidade</string>
+    <string name="privacy_settings_intro">As estatísticas de uso e os relatórios de falhas vão para o Google Firebase, ligados a um ID aleatório (nunca ao seu nome), e só se você permitir. Eles nunca são usados para anúncios.</string>
+    <string name="privacy_settings_unavailable">Esta versão do jogo não envia estatísticas nem relatórios de falhas. Suas escolhas ficam guardadas para as versões que enviam.</string>
+    <string name="privacy_reset_id">Redefinir meu ID de estatísticas</string>
+    <string name="privacy_account_explainer">Sua conta online (ID de jogador, backup na nuvem, presentes à espera) fica guardada no servidor do jogo. Excluí-la apaga tudo isso; o progresso neste celular continua.</string>
+    <string name="privacy_delete_account">Excluir minha conta online</string>
+    <string name="privacy_deleting">Excluindo sua conta…</string>
+
+    <!-- Confirmação antes de excluir a conta online. -->
+    <string name="privacy_delete_confirm_title">Excluir sua conta online?</string>
+    <string name="privacy_delete_confirm_body">Isso apaga tudo o que o servidor do jogo guarda sobre você: seu ID de jogador, seu backup na nuvem e os presentes à sua espera. Seu código de recuperação para de funcionar, e isso não pode ser desfeito.\n\nSeu progresso neste celular continua, e suas compras ficam na sua conta do Google Play. Uma assinatura do Clube do Capitão não é cancelada: gerencie-a no Google Play.</string>
+    <string name="privacy_delete_confirm_yes">Excluir minha conta</string>
+    <string name="privacy_delete_confirm_no">Manter</string>
+
+    <!-- Mensagens depois de uma ação. -->
+    <string name="privacy_message_reset">As estatísticas guardadas neste celular foram apagadas, e você tem um novo ID aleatório.</string>
+    <string name="privacy_message_deleted">Sua conta online foi excluída. Seu progresso neste celular continua aqui, e o jogo agora usa um novo ID de jogador.</string>
+    <string name="privacy_message_not_deleted">Sua conta não foi excluída: %1$s</string>
+</resources>
