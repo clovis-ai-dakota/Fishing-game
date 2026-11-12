@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Der Shop: Meldungen nach einem Kauf, einem Geschenk oder einer Cloud-Sicherung, was ein Artikel
+    enthält, Kontofehler und die Bildschirme des Shops (Seiten, Geschenke, Konto, Saison und
+    Wochenend-Event, Designs, Aquarium, Stores). Punkte sind Spielstand und Währung.
+    (The Shop. Keys start with shop_.)
+-->
+<resources>
+    <!-- Was ein Artikel enthält: kurze Nominalgruppen, zu Listen verbunden, nach einem Doppelpunkt. -->
+    <plurals name="shop_grant_detectors">
+        <item quantity="one">%d Raritätendetektor</item>
+        <item quantity="other">%d Raritätendetektoren</item>
+    </plurals>
+    <plurals name="shop_grant_lucky_charms">
+        <item quantity="one">%d Talisman</item>
+        <item quantity="other">%d Talismane</item>
+    </plurals>
+    <plurals name="shop_grant_sparkle_lures">
+        <item quantity="one">%d Funkelköder</item>
+        <item quantity="other">%d Funkelköder</item>
+    </plurals>
+    <plurals name="shop_grant_club_days">
+        <item quantity="one">%d Tag Kapitänsclub</item>
+        <item quantity="other">%d Tage Kapitänsclub</item>
+    </plurals>
+    <string name="shop_grant_a_boat">ein Boot</string>
+    <string name="shop_grant_title">Titel „%1$s“</string>
+    <string name="shop_grant_season_boat">Boot „%1$s“</string>
+    <string name="shop_grant_paint">Lackierung „%1$s“</string>
+    <string name="shop_grant_emblem">Emblem „%1$s“</string>
+    <string name="shop_grant_sail_print">Segeldruck „%1$s“</string>
+    <string name="shop_grant_season_pass">die Premium-Reihe dieser Saison: ein Saisonabzeichen, das Saisonboot auf Stufe 10 und jede Menge Zubehör</string>
+    <string name="shop_grant_collector_edition">der Saisonpass, %1$d Stufen sofort, das Saisonboot gleich dazu und ein Sammlerabzeichen</string>
+    <string name="shop_grant_event_pass">doppelter Fortschritt im Event dieses Wochenendes und eine größere Belohnung mit Event-Abzeichen</string>
+    <string name="shop_unlock_badge_rainbow">ein Regenbogen-Titelabzeichen</string>
+    <string name="shop_unlock_badge_club_forever">ein Club-Abzeichen, das nie abläuft</string>
+    <string name="shop_unlock_badge_season">ein Saisonabzeichen</string>
+    <string name="shop_unlock_badge_collector">ein Sammlerabzeichen</string>
+    <string name="shop_unlock_badge_event">ein Event-Abzeichen</string>
+    <string name="shop_unlock_badge_tournament">das Turnier-Titelabzeichen</string>
+    <string name="shop_unlock_badge_frame">das Titelabzeichen „%1$s“</string>
+
+    <!-- Meldungen nach einem Kauf. -->
+    <string name="shop_message_thanks">Danke! %1$s: %2$s.</string>
+    <string name="shop_message_got">%1$s: %2$s.</string>
+    <string name="shop_message_cancelled">Kauf abgebrochen: Es wurde nichts abgebucht.</string>
+    <string name="shop_message_pending">Zahlung ausstehend: %1$s. Der Artikel kommt, sobald sie bestätigt ist.</string>
+    <string name="shop_message_pending_unknown">Dein Kauf wartet noch auf die Zahlung. Er kommt, sobald sie bestätigt ist.</string>
+    <string name="shop_message_failed">Die Zahlung ist nicht durchgegangen.</string>
+    <string name="shop_message_failed_because">Die Zahlung ist nicht durchgegangen: %1$s</string>
+    <string name="shop_message_store_unavailable">%1$s ist gerade nicht verfügbar.</string>
+    <string name="shop_message_restoring">Deine Käufe werden bei %1$s geprüft…</string>
+    <string name="shop_message_club_pouch">Kapitänsclub: %1$s.</string>
+    <string name="shop_message_season_rewards">Saisonbelohnungen: %1$s.</string>
+    <string name="shop_message_event_claimed">Belohnung des Wochenend-Events abgeholt!</string>
+
+    <!-- Geschenke von und an Online-Gegner. -->
+    <string name="shop_gift_sent">%1$s an %2$s gesendet!</string>
+    <string name="shop_gift_refunded">%1$s Deine Punkte wurden zurückerstattet.</string>
+    <string name="shop_gift_kept">%1$s Stattdessen gehört dir: %2$s.</string>
+    <!-- %1$s: der Absender (oder shop_gift_from_you). -->
+    <string name="shop_gift_received">Geschenk von %1$s: %2$s (%3$s).</string>
+    <string name="shop_gift_received_owned">Geschenk von %1$s: %2$s. Das hattest du schon, darum bekommst du stattdessen %3$s Punkte.</string>
+    <!-- Steht nach „Geschenk von“ (shop_gift_received), daher im Dativ. -->
+    <string name="shop_gift_from_you">dir</string>
+
+    <!-- Cloud-Speicherung und Wiederherstellung. -->
+    <string name="shop_cloud_club_only">Cloud-Speicherung ist ein Vorteil des Kapitänsclubs.</string>
+    <string name="shop_cloud_backed_up">Dein Fortschritt ist gesichert.</string>
+    <string name="shop_cloud_bad_code">Das ist kein Wiederherstellungscode: Er beginnt mit DL- und hat 24 Buchstaben und Ziffern.</string>
+    <string name="shop_cloud_restored">Fortschritt wiederhergestellt.</string>
+
+    <!-- Fehler im Austausch mit dem Spielserver. -->
+    <string name="shop_account_unreachable">Server nicht erreichbar. Prüf deine Verbindung und versuch es noch einmal.</string>
+    <string name="shop_account_wrong_code">Dieser Wiederherstellungscode passt nicht zu diesem Spieler.</string>
+    <string name="shop_account_nothing_saved">Für diesen Spieler ist noch nichts gespeichert.</string>
+    <string name="shop_account_too_large">Das ist zu viel für den Server.</string>
+    <string name="shop_account_refused">Der Server konnte das nicht annehmen.</string>
+    <string name="shop_account_server_problem">Der Server hatte ein Problem (%1$d).</string>
+
+    <!-- ==== Der Tab „Shop“ ==== -->
+    <string name="shop_balance">%1$s Punkte zum Ausgeben</string>
+
+    <string name="shop_confirm_title">%1$s kaufen?</string>
+    <string name="shop_confirm_body">Du bekommst: %1$s.\n\nEs kostet %2$s Punkte; danach hast du noch %3$s Punkte.</string>
+    <string name="shop_confirm_buy">Für %1$s Punkte kaufen</string>
+
+    <string name="shop_club_pouch_title">Geschenk des Kapitänsclubs</string>
+    <string name="shop_club_pouch_body">Dein Gratis-Laternenbeutel des Monats ist bereit: %1$s.</string>
+    <string name="shop_claim">Abholen</string>
+    <string name="shop_starter_banner_body">Ein einmaliges Angebot, endet in %1$s.</string>
+    <string name="shop_starter_banner_see">Ansehen</string>
+    <string name="shop_badge_discount">-%1$d&#160;%%</string>
+
+    <string name="shop_owned">Im Besitz ✓</string>
+    <string name="shop_worn">Ausgerüstet ✓</string>
+    <string name="shop_on_your_boat">Auf deinem Boot ✓</string>
+    <string name="shop_in_use">Aktiv ✓</string>
+    <string name="shop_not_available">Gerade nicht verfügbar</string>
+    <string name="shop_wear">Ausrüsten</string>
+    <string name="shop_take_off">Ablegen</string>
+    <string name="shop_apply">Anbringen</string>
+    <string name="shop_use">Verwenden</string>
+
+    <!-- Seite „Seil“. -->
+    <string name="shop_rope_title">Seilverbesserungen</string>
+    <string name="shop_rope_note">Mit Punkten gekauft. Seillänge erreicht tiefere Zonen und neue Fische, Stärke trägt mehr Gewicht, Wendigkeit lenkt schneller. Anders überlegt? Stufe zurück, und du bekommst alles erstattet.</string>
+    <string name="shop_rope_level">Stufe %1$d/%2$d</string>
+    <string name="shop_rope_downgrade">Auf %1$s senken · %2$s Punkte zurück</string>
+    <string name="shop_rope_maxed">%1$s · Maximum erreicht</string>
+
+    <!-- Seite „Zubehör“. -->
+    <string name="shop_tackle_title">Zubehör</string>
+    <string name="shop_tackle_note">Gegenstände für einen Wurf: Schalte sie vor dem Auswerfen ein. Die Laterne und der Detektor wirken auch in Duellen. Kauf einzelne mit Punkten oder Pakete mit Euro oder Punkten.</string>
+    <string name="shop_tackle_owned">Du hast %1$d</string>
+    <string name="shop_tackle_desc_battles">%1$s Wirkt auch in Duellen.</string>
+    <string name="shop_tackle_desc_solo">%1$s Nur für Solo-Würfe.</string>
+    <string name="shop_tackle_single">Nur eins</string>
+
+    <!-- Seite „Stil“. -->
+    <string name="shop_style_boats_title">Fertige Boote</string>
+    <string name="shop_style_boats_note">Fertige Entwürfe: Nutze einen, wie er ist, oder mach ihn im Bootseditor zu deinem eigenen. Wie jeder Skin nur Optik.</string>
+    <string name="shop_style_sets_title">Komplette Sets</string>
+    <string name="shop_style_sets_note">Ein fertiges Boot mit Haken, Schnur und Spur im selben Stil.</string>
+    <string name="shop_style_parts_title">Lackierungen, Embleme und Drucke</string>
+    <string name="shop_style_parts_note">Als Vorschau an deinem eigenen Boot. Einmal gekauft, findest du sie auch im Bootseditor.</string>
+    <string name="shop_style_gear_title">Haken, Schnüre und Spuren</string>
+    <string name="shop_style_gear_note">Gleiche Größe und Trefferzone wie die klassische Ausrüstung: Sie ändern nur das Aussehen.</string>
+    <string name="shop_style_themes_title">App-Designs</string>
+    <string name="shop_style_themes_note">Szene und Farben der Menüs, bei Tag und bei Nacht. Aufwendigere Designs kosten mehr.</string>
+    <string name="shop_style_badges_title">Titelabzeichen</string>
+    <string name="shop_style_badges_note">Der Rahmen um deinen Titel (oder deinen Namen), auch online sichtbar. Saisonpässe, Events und der Club bringen weitere.</string>
+    <string name="shop_style_cards_title">Stile für Dex-Karten</string>
+    <string name="shop_style_cards_note">Wie der Dex die Arten zeigt, die du gefangen hast.</string>
+    <string name="shop_style_more_title">Mehr</string>
+    <string name="shop_set_contents">%1$s.</string>
+
+    <!-- Seite „Aquarium“. -->
+    <string name="shop_aquarium_page_note">Deine gefangenen Fische schwimmen in deinem Aquarium (Dex > Aquarium). Deko und ein größeres Becken ändern nur, wie es aussieht.</string>
+    <string name="shop_aquarium_open">Dein Aquarium öffnen</string>
+
+    <!-- Seite „Pässe“. -->
+    <string name="shop_passes_title">Pässe und Pakete</string>
+    <string name="shop_passes_note">Saisons, Wochenend-Events, der Kapitänsclub und einmalige Pakete.</string>
+
+    <!-- Eine breite Artikelkarte. -->
+    <string name="shop_item_worth">Einzeln gekauft %1$s wert.</string>
+    <string name="shop_item_offer_ends">Nur einmal: endet in %1$s.</string>
+    <string name="shop_club_member_for_life">Du bist Mitglied auf Lebenszeit.</string>
+    <plurals name="shop_club_member_until">
+        <item quantity="one">Mitglied bis %1$s. Mit Euro verlängert sich die Mitgliedschaft jeden Monat, bis du kündigst; mit Punkten kommt %2$d Tag dazu.</item>
+        <item quantity="other">Mitglied bis %1$s. Mit Euro verlängert sich die Mitgliedschaft jeden Monat, bis du kündigst; mit Punkten kommen %2$d Tage dazu.</item>
+    </plurals>
+    <plurals name="shop_club_how">
+        <item quantity="one">Mit Euro verlängert sich die Mitgliedschaft jeden Monat, bis du kündigst; mit Punkten ist es %d Tag.</item>
+        <item quantity="other">Mit Euro verlängert sich die Mitgliedschaft jeden Monat, bis du kündigst; mit Punkten sind es %d Tage.</item>
+    </plurals>
+
+    <!-- Unten auf jeder Shop-Seite außer „Seil“. -->
+    <string name="shop_footer_rates">Punktepreise: etwa %1$s Angeln pro Euro bei der Reichweite deines Seils (Laternenpakete: %2$s). Bezahlen spart also Zeit und kauft nie etwas, das es nicht auch für Punkte gibt. Größere Käufe geben +%3$d&#160;%% bis +%4$d&#160;%% mehr.</string>
+    <string name="shop_footer_payments">Zahlungen: %1$s</string>
+    <string name="shop_footer_restore">Käufe wiederherstellen</string>
+    <string name="shop_footer_account">Konto, Cloud-Speicherung und Geschenke</string>
+
+    <string name="shop_close">Schließen</string>
+
+    <!-- ==== Geschenke für einen Online-Gegner ==== -->
+    <string name="shop_gift_pick_title">Ein Geschenk für %1$s</string>
+    <string name="shop_gift_pick_note">Das Geschenk wartet beim nächsten Öffnen des Spiels. Nur Optik oder Zubehör für die Würfe.</string>
+
+    <!-- ==== Der Kontodialog ==== -->
+    <string name="shop_account_title">Dein Konto</string>
+    <string name="shop_account_player_id">Spieler-ID: %1$s</string>
+    <string name="shop_account_gifts_note">Online-Gegner können dir Geschenke schicken; sie kommen an, wenn du das Spiel oder den Shop öffnest.</string>
+    <string name="shop_account_cloud_title">Cloud-Speicherung</string>
+    <string name="shop_account_last_backup">Letzte Sicherung: %1$s. Dein Fortschritt wird nach deinen Würfen gesichert.</string>
+    <string name="shop_account_no_backup">Noch nicht gesichert.</string>
+    <string name="shop_account_backup_now">Jetzt sichern</string>
+    <string name="shop_account_club_perk">Ein Vorteil des Kapitänsclubs: Sichere deinen Fortschritt und stell ihn auf einem neuen Handy wieder her.</string>
+    <string name="shop_account_code_note">Dein Wiederherstellungscode stellt eine Sicherung auf einem anderen Handy wieder her. Behalte ihn für dich: Er ist der Schlüssel zu deinem Fortschritt.</string>
+    <string name="shop_account_code_clip">Deep-Line-Wiederherstellungscode</string>
+    <string name="shop_account_copy_code">Code kopieren</string>
+    <string name="shop_account_show_code">Wiederherstellungscode zeigen</string>
+    <string name="shop_account_code_field">Wiederherstellungscode</string>
+    <string name="shop_account_restore_warning">Das ersetzt den Fortschritt auf diesem Handy durch die Sicherung.</string>
+    <string name="shop_account_restore">Wiederherstellen</string>
+    <string name="shop_account_restore_open">Von einem anderen Handy wiederherstellen</string>
+
+    <!-- ==== Saison und Wochenend-Event ==== -->
+    <string name="shop_season_title">Saison %1$d · %2$s</string>
+    <string name="shop_season_ends">Endet in %1$s</string>
+    <string name="shop_season_ends_pass">Endet in %1$s · Pass aktiv</string>
+    <string name="shop_season_tier">Stufe %1$d/%2$d</string>
+    <string name="shop_season_xp">Jeder Solo-Wurf bringt Saison-XP: %1$d pro Wurf, %2$d pro Fisch und %3$d pro gelungenem Geheimnis. %4$d XP schalten eine Stufe frei.</string>
+    <string name="shop_season_premium_row">Obere Reihe: die Premium-Reihe des Passes</string>
+    <string name="shop_season_claim">%1$d abholen</string>
+    <string name="shop_event_none_title">Wochenend-Events</string>
+    <string name="shop_event_none_body">Jedes Wochenende gibt es ein Angelziel mit Belohnung. Das nächste beginnt in %1$s.</string>
+    <string name="shop_event_title">Wochenend-Event: %1$s</string>
+    <string name="shop_event_body">Endet in %1$s. Belohnung: %2$s.</string>
+    <string name="shop_event_body_pass">Endet in %1$s. Belohnung: %2$s; mit deinem Event-Pass (Fortschritt zählt doppelt): %3$s.</string>
+    <string name="shop_event_claim">Belohnung abholen</string>
+
+    <!-- ==== Designs der Menüs ==== -->
+    <string name="shop_themes_title">Designs</string>
+    <string name="shop_themes_mode_title">Tag oder Nacht</string>
+    <string name="shop_themes_mode_note">Jedes Design hat eine Tag- und eine Nachtversion. Das Wasser, in dem du angelst, ändert sich nie: Designs sind für die Menüs.</string>
+    <string name="shop_themes_join">Beitreten</string>
+    <string name="shop_themes_preview_reach">Reicht bis %1$s</string>
+
+    <!-- ==== Das Aquarium ==== -->
+    <string name="shop_aquarium_title">Aquarium</string>
+    <string name="shop_aquarium_count_empty">Im Becken: %1$d / %2$d. Fang Fische, um es zu füllen.</string>
+    <string name="shop_aquarium_count">Im Becken: %1$d / %2$d. Tippe auf eine Art, um sie hinzuzufügen oder herauszunehmen.</string>
+    <string name="shop_aquarium_decor">Deko</string>
+    <string name="shop_aquarium_more">Mehr Deko und ein größeres Becken im Shop</string>
+    <string name="shop_aquarium_catches">Deine Fänge</string>
+    <plurals name="shop_aquarium_cd_tank">
+        <item quantity="one">Aquarium mit %d Fisch</item>
+        <item quantity="other">Aquarium mit %d Fischen</item>
+    </plurals>
+
+    <!-- ==== Stores ==== -->
+    <string name="shop_store_test_name">Test-Store</string>
+    <string name="shop_store_test_declined">Der Test-Store hat die Karte abgelehnt.</string>
+    <string name="shop_store_not_on_screen">Google Play braucht das Spiel im Vordergrund.</string>
+    <string name="shop_store_not_on_sale">Dieser Artikel ist in Google Play noch nicht im Angebot.</string>
+</resources>
