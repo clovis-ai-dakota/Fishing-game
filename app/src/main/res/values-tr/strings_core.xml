@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Names and descriptions of things the game's rules define (core module): zones, rope stats,
+    tackle, battle modes, skins, boat options, shop items, themes, seasons, boards, secrets...
+    Keys: core_<kind>_<id>, with _desc for a description and _short for a short form. Names are
+    labels: they appear on their own or after a colon, never inflected inside a sentence.
+-->
+<resources>
+    <!-- Depth zones. -->
+    <string name="core_zone_shallows">Güneşli Sığlıklar</string>
+    <string name="core_zone_shallows_short">Sığlıklar</string>
+    <string name="core_zone_twilight">Alacakaranlık Resifi</string>
+    <string name="core_zone_twilight_short">Resif</string>
+    <string name="core_zone_midnight">Gece Yarısı Çukuru</string>
+    <string name="core_zone_midnight_short">Çukur</string>
+    <string name="core_zone_abyss">Abis Tabanı</string>
+    <string name="core_zone_abyss_short">Taban</string>
+
+    <!-- Things in the water that aren't fish. -->
+    <string name="core_obstacle_driftwood">Kütük</string>
+    <string name="core_obstacle_rock">Kaya</string>
+    <string name="core_obstacle_jelly">Denizanası kümesi</string>
+
+    <!-- Rope upgrades (Shop > Rope). -->
+    <string name="core_rope_length">Halat Uzunluğu</string>
+    <string name="core_rope_length_short">Uzunluk</string>
+    <string name="core_rope_length_desc">İğnenin geri dönmeden önce ne kadar derine inebileceği.</string>
+    <string name="core_rope_strength">Halat Gücü</string>
+    <string name="core_rope_strength_short">Güç</string>
+    <string name="core_rope_strength_desc">Misinanın taşıyabileceği en fazla toplam balık ağırlığı.</string>
+    <string name="core_rope_agility">Halat Çevikliği</string>
+    <string name="core_rope_agility_short">Çeviklik</string>
+    <string name="core_rope_agility_desc">İğneyi yana ne kadar hızlı yönlendirebileceğin.</string>
+
+    <!-- Tackle: one-cast items switched on before a cast. -->
+    <string name="core_tackle_lantern">Fener</string>
+    <string name="core_tackle_lantern_desc">Bir atış boyunca %1$d m altındaki karanlık suyun çok daha fazlasını aydınlatır.</string>
+    <string name="core_tackle_lucky_charm">Şans tılsımı</string>
+    <string name="core_tackle_lucky_charm_desc">Bir atış boyunca inişte bir ekstra çarpma hakkı (%2$d yerine %1$d).</string>
+    <string name="core_tackle_sparkle_lure">Parıltı yemi</string>
+    <string name="core_tackle_sparkle_lure_desc">Bir atış boyunca suda %1$d× daha fazla Parıldayan balık.</string>
+    <string name="core_tackle_detector">Nadir balık dedektörü</string>
+    <string name="core_tackle_detector_desc">Bir atış boyunca iğnenin %1$d m yakınındaki, henüz yakalamadığın türleri karanlıkta bile işaretler.</string>
+
+    <!-- Battle modes: the title, then the rules. -->
+    <string name="core_mode_best_of_five">5\'te En İyi</string>
+    <string name="core_mode_best_of_five_rules">Her turda herkes bir atış yapar. Yüksek puanı alan turu kazanır. 3 turu ilk alan kazanır.</string>
+    <string name="core_mode_time_attack">3 Dakika Yarışı</string>
+    <string name="core_mode_time_attack_rules">Oyuncu başına %1$d dakika balık tutma. Yalnızca en iyi tek atışın sayılır. Süre dolduğunda devam eden atış o anda biter.</string>
+    <string name="core_mode_heavy_haul">Ağır Av</string>
+    <string name="core_mode_heavy_haul_rules">Oyuncu başına %1$d atış. Toplamda en çok kilogram çıkaran kazanır.</string>
+    <string name="core_mode_species_hunt">Tür Avı</string>
+    <string name="core_mode_species_hunt_rules">Oyuncu başına %1$d atış. En çok farklı tür yakalayan kazanır. Eşitlikte toplam puan belirler.</string>
+    <string name="core_mode_deep_dive">Derin Dalış</string>
+    <string name="core_mode_deep_dive_rules">Oyuncu başına %1$d atış. En derin tek avı yapan kazanır. Eşitlikte toplam puan belirler.</string>
+
+    <!-- How well the computer rival plays. -->
+    <string name="core_bot_easy">Kolay</string>
+    <string name="core_bot_normal">Normal</string>
+    <string name="core_bot_hard">Zor</string>
+
+    <!-- Difficulty of a daily challenge. -->
+    <string name="core_challenge_easy">Kolay</string>
+    <string name="core_challenge_medium">Orta</string>
+    <string name="core_challenge_hard">Zor</string>
+
+    <!-- Skin slots. -->
+    <string name="core_slot_hook">İğne</string>
+    <string name="core_slot_line">Misina</string>
+    <string name="core_slot_boat">Tekne</string>
+    <string name="core_slot_trail">Kabarcık izi</string>
+    <string name="core_slot_title">Unvan</string>
+
+    <!-- Skins (cosmetics). -->
+    <string name="core_cosmetic_leviathan_bone_hook">Leviathan kemiği iğne</string>
+    <string name="core_cosmetic_leviathan_bone_hook_desc">Bir devden oyulmuş fildişi, üzerinde camgöbeği ışıkla atan rünler.</string>
+    <string name="core_cosmetic_giants_braid_line">Dev örgüsü</string>
+    <string name="core_cosmetic_giants_braid_line_desc">Boyunca bir parıltı akan kalın, soluk bir örgü misina.</string>
+    <string name="core_cosmetic_giant_slayer_pennant">Dev avcısı flaması</string>
+    <string name="core_cosmetic_giant_slayer_pennant_desc">Leviathan sancağı dalgalanan uzun bir direk ve camgöbeği süslemeli bir gövde.</string>
+    <string name="core_cosmetic_tide_trail">Gelgit izi</string>
+    <string name="core_cosmetic_tide_trail_desc">İğnenin ardında camgöbeği kabarcıklar ve halkalar.</string>
+    <string name="core_cosmetic_giant_slayer_title">Dev avcısı</string>
+    <string name="core_cosmetic_giant_slayer_title_desc">Unvan: ince bir misinayla bir dev yakaladın.</string>
+    <string name="core_cosmetic_prism_hook">Prizma iğne</string>
+    <string name="core_cosmetic_prism_hook_desc">Bütün renkler arasında dönüp duran kristal bir iğne.</string>
+    <string name="core_cosmetic_rainbow_line">Gökkuşağı misinası</string>
+    <string name="core_cosmetic_rainbow_line_desc">Misinanın boydan boya akan renkleri.</string>
+    <string name="core_cosmetic_prism_sail">Prizma yelken</string>
+    <string name="core_cosmetic_prism_sail_desc">Teknende bir gökkuşağı yelken.</string>
+    <string name="core_cosmetic_prism_trail">Prizma izi</string>
+    <string name="core_cosmetic_prism_trail_desc">İğnenin ardında gökkuşağı renkli kabarcıklar ve ışıltılar.</string>
+    <string name="core_cosmetic_perfectionist_title">Mükemmeliyetçi</string>
+    <string name="core_cosmetic_perfectionist_title_desc">Unvan: kusursuz atış.</string>
+    <string name="core_cosmetic_crown_hook">Taçlı iğne</string>
+    <string name="core_cosmetic_crown_hook_desc">Som altın, halkasında bir taç.</string>
+    <string name="core_cosmetic_golden_line">Altın misina</string>
+    <string name="core_cosmetic_golden_line_desc">Boyunca ışıltılar akan altın bir misina.</string>
+    <string name="core_cosmetic_royal_boat">Kraliyet teknesi</string>
+    <string name="core_cosmetic_royal_boat_desc">Altın süslemeli bir gövde ve taçlı mor bir yelken.</string>
+    <string name="core_cosmetic_golden_trail">Altın iz</string>
+    <string name="core_cosmetic_golden_trail_desc">İğnenin ardında altın ışıltılar.</string>
+    <string name="core_cosmetic_master_angler_title">Usta balıkçı</string>
+    <string name="core_cosmetic_master_angler_title_desc">Unvan: defterdeki bütün balıklar.</string>
+    <string name="core_cosmetic_coral_hook">Mercan iğne</string>
+    <string name="core_cosmetic_coral_hook_desc">Halkasında bir inci olan pembe mercan.</string>
+    <string name="core_cosmetic_neon_hook">Neon iğne</string>
+    <string name="core_cosmetic_neon_hook_desc">Parlayan macenta tüpler.</string>
+    <string name="core_cosmetic_obsidian_hook">Obsidyen iğne</string>
+    <string name="core_cosmetic_obsidian_hook_desc">Mor bir parıltısı olan siyah cam.</string>
+    <string name="core_cosmetic_ocean_line">Okyanus misinası</string>
+    <string name="core_cosmetic_ocean_line_desc">Turkuazdan koyu maviye geçen renkler.</string>
+    <string name="core_cosmetic_neon_line">Neon misina</string>
+    <string name="core_cosmetic_neon_line_desc">Nabız gibi atan pembe ve camgöbeği bir misina.</string>
+    <string name="core_cosmetic_silver_line">Gümüş misina</string>
+    <string name="core_cosmetic_silver_line_desc">Boyunca ışıltı akan cilalı gümüş.</string>
+    <string name="core_cosmetic_heart_trail">Kalp izi</string>
+    <string name="core_cosmetic_heart_trail_desc">Kabarcık yerine minik kalpler.</string>
+    <string name="core_cosmetic_star_trail">Yıldız izi</string>
+    <string name="core_cosmetic_star_trail_desc">Kabarcık yerine neon yıldızlar.</string>
+    <string name="core_cosmetic_petal_trail">Yaprak izi</string>
+    <string name="core_cosmetic_petal_trail_desc">Süzülen çiçek yaprakları.</string>
+    <string name="core_cosmetic_founder_title">Kurucu</string>
+    <string name="core_cosmetic_founder_title_desc">Unvan: Deep Line\'ı en başından destekledin.</string>
+
+    <!-- Names of skin sets. -->
+    <string name="core_set_giant_slayer">Dev Avcısı</string>
+    <string name="core_set_prismatic">Prizmatik</string>
+    <string name="core_set_sovereign">Hükümdar</string>
+    <string name="core_set_coral_reef">Mercan Resifi</string>
+    <string name="core_set_neon_nights">Neon Geceler</string>
+
+    <!-- Shop sections. -->
+    <string name="core_shop_section_tackle">Ekipman</string>
+    <string name="core_shop_section_style">Stil</string>
+    <string name="core_shop_section_passes">Biletler</string>
+    <string name="core_shop_section_aquarium">Akvaryum</string>
+
+    <!-- Shop items. -->
+    <string name="core_shop_item_lantern_pouch">Fener kesesi</string>
+    <string name="core_shop_item_lantern_pouch_desc">Bir kese dolusu Fener.</string>
+    <string name="core_shop_item_lantern_crate">Fener kasası</string>
+    <string name="core_shop_item_lantern_crate_desc">Bir kasa dolusu Fener.</string>
+    <string name="core_shop_item_lantern_chest">Fener sandığı</string>
+    <string name="core_shop_item_lantern_chest_desc">Bir sandık dolusu Fener.</string>
+    <string name="core_shop_item_lantern_barrel">Fener fıçısı</string>
+    <string name="core_shop_item_lantern_barrel_desc">Toplu alım bonuslu, bir fıçı dolusu Fener.</string>
+    <string name="core_shop_item_detector_pouch">Dedektör kesesi</string>
+    <string name="core_shop_item_detector_pouch_desc">Bir kese dolusu nadir balık dedektörü.</string>
+    <string name="core_shop_item_detector_crate">Dedektör kasası</string>
+    <string name="core_shop_item_detector_crate_desc">Bir kasa dolusu nadir balık dedektörü.</string>
+    <string name="core_shop_item_charm_bag">Tılsım torbası</string>
+    <string name="core_shop_item_charm_bag_desc">Bir torba dolusu Şans tılsımı.</string>
+    <string name="core_shop_item_lure_box">Yem kutusu</string>
+    <string name="core_shop_item_lure_box_desc">Bir kutu dolusu Parıltı yemi.</string>
+    <string name="core_shop_item_paint_flames">Alevli boya</string>
+    <string name="core_shop_item_paint_flames_desc">Gövdeyi yalayan alevler.</string>
+    <string name="core_shop_item_paint_starry">Yıldızlı gece boyası</string>
+    <string name="core_shop_item_paint_starry_desc">Gövdede göz kırpan yıldızlar.</string>
+    <string name="core_shop_item_paint_metallic">Metalik boya</string>
+    <string name="core_shop_item_paint_metallic_desc">Cilalı metal parlaklığı.</string>
+    <string name="core_shop_item_paint_neon">Neon boya</string>
+    <string name="core_shop_item_paint_neon_desc">Parlayan neon şeritler.</string>
+    <string name="core_shop_item_emblem_crown">Taç amblemi</string>
+    <string name="core_shop_item_emblem_crown_desc">Altın bir taç.</string>
+    <string name="core_shop_item_emblem_skull">Kurukafa amblemi</string>
+    <string name="core_shop_item_emblem_skull_desc">Sevimli bir korsan kurukafası.</string>
+    <string name="core_shop_item_emblem_lightning">Şimşek amblemi</string>
+    <string name="core_shop_item_emblem_lightning_desc">Bir şimşek çakması.</string>
+    <string name="core_shop_item_emblem_shell">Deniz kabuğu amblemi</string>
+    <string name="core_shop_item_emblem_shell_desc">Bir tarak kabuğu.</string>
+    <string name="core_shop_item_emblem_trident">Üç dişli amblemi</string>
+    <string name="core_shop_item_emblem_trident_desc">Deniz kralının üç dişli mızrağı.</string>
+    <string name="core_shop_item_cloth_stripes">Çizgili yelkenler</string>
+    <string name="core_shop_item_cloth_stripes_desc">Yelkende ve bayrakta çizgiler.</string>
+    <string name="core_shop_item_cloth_stars">Yıldızlı yelkenler</string>
+    <string name="core_shop_item_cloth_stars_desc">Yelkende ve bayrakta yıldızlar.</string>
+    <string name="core_shop_item_cloth_waves">Dalgalı yelkenler</string>
+    <string name="core_shop_item_cloth_waves_desc">Yelkende ve bayrakta dalgalar.</string>
+    <string name="core_shop_item_set_coral_reef">Mercan Resifi seti</string>
+    <string name="core_shop_item_set_coral_reef_desc">Mercan Resifi Kruvazörü, ona uygun bir iğne, misina ve iz.</string>
+    <string name="core_shop_item_set_neon_nights">Neon Geceler seti</string>
+    <string name="core_shop_item_set_neon_nights_desc">Neon Geceler teknesi, ona uygun bir iğne, misina ve iz.</string>
+    <string name="core_shop_item_starter_pack">Başlangıç paketi</string>
+    <!-- %1$d: number of Lanterns (always several). -->
+    <string name="core_shop_item_starter_pack_desc">Mercan Resifi Kruvazörü, Metalik boya, bir Neon misina, bir gökkuşağı unvan rozeti ve %1$d Fener.</string>
+    <string name="core_shop_item_captains_club">Kaptan Kulübü</string>
+    <!-- %1$d: days of membership. -->
+    <string name="core_shop_item_captains_club_desc">%1$d gün: üyelere özel Aurora boyası, bir kulüp unvan rozeti, bulut kaydı ve her ay ücretsiz bir Fener kesesi.</string>
+    <string name="core_shop_item_founders_pack">Kurucu paketi</string>
+    <string name="core_shop_item_founders_pack_desc">Kurucu unvanı, Kurucu Amiral Gemisi teknesi ve süresi hiç dolmayan bir kulüp rozeti.</string>
+    <string name="core_shop_item_season_pass">Sezon bileti</string>
+    <string name="core_shop_item_season_pass_desc">Bu sezonun premium ödülleri: bir sezon rozeti, 10. kademede sezon teknesi ve bolca ekipman.</string>
+    <string name="core_shop_item_collector_edition">Koleksiyoncu sürümü</string>
+    <!-- %1$d: tiers skipped. -->
+    <string name="core_shop_item_collector_edition_desc">Sezon bileti, anında %1$d kademe, sezon teknesi hemen ve bir koleksiyoncu rozeti.</string>
+    <string name="core_shop_item_event_pass">Hafta sonu etkinlik bileti</string>
+    <string name="core_shop_item_event_pass_desc">Bu hafta sonunun etkinlik ilerlemesini ikiye katlar ve etkinlik rozetli daha büyük bir ödül ekler.</string>
+    <string name="core_shop_item_badge_rainbow">Gökkuşağı unvan rozeti</string>
+    <string name="core_shop_item_badge_rainbow_desc">Renkleri değişen gökkuşağı tonlarında bir unvan rozeti.</string>
+    <string name="core_shop_item_badge_ocean">Okyanus unvan rozeti</string>
+    <string name="core_shop_item_badge_ocean_desc">Dalgaların yuvarlandığı bir unvan rozeti.</string>
+    <string name="core_shop_item_badge_ember">Kor unvan rozeti</string>
+    <string name="core_shop_item_badge_ember_desc">Parlayan korlarla bezeli bir unvan rozeti.</string>
+    <string name="core_shop_item_card_holo">Holografik Dex kartları</string>
+    <string name="core_shop_item_card_holo_desc">Yakaladığın türlerin Dex kartları holografik görünümde.</string>
+    <string name="core_shop_item_card_gold">Altın varak Dex kartları</string>
+    <string name="core_shop_item_card_gold_desc">Yakaladığın türlerin Dex kartları altın varak görünümde.</string>
+    <string name="core_shop_item_card_night">Yıldızlı gece Dex kartları</string>
+    <string name="core_shop_item_card_night_desc">Yakaladığın türlerin Dex kartları yıldızlı gece görünümünde.</string>
+    <string name="core_shop_item_card_coral">Mercan Dex kartları</string>
+    <string name="core_shop_item_card_coral_desc">Yakaladığın türlerin Dex kartları mercan görünümünde.</string>
+    <string name="core_shop_item_aquarium_expansion">Büyük akvaryum</string>
+    <!-- %1$d: fish in the big tank; %2$d: in the normal one. -->
+    <string name="core_shop_item_aquarium_expansion_desc">Daha geniş bir tankta %2$d yerine %1$d balıklık yer.</string>
+    <string name="core_shop_item_theme_collection">Tüm temalar</string>
+    <!-- %1$d: number of themes for sale. -->
+    <string name="core_shop_item_theme_collection_desc">Menüler için %1$d temanın hepsi, gündüz ve gece.</string>
+    <!-- A menu theme sold in the shop. %1$s: the theme's name (e.g. Kelp Forest). -->
+    <string name="core_shop_item_theme">%1$s teması</string>
+
+    <!-- Small tags on shop cards. -->
+    <string name="core_shop_badge_set">Set</string>
+    <string name="core_shop_badge_special">Özel</string>
+
+    <!-- Premade boats and season boats: a name, then a one-line description. -->
+    <string name="core_boat_coral_cruiser">Mercan Resifi Kruvazörü</string>
+    <string name="core_boat_coral_cruiser_desc">Güneşli renkler ve gül pembesi bir yelken.</string>
+    <string name="core_boat_lagoon_explorer">Lagün Kâşifi</string>
+    <string name="core_boat_lagoon_explorer_desc">Puantiyeler ve bir çapa, maceraya hazır.</string>
+    <string name="core_boat_sunset_racer">Gün Batımı Yarışçısı</string>
+    <string name="core_boat_sunset_racer_desc">Baştan kıça alevler.</string>
+    <string name="core_boat_midnight_corsair">Gece Yarısı Korsanı</string>
+    <string name="core_boat_midnight_corsair_desc">Siyah yelkenli bir korsan gemisi.</string>
+    <string name="core_boat_starlight_voyager">Yıldız Işığı Gezgini</string>
+    <string name="core_boat_starlight_voyager_desc">Gövdeye boyanmış bir gece göğü.</string>
+    <string name="core_boat_royal_regatta">Kraliyet Regatası</string>
+    <string name="core_boat_royal_regatta_desc">Altın süslemeler ve taçlı bir yelken.</string>
+    <string name="core_boat_galaxy_dreamer">Galaksi Hayalperesti</string>
+    <string name="core_boat_galaxy_dreamer_desc">Mor yıldızlar ve nane yeşili vurgular.</string>
+    <string name="core_boat_neon_nights">Neon Geceler</string>
+    <string name="core_boat_neon_nights_desc">Parlayan tüpler ve yıldızlı bir desen.</string>
+    <string name="core_boat_founders_flagship">Kurucu Amiral Gemisi</string>
+    <string name="core_boat_founders_flagship_desc">Lacivert ve altın, yıldızlı bir yelkende üç dişli mızrak.</string>
+    <string name="core_boat_season_tidecaller">Gelgit Çağıran</string>
+    <string name="core_boat_season_tidecaller_desc">Sezon teknesi: deniz yeşili dalgalar ve yelkende bir deniz kabuğu.</string>
+    <string name="core_boat_season_moonbloom">Ay Goncası</string>
+    <string name="core_boat_season_moonbloom_desc">Sezon teknesi: hilalin altında leylak rengi kutup ışıkları.</string>
+    <string name="core_boat_season_frostfin">Buz Yüzgeç</string>
+    <string name="core_boat_season_frostfin_desc">Sezon teknesi: şimşek bayraklı cilalı buz.</string>
+    <string name="core_boat_season_goldwake">Altın Dalga</string>
+    <string name="core_boat_season_goldwake_desc">Sezon teknesi: gece mavisi üstünde altın neon ve bir taç.</string>
+
+    <!-- Boat paint colours (boat editor). -->
+    <string name="core_color_cream">Krem</string>
+    <string name="core_color_sand">Kum</string>
+    <string name="core_color_driftwood">Ahşap</string>
+    <string name="core_color_walnut">Ceviz</string>
+    <string name="core_color_pearl">İnci</string>
+    <string name="core_color_slate">Arduvaz</string>
+    <string name="core_color_charcoal">Kömür</string>
+    <string name="core_color_lagoon">Lagün</string>
+    <string name="core_color_teal">Petrol</string>
+    <string name="core_color_ocean">Okyanus</string>
+    <string name="core_color_navy">Lacivert</string>
+    <string name="core_color_seafoam">Deniz köpüğü</string>
+    <string name="core_color_coral">Mercan</string>
+    <string name="core_color_tangerine">Mandalina</string>
+    <string name="core_color_sunflower">Ayçiçeği</string>
+    <string name="core_color_rose">Gül</string>
+    <string name="core_color_berry">Böğürtlen</string>
+    <string name="core_color_crimson">Kızıl</string>
+    <string name="core_color_lilac">Leylak</string>
+    <string name="core_color_violet">Menekşe</string>
+    <string name="core_color_mint">Nane</string>
+    <string name="core_color_lime">Fıstık yeşili</string>
+    <string name="core_color_gold">Altın</string>
+    <string name="core_color_midnight">Gece mavisi</string>
+
+    <!-- Boat editor options: hull patterns (paints), sail and flag prints, sails, flags, emblems.
+         Patterns are written so that "… gövde boyası" reads right (shop_grant_paint). -->
+    <string name="core_pattern_solid">Düz</string>
+    <string name="core_pattern_stripe">Yarış şeritli</string>
+    <string name="core_pattern_two_tone">İki renkli</string>
+    <string name="core_pattern_waves">Dalgalı</string>
+    <string name="core_pattern_dots">Puantiyeli</string>
+    <string name="core_pattern_checker">Damalı</string>
+    <string name="core_pattern_flames">Alevli</string>
+    <string name="core_pattern_starry">Yıldızlı gece</string>
+    <string name="core_pattern_metallic">Metalik</string>
+    <string name="core_pattern_neon">Neon</string>
+    <string name="core_pattern_aurora">Aurora</string>
+    <string name="core_cloth_plain">Sade</string>
+    <string name="core_cloth_stripes">Çizgili</string>
+    <string name="core_cloth_stars">Yıldızlı</string>
+    <string name="core_cloth_waves">Dalgalı</string>
+    <string name="core_sail_none">Yelken yok</string>
+    <string name="core_sail_triangle">Üçgen yelken</string>
+    <string name="core_sail_square">Kare yelken</string>
+    <string name="core_sail_twin">Çift yelken</string>
+    <string name="core_flag_none">Bayrak yok</string>
+    <string name="core_flag_pennant">Flama</string>
+    <string name="core_flag_swallowtail">Kırlangıç kuyruğu</string>
+    <string name="core_flag_banner">Sancak</string>
+    <string name="core_emblem_none">Amblem yok</string>
+    <string name="core_emblem_star">Yıldız</string>
+    <string name="core_emblem_anchor">Çapa</string>
+    <string name="core_emblem_fish">Balık</string>
+    <string name="core_emblem_heart">Kalp</string>
+    <string name="core_emblem_moon">Ay</string>
+    <string name="core_emblem_wave">Dalga</string>
+    <string name="core_emblem_crown">Taç</string>
+    <string name="core_emblem_skull">Kurukafa</string>
+    <string name="core_emblem_lightning">Şimşek</string>
+    <string name="core_emblem_shell">Deniz kabuğu</string>
+    <string name="core_emblem_trident">Üç dişli</string>
+
+    <!-- Atmospheres. -->
+    <string name="core_atmosphere_family">Aile</string>
+    <string name="core_atmosphere_nightmare">Kâbus</string>
+
+    <!-- Title badge frames. -->
+    <string name="core_frame_gold">Altın</string>
+    <string name="core_frame_rainbow">Gökkuşağı</string>
+    <string name="core_frame_ocean">Okyanus</string>
+    <string name="core_frame_ember">Kor</string>
+    <string name="core_frame_club">Kaptan Kulübü</string>
+    <string name="core_frame_club_forever">Kurucu kulübü</string>
+    <string name="core_frame_season">Sezon</string>
+    <string name="core_frame_collector">Koleksiyoncu</string>
+    <string name="core_frame_event">Hafta sonu etkinliği</string>
+    <string name="core_frame_tournament">Turnuva</string>
+
+    <!-- Dex card styles. -->
+    <string name="core_card_classic">Klasik</string>
+    <string name="core_card_holo">Holografik</string>
+    <string name="core_card_gold">Altın varak</string>
+    <string name="core_card_night">Yıldızlı gece</string>
+    <string name="core_card_coral">Mercan</string>
+
+    <!-- Aquarium decor. -->
+    <string name="core_decor_plants">Su bitkileri</string>
+    <string name="core_decor_plants_desc">Salınan yeşil bitkiler.</string>
+    <string name="core_decor_pebbles">Çakıl taşları</string>
+    <string name="core_decor_pebbles_desc">Pürüzsüz dere çakılları.</string>
+    <string name="core_decor_sand_castle">Kumdan kale</string>
+    <string name="core_decor_sand_castle_desc">Kuleleri olan küçük bir kale.</string>
+    <string name="core_decor_bubbler">Kabarcıklı dalgıç</string>
+    <string name="core_decor_bubbler_desc">Kabarcık üfleyen bir hazine dalgıcı.</string>
+    <string name="core_decor_treasure_chest">Hazine sandığı</string>
+    <string name="core_decor_treasure_chest_desc">Açılınca altınları görünen bir sandık.</string>
+    <string name="core_decor_coral_garden">Mercan bahçesi</string>
+    <string name="core_decor_coral_garden_desc">Pembe ve turuncu mercanlar.</string>
+    <string name="core_decor_lantern_lights">Fener ışıkları</string>
+    <string name="core_decor_lantern_lights_desc">Üst kenar boyunca bir dizi parlayan fener.</string>
+    <string name="core_decor_sunken_ship">Batık gemi</string>
+    <string name="core_decor_sunken_ship_desc">Kumda yatan bir gemi enkazı.</string>
+
+    <!-- Menu themes. -->
+    <string name="core_theme_lagoon">Lagün</string>
+    <string name="core_theme_lagoon_desc">Güneşli turkuaz su, ışık huzmeleri ve yükselen kabarcıklar.</string>
+    <string name="core_theme_kelp_forest">Yosun Ormanı</string>
+    <string name="core_theme_kelp_forest_desc">Salınan yosunların arasından süzülen yeşil-altın ışık.</string>
+    <string name="core_theme_sandbar">Kum Seti</string>
+    <string name="core_theme_sandbar_desc">Işığın dalgalandığı sığ, kumlu su.</string>
+    <string name="core_theme_coral_reef">Mercan Resifi</string>
+    <string name="core_theme_coral_reef_desc">Mercan pembeleri ve turuncuları, altta bir resif.</string>
+    <string name="core_theme_polar">Kutup Suları</string>
+    <string name="core_theme_polar_desc">Buz mavileri, yüzen buzlar ve süzülen kar.</string>
+    <string name="core_theme_sunset_harbor">Gün Batımı Limanı</string>
+    <string name="core_theme_sunset_harbor_desc">Limanın üzerinde parlayan bir gökyüzü, ufukta tekneler.</string>
+    <string name="core_theme_koi_pond">Koi Göleti</string>
+    <string name="core_theme_koi_pond_desc">Yeşim rengi su, süzülen koi balıkları ve üstte nilüfer yaprakları.</string>
+    <string name="core_theme_treasure_cove">Hazine Koyu</string>
+    <string name="core_theme_treasure_cove_desc">Koyu mavi ve altın: deniz dibinde ışıldayan sikkeler.</string>
+    <string name="core_theme_glow_tide">Işıltılı Gelgit</string>
+    <string name="core_theme_glow_tide_desc">Canlı bir denizde parlayan denizanaları ve ışıldayan planktonlar.</string>
+    <string name="core_theme_aurora">Aurora</string>
+    <string name="core_theme_aurora_desc">Suyun üzerinde kuzey ışıkları.</string>
+
+    <!-- Night mode of the menu themes. -->
+    <string name="core_night_day">Gündüz</string>
+    <string name="core_night_night">Gece</string>
+    <string name="core_night_auto">Telefonuma göre</string>
+
+    <!-- Season names. -->
+    <string name="core_season_coral_tides">Mercan Gelgitleri</string>
+    <string name="core_season_midnight_bloom">Gece Yarısı Çiçeği</string>
+    <string name="core_season_frost_current">Ayaz Akıntısı</string>
+    <string name="core_season_sunken_gold">Batık Altın</string>
+    <string name="core_season_storm_season">Fırtına Mevsimi</string>
+    <string name="core_season_lantern_festival">Fener Festivali</string>
+
+    <!-- Weekend event goals (an imperative). -->
+    <string name="core_goal_sparkling">Parıldayan balık yakala</string>
+    <string name="core_goal_fish">Balık yakala</string>
+    <string name="core_goal_deep">Gece Yarısı Çukuru\'na ulaş</string>
+    <string name="core_goal_species">Farklı türler yakala</string>
+
+    <!-- Final placings of the weekly tournament (Turkish writes % before the number). -->
+    <string name="core_tier_champion">Şampiyon</string>
+    <string name="core_tier_gold">İlk %10</string>
+    <string name="core_tier_silver">İlk %25</string>
+    <string name="core_tier_bronze">İlk %50</string>
+    <string name="core_tier_took_part">Katıldı</string>
+
+    <!-- Roles in a club. -->
+    <string name="core_role_owner">Başkan</string>
+    <string name="core_role_member">Üye</string>
+
+    <!-- Weekly leaderboards. -->
+    <string name="core_board_best_cast">En iyi atış</string>
+    <string name="core_board_best_cast_desc">Haftanın en yüksek puanlı tek atışı.</string>
+    <string name="core_board_deepest">En derin av</string>
+    <string name="core_board_deepest_desc">Bu hafta yakalanan en derin balık.</string>
+    <string name="core_board_rarest">En nadir av</string>
+    <string name="core_board_rarest_desc">Bu hafta yakalanan en nadir tür; eşitlikte daha derin av kazanır.</string>
+    <string name="core_view_global">Herkes</string>
+    <string name="core_view_league">Lig</string>
+    <string name="core_view_friends">Arkadaşlar</string>
+
+    <!-- A battle player's score line, by mode. -->
+    <plurals name="core_score_rounds">
+        <item quantity="one">%d tur</item>
+        <item quantity="other">%d tur</item>
+    </plurals>
+    <string name="core_score_best_cast">en iyi atış %1$s puan</string>
+    <string name="core_score_kg">%1$s kg</string>
+    <plurals name="core_score_species">
+        <item quantity="one">%d tür</item>
+        <item quantity="other">%d tür</item>
+    </plurals>
+    <string name="core_score_deepest">en derin av %1$s m</string>
+
+    <!-- Fishing secrets' titles: only shown once found, never in the tour. -->
+    <string name="core_secret_last_bump">Son çarpma, çarptığını yakalar</string>
+    <string name="core_secret_free_pass">Serbest geçiş</string>
+    <string name="core_secret_schooling">Balık sürüsü</string>
+    <string name="core_secret_surface_skim">Yüzey sıyırma</string>
+    <string name="core_secret_zen_cast">Zen atışı</string>
+    <string name="core_secret_pinball">Pinbol</string>
+    <string name="core_secret_second_encounter">İkinci karşılaşma</string>
+    <string name="core_secret_clean_drop">Temiz iniş</string>
+    <string name="core_secret_rock_bottom">Dibe vuruş</string>
+    <string name="core_secret_buzzer_beater">Son saniye</string>
+    <string name="core_secret_corner_pocket">Köşe vuruşu</string>
+    <string name="core_secret_grand_tour">Büyük tur</string>
+    <string name="core_secret_sparkle_snag">Parıltı kapma</string>
+    <string name="core_secret_ladder">Merdiven</string>
+    <string name="core_secret_perfect_load">Kusursuz yük</string>
+    <string name="core_secret_moonlit_angler">Ay ışığı balıkçısı</string>
+    <string name="core_secret_shutout">Ezici zafer</string>
+    <string name="core_secret_while_it_flees">Kaçarken yakala</string>
+    <string name="core_secret_blind_drop">Kör iniş</string>
+    <string name="core_secret_zone_sweep">Bölge süpürme</string>
+    <string name="core_secret_grand_slam">Büyük vurgun</string>
+    <string name="core_secret_double_header">Çifte av</string>
+    <string name="core_secret_crowd_surfer">Kalabalıkta sörf</string>
+    <string name="core_secret_david_and_goliath">Davut ile Golyat</string>
+    <string name="core_secret_perfect_cast">Kusursuz atış</string>
+    <string name="core_secret_master_angler">Usta balıkçı</string>
+</resources>

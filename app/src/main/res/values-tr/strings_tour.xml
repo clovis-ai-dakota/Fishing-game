@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The guided tour (ui/tour/): a card per step, with a title and a body. Keys: tour_<step id>_title
+    and tour_<step id>_body. Names of screens, buttons, tackle, zones and modes match their labels
+    elsewhere in the app. Never hint at a fishing secret here.
+-->
+<resources>
+    <!-- The card's controls. -->
+    <string name="tour_counter">%1$d / %2$d</string>
+    <string name="tour_counter_whats_new">Yenilikler · %1$d / %2$d</string>
+    <string name="tour_skip">Tanıtımı geç</string>
+    <string name="tour_back">Geri</string>
+    <string name="tour_next">İleri</string>
+    <string name="tour_finish">Bitir</string>
+
+    <string name="tour_welcome_title">Deep Line\'a hoş geldin!</string>
+    <string name="tour_welcome_body">Derinlerdeki her balığı yakala. Bu kısa tanıtım, nasıl oynanacağını ve her şeyin ne işe yaradığını gösterir. İleri düğmesine dokun ya da yolunu zaten biliyorsan Tanıtımı geç düğmesine bas.</string>
+
+    <string name="tour_tabs_title">Dört sekme</string>
+    <string name="tour_tabs_body">Alttaki çubuk seni her yere götürür: Balık sekmesinde olta atarsın, Dex karşılaştığın her türü toplar, Mağaza sekmesinde halat geliştirmeleri, ekipman ve teknen için görünümler bulunur, Düello sekmesi ise 1v1 maçlar içindir.</string>
+
+    <string name="tour_cast_title">Oltanı at</string>
+    <string name="tour_cast_body">Balık sekmesinin altındaki büyük Oltayı at düğmesi, iğneni tekneden suya bırakır.</string>
+
+    <string name="tour_steer_title">İğneyi yönlendir</string>
+    <string name="tour_steer_body">Atış sırasında ekranın herhangi bir yerinde parmağını sola ve sağa kaydır. Bir halka parmağının nerede olduğunu gösterir: iğne ona doğru süzülür ve onu takip eder. Halat Çevikliği onu hızlandırır.</string>
+
+    <!-- The way down: avoid bumping into things. -->
+    <string name="tour_descent_title">İnerken: kaç</string>
+    <!-- %1$d: bumps allowed (4); %2$d: depth of the bump-free zone in meters. -->
+    <string name="tour_descent_body">İğne %1$d kez çarpana ya da halatın sonuna gelene kadar batar, sonra yukarı döner. Bir balıkta yalnızca kafa çarpma sayılır (çıkarken hedeflediğin yerin ta kendisi); gövdeye ya da kuyruğa sürtünmek sayılmaz. Kayalar, kütükler ve denizanaları ise neresine dokunursan dokun sayılır. İlk %2$d m çarpmasızdır.</string>
+
+    <string name="tour_ascent_title">Çıkarken: kafaları hedefle</string>
+    <string name="tour_ascent_body">Yukarı çıkarken iğneyi bir balığın kafasıyla buluşacak şekilde yönlendir: gözünün yanındaki açık renkli yüz. Kuyruğa ya da gövdeye dokunmak hiçbir şey yapmaz.</string>
+
+    <string name="tour_weight_title">Ağırlığa dikkat</string>
+    <string name="tour_weight_body">Halatın ancak belli bir ağırlık taşıyabilir. Yük çubuğunu izle: dolduğunda daha ağır balıklar kaçıp gider.</string>
+
+    <string name="tour_fast_reel_title">Misina dolu mu? Hızlı sar</string>
+    <!-- %1$d: bumps allowed; %2$s: seconds, a decimal number already formatted (e.g. 1,5). -->
+    <string name="tour_fast_reel_body">%1$d çarpma hakkını kullandığın anda ya da misinana artık bir şey sığmadığında, çıkarken bir Hızlı sar düğmesi belirir: nerede olursan ol, iğneyi en fazla %2$s saniyede tekneye çeker. Bundan sonra başka bir şey yakalanmaz. Süreli düellolarda zamana karşı çok işe yarar.</string>
+
+    <string name="tour_themes_title">Temalar</string>
+    <string name="tour_themes_body">Üstteki palet düğmesi menülerin görünümünü değiştirir: varsayılan tema Lagün, her sekmenin arkasında bir deniz manzarası var. Mağaza\'da euro ya da puanla alınabilen başka temalar da var; daha zengin olanlar daha pahalı. Balık tuttuğun su asla değişmez.</string>
+
+    <string name="tour_night_mode_title">Gece modu</string>
+    <string name="tour_night_mode_body">Her temanın bir gece sürümü var: Gündüz ya da Gece seç veya telefonunun karanlık modunu takip et.</string>
+
+    <string name="tour_points_title">Puan topla</string>
+    <!-- %1$d: how many times more a Sparkling fish is worth. -->
+    <string name="tour_points_body">Derindeki avlar daha çok puan getirir; puanların burada, üstte görünür. Parıldayan balıklar (altın kontur ve ışıltılar) %1$d× daha değerlidir.</string>
+
+    <string name="tour_upgrades_title">Halatını geliştir</string>
+    <string name="tour_upgrades_body">Puanlarını Mağaza sekmesinin Halat sayfasında harca. Halat Uzunluğu daha derin bölgelere ve yeni balıklara ulaştırır, Halat Gücü daha fazla ağırlık taşır, Halat Çevikliği daha hızlı yönlendirir. Fikrin mi değişti? Bir seviye düşür ve harcadığın her puanı geri al.</string>
+
+    <string name="tour_tackle_title">Ekipman</string>
+    <!-- %1$d: the detector's radius in meters; %2$d: how many times more Sparkling fish the lure brings. -->
+    <string name="tour_tackle_body">Ekipman sayfası, atıştan önce açacağın tek atışlık eşyalar satar. Fenerler karanlığı aydınlatır; Nadir balık dedektörü, iğnenin %1$d m yakınındaki henüz yakalamadığın türleri işaretler; Şans tılsımı inişte bir ekstra çarpma hakkı verir; Parıltı yemi ise %2$d× daha fazla Parıldayan balık getirir. Fiyatlar halatının erişimiyle birlikte artar.</string>
+
+    <string name="tour_two_prices_title">İki ödeme yolu</string>
+    <!-- %1$d: minutes of fishing per euro; %2$s: the time per euro for Lantern packs (e.g. "1 saat"). -->
+    <string name="tour_two_prices_body">Mağaza\'daki her şeyin iki fiyatı var: euro ya da puan. Puan fiyatı, halatının erişiminde euro başına yaklaşık %1$d dakikalık balık tutmaya denk gelir (Fener paketlerinde %2$s), yani para ödemek yalnızca zaman kazandırır: her şey oynayarak kazanılabilir. Puanla ödemeden önce onayın istenir.</string>
+
+    <string name="tour_lantern_title">Fenerler derinleri aydınlatır</string>
+    <!-- %1$d: depth where the water goes dark; %2$d: the lit radius with a Lantern; %3$d: without (meters). -->
+    <string name="tour_lantern_body">%1$d m altında su karanlıktır. İğnenin çevresinde çok daha fazla suyu aydınlatmak için bunu atıştan önce aç (%3$d m yerine %2$d m). Her atışta bir Fener kullanılır; kilometre taşlarından daha fazlasını kazan ya da Mağaza\'dan satın al.</string>
+
+    <string name="tour_dex_title">Dex\'ini doldur</string>
+    <!-- %1$d: number of species; %2$d: number of depth zones. -->
+    <string name="tour_dex_body">%2$d derinlik bölgesinde %1$d tür yaşıyor, bazıları nadir, ve her birinin numaralı bir kartı var. İğnene yakın yüzen bir balık Görüldü olarak işaretlenir: adını ve derinliklerini öğrenirsin. Kartını ağırlığıyla, puanlarıyla ve rekorlarınla doldurmak için onu yakala.</string>
+
+    <string name="tour_dex_filters_title">Bölgelere göre gez</string>
+    <string name="tour_dex_filters_body">Kartları derinlik bölgesine göre filtrele ya da yalnızca yakaladığın balıkları göster. Sayfasını açmak için bir karta dokun, sonra Dex\'te gezinmek için kaydır.</string>
+
+    <string name="tour_milestones_title">Kilometre taşı ödülleri</string>
+    <string name="tour_milestones_body">Kazandığın her puan, harcasan bile kilometre taşı ödüllerine (bonus puan ve Fenerler) sayılır. Balık sekmesinin üstündeki kupa onları açar; alınmaya hazır bir ödül olduğunda kupanın üstünde bir işaret belirir.</string>
+
+    <string name="tour_secrets_title">Balıkçılık sırları</string>
+    <!-- Hints that secrets exist, never what they are. -->
+    <string name="tour_secrets_body">Bazı numaralar yalnızca oynayarak bulunur ve karşılığını verir: her başardığında atışa bir bonus ekler, düellolarda da. İlk seferinde hemen orada açıklanır ve bir keşif ödülü kazandırır, Dex\'te de bir Sırlar bölümü belirir. En nadir sırlar ayrıca iğnen, misinan, teknen ve kabarcık izin için Görünümlerin, bir de adının altında gösterilen bir unvanın kilidini açar; çevrim içi düellolarda da görünür. Gösteriş içindir: yalnızca görünüm, asla avantaj değil.</string>
+
+    <string name="tour_boat_title">Tekneni özelleştir</string>
+    <!-- "Tekneyi özelleştir" is the button's label in the Skins section. -->
+    <string name="tour_boat_body">Dex\'in Görünümler bölümünü açmak için Balık sekmesinin üstündeki teknene dokun. Tekneyi özelleştir düğmesiyle gövdeyi, süslemeleri ve kabini boyayabilir; desen, yelken, bayrak ve amblem ekleyebilirsin. Temel renkler bedava; geri kalanların kilidi puanla ya da daha çok tür yakaladıkça, yeni bölgelere ulaştıkça ve kilometre taşlarını aldıkça açılır.</string>
+
+    <string name="tour_shop_style_title">Stil</string>
+    <string name="tour_shop_style_body">Stil sayfasında hazır tekneler, boyalar, amblemler ve yelken desenleri (kendi teknende önizlenir), ayrıca yeni iğneler, misinalar ve izler var. Her görünüm gibi bunlar da yalnızca görüntüyü değiştirir, oyunu asla.</string>
+
+    <string name="tour_aquarium_title">Akvaryumun</string>
+    <string name="tour_aquarium_body">Yakaladığın balıklar akvaryumunda yüzer: onu Dex\'teki Akvaryum düğmesiyle aç ve orada kimlerin yüzeceğini seç. Dekorlar ve daha büyük bir tank Mağaza\'nın Akvaryum sayfasında.</string>
+
+    <string name="tour_season_title">Sezonlar ve hafta sonu etkinlikleri</string>
+    <!-- %1$s: how long a season lasts (e.g. "6 hafta"). -->
+    <string name="tour_season_body">Her sezon %1$s sürer. Her solo atış sezon XP\'si kazandırır ve ödül kademelerini açar: herkes için ekipman ve puan, sezon biletiyle daha fazlası (bir sezon teknesi, bir rozet). Her hafta sonu ayrıca kendi ödülü olan bir balıkçılık hedefi getirir. Bunların hiçbiri düelloları değiştirmez.</string>
+
+    <string name="tour_passes_title">Biletler</string>
+    <string name="tour_passes_body">Kaptan Kulübü aylık bir üyeliktir: üyelere özel bir boya, bir kulüp unvan rozeti, bulut kaydı ve her ay ücretsiz bir Fener kesesi. Yeni balıkçılara ayrıca birkaç gün boyunca tek seferlik bir Başlangıç paketi teklifi sunulur. Mağaza sekmesindeki bir nokta, orada seni bekleyen bir şey olduğunu gösterir.</string>
+
+    <string name="tour_badges_title">Unvan rozetleri ve Dex kartları</string>
+    <string name="tour_badges_body">Unvan rozetinin çerçevesini (adının altında, çevrim içi oyunda da gösterilir) ve Dex\'in yakaladığın türleri nasıl göstereceğini seç. Daha fazlası Mağaza\'dan, sezon biletlerinden ve etkinliklerden gelir.</string>
+
+    <string name="tour_atmosphere_title">Atmosfer</string>
+    <string name="tour_atmosphere_body">Su yüzeye yakın yerlerde zararsızdır ve derine indikçe ürkütücüleşir. Kâbus\'un kilidini açmak için Abis Tabanı\'na ulaş: derinler için korkutucu bir görünüm. Tam olarak eskisi kadar görürsün, yalnızca havası değişir.</string>
+
+    <string name="tour_battle_title">1v1 düellolar</string>
+    <!-- The five battle modes' names must match core_mode_*. -->
+    <string name="tour_battle_body">Bir mod seç: 5\'te En İyi, 3 Dakika Yarışı, Ağır Av, Tür Avı ya da Derin Dalış. İki oyuncu da tıpatıp aynı suda balık tutar, yani kazananı beceri belirler.</string>
+
+    <string name="tour_opponents_title">Rakibini seç</string>
+    <!-- %1$d: the rope's level in every stat. -->
+    <string name="tour_opponents_body">Bilgisayara (Kolay, Normal ya da Zor), bu telefondaki bir arkadaşına ya da çevrim içi birine karşı oyna: bir oda kur ve kodunu paylaş ya da Hızlı eşleşme düğmesini kullan. Çevrim içi düellolarda iki oyuncu da aynı turnuva halatını kullanır (her özellikte seviye %1$d).</string>
+
+    <string name="tour_battle_tackle_title">Düellolarda ekipman</string>
+    <string name="tour_battle_tackle_body">Fenerler ve Nadir balık dedektörleri düellolarda da işe yarar: onları burada aç, her atışın bir tane kullanır. Herkes edinebildiği için oyunun bir parçasıdırlar. Şans tılsımı ve Parıltı yemi yalnızca solo atışlar içindir.</string>
+
+    <string name="tour_gifts_title">Hediyeler ve bulut kaydı</string>
+    <string name="tour_gifts_body">Çevrim içi bir düellodan sonra rakibine euro ya da puanla ödenen bir hediye gönderebilirsin: ekipman ya da görünüm. Sana gelen hediyeler oyunu açtığında ulaşır. Kaptan Kulübü üyelerinin ilerlemesi sunucuda yedeklenir: Mağaza\'daki Hesap düğmesi, yedeği yeni bir telefonda geri yükleyen kurtarma kodunu gösterir.</string>
+
+    <string name="tour_wager_title">Puanına bahse gir</string>
+    <!-- %1$s, %2$s, %3$s: how many times the stake a win pays back against each difficulty. -->
+    <string name="tour_wager_body">Bilgisayara karşı sonuca puan yatırabilirsin: kazanırsan bahsin Kolay rakibe karşı %1$s×, Normal rakibe karşı %2$s×, Zor rakibe karşı %3$s× olarak geri ödenir. Beraberlikte bahis iade edilir.</string>
+
+    <string name="tour_settings_title">Ayarlar</string>
+    <string name="tour_settings_body">Balık sekmesinin üstündeki dişli simgesi Ayarlar\'ı açar.</string>
+
+    <string name="tour_sound_title">Ses ve hissiyat</string>
+    <!-- Ses düzeyi, Müzik, Ses efektleri, Titreşim and Hareketi azalt are the settings' names. -->
+    <string name="tour_sound_body">Ses düzeyini, müziği ve ses efektlerini burada ayrı ayrı ayarla. Müzik iğneni takip eder: yüzeye yakın sakin, derinlerde daha karanlık. Titreşim çarpmalara, avlara ve büyük galibiyetlere hafif bir dokunuş ekler; Hareketi azalt ise ekran sarsıntısını, ağır çekimi ve parlamaları kapatır.</string>
+
+    <string name="tour_daily_title">Günlük ödüller</string>
+    <!-- %1$s: the calendar's length (e.g. "7 gün", used twice); %2$d: shields a new player starts
+         with; %3$d: the most shields one can hold. -->
+    <string name="tour_daily_body">Burada günde bir kez ödül al: puan ve ekipman, her %1$s sonunda da daha büyüğü. Bir günü kaçırmak takvimi asla geri almaz. Serin, ödülü üst üste aldığın günleri sayar ve bir seri kalkanı kaçırılan bir günü kendiliğinden kapatır: %2$d kalkanla başlarsın ve her %1$s sonunda bir tane daha gelir (en fazla %3$d).</string>
+
+    <string name="tour_daily_challenges_title">Günlük görevler</string>
+    <!-- %1$s: free swaps a day (tour_daily_swaps). -->
+    <string name="tour_daily_challenges_body">Her gün halatına uygun kolay, orta ve zor üç görev gelir; ödülleri ekipman ve puan. Birini beğenmedin mi? Bedavaya değiştir (%1$s). Yalnızca solo atışlar sayılır. Yenileri gece yarısı gelir; bitirdiklerini almayı unutursan senin yerine toplanır.</string>
+    <plurals name="tour_daily_swaps">
+        <item quantity="one">günde %d değiştirme hakkı</item>
+        <item quantity="other">günde %d değiştirme hakkı</item>
+    </plurals>
+
+    <string name="tour_migrations_title">Göçler</string>
+    <!-- %1$s: how long a migration lasts (e.g. "2 gün"). -->
+    <string name="tour_migrations_body">Her hafta %1$s boyunca, daha az yaygın iki tür göç eder: biri yüzeye yakın, biri derinlerde; ikisi de yaşadıkları yerde çok daha yaygın olur. Balık sekmesinde ve Dex\'te bir afiş onları gösterir. Göçler solo atışlar içindir: düellolar asla değişmez.</string>
+
+    <string name="tour_reminders_title">Hatırlatmalar</string>
+    <!-- %1$s and %2$s: times on the hour, start and end of the quiet hours. -->
+    <string name="tour_reminders_body">Günlük ödülün hazır olduğunda, serin bitmek üzereyken ya da bir göç başladığında haber almak ister misin? Hatırlatmaları Ayarlar\'dan aç: günde en fazla bir tane ve %1$s ile %2$s arasında asla.</string>
+
+    <string name="tour_social_title">Arkadaşlar ve sıralamalar</string>
+    <!-- %1$d: the standard rope's level in every stat. -->
+    <string name="tour_social_body">Arkadaşlar, haftalık sıralamalar ve haftalık turnuva buradan açılır. Oradaki her şey çevrim içi düelloların standart halatıyla oynanır (her özellikte seviye %1$d), yani önemli olan beceridir.</string>
+
+    <string name="tour_friend_code_title">Arkadaş kodun</string>
+    <string name="tour_friend_code_body">Oyuncu kimliğin aynı zamanda arkadaş kodundur: arkadaşların seni ekleyebilsin diye onu paylaş. Kimse seni adınla bulamaz; sıralamalardaki yabancılar yalnızca kimliğinden üretilmiş bir ad görür.</string>
+
+    <string name="tour_friends_title">Arkadaş ekle</string>
+    <!-- "Meydan oku" is a button on a friend's card. -->
+    <string name="tour_friends_body">İstek göndermek için bir arkadaşının oyuncu kimliğini yaz: kabul ettiğinde arkadaş olursunuz. Kartları çevrim içi olup olmadıklarını ve haftanın en iyi avlarını gösterir; Meydan oku düğmesi onları çevrim içi bir düello odasına davet eder.</string>
+
+    <string name="tour_leaderboards_title">Haftalık sıralamalar</string>
+    <!-- %1$d: anglers in a league. -->
+    <string name="tour_leaderboards_body">Üç tablo var: en iyi atış, en derin av ve en nadir av; herkes için, yaklaşık %1$d balıkçıdan oluşan ligin için ya da arkadaşların için. Yalnızca sunucunun kendisinin doğruladığı atışlar sayılır: haftalık turnuva ve çevrim içi düellolar. Her tablo Pazartesi 00:00 UTC\'de sıfırlanır.</string>
+
+    <string name="tour_tournament_title">Haftalık turnuva</string>
+    <!-- %1$d: bumps; %2$d: attempts a week; %3$d: the percentage of players who win the badge. -->
+    <string name="tour_tournament_body">Hafta boyunca herkes %1$d çarpma hakkıyla tıpatıp aynı suda balık tutar. %2$d deneme hakkın var ve en iyisi sayılır; bir denemeyi başlatmak o hakkı harcar. Hafta bitince ödüller final sıralamana göre verilir ve ilk %%%3$d, Turnuva unvan rozetini kazanır.</string>
+
+    <string name="tour_clubs_title">Kulüpler</string>
+    <!-- %1$d: the most members a club can have. -->
+    <string name="tour_clubs_body">Bir kulübe koduyla katıl ya da balıkçılık sözcüklerinden üretilmiş bir adla kendin kur. En fazla %1$d balıkçı haftalık bir hedef için birlikte balık tutar ve yardım eden herkes ulaşılan her ödülü alır. Sohbet yok.</string>
+
+    <string name="tour_privacy_title">Gizliliğin</string>
+    <string name="tour_privacy_body">Kullanım istatistikleri ve çökme raporları yalnızca sen izin verirsen gönderilir. Fikrini istediğin zaman Ayarlar\'daki Gizlilik bölümünde bulunan iki anahtarla değiştir. Çevrim içi hesabını silebileceğin ve gizlilik politikasını okuyabileceğin yer de orası.</string>
+
+    <string name="tour_language_title">Dilin</string>
+    <string name="tour_language_body">Deep Line İngilizce, Fransızca, İspanyolca, Almanca, Brezilya Portekizcesi ve Türkçe konuşur. Burada birini seç ya da telefonunun dilini kullanmaya devam et.</string>
+
+    <!-- "Rastgele!" is the Turkish anglers' wish for good fishing. -->
+    <string name="tour_replay_title">Hepsi bu kadar, rastgele!</string>
+    <string name="tour_replay_body">Bu tanıtımı istediğin zaman Ayarlar\'dan yeniden izleyebilirsin.</string>
+</resources>
