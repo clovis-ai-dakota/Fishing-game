@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The daily loop: daily rewards and the streak, daily challenges, migrations and reminders
+    (DailyText.kt, DailyController.kt, ui/daily/). Keys start with daily_. Reminder notifications
+    go here too (daily_reminder_*).
+-->
+<resources>
+    <!-- %1$s and %2$s: times on the hour (start and end of the quiet hours). -->
+    <string name="daily_reminder_promise">Günde en fazla bir tane, %1$s ile %2$s arasında asla; istediğin zaman Ayarlar\'dan kapatabilirsin.</string>
+
+    <!-- Rewards, as noun phrases joined into a list. -->
+    <string name="daily_grant_shield">bir seri kalkanı</string>
+    <!-- Short labels on the 7-day calendar's tiles (tiny). -->
+    <string name="daily_tile_lanterns">%1$d × Fener</string>
+    <string name="daily_tile_detector">Dedektör</string>
+    <string name="daily_tile_charm">Şans tılsımı</string>
+    <string name="daily_tile_lure">Parıltı yemi</string>
+    <string name="daily_tile_shield">Kalkan</string>
+
+    <!-- Daily challenges: one sentence each, an instruction. -->
+    <plurals name="daily_challenge_casts">
+        <item quantity="one">Oltanı %d kez at.</item>
+        <item quantity="other">Oltanı %d kez at.</item>
+    </plurals>
+    <plurals name="daily_challenge_catch_fish">
+        <item quantity="one">%d balık yakala.</item>
+        <item quantity="other">%d balık yakala.</item>
+    </plurals>
+    <plurals name="daily_challenge_catch_zone">
+        <!-- %1$d: how many; %2$s: a depth zone's name (followed by "bölgesinden"). -->
+        <item quantity="one">%2$s bölgesinden %1$d balık yakala.</item>
+        <item quantity="other">%2$s bölgesinden %1$d balık yakala.</item>
+    </plurals>
+    <!-- %1$d: a depth in meters. -->
+    <string name="daily_challenge_reach_depth">Bir atışta %1$d m derinliğe in.</string>
+    <!-- %1$s: a species' name. -->
+    <string name="daily_challenge_catch_species_one">Bu türden bir balık yakala: %1$s.</string>
+    <!-- %1$d: how many (always 2 or more); %2$s: a species' name. -->
+    <string name="daily_challenge_catch_species">Bu türden %1$d balık yakala: %2$s.</string>
+    <!-- %1$s: points, already formatted. -->
+    <string name="daily_challenge_earn_points">%1$s puan kazan.</string>
+    <plurals name="daily_challenge_land_weight">
+        <item quantity="one">%d kg balık çıkar.</item>
+        <item quantity="other">%d kg balık çıkar.</item>
+    </plurals>
+    <plurals name="daily_challenge_sparkling">
+        <item quantity="one">%d Parıldayan balık yakala.</item>
+        <item quantity="other">%d Parıldayan balık yakala.</item>
+    </plurals>
+    <plurals name="daily_challenge_big_cast">
+        <item quantity="one">Tek bir atışta %d balık çıkar.</item>
+        <item quantity="other">Tek bir atışta %d balık çıkar.</item>
+    </plurals>
+    <plurals name="daily_challenge_new_species">
+        <item quantity="one">Daha önce hiç yakalamadığın %d tür yakala.</item>
+        <item quantity="other">Daha önce hiç yakalamadığın %d tür yakala.</item>
+    </plurals>
+    <!-- %1$d: best so far; %2$d: goal (meters). -->
+    <string name="daily_progress_depth">En derin: %1$d / %2$d m</string>
+    <!-- %1$d: best so far; %2$d: goal (fish). -->
+    <string name="daily_progress_big_cast">En iyi atış: %1$d / %2$d balık</string>
+
+    <!-- After claiming the daily reward. %1$d: the calendar day (1 to 7, written as "3. gün"); %2$s: the rewards. -->
+    <string name="daily_claimed">%1$d. gün ödülü: %2$s.</string>
+    <!-- %1$d: streak in days (2 or more); %2$d: calendar day; %3$s: rewards. -->
+    <string name="daily_claimed_streak">Üst üste %1$d gün! %2$d. gün ödülü: %3$s.</string>
+    <string name="daily_claimed_restarted">Bugün yeni bir seri başlıyor. %1$d. gün ödülü: %2$s.</string>
+    <!-- %1$s: the streak (e.g. "5 gün"); %2$d: calendar day; %3$s: rewards. -->
+    <string name="daily_claimed_one_shield">Bir seri kalkanı kaçırdığın günü kapattı: serin %1$s. %2$d. gün ödülü: %3$s.</string>
+    <!-- %1$d: shields used; %2$s: the streak; %3$d: calendar day; %4$s: rewards. -->
+    <string name="daily_claimed_shields">%1$d seri kalkanı kaçırdığın günleri kapattı: serin %2$s. %3$d. gün ödülü: %4$s.</string>
+    <string name="daily_collected">Önceki bir günden bitirdiğin görevler senin yerine toplandı: %1$s.</string>
+    <string name="daily_challenge_claimed">Görev tamamlandı! Kazandığın: %1$s.</string>
+    <!-- %1$s: its difficulty (Kolay, Orta, Zor); %2$s: the new challenge. -->
+    <string name="daily_challenge_swapped">Yeni görev (%1$s): %2$s</string>
+    <string name="daily_reminders_blocked">Hatırlatmalar kapalı kalıyor: bu telefonda Deep Line bildirimleri engellenmiş. Telefonun ayarlarından bildirimlere izin verebilirsin.</string>
+
+    <!-- The Daily card on the Fish tab and the Daily screen. -->
+    <string name="daily_title">Günlük</string>
+    <plurals name="daily_streak">
+        <item quantity="one">%d günlük seri</item>
+        <item quantity="other">%d günlük seri</item>
+    </plurals>
+    <string name="daily_streak_none">Henüz seri yok</string>
+    <!-- %1$d: the calendar day (1 to 7); %2$s: its rewards, a list. -->
+    <string name="daily_claim_button">%1$d. günü al: %2$s</string>
+    <!-- %1$d: the next calendar day; %2$s: its rewards; %3$s: the time until then ("5 sa 12 dk"). -->
+    <string name="daily_claim_wait">Bugünün ödülü alındı. %1$d. gün (%2$s) %3$s sonra hazır.</string>
+    <plurals name="daily_best_streak">
+        <item quantity="one">En uzun seri: %d gün.</item>
+        <item quantity="other">En uzun seri: %d gün.</item>
+    </plurals>
+    <!-- %1$s: the best streak (a whole sentence); %2$d: streak shields held; %3$d: the most shields
+         one can hold; %4$d: the calendar day that brings a new shield (7). -->
+    <string name="daily_streak_rules">%1$s Seri kalkanları: %2$d / %3$d. Bir kalkan kaçırılan bir günü kendiliğinden kapatır ve %4$d. gün yeni bir kalkan getirir. Bir günü kaçırmak takvimi asla geri almaz.</string>
+    <string name="daily_challenges_title">Bugünün görevleri</string>
+    <string name="daily_challenge_done">Bitti</string>
+    <string name="daily_challenge_claim">Al</string>
+    <string name="daily_challenge_swap">Değiştir</string>
+    <string name="daily_swaps_none">Bugün ücretsiz değiştirme hakkın kalmadı.</string>
+    <plurals name="daily_swaps_left">
+        <item quantity="one">Beğenmediğin bir görev için bugün %d ücretsiz değiştirme hakkın kaldı.</item>
+        <item quantity="other">Beğenmediğin görevler için bugün %d ücretsiz değiştirme hakkın kaldı.</item>
+    </plurals>
+    <!-- %1$s: the free swaps left (a whole sentence). -->
+    <string name="daily_challenges_rules">%1$s Yalnızca solo atışlar sayılır. Yeni görevler gece yarısı gelir; bitirdiklerini almayı unutursan senin yerine toplanır.</string>
+    <string name="daily_remind_button">Ödülüm hazır olunca bana hatırlat</string>
+
+    <!-- Turning reminders on: a dialog shown once, right after the first daily reward. -->
+    <string name="daily_optin_title">Hatırlatma ister misin?</string>
+    <!-- %1$s: how often reminders come (daily_reminder_promise, a whole sentence). -->
+    <string name="daily_optin_body">Deep Line, günlük ödülün hazır olduğunda, serin bitmek üzereyken ve bir göç başladığında sana haber verebilir. %1$s</string>
+    <string name="daily_optin_yes">Aç</string>
+    <string name="daily_optin_no">Şimdi değil</string>
+
+    <!-- Migrations. -->
+    <string name="daily_migration_banner_title">Göç sürüyor</string>
+    <!-- %1$s: the time left ("1 g 5 sa"). "Bu ikisi": the two species listed below. -->
+    <string name="daily_migration_banner_body">Bu ikisi %1$s boyunca solo atışlarda çok daha yaygın.</string>
+    <string name="daily_migrating_note">Şu an göç ediyor: %1$s boyunca solo atışlarda çok daha yaygın.</string>
+    <string name="daily_migration_live">Göç: %1$s kaldı</string>
+    <!-- %1$s: the time until the next one starts. -->
+    <string name="daily_migration_next">Sonraki göç %1$s sonra</string>
+    <!-- %d: how many days a migration lasts. -->
+    <plurals name="daily_migration_about">
+        <item quantity="one">Her hafta %d gün boyunca, daha az yaygın iki tür yaşadıkları yerde çok daha yaygın hale gelir: biri yüzeye yakın, biri derinlerde. Yalnızca solo atışlar: düellolar asla değişmez.</item>
+        <item quantity="other">Her hafta %d gün boyunca, daha az yaygın iki tür yaşadıkları yerde çok daha yaygın hale gelir: biri yüzeye yakın, biri derinlerde. Yalnızca solo atışlar: düellolar asla değişmez.</item>
+    </plurals>
+    <string name="daily_migrant_open">Dex sayfasını aç</string>
+    <!-- %1$s: its depth zone; %2$d and %3$d: the depths where it lives, in meters. -->
+    <string name="daily_migrant_where">%1$s · %2$d–%3$d m</string>
+
+    <!-- Notification channels: a short name and a one-sentence description. -->
+    <string name="daily_channel_daily_name">Günlük ödül hazır</string>
+    <string name="daily_channel_daily_description">Bugünün ödülü seni beklerken ve oyunu henüz açmadıysan.</string>
+    <string name="daily_channel_streak_name">Seri tehlikede</string>
+    <string name="daily_channel_streak_description">Akşamları, bugünün ödülünü almazsan giriş serin gece yarısı bitecekse.</string>
+    <string name="daily_channel_events_name">Göçler ve etkinlikler</string>
+    <string name="daily_channel_events_description">Bir göç ya da hafta sonu etkinliği başladığında.</string>
+
+    <!-- Reminder notifications. -->
+    <string name="daily_reminder_ready_title_1">Günlük ödülün seni bekliyor</string>
+    <string name="daily_reminder_ready_title_2">Balıklar oltaya geliyor</string>
+    <string name="daily_reminder_ready_title_3">İskelede seni bir ödül bekliyor</string>
+    <!-- %1$d: the calendar day (1 to 7). -->
+    <string name="daily_reminder_ready_text_1">Ödül takviminin %1$d. günü alınmaya hazır.</string>
+    <string name="daily_reminder_ready_text_2">Bugünün ödülü ve üç yeni görev seni bekliyor.</string>
+    <string name="daily_reminder_ready_text_3">Bugünün ödülünü al ve bugünkü görevlere göz at.</string>
+    <plurals name="daily_reminder_streak_title">
+        <item quantity="one">%d günlük serini koru</item>
+        <item quantity="other">%d günlük serini koru</item>
+    </plurals>
+    <string name="daily_reminder_streak_text">Serinin devam etmesi için bugünün ödülünü gece yarısından önce al.</string>
+    <string name="daily_reminder_streak_text_shield">Bugünün ödülünü gece yarısından önce al. Bugünü kaçırırsan bir seri kalkanı onu kapatır.</string>
+    <string name="daily_reminder_migration_title">Bir göç başladı</string>
+    <!-- %1$d: how many days the migration lasts; %2$s: the two species, a list. -->
+    <plurals name="daily_reminder_migration_text">
+        <item quantity="one">Önümüzdeki %1$d gün boyunca iki tür çok daha yaygın: %2$s.</item>
+        <item quantity="other">Önümüzdeki %1$d gün boyunca iki tür çok daha yaygın: %2$s.</item>
+    </plurals>
+    <!-- %1$s: the depth zone it lives in. -->
+    <string name="daily_reminder_unknown_species">bilinmeyen bir tür (%1$s)</string>
+    <string name="daily_reminder_event_title">Hafta sonu etkinliği başladı</string>
+    <!-- %1$s: the event's goal; %2$d: how many it takes. -->
+    <string name="daily_reminder_event_text">Bu hafta sonunun hedefi: %1$s (%2$d). Ulaştığında seni bir ödül bekliyor.</string>
+</resources>

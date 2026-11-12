@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The Dex tab (ui/dex/): the species cards and each species' page, and the Skins section.
+    "Dex" is a coined name: kept as is ("Dex\'te", "Dex\'in"). Keys start with dex_.
+-->
+<resources>
+    <!-- The Dex tab's header. -->
+    <plurals name="dex_subtitle">
+        <item quantity="one">Derinlerde bulunacak %d tür</item>
+        <item quantity="other">Derinlerde bulunacak %d tür</item>
+    </plurals>
+    <string name="dex_aquarium_button">Akvaryum</string>
+
+    <!-- Secret tiers: 1 is easy, 5 is the rarest. -->
+    <string name="dex_tier_legendary">Efsanevi</string>
+    <string name="dex_tier">Kademe %1$d</string>
+
+    <!-- Species section: the header card. Turkish writes the percent sign first: %45. -->
+    <string name="dex_species_completion">%%%1$d</string>
+    <string name="dex_species_counts">Görülen %1$d · Yakalanan %2$d / %3$d</string>
+    <string name="dex_species_filter_all">Tümü</string>
+    <string name="dex_species_filter_caught">Yakalananlar</string>
+    <string name="dex_species_empty">Burada henüz yakalanmış balık yok. Balık tutmaya devam et!</string>
+    <string name="dex_species_cd_seen">Görüldü</string>
+    <string name="dex_cd_sparkling_caught">Parıldayan yakalandı</string>
+
+    <!-- A species' page. -->
+    <!-- %1$s: the species' number in the Dex, e.g. #007. -->
+    <string name="dex_fish_title">Dex %1$s</string>
+    <string name="dex_fish_previous">Önceki balık</string>
+    <string name="dex_fish_next">Sonraki balık</string>
+    <string name="dex_fish_state_unknown">Henüz görülmedi</string>
+    <string name="dex_fish_state_seen">Görüldü, henüz yakalanmadı</string>
+    <string name="dex_fish_state_caught">Yakalandı</string>
+    <string name="dex_fish_depth">Derinlik</string>
+    <string name="dex_fish_depth_range">%1$s–%2$s m</string>
+    <string name="dex_fish_weight">Ağırlık</string>
+    <string name="dex_fish_base_points">Temel puan</string>
+    <string name="dex_fish_rarity">Nadirlik</string>
+    <string name="dex_fish_records">Rekorların</string>
+    <string name="dex_fish_record_caught">Yakalanan</string>
+    <string name="dex_fish_record_sparkling">Parıldayan</string>
+    <string name="dex_fish_record_deepest">En derin</string>
+    <string name="dex_fish_record_best">En iyi</string>
+    <string name="dex_fish_hint_unknown">Onu görmek için bu derinliklerde balık tut: iğnene yakın yüzen her şey Dex\'e eklenir.</string>
+    <string name="dex_fish_hint_seen">Ağırlığını, puanlarını, nadirliğini ve rekorlarını doldurmak için bir tane yakala.</string>
+
+    <!-- Skins section. Locked legendary skins only show their slot. -->
+    <string name="dex_skins_legendary_title">Efsanevi görünümler</string>
+    <string name="dex_skins_your_title">Unvanın:</string>
+    <!-- %1$d: legendary skins unlocked; %2$d: all legendary skins. -->
+    <string name="dex_skins_note">Görünümler yalnızca takımının görüntüsünü değiştirir: oyunun nasıl oynandığını asla değiştirmez. Açılan efsanevi görünümler: %1$d / %2$d.</string>
+    <!-- %1$s: the set's name, e.g. Dev Avcısı. -->
+    <string name="dex_skins_set">%1$s seti</string>
+    <string name="dex_skins_set_locked">Kilitli set</string>
+    <string name="dex_skins_locked">Kilitli</string>
+    <string name="dex_skins_equipped">Takılı ✓</string>
+    <string name="dex_skins_shop_gear">Mağaza\'dan alınanlar</string>
+    <string name="dex_skins_shop_browse">Mağaza\'ya göz at</string>
+    <string name="dex_skins_shop_more">Mağaza\'da daha fazlası</string>
+    <string name="dex_skins_boat_title">Teknen</string>
+    <string name="dex_skins_boat_cd">Kendi tasarladığın tekne</string>
+    <string name="dex_skins_boat_body">Onu kendin boya ve donat. Temel seçenekler ücretsiz; daha fazlası puanla ve ilerledikçe açılır.</string>
+    <string name="dex_skins_boat_worn">Takılı ✓ · klasik tekneyi kullan</string>
+    <string name="dex_skins_boat_wear">Teknemi kullan</string>
+    <string name="dex_skins_boat_customise">Tekneyi özelleştir</string>
+    <string name="dex_skins_boat_shop">Mağaza tekneleri</string>
+    <string name="dex_skins_badge_title">Unvan rozeti</string>
+    <string name="dex_skins_cards_title">Dex kartları</string>
+    <string name="dex_skins_badges_more">Mağaza\'da daha fazla rozet ve kart stili</string>
+    <string name="dex_skins_atmosphere_title">Atmosfer</string>
+    <string name="dex_skins_atmosphere_locked">Kâbus\'un kilidini açmak için Abis Tabanı\'na ulaş: derin sular için korkutucu bir görünüm.</string>
+    <string name="dex_skins_atmosphere_nightmare">Derinler gerçekten korkutucu. Yine de tam olarak eskisi kadar görürsün: yalnızca havası değişir.</string>
+    <string name="dex_skins_atmosphere_family">Yüzeyde zararsız, derine indikçe daha ürkütücü.</string>
+</resources>

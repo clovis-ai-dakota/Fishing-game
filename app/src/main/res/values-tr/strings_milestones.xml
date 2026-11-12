@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Milestones (ui/MilestonesScreen.kt): rewards for the lifetime total of points earned. Keys
+    start with milestones_.
+-->
+<resources>
+    <string name="milestones_title">Kilometre taşları</string>
+    <string name="milestones_earned">Toplam kazanç: %1$s puan</string>
+    <string name="milestones_explainer">Kilometre taşları, geliştirmelere harcadıktan sonra bile balıklardan kazandığın her puanı sayar.</string>
+    <string name="milestones_threshold">%1$s puan</string>
+    <string name="milestones_claimed">Alındı ✓</string>
+    <string name="milestones_claim">Al</string>
+    <string name="milestones_reward_points">+%1$s puan</string>
+</resources>

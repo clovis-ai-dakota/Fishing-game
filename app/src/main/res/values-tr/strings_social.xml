@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Friends and rankings: friends, the weekly leaderboards, the weekly tournament and clubs
+    (social/SocialController.kt; ui/social/). Keys start with social_. Player and club names are
+    never translated and are placed where Turkish needs no suffix (after a colon, in parentheses,
+    as the subject, or before "için" / "kulübünden").
+-->
+<resources>
+    <!-- Messages after an action. -->
+    <!-- %1$d: the length of a player id. -->
+    <string name="social_message_bad_id">Bir oyuncu kimliği %1$d harf ve rakamdan oluşur.</string>
+    <string name="social_message_own_id">Bu senin kendi oyuncu kimliğin. Seni ekleyebilmeleri için onu arkadaşlarınla paylaş.</string>
+    <!-- %1$s: the friend's name. -->
+    <string name="social_message_now_friends">Artık arkadaşsınız: %1$s.</string>
+    <!-- %1$s: the player id the request was sent to. -->
+    <string name="social_message_request_sent">Arkadaşlık isteği gönderildi: %1$s. Kabul ettiğinde arkadaş olacaksınız.</string>
+    <string name="social_message_removed">%1$s artık arkadaş listende değil.</string>
+    <string name="social_challenge_creating">%1$s için oda kuruluyor…</string>
+    <plurals name="social_challenge_sent">
+        <!-- %1$s: the friend's name; %2$d: minutes the challenge stays open. -->
+        <item quantity="one">Meydan okuma gönderildi: %1$s. %2$d dakika boyunca Arkadaşlar ekranında görecek.</item>
+        <item quantity="other">Meydan okuma gönderildi: %1$s. %2$d dakika boyunca Arkadaşlar ekranında görecek.</item>
+    </plurals>
+    <!-- After an error message (%1$s). -->
+    <string name="social_challenge_not_sent">%1$s Meydan okuma gönderilmedi: bunun yerine oda kodunu arkadaşınla paylaş.</string>
+    <!-- %1$s: the placing (e.g. İlk %10); %2$s: what it gives. -->
+    <string name="social_message_tournament_reward">Turnuva ödülü (%1$s): %2$s.</string>
+    <!-- %1$s: the club's name (never translated); %2$s: its code. -->
+    <string name="social_message_club_created">Kulübe hoş geldin: %1$s! Balıkçıları davet etmek için şu kodu paylaş: %2$s.</string>
+    <string name="social_message_bad_club_code">Bir kulüp kodu %1$d harf ve rakamdan oluşur.</string>
+    <string name="social_message_club_joined">Kulübe hoş geldin: %1$s!</string>
+    <string name="social_message_club_left">Kulüpten ayrıldın.</string>
+    <string name="social_message_member_removed">%1$s kulüpten çıkarıldı.</string>
+    <string name="social_message_owner_changed">Kulübün yeni başkanı: %1$s.</string>
+    <string name="social_message_club_renamed">Kulübün yeni adı: %1$s.</string>
+    <string name="social_message_club_reward">Kulüp hedefi ödülü: %1$s.</string>
+    <string name="social_message_forgotten">Arkadaşların, sıralamaların ve kulüp üyeliğin sunucudan silindi.</string>
+
+    <!-- Problems reported by the server. -->
+    <string name="social_problem_unreachable">Sunucuya ulaşılamıyor. Bağlantını kontrol edip tekrar dene.</string>
+    <string name="social_problem_bad_request">Sunucu bunu kabul edemedi.</string>
+    <string name="social_problem_wrong_secret">Sunucu bu oyuncuyu tanımıyor. Kurtarma kodunu Mağaza\'daki Hesap düğmesinden geri yükle.</string>
+    <string name="social_problem_unknown_player">Bu oyuncu kimliğine sahip bir balıkçı henüz yok.</string>
+    <string name="social_problem_unknown_club">Bu koda sahip bir kulüp yok.</string>
+    <string name="social_problem_clubs_off">Kulüpler bu sunucuda henüz açık değil.</string>
+    <string name="social_problem_not_friends">Yalnızca arkadaşlarına meydan okuyabilirsin.</string>
+    <!-- %1$d: the most friends a player can have. -->
+    <string name="social_problem_friends_full">Arkadaş listen dolu (%1$d arkadaş). Önce birini çıkar.</string>
+    <string name="social_problem_their_friends_full">Bu balıkçı şu anda daha fazla arkadaşlık isteği alamıyor.</string>
+    <string name="social_problem_already_in_club">Zaten bir kulüptesin. Önce ondan ayrıl.</string>
+    <string name="social_problem_not_in_club">Bir kulüpte değilsin.</string>
+    <string name="social_problem_not_owner">Bunu yalnızca kulübün başkanı yapabilir.</string>
+    <!-- %1$d: the most members a club can have. -->
+    <string name="social_problem_club_full">Bu kulüp dolu (%1$d üye).</string>
+    <!-- %1$d: hours to wait. -->
+    <string name="social_problem_rejoin_later">Bu kulüpten çıkarıldın, bu yüzden ancak %1$d saat sonra yeniden katılabilirsin.</string>
+    <string name="social_problem_no_attempts">Bu haftaki tüm denemelerini kullandın. Yeni turnuva Pazartesi 00:00 UTC\'de başlar.</string>
+    <string name="social_problem_attempt_expired">Bu denemenin sonucu çok geç geldi, bu yüzden 0 puan aldı.</string>
+    <string name="social_problem_cast_rejected">Sunucu bu denemeyi kabul edemedi, bu yüzden 0 puan aldı.</string>
+    <string name="social_problem_too_big">Bu, sunucu için fazla büyük.</string>
+    <string name="social_problem_too_many_requests">Aynı anda çok fazla istek var. Lütfen biraz bekleyip tekrar dene.</string>
+
+    <!-- Shared by every social screen. -->
+    <string name="social_offline_title">Sunucuya ulaşılamıyor</string>
+    <!-- "Çevrim içi düello" is the online lobby (Battle tab). -->
+    <string name="social_offline_body">Arkadaşlar, sıralamalar, turnuva ve kulüpler için düello sunucusu gerekir. Bağlantını ya da Çevrim içi düello ekranındaki sunucu adresini kontrol et, sonra tekrar dene. Oyunun geri kalanı çevrim dışı çalışır.</string>
+    <string name="social_offline_body_no_clubs">Arkadaşlar, sıralamalar ve turnuva için düello sunucusu gerekir. Bağlantını ya da Çevrim içi düello ekranındaki sunucu adresini kontrol et, sonra tekrar dene. Oyunun geri kalanı çevrim dışı çalışır.</string>
+    <string name="social_offline_retry">Tekrar dene</string>
+    <string name="social_player_you">%1$s (sen)</string>
+    <string name="social_status_online">Çevrim içi</string>
+    <string name="social_status_offline">Çevrim dışı</string>
+    <!-- %1$d: the rank (1 = first). -->
+    <string name="social_rank">#%1$d</string>
+    <string name="social_copy">Kopyala</string>
+    <string name="social_share">Paylaş</string>
+    <string name="social_clip_player_id">Deep Line oyuncu kimliği</string>
+    <!-- %1$s: the player id (a code, never translated). -->
+    <string name="social_share_player_id">Deep Line\'da beni arkadaş olarak ekle. Oyuncu kimliğim: %1$s</string>
+    <string name="social_loading">Yükleniyor…</string>
+
+    <!-- The Battle tab's card and the hub of friends and rankings. -->
+    <string name="social_hub_title">Arkadaşlar ve sıralamalar</string>
+    <string name="social_entry_body">Arkadaş ekle, haftalık sıralamalarda yüksel, haftalık turnuvada balık tut ve bir kulübe katıl.</string>
+    <string name="social_entry_body_no_clubs">Arkadaş ekle, haftalık sıralamalarda yüksel ve haftalık turnuvada balık tut.</string>
+    <string name="social_entry_open">Arkadaşlar ve sıralamaları aç</string>
+    <string name="social_hub_id_title">Oyuncu kimliğin</string>
+    <string name="social_hub_id_body">Bu senin arkadaş kodun: arkadaşların seni ekleyebilsin diye paylaş ve onlarınkini iste. Oyuncular adla bulunamaz. Arkadaşların, çevrim içi kullandığın adı, unvanını ve çevrim içi olup olmadığını görür.</string>
+    <string name="social_hub_friends_unknown">Eklediğin arkadaşlar, haftanın en iyi avlarıyla birlikte burada görünür.</string>
+    <string name="social_hub_friends_none">Henüz arkadaş yok. Oyuncu kimliğiyle birini ekle.</string>
+    <plurals name="social_hub_friend_count">
+        <item quantity="one">%d arkadaşın var.</item>
+        <item quantity="other">%d arkadaşın var.</item>
+    </plurals>
+    <plurals name="social_hub_requests_waiting">
+        <item quantity="one">%d arkadaşlık isteği yanıtını bekliyor.</item>
+        <item quantity="other">%d arkadaşlık isteği yanıtını bekliyor.</item>
+    </plurals>
+    <plurals name="social_hub_challenges_waiting">
+        <item quantity="one">%d meydan okuma seni bekliyor.</item>
+        <item quantity="other">%d meydan okuma seni bekliyor.</item>
+    </plurals>
+    <string name="social_hub_friends_button">Arkadaşlar</string>
+    <!-- %1$s: the time left before the reset ("2 g 5 sa"). Keep 00:00 UTC. -->
+    <string name="social_hub_leaderboards_body">Haftanın en iyi atışı, en derin avı ve en nadir avı; herkes için, ligin için ve arkadaşların için. Pazartesi 00:00 UTC\'de, %1$s sonra sıfırlanırlar.</string>
+    <string name="social_hub_leaderboards_button">Sıralamalar</string>
+    <plurals name="social_hub_attempts_left">
+        <item quantity="one">Bu hafta %d deneme hakkın kaldı.</item>
+        <item quantity="other">Bu hafta %d deneme hakkın kaldı.</item>
+    </plurals>
+    <!-- %1$s: the player's best tournament score this week, with its unit. -->
+    <string name="social_hub_best">En iyin: %1$s.</string>
+    <!-- %1$s: best score with its unit; %2$s: the player's rank (a number); %3$s: players ranked. -->
+    <string name="social_hub_best_ranked">En iyin: %1$s, sıralaman %2$s / %3$s.</string>
+    <string name="social_hub_reward_waiting">Seni bir ödül bekliyor.</string>
+    <plurals name="social_hub_tournament_about">
+        <item quantity="one">Hafta boyunca herkes aynı suda, kişi başı %d deneme hakkıyla balık tutar. En iyi denemen sayılır.</item>
+        <item quantity="other">Hafta boyunca herkes aynı suda, kişi başı %d deneme hakkıyla balık tutar. En iyi denemen sayılır.</item>
+    </plurals>
+    <string name="social_hub_tournament_button">Turnuva</string>
+    <!-- %1$s: the club's name (never translated, after a colon); %2$s: fish caught this week. -->
+    <plurals name="social_hub_club_body">
+        <item quantity="one">Kulübün: %1$s. Bu hafta birlikte %2$s balık yakaladınız.</item>
+        <item quantity="other">Kulübün: %1$s. Bu hafta birlikte %2$s balık yakaladınız.</item>
+    </plurals>
+    <string name="social_hub_clubs_body">Bir kulübe koduyla katıl ya da kendin kur ve haftalık bir hedef için birlikte balık tutun.</string>
+    <string name="social_hub_clubs_button">Kulüpler</string>
+    <!-- Deleting the player's social data (Privacy). -->
+    <string name="social_forget_button">Sosyal verilerimi sunucudan sil</string>
+    <string name="social_forget_title">Sosyal verilerin silinsin mi?</string>
+    <string name="social_forget_body">Bu işlem arkadaşlıklarını (iki taraftan da), arkadaşlık isteklerini, sıralama ve turnuva kayıtlarını ve kulüp üyeliğini sunucudan siler. İlerlemen, satın alımların ve hediyelerin bu telefonda kalır.</string>
+    <string name="social_forget_confirm">Sil</string>
+
+    <!-- Friends (FriendsScreen.kt). -->
+    <string name="social_friends_title">Arkadaşlar</string>
+    <string name="social_friends_add_title">Arkadaş ekle</string>
+    <string name="social_friends_id_label">Arkadaşının oyuncu kimliği</string>
+    <string name="social_friends_send">Gönder</string>
+    <!-- "Arkadaşlar" is this screen. %1$s: the player's own id (a code). -->
+    <string name="social_friends_add_body">İsteğini Arkadaşlar ekranını bir sonraki açışında görecek; kabul ettiğinde arkadaş olacaksınız. Senin kimliğin: %1$s.</string>
+    <string name="social_friends_challenges_title">Meydan okumalar</string>
+    <!-- %1$s: the friend's name (the subject); %2$s: the battle mode (after a colon). -->
+    <string name="social_friends_challenged">%1$s sana meydan okuyor: %2$s.</string>
+    <!-- %1$s: the time left ("8 dk"). -->
+    <string name="social_friends_room_closes">Oda %1$s sonra kapanıyor.</string>
+    <string name="social_friends_join">Katıl</string>
+    <string name="social_friends_requests_title">İstekler</string>
+    <!-- %1$s: their player id. -->
+    <string name="social_friends_request_in">Arkadaşın olmak istiyor (%1$s).</string>
+    <string name="social_friends_accept">Kabul et</string>
+    <string name="social_friends_decline">Reddet</string>
+    <!-- %1$s: the player id it went to. -->
+    <string name="social_friends_request_out">Kabul etmesi bekleniyor: %1$s.</string>
+    <string name="social_friends_list_title">Arkadaşların</string>
+    <!-- %1$d: friends; %2$d: the most friends a player can have. -->
+    <string name="social_friends_list_title_count">Arkadaşların (%1$d / %2$d)</string>
+    <string name="social_friends_list_waiting">Sunucu yanıt verdiğinde arkadaşların burada görünür.</string>
+    <string name="social_friends_list_none">Henüz arkadaş yok. Oyuncu kimliğini paylaş ya da onlarınkini iste.</string>
+    <string name="social_friends_challenge">Meydan oku</string>
+    <string name="social_friends_challenge_title">Meydan oku: %1$s</string>
+    <!-- %1$s: the friend's name (the subject); %2$d: minutes the challenge stays open. -->
+    <plurals name="social_friends_challenge_body">
+        <item quantity="one">Bir mod seç: bir düello odası açılır ve %1$s, meydan okumanı %2$d dakika boyunca görür. İkiniz de standart turnuva halatını kullanırsınız.</item>
+        <item quantity="other">Bir mod seç: bir düello odası açılır ve %1$s, meydan okumanı %2$d dakika boyunca görür. İkiniz de standart turnuva halatını kullanırsınız.</item>
+    </plurals>
+    <!-- %1$s: the friend's name (the subject). -->
+    <string name="social_friends_remove_title">%1$s arkadaşlarından çıkarılsın mı?</string>
+    <string name="social_friends_remove_body">Artık arkadaş olmayacaksınız. Ona haber verilmez ve daha sonra birbirinizi yeniden ekleyebilirsiniz.</string>
+    <string name="social_friends_remove">Çıkar</string>
+    <string name="social_friends_keep">Kalsın</string>
+    <!-- %1$s: a list of the parts below, joined with commas. -->
+    <string name="social_friends_week">Bu hafta: %1$s.</string>
+    <!-- Parts of the list above (after a colon, so lower case). -->
+    <string name="social_friends_week_best_cast">en iyi atış %1$s</string>
+    <string name="social_friends_week_deepest">en derin av %1$s</string>
+    <string name="social_friends_week_tournament">turnuva %1$s</string>
+    <string name="social_friends_week_none">Bu hafta henüz skor yok.</string>
+
+    <!-- The weekly leaderboards (LeaderboardsScreen.kt). -->
+    <string name="social_leaderboards_title">Haftalık sıralamalar</string>
+    <!-- %1$s: what the chosen board ranks (a whole sentence); %2$s: time left before the reset;
+         %3$d: the rope's level. Keep 00:00 UTC. -->
+    <string name="social_leaderboards_about">%1$s Tablolar Pazartesi 00:00 UTC\'de, %2$s sonra sıfırlanır. Yalnızca sunucunun kendisinin doğruladığı atışlar sayılır: herkesin aynı standart halatı (seviye %3$d) kullandığı haftalık turnuva ve çevrim içi düellolar.</string>
+    <string name="social_leaderboards_your_rank">Sıralaman</string>
+    <!-- %1$s: anglers on the board, already formatted. -->
+    <plurals name="social_leaderboards_players">
+        <item quantity="one">Bu tabloda %1$s balıkçı var.</item>
+        <item quantity="other">Bu tabloda %1$s balıkçı var.</item>
+    </plurals>
+    <!-- %1$d: how many are shown. -->
+    <string name="social_leaderboards_top">İlk %1$d</string>
+    <string name="social_leaderboards_league">Ligin</string>
+    <string name="social_leaderboards_friends">Sen ve arkadaşların</string>
+    <string name="social_leaderboards_waiting">Sunucu yanıt verdiğinde tablo burada görünür.</string>
+    <plurals name="social_leaderboards_league_empty">
+        <item quantity="one">Ligin, haftanın ilk skorunla başlar: haftaya seninle aynı zamanda başlayan yaklaşık %d balıkçı.</item>
+        <item quantity="other">Ligin, haftanın ilk skorunla başlar: haftaya seninle aynı zamanda başlayan yaklaşık %d balıkçı.</item>
+    </plurals>
+    <string name="social_leaderboards_friends_empty">Bu hafta henüz senden ya da arkadaşlarından skor yok.</string>
+    <string name="social_leaderboards_global_empty">Bu hafta henüz skor yok. İlk olmak için haftalık turnuvada ya da çevrim içi bir düelloda balık tut.</string>
+    <string name="social_leaderboards_strangers">Arkadaşın olmayan balıkçılar, oyuncu kimliklerinden üretilmiş bir adla gösterilir.</string>
+    <!-- %1$s: the depth with its unit; %2$s: the species. -->
+    <string name="social_leaderboards_deepest_value">%1$s · %2$s</string>
+
+    <!-- The weekly tournament (TournamentScreen.kt). Ranks are ordinals written by the phone ("3."). -->
+    <string name="social_tournament_title">Haftalık turnuva</string>
+    <string name="social_tournament_reward_title">Bir ödül seni bekliyor</string>
+    <!-- %1$s: the player's final rank ("3."); %2$s: players ranked; %3$s: their best score with its
+         unit; %4$s: the band they reached (core_tier_*). -->
+    <string name="social_tournament_reward_body">%2$s oyuncu içinde %3$s ile %1$s oldun: %4$s.</string>
+    <string name="social_tournament_reward_grants">Ödül: %1$s.</string>
+    <string name="social_tournament_claim">Al</string>
+    <string name="social_tournament_water_title">Bu haftanın suyu</string>
+    <!-- %1$d: the standard rope's level; %2$d: bumps allowed; %3$d: attempts a week. -->
+    <string name="social_tournament_water_body">Hafta boyunca herkes standart halatla (her özellikte seviye %1$d) ve %2$d çarpma hakkıyla tıpatıp aynı suda balık tutar. %3$d deneme hakkın var ve en iyisi sayılır. Bir denemeyi başlatmak, yarıda bıraksan bile o hakkı harcar. Fenerler ve dedektörler düellolarda olduğu gibi çalışır; turnuva avları puanlarına ya da balık defterine sayılmaz.</string>
+    <!-- Small labels above big numbers. -->
+    <string name="social_tournament_attempts_left">Kalan deneme</string>
+    <string name="social_tournament_attempts_value">%1$d / %2$d</string>
+    <string name="social_tournament_ends_in">Bitişe kalan</string>
+    <string name="social_tournament_your_best">En iyin</string>
+    <string name="social_tournament_no_score">Henüz skor yok</string>
+    <string name="social_tournament_your_rank">Sıralaman</string>
+    <!-- %1$s: the player's rank ("3."); %2$s: players ranked. -->
+    <string name="social_tournament_rank_value">%2$s oyuncu içinde %1$s</string>
+    <string name="social_tournament_not_ranked">Henüz sıralamada değil</string>
+    <!-- %1$d: this attempt's number; %2$d: attempts a week. -->
+    <string name="social_tournament_start">Denemeyi başlat (%1$d/%2$d)</string>
+    <string name="social_tournament_no_attempts">Deneme hakkın kalmadı: Pazartesi görüşürüz</string>
+    <string name="social_tournament_waiting">Sunucu yanıt verdiğinde denemelerin ve en iyi skorun burada görünür.</string>
+    <string name="social_tournament_attempt_title">Deneme %1$d</string>
+    <string name="social_tournament_attempt_points">%1$s.</string>
+    <!-- %1$s: the best score with its unit; %2$s: the player's rank ("3."); %3$s: players ranked. -->
+    <string name="social_tournament_attempt_best">Bu haftaki en iyin: %1$s, %3$s oyuncu içinde %2$s.</string>
+    <string name="social_tournament_standings_title">Sıralama</string>
+    <string name="social_tournament_standings_none">Bu hafta henüz skor yok: ilk skor seninki olabilir.</string>
+    <string name="social_tournament_rewards_title">Ödüller</string>
+    <string name="social_tournament_rewards_body">Ödüller hafta bitince final sıralamana göre verilir ve buradan alınır.</string>
+    <!-- Who gets each band's reward. No arguments: Turkish writes % before the number. -->
+    <string name="social_tournament_tier_champion">Kazanan ve ilk %1</string>
+    <string name="social_tournament_tier_gold">İlk %10</string>
+    <string name="social_tournament_tier_silver">İlk %25</string>
+    <string name="social_tournament_tier_bronze">İlk yarı</string>
+    <string name="social_tournament_tier_took_part">Katılan diğer herkes</string>
+
+    <!-- Clubs (ClubsScreen.kt; they ship in a later update). Club names are never translated. -->
+    <string name="social_clubs_title">Kulüpler</string>
+    <string name="social_clubs_other_names">Başka adlar</string>
+    <string name="social_clubs_top_title">Bu haftanın en aktif kulüpleri</string>
+    <!-- %1$s: the club's name. -->
+    <string name="social_clubs_yours">%1$s (senin)</string>
+    <plurals name="social_clubs_members">
+        <item quantity="one">%d üye</item>
+        <item quantity="other">%d üye</item>
+    </plurals>
+    <plurals name="social_clubs_fish">
+        <item quantity="one">%1$s balık</item>
+        <item quantity="other">%1$s balık</item>
+    </plurals>
+    <string name="social_clubs_join_title">Bir kulübe katıl</string>
+    <string name="social_clubs_code">Kulüp kodu</string>
+    <string name="social_clubs_join">Katıl</string>
+    <!-- %1$d: characters in a club code; %2$d: the most members a club can have. -->
+    <string name="social_clubs_join_body">Kulübün %1$d karakterlik kodunu üyelerinden iste. Bir kulüpte haftalık bir hedef için birlikte balık tutan en fazla %2$d balıkçı olur. Sohbet yok.</string>
+    <string name="social_clubs_start_title">Kulüp kur</string>
+    <string name="social_clubs_start_body">Bir ad seç: kulüp adları balıkçılık sözcüklerinden üretilir, böylece herkes için hoş olur.</string>
+    <!-- %1$s: the club's name (followed by "kulübünü"). -->
+    <string name="social_clubs_start_button">%1$s kulübünü kur</string>
+    <string name="social_clip_club_code">Deep Line kulüp kodu</string>
+    <!-- %1$s: the club's name; %2$s: its code (never translated). -->
+    <string name="social_clubs_share">Deep Line\'da kulübüme katıl: %1$s. Kod: %2$s</string>
+    <!-- %1$d: members; %2$d: the most a club can have. -->
+    <plurals name="social_clubs_member_count">
+        <item quantity="one">%1$d / %2$d üye.</item>
+        <item quantity="other">%1$d / %2$d üye.</item>
+    </plurals>
+    <string name="social_clubs_you_own">Bu kulübün başkanı sensin.</string>
+    <string name="social_clubs_goal_title">Bu haftanın hedefi</string>
+    <!-- %1$s: fish caught this week; %2$s: the time left before the reset. Keep 00:00 UTC. -->
+    <plurals name="social_clubs_goal_body">
+        <item quantity="one">Birlikte %1$s balık yakalandı. Hedef Pazartesi 00:00 UTC\'de, %2$s sonra sıfırlanır.</item>
+        <item quantity="other">Birlikte %1$s balık yakalandı. Hedef Pazartesi 00:00 UTC\'de, %2$s sonra sıfırlanır.</item>
+    </plurals>
+    <!-- %d: the most fish a member adds to the goal each day. -->
+    <plurals name="social_clubs_goal_rules">
+        <item quantity="one">Solo atışlarından gelen balıklar günde en fazla %d tane sayılır. Yardım eden her üye ulaşılan her ödülü alır.</item>
+        <item quantity="other">Solo atışlarından gelen balıklar günde en fazla %d tane sayılır. Yardım eden her üye ulaşılan her ödülü alır.</item>
+    </plurals>
+    <plurals name="social_clubs_claim">
+        <item quantity="one">%d ödülü al</item>
+        <item quantity="other">%d ödülü al</item>
+    </plurals>
+    <string name="social_clubs_members_title">Bu haftanın üyeleri</string>
+    <string name="social_clubs_manage">Yönet</string>
+    <string name="social_clubs_rename">Yeniden adlandır</string>
+    <string name="social_clubs_rename_title">Kulübü yeniden adlandır</string>
+    <string name="social_clubs_leave">Kulüpten ayrıl</string>
+    <!-- %1$s: the club's name (followed by "kulübünden"). -->
+    <string name="social_clubs_leave_title">%1$s kulübünden ayrılıyor musun?</string>
+    <string name="social_clubs_leave_owner">Kulüpte en uzun süredir bulunan üye başkan olur. Bu haftaki balıkların kulübün hedefinde kalır.</string>
+    <string name="social_clubs_leave_last">Son üye sensin, bu yüzden kulüp kapanır.</string>
+    <string name="social_clubs_leave_member">Bu haftaki balıkların kulübün hedefinde kalır. Hemen başka bir kulübe katılabilirsin.</string>
+    <string name="social_clubs_leave_confirm">Ayrıl</string>
+    <string name="social_clubs_stay">Kal</string>
+    <!-- %1$s: the member's name (after a colon); %2$d: hours before a removed member can rejoin. -->
+    <plurals name="social_clubs_manage_body">
+        <item quantity="one">Başkanlığı devredebilir (sen üye olursun) ya da üyeyi kulüpten çıkarabilirsin: %1$s. Çıkarılan bir üye %2$d saat sonra yeniden katılabilir.</item>
+        <item quantity="other">Başkanlığı devredebilir (sen üye olursun) ya da üyeyi kulüpten çıkarabilirsin: %1$s. Çıkarılan bir üye %2$d saat sonra yeniden katılabilir.</item>
+    </plurals>
+    <string name="social_clubs_make_owner">Başkan yap</string>
+    <string name="social_clubs_remove">Çıkar</string>
+</resources>
