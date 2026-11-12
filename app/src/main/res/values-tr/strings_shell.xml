@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The app shell: the bottom tabs, the pages of the Shop and sections of the Dex, and the dialogs
+    AppRoot shows over every screen. Keys start with shell_.
+-->
+<resources>
+    <!-- Bottom navigation tabs. -->
+    <string name="shell_tab_fish">Balık</string>
+    <string name="shell_tab_dex">Dex</string>
+    <string name="shell_tab_shop">Mağaza</string>
+    <string name="shell_tab_battle">Düello</string>
+
+    <!-- Pages of the Shop tab. -->
+    <string name="shell_shop_page_rope">Halat</string>
+    <string name="shell_shop_page_tackle">Ekipman</string>
+    <string name="shell_shop_page_style">Stil</string>
+    <string name="shell_shop_page_passes">Biletler</string>
+    <string name="shell_shop_page_aquarium">Akvaryum</string>
+
+    <!-- Sections of the Dex tab. -->
+    <string name="shell_dex_section_species">Türler</string>
+    <string name="shell_dex_section_secrets">Sırlar</string>
+    <string name="shell_dex_section_skins">Görünümler</string>
+
+    <!-- Asked when the guided tour closes. -->
+    <string name="shell_tour_again_title">Tanıtım bir dahaki sefere de gösterilsin mi?</string>
+    <string name="shell_tour_again_body">Deep Line\'ı bir sonraki açışında tanıtım yeniden açılsın mı? Tanıtımı istediğin zaman Ayarlar\'dan da başlatabilirsin: Balık sekmesinin üstündeki dişli simgesi.</string>
+    <string name="shell_tour_again_yes">Evet, bir dahaki sefere</string>
+
+    <!-- Debug builds only: a fake payment sheet. %1$s: the price; %2$s: the item's name. -->
+    <string name="shell_test_store_title">Test mağazası</string>
+    <string name="shell_test_store_body">%2$s için %1$s ödensin mi? Bu bir test sürümü: gerçek para çekilmez. Ödemenin nasıl sonuçlanacağını seç.</string>
+    <string name="shell_test_store_pending">Beklemede</string>
+    <string name="shell_test_store_fail">Başarısız</string>
+    <string name="shell_test_store_approve">Onayla</string>
+</resources>

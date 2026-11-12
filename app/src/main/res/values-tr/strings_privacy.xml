@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Privacy: the consent sheet, Settings > Privacy and account deletion. Keys start with privacy_.
+    Legal-ish texts: plain, accurate and complete. "İzin ver" and "İzin verme" are equal choices.
+-->
+<resources>
+    <!-- Consent sheet. -->
+    <string name="privacy_consent_title">Deep Line\'ı daha iyi hale getirmemize yardım eder misin?</string>
+    <string name="privacy_consent_body">İzin verirsen oyun, kullanım istatistiklerini (hangi ekranları açtığın, atışlarının ve düellolarının nasıl geçtiği, ne satın aldığın) ve çökme raporlarını Google Firebase\'e gönderir. Bunlar hataları düzeltmemize ve oyunu dengelememize yardım eder.</string>
+    <string name="privacy_consent_promise">Bu veriler adınla değil, rastgele bir kimlikle ilişkilendirilir ve asla reklam için kullanılmaz. Sen izin vermedikçe hiçbir şey gönderilmez ve fikrini istediğin zaman Ayarlar\'daki Gizlilik bölümünden değiştirebilirsin.</string>
+    <string name="privacy_read_policy">Gizlilik politikasını oku</string>
+    <string name="privacy_consent_choose">Her biri için ayrı seç</string>
+    <string name="privacy_consent_save">Seçimlerimi kaydet</string>
+    <string name="privacy_consent_refuse">İzin verme</string>
+    <string name="privacy_consent_allow">İzin ver</string>
+
+    <!-- The two kinds of data. -->
+    <string name="privacy_analytics_title">Kullanım istatistikleri</string>
+    <string name="privacy_analytics_subtitle">Oyunun nasıl oynandığı: ekranlar, atışlar, düellolar, satın alımlar.</string>
+    <string name="privacy_crash_title">Çökme raporları</string>
+    <string name="privacy_crash_subtitle">Oyun çöktüğünde ya da bir şey başarısız olduğunda neyin yanlış gittiği.</string>
+
+    <!-- Settings > Privacy. -->
+    <string name="privacy_settings_title">Gizlilik</string>
+    <string name="privacy_settings_intro">Kullanım istatistikleri ve çökme raporları, rastgele bir kimlikle (asla adınla değil) ilişkilendirilerek ve yalnızca sen izin verirsen Google Firebase\'e gönderilir. Asla reklam için kullanılmazlar.</string>
+    <string name="privacy_settings_unavailable">Oyunun bu sürümü hiçbir istatistik ya da çökme raporu göndermez. Seçimlerin, gönderen sürümler için saklanır.</string>
+    <string name="privacy_reset_id">İstatistik kimliğimi sıfırla</string>
+    <string name="privacy_account_explainer">Çevrim içi hesabın (oyuncu kimliği, bulut yedeği, bekleyen hediyeler) oyun sunucusunda tutulur. Hesabı silmek bunların hepsini siler; bu telefondaki ilerleme kalır.</string>
+    <string name="privacy_delete_account">Çevrim içi hesabımı sil</string>
+    <string name="privacy_deleting">Hesabın siliniyor…</string>
+
+    <!-- Confirmation dialog before deleting the online account. -->
+    <string name="privacy_delete_confirm_title">Çevrim içi hesabın silinsin mi?</string>
+    <string name="privacy_delete_confirm_body">Bu işlem, oyun sunucusunun senin için tuttuğu her şeyi siler: oyuncu kimliğin, bulut yedeğin ve seni bekleyen hediyeler. Kurtarma kodun artık çalışmaz ve bu işlem geri alınamaz.\n\nBu telefondaki ilerlemen kalır, satın alımların da Google Play hesabında kalır. Kaptan Kulübü aboneliği iptal edilmez: onu Google Play\'de yönet.</string>
+    <string name="privacy_delete_confirm_yes">Hesabımı sil</string>
+    <string name="privacy_delete_confirm_no">Kalsın</string>
+
+    <!-- Messages shown in the Privacy section after an action. -->
+    <string name="privacy_message_reset">Bu telefonda tutulan istatistikler temizlendi ve artık yeni bir rastgele kimliğin var.</string>
+    <string name="privacy_message_deleted">Çevrim içi hesabın silindi. Bu telefondaki ilerlemen hâlâ burada ve oyun artık yeni bir oyuncu kimliği kullanıyor.</string>
+    <!-- %1$s: why it failed (a full sentence). -->
+    <string name="privacy_message_not_deleted">Hesabın silinmedi: %1$s</string>
+</resources>

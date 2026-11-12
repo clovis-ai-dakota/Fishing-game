@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Settings (the gear on the Fish tab) and its sections: help, sound and feel, notifications,
+    language, credits (ui/settings/). Keys start with settings_<section>_.
+-->
+<resources>
+    <string name="settings_title">Ayarlar</string>
+    <string name="settings_version">Deep Line %1$s</string>
+
+    <!-- Help section. -->
+    <string name="settings_help_title">Yardım</string>
+    <string name="settings_help_body">Tanıtım, nasıl oynanacağını ve her şeyin ne işe yaradığını gösterir.</string>
+    <string name="settings_help_tour">Tanıtımı başlat</string>
+
+    <!-- Sound and feel section. -->
+    <string name="settings_sound_title">Ses ve hissiyat</string>
+    <string name="settings_sound_volume">Ses düzeyi</string>
+    <string name="settings_sound_music">Müzik</string>
+    <string name="settings_sound_effects">Ses efektleri</string>
+    <!-- Turkish writes the percent sign before the number: %50. -->
+    <string name="settings_sound_percent">%%%1$d</string>
+    <string name="settings_sound_vibration">Titreşim</string>
+    <string name="settings_sound_vibration_on">Çarpmalarda, avlarda ve büyük galibiyetlerde hafif bir titreşim.</string>
+    <string name="settings_sound_vibration_none">Bu telefon titreşim desteklemiyor.</string>
+    <string name="settings_sound_reduce_motion">Hareketi azalt</string>
+    <string name="settings_sound_reduce_motion_body">Atışlar sırasında ekran sarsıntısı, ağır çekim ya da parlama olmaz.</string>
+
+    <!-- Notifications section. -->
+    <string name="settings_notif_title">Bildirimler</string>
+    <string name="settings_notif_reminders">Hatırlatmalar</string>
+    <string name="settings_notif_reminders_body">Günlük ödülün hazır olduğunda, serin bitmek üzereyken ya da bir göç başladığında. %1$s</string>
+    <string name="settings_notif_daily">Günlük ödül hazır</string>
+    <!-- %1$s: a time on the hour, e.g. 12:00. -->
+    <string name="settings_notif_daily_body">Saat %1$s itibarıyla, o gün oyunu henüz açmadıysan.</string>
+    <string name="settings_notif_streak">Seri tehlikede</string>
+    <plurals name="settings_notif_streak_body">
+        <item quantity="one">Akşamları, %d gün veya daha uzun bir seri gece yarısı bitecekse.</item>
+        <item quantity="other">Akşamları, %d gün veya daha uzun bir seri gece yarısı bitecekse.</item>
+    </plurals>
+    <string name="settings_notif_events">Göçler ve etkinlikler</string>
+    <string name="settings_notif_events_body">Bir göç ya da hafta sonu etkinliği başladığında.</string>
+    <string name="settings_notif_blocked">Bu telefonda Deep Line bildirimleri kapalı, bu yüzden hiçbir hatırlatma gelemez.</string>
+    <string name="settings_notif_phone_settings">Telefon ayarlarını aç</string>
+
+    <!-- Language section. -->
+    <string name="settings_language_title">Dil</string>
+    <string name="settings_language_system">Telefonun dili</string>
+    <string name="settings_language_system_now">Şu an: %1$s</string>
+    <string name="settings_language_body">Oyuncuların yazdığı adlar asla çevrilmez.</string>
+
+    <!-- Credits section. -->
+    <string name="settings_credits_title">Emeği geçenler</string>
+    <string name="settings_credits_body">Tüm sesler ve müzikler kamu malı olarak bağışlanmış (CC0) ve OpenGameArt.org\'da paylaşılmış özgür eserlerdir. Yaratıcılarına teşekkür ederiz.</string>
+    <string name="settings_credits_music">Müzik: %1$s</string>
+    <string name="settings_credits_sounds">Sesler: %1$s</string>
+    <string name="settings_credits_by">Yapan: %1$s. Lisans: %2$s.</string>
+</resources>

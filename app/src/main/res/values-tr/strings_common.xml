@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Words and formats used all over the app: buttons, units, numbers, lists. Keys start with
+    common_. Turkish: "sen" register; nouns stay singular after a number.
+-->
+<resources>
+    <!-- Buttons. -->
+    <string name="common_ok">Tamam</string>
+    <string name="common_cancel">İptal</string>
+    <string name="common_back">‹ Geri</string>
+    <string name="common_no_thanks">Hayır, teşekkürler</string>
+    <string name="common_got_it">Anladım</string>
+
+    <!-- Units. -->
+    <string name="common_meters">%1$s m</string>
+    <string name="common_kg">%1$s kg</string>
+    <string name="common_meters_per_second">%1$s m/s</string>
+    <string name="common_points">%1$s puan</string>
+    <string name="common_points_plus">+%1$s puan</string>
+    <string name="common_time_on_the_hour">%1$02d:00</string>
+    <!-- Durations. -->
+    <plurals name="common_days">
+        <item quantity="one">%d gün</item>
+        <item quantity="other">%d gün</item>
+    </plurals>
+    <plurals name="common_hours">
+        <item quantity="one">%d saat</item>
+        <item quantity="other">%d saat</item>
+    </plurals>
+    <plurals name="common_weeks">
+        <item quantity="one">%d hafta</item>
+        <item quantity="other">%d hafta</item>
+    </plurals>
+    <plurals name="common_lanterns">
+        <item quantity="one">%d Fener</item>
+        <item quantity="other">%d Fener</item>
+    </plurals>
+    <!-- Short durations: g = gün, sa = saat, dk = dakika. -->
+    <string name="common_duration_minutes">%1$d dk</string>
+    <string name="common_duration_hours">%1$d sa</string>
+    <string name="common_duration_hours_minutes">%1$d sa %2$d dk</string>
+    <string name="common_duration_days_hours">%1$d g %2$d sa</string>
+    <!-- Compact numbers: B = bin, Mn = milyon. -->
+    <string name="common_compact_thousands">%1$s B</string>
+    <string name="common_compact_millions">%1$s Mn</string>
+    <string name="common_progress_of">%1$s / %2$s</string>
+
+    <!-- Lists: "a, b ve c". -->
+    <string name="common_list_middle">%1$s, %2$s</string>
+    <string name="common_list_end">%1$s ve %2$s</string>
+</resources>

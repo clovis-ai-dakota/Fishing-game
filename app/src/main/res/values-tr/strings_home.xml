@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The Fish tab (ui/HomeScreen.kt): the game's hub, with the big Cast line button. Keys start
+    with home_.
+-->
+<resources>
+    <string name="home_tagline">Derinlerdeki her balığı yakala</string>
+    <string name="home_cd_milestones">Kilometre taşları</string>
+    <string name="home_cd_themes">Temalar</string>
+    <string name="home_cd_settings">Ayarlar</string>
+    <string name="home_boat_action">Tekneni özelleştir</string>
+
+    <!-- The rope card. -->
+    <string name="home_rope_title">Halatın</string>
+    <string name="home_rope_reach">Erişim: %1$s · %2$s</string>
+    <string name="home_rope_stats">Atış: %1$s · Toplam kazanç: %2$s puan</string>
+    <string name="home_rope_stats_deepest">Atış: %1$s · Toplam kazanç: %2$s puan · En derin av %3$s</string>
+
+    <!-- The Dex card. -->
+    <string name="home_dex_title">Dex</string>
+    <string name="home_dex_caught">Yakalanan %1$d / %2$d</string>
+    <string name="home_dex_seen">Görülen %1$d</string>
+    <string name="home_dex_zone">%1$s %2$d/%3$d</string>
+
+    <!-- The milestones card. -->
+    <string name="home_milestones_title">Kilometre taşları</string>
+    <plurals name="home_milestones_to_claim">
+        <item quantity="one">%d ödül hazır!</item>
+        <item quantity="other">%d ödül hazır!</item>
+    </plurals>
+    <string name="home_milestones_next">%1$s / %2$s · sıradaki: %3$s</string>
+    <string name="home_milestones_done">Tüm kilometre taşlarına ulaşıldı!</string>
+
+    <!-- Tackle above the Cast line button. -->
+    <string name="home_lanterns">Fenerler: %1$d</string>
+    <string name="home_lanterns_hint">Sonraki atışta %1$d m altındaki karanlığı aydınlat.</string>
+    <string name="home_tackle_detector">Dedektör ×%1$d</string>
+    <string name="home_tackle_charm">Şans tılsımı ×%1$d</string>
+    <string name="home_tackle_lure">Parıltı yemi ×%1$d</string>
+    <string name="home_cast_button">Oltayı at</string>
+
+    <!-- The rules, in a dialog. -->
+    <string name="home_rules_title">Nasıl balık tutulur</string>
+    <string name="home_rules_body">• İğneyi yönlendirmek için parmağını sola ve sağa kaydır.\n• İniş: iğne %1$d kez çarpana ya da halat bitene kadar batar. Çarpma, bir balığın kafasına ya da bir kayaya, kütüğe veya denizanasına dokunmaktır; bir balığın gövdesine ya da kuyruğuna sürtünmek sayılmaz. İlk %2$d m çarpmasızdır.\n• Çıkış: bir balığı yakalamak için kafasına (gözünün yanındaki açık renkli yüze) dokun. Kuyruğa dokunmak hiçbir şey yapmaz. Halat ancak belli bir ağırlık taşıyabilir.\n• Derindeki avlar daha çok puan getirir. Parıldayan balıklar %3$d× daha değerlidir.\n• %4$d m altında su kararır. Bir Fener suyun çok daha fazlasını aydınlatır.</string>
+</resources>
