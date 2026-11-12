@@ -118,7 +118,7 @@
     <string name="shop_starter_banner_body">Una oferta única: termina en %1$s.</string>
     <string name="shop_starter_banner_see">Verla</string>
     <!-- A discount badge (no-break space before %). Tight. -->
-    <string name="shop_badge_discount">-%1$d %%</string>
+    <string name="shop_badge_discount">-%1$d %%</string>
 
     <!-- Instead of the prices, once the player has it (short). -->
     <string name="shop_owned">Obtenido ✓</string>
@@ -199,7 +199,7 @@
 
     <!-- %1$s: fishing time one euro stands for; %2$s: the same for Lantern packs; %3$d and %4$d:
          the extra percentage the bigger purchases give. -->
-    <string name="shop_footer_rates">Precios en puntos: unos %1$s de pesca por euro con el alcance de tu cuerda (packs de Faroles: %2$s), así que pagar solo ahorra tiempo y nunca compra nada que no se pueda conseguir con puntos. Las compras más grandes dan entre un +%3$d %% y un +%4$d %% más.</string>
+    <string name="shop_footer_rates">Precios en puntos: unos %1$s de pesca por euro con el alcance de tu cuerda (packs de Faroles: %2$s), así que pagar solo ahorra tiempo y nunca compra nada que no se pueda conseguir con puntos. Las compras más grandes dan entre un +%3$d %% y un +%4$d %% más.</string>
     <!-- %1$s: the store's name (Google Play, or "Tienda de prueba"). -->
     <string name="shop_footer_payments">Pagos: %1$s</string>
     <string name="shop_footer_restore">Restaurar compras</string>

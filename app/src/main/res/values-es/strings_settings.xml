@@ -19,7 +19,7 @@
     <string name="settings_sound_music">Música</string>
     <string name="settings_sound_effects">Efectos de sonido</string>
     <!-- A slider's level. %1$d: 0 to 100 (no-break space before %). -->
-    <string name="settings_sound_percent">%1$d %%</string>
+    <string name="settings_sound_percent">%1$d %%</string>
     <string name="settings_sound_vibration">Vibración</string>
     <string name="settings_sound_vibration_on">Un toque suave con los golpes, las capturas y las grandes victorias.</string>
     <string name="settings_sound_vibration_none">Este teléfono no puede vibrar.</string>

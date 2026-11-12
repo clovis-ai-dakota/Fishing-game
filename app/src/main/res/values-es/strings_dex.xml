@@ -20,7 +20,7 @@
 
     <!-- Species section: the header card. -->
     <!-- A whole percentage (no-break space before %). -->
-    <string name="dex_species_completion">%1$d %%</string>
+    <string name="dex_species_completion">%1$d %%</string>
     <!-- Tight: one line next to the ring. -->
     <string name="dex_species_counts">Vistas %1$d · Capturadas %2$d / %3$d</string>
     <string name="dex_species_filter_all">Todas</string>

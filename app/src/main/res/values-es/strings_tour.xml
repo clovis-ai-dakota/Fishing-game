@@ -175,7 +175,7 @@
 
     <string name="tour_tournament_title">El torneo semanal</string>
     <!-- %1$d: bumps; %2$d: attempts a week; %3$d: the percentage of players who win the badge. -->
-    <string name="tour_tournament_body">Durante toda la semana, todo el mundo pesca en exactamente la misma agua con %1$d golpes. Tienes %2$d intentos y cuenta el mejor; empezar un intento lo gasta. Cuando termina la semana, las recompensas se reparten según tu puesto final, y el %3$d %% mejor gana la insignia de título Torneo.</string>
+    <string name="tour_tournament_body">Durante toda la semana, todo el mundo pesca en exactamente la misma agua con %1$d golpes. Tienes %2$d intentos y cuenta el mejor; empezar un intento lo gasta. Cuando termina la semana, las recompensas se reparten según tu puesto final, y el %3$d %% mejor gana la insignia de título Torneo.</string>
 
     <string name="tour_clubs_title">Clubes</string>
     <!-- %1$d: the most members a club can have. -->

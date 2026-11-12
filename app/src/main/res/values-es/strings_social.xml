@@ -255,9 +255,9 @@
     <string name="social_tournament_rewards_title">Recompensas</string>
     <string name="social_tournament_rewards_body">Las recompensas se reparten según tu puesto final cuando termina la semana, y se reclaman aquí.</string>
     <!-- Who gets each band's reward (no-break space before %). -->
-    <string name="social_tournament_tier_champion">El primer puesto y el 1 % mejor</string>
-    <string name="social_tournament_tier_gold">El 10 % mejor</string>
-    <string name="social_tournament_tier_silver">El 25 % mejor</string>
+    <string name="social_tournament_tier_champion">El primer puesto y el 1 % mejor</string>
+    <string name="social_tournament_tier_gold">El 10 % mejor</string>
+    <string name="social_tournament_tier_silver">El 25 % mejor</string>
     <string name="social_tournament_tier_bronze">La mitad mejor</string>
     <string name="social_tournament_tier_took_part">Todos los demás participantes</string>
 

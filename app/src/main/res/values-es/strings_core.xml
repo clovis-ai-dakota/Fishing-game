@@ -408,9 +408,9 @@
 
     <!-- Final placings of the weekly tournament. -->
     <string name="core_tier_champion">Campeón</string>
-    <string name="core_tier_gold">Top 10 %</string>
-    <string name="core_tier_silver">Top 25 %</string>
-    <string name="core_tier_bronze">Top 50 %</string>
+    <string name="core_tier_gold">Top 10 %</string>
+    <string name="core_tier_silver">Top 25 %</string>
+    <string name="core_tier_bronze">Top 50 %</string>
     <string name="core_tier_took_part">Participación</string>
 
     <!-- Roles in a club. -->
