@@ -247,18 +247,18 @@ You translate one language, in its folder. For each English file `values/strings
 4. Don't copy `translatable="false"` strings (`app_name`).
 5. Follow the glossary below, and record your choices for the game's terms in
    `docs/l10n-glossary/<lang>.md` (one file per language: zones, tackle, modes, bumps, Dex...) so
-   every screen uses the same words. Species: translate each generator word once (section 11) and
-   reuse it.
+   every screen uses the same words. Species names stay in English for now (`strings_species.xml`
+   is `translatable="false"`: leave it out).
 6. Respect length: short labels (tabs, chips, buttons) should stay close to the English length;
    comments say when something is tight.
 7. Typography: French puts a no-break space before `:`, `!`, `?`, `;` and inside « » (write
    ` ` or ` `); Spanish opens questions and exclamations (`¿`, `¡`); German capitalises
    nouns; use your language's quotation marks.
 
-Run `LocalizationResourcesTest` as you go. **When your language is complete**, add its folder
-suffix to `LocalizationResourcesTest.REQUIRED_LANGUAGES` (`"fr"`, `"es"`, `"de"`, `"pt-rBR"`,
-`"tr"`): from then on a missing file or key fails the build. That's the switch from "checked as you
-go" to strict.
+Run `LocalizationResourcesTest` as you go. All five languages (`"fr"`, `"es"`, `"de"`,
+`"pt-rBR"`, `"tr"`) are complete and in `LocalizationResourcesTest.REQUIRED_LANGUAGES`, so a
+missing file or key fails the build: **every new English string needs its five translations in the
+same change**. A new language goes in that list once it is complete.
 
 ## 11. Glossary
 

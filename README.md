@@ -293,8 +293,10 @@ first, nothing given for a review; the game never knows whether the player rated
 
 ### Languages
 
-The game speaks **English, French, Spanish, German, Brazilian Portuguese and Turkish** (the
-translations are being written; until a language is complete, its missing text shows in English).
+The game speaks **English, French, Spanish, German, Brazilian Portuguese and Turkish**: every
+screen, the tour, notifications and the store listing are translated (species names stay in
+English as proper names). Each language's term choices are in `docs/l10n-glossary/<lang>.md`;
+machine-quality translations should get a native speaker's review before release.
 Settings > Language lists each language in its own words, plus "Phone's language" (the default);
 on Android 13+ it is the same setting as the system's per-app language (Settings > Apps > Deep
 Line > Language), and on older phones the game keeps the choice itself. Changing it redraws the

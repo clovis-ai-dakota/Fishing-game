@@ -309,8 +309,9 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     preference applied in `MainActivity.attachBaseContext` below. The locale config, the picker
     and `localeFilters` list the same languages (`LocalizationResourcesTest`).
   - Quality tests: `LocalizationResourcesTest` (translations mirror English file by file:
-    keys, placeholders, plural forms, escaping; `REQUIRED_LANGUAGES` makes a finished language
-    strict) and `HardcodedTextTest` (no text in files listed in `CONVERTED`: add a file once it is
+    keys, placeholders, plural forms, escaping; all five languages are in `REQUIRED_LANGUAGES`, so
+    **a new English string needs its French, Spanish, German, Brazilian Portuguese and Turkish
+    translations in the same change**, following `docs/l10n-glossary/<lang>.md`) and `HardcodedTextTest` (no text in files listed in `CONVERTED`: add a file once it is
     converted; no core English name shown). Check new screens with the English (XA) pseudo-locale
     (debug builds, Settings > Language) and in German and French, the longest languages.
 - All tunable numbers live in `core/.../GameConfig.kt` (plus the tables in `FishSpecies.kt`,

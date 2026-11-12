@@ -223,10 +223,11 @@ class LocalizationResourcesTest {
 
     companion object {
         /**
-         * Languages that must have every English file. Empty until the translators finish: each
-         * adds its folder suffix ("fr", "es", "de", "pt-rBR", "tr") when its language is complete.
+         * Languages that must have every English file (every file with something to translate):
+         * all five translations are complete, so a missing file or key fails the build. A new
+         * language goes here once it is complete.
          */
-        val REQUIRED_LANGUAGES: Set<String> = emptySet()
+        val REQUIRED_LANGUAGES: Set<String> = setOf("fr", "es", "de", "pt-rBR", "tr")
 
         /**
          * The plural categories each language uses for whole numbers (Unicode CLDR, as in Android's
