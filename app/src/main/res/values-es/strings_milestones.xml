@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Hitos (ui/MilestonesScreen.kt, con el trofeo de la pestaña Pescar): recompensas por el total
+    de puntos ganados en toda la carrera. Las claves empiezan por milestones_.
+-->
+<resources>
+    <string name="milestones_title">Hitos</string>
+    <string name="milestones_earned">Total ganado: %1$s pts</string>
+    <string name="milestones_explainer">Los hitos cuentan todos los puntos que ganas con los peces, aunque después los gastes en mejoras.</string>
+    <string name="milestones_threshold">%1$s pts</string>
+    <string name="milestones_claimed">Reclamado ✓</string>
+    <string name="milestones_claim">Reclamar</string>
+    <string name="milestones_reward_points">+%1$s pts</string>
+</resources>

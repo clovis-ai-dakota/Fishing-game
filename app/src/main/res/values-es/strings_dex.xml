@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    La pestaña Dex (ui/dex/): las cartas de las especies, la página de cada especie y la sección
+    Aspectos. "Dex" es un nombre inventado: se mantiene. Las claves empiezan por dex_.
+-->
+<resources>
+    <!-- The Dex tab's header. -->
+    <plurals name="dex_subtitle">
+        <item quantity="one">%d especie por descubrir en las profundidades</item>
+        <item quantity="many">%d de especies por descubrir en las profundidades</item>
+        <item quantity="other">%d especies por descubrir en las profundidades</item>
+    </plurals>
+    <!-- Opens the aquarium. One short word. -->
+    <string name="dex_aquarium_button">Acuario</string>
+
+    <!-- Secret tiers: short label in a card's corner. -->
+    <string name="dex_tier_legendary">Legendario</string>
+    <!-- %1$d: the tier, 1 to 4. -->
+    <string name="dex_tier">Rango %1$d</string>
+
+    <!-- Species section: the header card. -->
+    <!-- A whole percentage (no-break space before %). -->
+    <string name="dex_species_completion">%1$d %%</string>
+    <!-- Tight: one line next to the ring. -->
+    <string name="dex_species_counts">Vistas %1$d · Capturadas %2$d / %3$d</string>
+    <string name="dex_species_filter_all">Todas</string>
+    <string name="dex_species_filter_caught">Solo capturadas</string>
+    <string name="dex_species_empty">Aún no has capturado ningún pez aquí. ¡Sigue pescando!</string>
+    <string name="dex_species_cd_seen">Vista</string>
+    <string name="dex_cd_sparkling_caught">Capturado en versión brillante</string>
+
+    <!-- A species' page. -->
+    <!-- %1$s: the species' number in the Dex, e.g. #007. -->
+    <string name="dex_fish_title">Dex %1$s</string>
+    <string name="dex_fish_previous">Pez anterior</string>
+    <string name="dex_fish_next">Pez siguiente</string>
+    <string name="dex_fish_state_unknown">Aún sin ver</string>
+    <string name="dex_fish_state_seen">Vista, aún sin capturar</string>
+    <string name="dex_fish_state_caught">Capturada</string>
+    <string name="dex_fish_depth">Profundidad</string>
+    <string name="dex_fish_depth_range">%1$s–%2$s m</string>
+    <string name="dex_fish_weight">Peso</string>
+    <string name="dex_fish_base_points">Puntos base</string>
+    <string name="dex_fish_rarity">Rareza</string>
+    <string name="dex_fish_records">Tus récords</string>
+    <string name="dex_fish_record_caught">Capturados</string>
+    <string name="dex_fish_record_sparkling">Brillantes</string>
+    <string name="dex_fish_record_deepest">Más profundo</string>
+    <string name="dex_fish_record_best">Mejor</string>
+    <string name="dex_fish_hint_unknown">Pesca cerca de estas profundidades para avistarla: todo lo que nade cerca de tu anzuelo se añade al Dex.</string>
+    <string name="dex_fish_hint_seen">Captura uno para completar su peso, sus puntos, su rareza y tus récords.</string>
+
+    <!-- Skins section. Locked legendary skins only show their slot. -->
+    <string name="dex_skins_legendary_title">Aspectos legendarios</string>
+    <string name="dex_skins_your_title">Tu título:</string>
+    <string name="dex_skins_note">Los aspectos solo cambian cómo se ve tu equipo: nunca cambian cómo se juega. Aspectos legendarios desbloqueados: %1$d de %2$d.</string>
+    <!-- %1$s: the set's name, e.g. Matagigantes. -->
+    <string name="dex_skins_set">Conjunto %1$s</string>
+    <string name="dex_skins_set_locked">Conjunto bloqueado</string>
+    <string name="dex_skins_locked">Bloqueado</string>
+    <string name="dex_skins_equipped">Equipado ✓</string>
+    <string name="dex_skins_shop_gear">Equipo de la Tienda</string>
+    <string name="dex_skins_shop_browse">Ver la Tienda</string>
+    <string name="dex_skins_shop_more">Más en la Tienda</string>
+    <string name="dex_skins_boat_title">Tu barco</string>
+    <string name="dex_skins_boat_cd">Tu barco hecho a mano</string>
+    <string name="dex_skins_boat_body">Píntalo y aparéjalo a tu gusto. Las opciones básicas son gratis; otras se desbloquean con puntos y a medida que avanzas.</string>
+    <string name="dex_skins_boat_worn">Equipado ✓ · usar el barco clásico</string>
+    <string name="dex_skins_boat_wear">Equipar mi barco</string>
+    <!-- Side by side: keep them short. -->
+    <string name="dex_skins_boat_customise">Personalizar barco</string>
+    <string name="dex_skins_boat_shop">Barcos de la Tienda</string>
+    <string name="dex_skins_badge_title">Insignia de título</string>
+    <string name="dex_skins_cards_title">Cartas del Dex</string>
+    <string name="dex_skins_badges_more">Más insignias y estilos de carta en la Tienda</string>
+    <string name="dex_skins_atmosphere_title">Atmósfera</string>
+    <string name="dex_skins_atmosphere_locked">Llega a la Llanura Abisal para desbloquear Pesadilla: una estética aterradora para las aguas profundas.</string>
+    <string name="dex_skins_atmosphere_nightmare">Las profundidades dan miedo de verdad. Sigues viendo exactamente lo mismo que antes: solo cambia el ambiente.</string>
+    <string name="dex_skins_atmosphere_family">Inofensivo en la superficie, más inquietante cuanto más bajas.</string>
+</resources>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    El marco de la app: pestañas inferiores, páginas de la Tienda, secciones del Dex y los
+    diálogos que AppRoot muestra sobre cualquier pantalla. Las claves empiezan por shell_.
+-->
+<resources>
+    <!-- Bottom navigation tabs (~10 characters at most). -->
+    <string name="shell_tab_fish">Pescar</string>
+    <string name="shell_tab_dex">Dex</string>
+    <string name="shell_tab_shop">Tienda</string>
+    <string name="shell_tab_battle">Duelo</string>
+
+    <!-- Pages of the Shop tab (chips in a row). -->
+    <string name="shell_shop_page_rope">Cuerda</string>
+    <string name="shell_shop_page_tackle">Aparejos</string>
+    <string name="shell_shop_page_style">Estilo</string>
+    <string name="shell_shop_page_passes">Pases</string>
+    <string name="shell_shop_page_aquarium">Acuario</string>
+
+    <!-- Sections of the Dex tab (chips in a row). -->
+    <string name="shell_dex_section_species">Especies</string>
+    <string name="shell_dex_section_secrets">Secretos</string>
+    <string name="shell_dex_section_skins">Aspectos</string>
+
+    <!-- Asked when the guided tour closes. -->
+    <string name="shell_tour_again_title">¿Mostrar la guía la próxima vez?</string>
+    <string name="shell_tour_again_body">¿Quieres que la guía vuelva a abrirse la próxima vez que inicies Deep Line? También puedes verla cuando quieras desde Ajustes, con el engranaje de la parte superior de la pestaña Pescar.</string>
+    <string name="shell_tour_again_yes">Sí, la próxima vez</string>
+
+    <!-- Debug builds only: a fake payment sheet. -->
+    <string name="shell_test_store_title">Tienda de prueba</string>
+    <!-- %1$s: the price; %2$s: the item's name. -->
+    <string name="shell_test_store_body">¿Pagar %1$s por este artículo (%2$s)? Es una versión de prueba: no se cobra dinero real. Elige cómo termina el pago.</string>
+    <string name="shell_test_store_pending">Pendiente</string>
+    <string name="shell_test_store_fail">Fallar</string>
+    <string name="shell_test_store_approve">Aprobar</string>
+</resources>

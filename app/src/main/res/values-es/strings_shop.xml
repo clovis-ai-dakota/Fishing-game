@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    La Tienda: mensajes tras una compra, un regalo o un guardado en la nube (GameViewModel), lo que
+    da cada artículo (ShopText), errores de cuenta (AccountClient) y las pantallas de la Tienda
+    (ui/shop/): páginas, regalos, cuenta, temporada y evento de fin de semana, Temas, acuario y los
+    mensajes de las tiendas (billing/). Las claves empiezan por shop_. "pts" es la unidad corta de
+    los puntos; los precios en euros llegan ya formateados.
+-->
+<resources>
+    <!-- What an item gives: short noun phrases, joined with commas, used after a colon. -->
+    <plurals name="shop_grant_detectors">
+        <item quantity="one">%d Detector de peces raros</item>
+        <item quantity="many">%d de Detectores de peces raros</item>
+        <item quantity="other">%d Detectores de peces raros</item>
+    </plurals>
+    <plurals name="shop_grant_lucky_charms">
+        <item quantity="one">%d Amuleto de la suerte</item>
+        <item quantity="many">%d de Amuletos de la suerte</item>
+        <item quantity="other">%d Amuletos de la suerte</item>
+    </plurals>
+    <plurals name="shop_grant_sparkle_lures">
+        <item quantity="one">%d Señuelo brillante</item>
+        <item quantity="many">%d de Señuelos brillantes</item>
+        <item quantity="other">%d Señuelos brillantes</item>
+    </plurals>
+    <plurals name="shop_grant_club_days">
+        <item quantity="one">%d día de Club del Capitán</item>
+        <item quantity="many">%d de días de Club del Capitán</item>
+        <item quantity="other">%d días de Club del Capitán</item>
+    </plurals>
+    <string name="shop_grant_a_boat">un barco</string>
+    <!-- %1$s: the title, e.g. Fundador. -->
+    <string name="shop_grant_title">el título %1$s</string>
+    <!-- %1$s: the boat's name, e.g. Llamamareas. -->
+    <string name="shop_grant_season_boat">el barco %1$s</string>
+    <!-- Boat options. %1$s: its name. -->
+    <string name="shop_grant_paint">pintura %1$s</string>
+    <string name="shop_grant_emblem">emblema %1$s</string>
+    <string name="shop_grant_sail_print">estampado de vela %1$s</string>
+    <!-- What the passes give, after "Pase de temporada:" etc. -->
+    <string name="shop_grant_season_pass">la ruta premium de esta temporada: una insignia de temporada, el barco de temporada en el nivel 10 y muchos aparejos</string>
+    <!-- %1$d: tiers skipped. -->
+    <string name="shop_grant_collector_edition">el pase de temporada, %1$d niveles al instante, el barco de temporada desde ya y una insignia de coleccionista</string>
+    <string name="shop_grant_event_pass">el doble de progreso en el evento de este fin de semana y una recompensa mayor con una insignia del evento</string>
+    <!-- Title badge frames and other unlocks. -->
+    <string name="shop_unlock_badge_rainbow">una insignia de título arcoíris</string>
+    <string name="shop_unlock_badge_club_forever">una insignia del Club que nunca caduca</string>
+    <string name="shop_unlock_badge_season">una insignia de temporada</string>
+    <string name="shop_unlock_badge_collector">una insignia de coleccionista</string>
+    <string name="shop_unlock_badge_event">una insignia de evento</string>
+    <string name="shop_unlock_badge_tournament">la insignia de título Torneo</string>
+    <!-- %1$s: the frame's name, e.g. Océano. -->
+    <string name="shop_unlock_badge_frame">la insignia de título %1$s</string>
+
+    <!-- Messages after buying. -->
+    <!-- %1$s: the item; %2$s: what it gives. -->
+    <string name="shop_message_thanks">¡Gracias! %1$s: %2$s.</string>
+    <string name="shop_message_got">%1$s: %2$s.</string>
+    <string name="shop_message_cancelled">Compra cancelada: no se ha cobrado nada.</string>
+    <!-- %1$s: the item. -->
+    <string name="shop_message_pending">Pago pendiente de confirmación (%1$s). Te llegará en cuanto se confirme.</string>
+    <string name="shop_message_pending_unknown">Tu compra está a la espera de que se confirme el pago. Te llegará en cuanto se confirme.</string>
+    <string name="shop_message_failed">El pago no se ha completado.</string>
+    <!-- %1$s: the store's own explanation (may stay in English). -->
+    <string name="shop_message_failed_because">El pago no se ha completado: %1$s</string>
+    <!-- %1$s: the store's name (Google Play). -->
+    <string name="shop_message_store_unavailable">%1$s no está disponible en este momento.</string>
+    <string name="shop_message_restoring">Buscando tus compras en %1$s…</string>
+    <string name="shop_message_club_pouch">Club del Capitán: %1$s.</string>
+    <string name="shop_message_season_rewards">Recompensas de temporada: %1$s.</string>
+    <string name="shop_message_event_claimed">¡Has reclamado la recompensa del evento de fin de semana!</string>
+
+    <!-- Gifts to and from online opponents. -->
+    <!-- %1$s: the item; %2$s: the friend's name (as they typed it). -->
+    <string name="shop_gift_sent">¡Regalo enviado a %2$s: %1$s!</string>
+    <!-- After an error message. -->
+    <string name="shop_gift_refunded">%1$s Te hemos devuelto los puntos.</string>
+    <!-- After an error message. %2$s: the item. -->
+    <string name="shop_gift_kept">%1$s En su lugar, el artículo es para ti (%2$s).</string>
+    <!-- %1$s: who sent it (a player's name, or shop_gift_from_you); %2$s: the item; %3$s: what it gives. -->
+    <string name="shop_gift_received">Regalo de %1$s. %2$s: %3$s.</string>
+    <!-- %1$s: who sent it; %2$s: the item; %3$s: points given instead. -->
+    <string name="shop_gift_received_owned">Regalo de %1$s: %2$s. Ya lo tenías, así que recibes %3$s pts a cambio.</string>
+    <!-- Who a gift is from when the player bought it for themselves: used after "Regalo de". -->
+    <string name="shop_gift_from_you">ti</string>
+
+    <!-- Cloud save and recovery codes. -->
+    <string name="shop_cloud_club_only">El guardado en la nube es una ventaja del Club del Capitán.</string>
+    <string name="shop_cloud_backed_up">Tu progreso tiene copia de seguridad.</string>
+    <!-- "DL-" is the start of every recovery code: keep it as is. -->
+    <string name="shop_cloud_bad_code">Eso no es un código de recuperación: empieza por DL- y tiene 24 letras y cifras.</string>
+    <string name="shop_cloud_restored">Progreso restaurado.</string>
+
+    <!-- Errors talking to the game server. Full sentences. -->
+    <string name="shop_account_unreachable">No se puede conectar con el servidor. Comprueba tu conexión y vuelve a intentarlo.</string>
+    <string name="shop_account_wrong_code">Ese código de recuperación no corresponde a este jugador.</string>
+    <string name="shop_account_nothing_saved">Todavía no hay nada guardado para este jugador.</string>
+    <string name="shop_account_too_large">Es demasiado para el servidor.</string>
+    <string name="shop_account_refused">El servidor no ha podido aceptarlo.</string>
+    <!-- %1$d: the HTTP status code. -->
+    <string name="shop_account_server_problem">El servidor ha tenido un problema (%1$d).</string>
+
+    <!-- ==== The Shop tab ==== -->
+    <string name="shop_balance">%1$s pts para gastar</string>
+
+    <!-- Buying with points asks first. %1$s: the item's name. -->
+    <string name="shop_confirm_title">¿Comprar %1$s?</string>
+    <!-- %1$s: what the item gives; %2$s: its price; %3$s: points left after buying. -->
+    <string name="shop_confirm_body">Recibes: %1$s.\n\nCuesta %2$s pts; te quedarán %3$s pts.</string>
+    <string name="shop_confirm_buy">Comprar por %1$s pts</string>
+
+    <!-- The Captain's Club's free monthly gift. -->
+    <string name="shop_club_pouch_title">Regalo del Club del Capitán</string>
+    <!-- %1$s: what the pouch gives, e.g. "12 Faroles". -->
+    <string name="shop_club_pouch_body">Tu Bolsa de Faroles mensual gratis está lista: %1$s.</string>
+    <string name="shop_claim">Reclamar</string>
+    <!-- %1$s: time left, e.g. "2 d 5 h". -->
+    <string name="shop_starter_banner_body">Una oferta única: termina en %1$s.</string>
+    <string name="shop_starter_banner_see">Verla</string>
+    <!-- A discount badge (no-break space before %). Tight. -->
+    <string name="shop_badge_discount">-%1$d %%</string>
+
+    <!-- Instead of the prices, once the player has it (short). -->
+    <string name="shop_owned">Obtenido ✓</string>
+    <string name="shop_worn">Equipado ✓</string>
+    <string name="shop_on_your_boat">En tu barco ✓</string>
+    <string name="shop_in_use">En uso ✓</string>
+    <string name="shop_not_available">No disponible ahora mismo</string>
+    <!-- Small buttons on owned items. -->
+    <string name="shop_wear">Equipar</string>
+    <string name="shop_take_off">Quitar</string>
+    <string name="shop_apply">Aplicar</string>
+    <string name="shop_use">Usar</string>
+
+    <!-- Rope page. -->
+    <string name="shop_rope_title">Mejoras de cuerda</string>
+    <string name="shop_rope_note">Se compran con puntos. La Longitud de cuerda te lleva a zonas más profundas y a peces nuevos, la Fuerza aguanta más peso y la Agilidad guía más rápido. ¿Has cambiado de idea? Baja un nivel y recupera todos sus puntos.</string>
+    <!-- Nv. = nivel. Tight. -->
+    <string name="shop_rope_level">Nv. %1$d / %2$d</string>
+    <!-- %1$s: the stat one level lower; %2$s: points given back. -->
+    <string name="shop_rope_downgrade">Bajar a %1$s · recuperas %2$s pts</string>
+    <string name="shop_rope_maxed">%1$s · al máximo</string>
+
+    <!-- Tackle page. -->
+    <string name="shop_tackle_title">Aparejos</string>
+    <string name="shop_tackle_note">Objetos de un solo lance: actívalos antes de lanzar. El Farol y el detector también funcionan en los duelos. Compra uno con puntos, o un pack con euros o con puntos.</string>
+    <!-- Tight: next to the name. -->
+    <string name="shop_tackle_owned">Tienes %1$d</string>
+    <!-- %1$s: the description (full sentences). -->
+    <string name="shop_tackle_desc_battles">%1$s También funciona en los duelos.</string>
+    <string name="shop_tackle_desc_solo">%1$s Solo en lances en solitario.</string>
+    <string name="shop_tackle_single">Solo uno</string>
+
+    <!-- Style page: looks only. -->
+    <string name="shop_style_boats_title">Barcos prediseñados</string>
+    <string name="shop_style_boats_note">Diseños listos para usar: equípalos tal cual o hazlos tuyos en el editor de barcos. Como todos los aspectos, solo cambian la apariencia.</string>
+    <string name="shop_style_sets_title">Conjuntos completos</string>
+    <string name="shop_style_sets_note">Un barco prediseñado con anzuelo, sedal y estela a juego.</string>
+    <string name="shop_style_parts_title">Pinturas, emblemas y estampados</string>
+    <string name="shop_style_parts_note">Se previsualizan en tu propio barco. Una vez comprados, también aparecen en el editor de barcos.</string>
+    <string name="shop_style_gear_title">Anzuelos, sedales y estelas</string>
+    <string name="shop_style_gear_note">Mismo tamaño y misma zona de contacto que el equipo clásico: solo cambian la apariencia.</string>
+    <string name="shop_style_themes_title">Temas de la app</string>
+    <string name="shop_style_themes_note">La escena y los colores de los menús, de día y de noche. Los temas más elaborados cuestan más.</string>
+    <string name="shop_style_badges_title">Insignias de título</string>
+    <string name="shop_style_badges_note">El marco alrededor de tu título (o de tu nombre), visible también en línea. Los pases de temporada, los eventos y el Club añaden más.</string>
+    <string name="shop_style_cards_title">Estilos de carta del Dex</string>
+    <string name="shop_style_cards_note">Cómo muestra el Dex las especies que has capturado.</string>
+    <string name="shop_style_more_title">Más</string>
+    <!-- %1$s: the list of what a set gives. -->
+    <string name="shop_set_contents">%1$s.</string>
+
+    <!-- Aquarium page of the Shop. -->
+    <string name="shop_aquarium_page_note">Los peces que capturas nadan en tu acuario (Dex > Acuario). La decoración y una pecera más grande solo cambian su apariencia.</string>
+    <string name="shop_aquarium_open">Abrir tu acuario</string>
+
+    <!-- Passes page. -->
+    <string name="shop_passes_title">Pases y packs</string>
+    <string name="shop_passes_note">Temporadas, eventos de fin de semana, el Club del Capitán y packs de un solo uso.</string>
+
+    <!-- A full-width item card. -->
+    <!-- %1$s: the price of its pieces bought one by one, e.g. 4,97 €. -->
+    <string name="shop_item_worth">Por separado costaría %1$s.</string>
+    <!-- %1$s: time left, e.g. "2 d 5 h". -->
+    <string name="shop_item_offer_ends">Solo una vez: termina en %1$s.</string>
+    <string name="shop_club_member_for_life">Tu membresía es de por vida.</string>
+    <plurals name="shop_club_member_until">
+        <!-- %1$s: the date membership ends; %2$d: days one points purchase adds. -->
+        <item quantity="one">Membresía hasta el %1$s. Con euros se renueva cada mes hasta que la canceles; con puntos añade %2$d día.</item>
+        <item quantity="many">Membresía hasta el %1$s. Con euros se renueva cada mes hasta que la canceles; con puntos añade %2$d de días.</item>
+        <item quantity="other">Membresía hasta el %1$s. Con euros se renueva cada mes hasta que la canceles; con puntos añade %2$d días.</item>
+    </plurals>
+    <plurals name="shop_club_how">
+        <!-- Not a member. %d: days one points purchase gives. -->
+        <item quantity="one">Con euros se renueva cada mes hasta que la canceles; con puntos es %d día.</item>
+        <item quantity="many">Con euros se renueva cada mes hasta que la canceles; con puntos son %d de días.</item>
+        <item quantity="other">Con euros se renueva cada mes hasta que la canceles; con puntos son %d días.</item>
+    </plurals>
+
+    <!-- %1$s: fishing time one euro stands for; %2$s: the same for Lantern packs; %3$d and %4$d:
+         the extra percentage the bigger purchases give. -->
+    <string name="shop_footer_rates">Precios en puntos: unos %1$s de pesca por euro con el alcance de tu cuerda (packs de Faroles: %2$s), así que pagar solo ahorra tiempo y nunca compra nada que no se pueda conseguir con puntos. Las compras más grandes dan entre un +%3$d %% y un +%4$d %% más.</string>
+    <!-- %1$s: the store's name (Google Play, or "Tienda de prueba"). -->
+    <string name="shop_footer_payments">Pagos: %1$s</string>
+    <string name="shop_footer_restore">Restaurar compras</string>
+    <string name="shop_footer_account">Cuenta, guardado en la nube y regalos</string>
+
+    <string name="shop_close">Cerrar</string>
+
+    <!-- ==== Gifts ==== -->
+    <!-- %1$s: the opponent's name, as they typed it. -->
+    <string name="shop_gift_pick_title">Un regalo para %1$s</string>
+    <string name="shop_gift_pick_note">Lo encontrará la próxima vez que abra el juego. Algo estético, o aparejos para sus lances.</string>
+
+    <!-- ==== The account dialog ==== -->
+    <string name="shop_account_title">Tu cuenta</string>
+    <!-- %1$s: the player's public id: never translated. -->
+    <string name="shop_account_player_id">ID de jugador: %1$s</string>
+    <string name="shop_account_gifts_note">Tus rivales en línea pueden enviarte regalos; llegan cuando abres el juego o la Tienda.</string>
+    <string name="shop_account_cloud_title">Guardado en la nube</string>
+    <!-- %1$s: the date and time of the last backup. -->
+    <string name="shop_account_last_backup">Última copia: %1$s. Tu progreso se guarda después de tus lances.</string>
+    <string name="shop_account_no_backup">Aún no hay copia de seguridad.</string>
+    <string name="shop_account_backup_now">Guardar ahora</string>
+    <string name="shop_account_club_perk">Una ventaja del Club del Capitán: guarda una copia de tu progreso y restáurala en un teléfono nuevo.</string>
+    <string name="shop_account_code_note">Tu código de recuperación restaura una copia en otro teléfono. No lo compartas: es la llave de tu progreso.</string>
+    <!-- The name of the copied text, shown by the phone's clipboard. -->
+    <string name="shop_account_code_clip">Código de recuperación de Deep Line</string>
+    <string name="shop_account_copy_code">Copiar el código</string>
+    <string name="shop_account_show_code">Mostrar mi código de recuperación</string>
+    <string name="shop_account_code_field">Código de recuperación</string>
+    <string name="shop_account_restore_warning">Esto sustituye el progreso de este teléfono por la copia de seguridad.</string>
+    <string name="shop_account_restore">Restaurar</string>
+    <string name="shop_account_restore_open">Restaurar desde otro teléfono</string>
+
+    <!-- ==== The season and the weekend event ==== -->
+    <!-- %1$d: the season's number; %2$s: its name. -->
+    <string name="shop_season_title">Temporada %1$d · %2$s</string>
+    <string name="shop_season_ends">Termina en %1$s</string>
+    <string name="shop_season_ends_pass">Termina en %1$s · Pase activo</string>
+    <!-- Tight. -->
+    <string name="shop_season_tier">Nivel %1$d / %2$d</string>
+    <!-- XP = puntos de experiencia. -->
+    <string name="shop_season_xp">Cada lance en solitario da XP de temporada: %1$d por lance, %2$d por pez y %3$d por secreto conseguido. Con %4$d XP se abre un nivel.</string>
+    <string name="shop_season_premium_row">Fila superior: la ruta premium del pase</string>
+    <!-- Short. -->
+    <string name="shop_season_claim">Reclamar %1$d</string>
+    <string name="shop_event_none_title">Eventos de fin de semana</string>
+    <!-- %1$s: time until the next one. -->
+    <string name="shop_event_none_body">Cada fin de semana trae un objetivo de pesca con recompensa. El próximo empieza dentro de %1$s.</string>
+    <!-- %1$s: the event's goal, e.g. "Captura peces". -->
+    <string name="shop_event_title">Evento de fin de semana: %1$s</string>
+    <!-- %1$s: time left; %2$s: the reward. -->
+    <string name="shop_event_body">Termina en %1$s. Recompensa: %2$s.</string>
+    <!-- %1$s: time left; %2$s: the reward; %3$s: the pass's bigger reward. -->
+    <string name="shop_event_body_pass">Termina en %1$s. Recompensa: %2$s; con tu pase del evento (el progreso cuenta el doble): %3$s.</string>
+    <string name="shop_event_claim">Reclamar la recompensa</string>
+
+    <!-- ==== Themes ==== -->
+    <string name="shop_themes_title">Temas</string>
+    <string name="shop_themes_mode_title">De día o de noche</string>
+    <string name="shop_themes_mode_note">Cada tema tiene una versión de día y otra de noche. El agua en la que pescas nunca cambia: los temas son para los menús.</string>
+    <!-- Short. -->
+    <string name="shop_themes_join">Unirse</string>
+    <!-- %1$s: a depth, e.g. "240 m". -->
+    <string name="shop_themes_preview_reach">Llega a %1$s</string>
+
+    <!-- ==== The aquarium ==== -->
+    <string name="shop_aquarium_title">Acuario</string>
+    <!-- %1$d: species in the tank; %2$d: how many it holds. -->
+    <string name="shop_aquarium_count_empty">En la pecera: %1$d / %2$d. Captura peces para llenarla.</string>
+    <string name="shop_aquarium_count">En la pecera: %1$d / %2$d. Toca una especie para añadirla o sacarla.</string>
+    <string name="shop_aquarium_decor">Decoración</string>
+    <string name="shop_aquarium_more">Más decoración y una pecera más grande en la Tienda</string>
+    <string name="shop_aquarium_catches">Tus capturas</string>
+    <plurals name="shop_aquarium_cd_tank">
+        <item quantity="one">Acuario con %d pez</item>
+        <item quantity="many">Acuario con %d de peces</item>
+        <item quantity="other">Acuario con %d peces</item>
+    </plurals>
+
+    <!-- ==== Stores (billing/) ==== -->
+    <string name="shop_store_test_name">Tienda de prueba</string>
+    <string name="shop_store_test_declined">La tienda de prueba ha rechazado la tarjeta.</string>
+    <string name="shop_store_not_on_screen">Google Play necesita que el juego esté en pantalla.</string>
+    <string name="shop_store_not_on_sale">Este artículo aún no está a la venta en Google Play.</string>
+</resources>

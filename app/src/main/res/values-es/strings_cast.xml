@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Durante un lance: los avisos breves sobre el agua (GameViewModel), el HUD, la pausa y los
+    resultados. Las claves empiezan por cast_. Los avisos se leen en un instante: cortos y directos.
+-->
+<resources>
+    <plurals name="cast_notice_bump">
+        <!-- %d: bumps left before the line turns back up. -->
+        <item quantity="one">¡Golpe! Queda %d</item>
+        <item quantity="many">¡Golpe! Quedan %d</item>
+        <item quantity="other">¡Golpe! Quedan %d</item>
+    </plurals>
+    <string name="cast_notice_pulled_up">¡Sedal arriba! Apunta a las cabezas</string>
+    <string name="cast_notice_rope_end">¡Fin de la cuerda! A recoger</string>
+    <!-- %1$s: the species; %2$s: points won. The two spaces are kept on purpose (quoted). -->
+    <string name="cast_notice_caught">"%1$s  +%2$s"</string>
+    <!-- A Sparkling fish was caught ("brillante" doesn't change with the name). -->
+    <string name="cast_notice_caught_sparkling">"%1$s brillante  +%2$s"</string>
+    <string name="cast_notice_too_heavy">Demasiado pesado: %1$s</string>
+    <!-- %1$s: what the last bump hooked; %2$s: points. -->
+    <string name="cast_notice_last_bump">"Último golpe, enganchado: %1$s  +%2$s"</string>
+    <string name="cast_notice_times_up">¡Se acabó el tiempo!</string>
+
+    <!-- The HUD. Chips are small: keep them short. -->
+    <string name="cast_hud_phase_sinking">Bajando</string>
+    <string name="cast_hud_phase_reeling">Subiendo</string>
+    <string name="cast_hud_phase_surfaced">En superficie</string>
+    <string name="cast_hud_pause">Pausa</string>
+    <string name="cast_hud_bumps">Golpes</string>
+    <!-- The weight bar. %1$s: kg on the line now; %2$s: the most the rope can carry. Short. -->
+    <string name="cast_hud_load">Carga %1$s / %2$s kg</string>
+    <!-- %1$d: the depth (m) below which bumps count. -->
+    <string name="cast_hud_bump_free">Zona libre de golpes · cuentan por debajo de %1$d m</string>
+    <string name="cast_hud_lantern_lit">Farol encendido</string>
+    <!-- %1$s: the player's name; %2$d: the round. -->
+    <string name="cast_hud_battle_round">%1$s · Ronda %2$d</string>
+    <string name="cast_hud_battle_cast_of">%1$s · Lance %2$d/%3$d</string>
+    <string name="cast_hud_battle_cast">%1$s · Lance %2$d</string>
+    <string name="cast_hud_player">Jugador</string>
+    <string name="cast_hud_tournament_attempt">Torneo · Intento %1$d de %2$d</string>
+
+    <!-- Hints in the middle of the screen. -->
+    <string name="cast_hint_steer">Arrastra para guiar: el anzuelo va hacia tu dedo. Por debajo de %1$d m, evita las cabezas de los peces y los objetos: con %2$d golpes, el sedal sube.</string>
+    <!-- CABEZA is in capitals for emphasis. -->
+    <string name="cast_hint_heads">Toca a los peces en la CABEZA para engancharlos. Las colas no cuentan.</string>
+
+    <!-- The fast reel button. Big button, one line. -->
+    <string name="cast_fast_reel">Recoger rápido</string>
+    <string name="cast_fast_reel_line_full">Sedal lleno · Recoger rápido</string>
+
+    <!-- The pause dialog. -->
+    <string name="cast_pause_title">En pausa</string>
+    <string name="cast_pause_body_solo">Si sales, este lance termina sin puntuar ninguno de los peces del sedal.</string>
+    <string name="cast_pause_body_battle">Si sales, pierdes el duelo. El reloj del duelo se detiene durante la pausa.</string>
+    <string name="cast_pause_body_online">Si sales, pierdes el duelo. En línea, tu rival sigue pescando mientras estás en pausa.</string>
+    <string name="cast_pause_body_tournament">Si sales, este intento del torneo puntúa 0 y cuenta igualmente como uno de tus intentos.</string>
+    <string name="cast_pause_resume">Reanudar</string>
+    <string name="cast_pause_quit">Salir del lance</string>
+    <string name="cast_pause_forfeit">Abandonar el duelo</string>
+
+    <!-- The results panel at the end of a cast. -->
+    <string name="cast_results_title">Lance terminado</string>
+    <!-- Pieces joined with " · ". %1$s: meters, already formatted ("312 m"). -->
+    <string name="cast_results_deepest">Punto más profundo: %1$s</string>
+    <plurals name="cast_results_fish">
+        <item quantity="one">%d pez</item>
+        <item quantity="many">%d de peces</item>
+        <item quantity="other">%d peces</item>
+    </plurals>
+    <plurals name="cast_results_objects">
+        <item quantity="one">%d objeto</item>
+        <item quantity="many">%d de objetos</item>
+        <item quantity="other">%d objetos</item>
+    </plurals>
+    <string name="cast_results_nothing">Esta vez no hay nada en el sedal. Al subir, lleva el anzuelo hacia los peces para que toque su cabeza.</string>
+    <string name="cast_results_by_last_bump">enganchado con el último golpe</string>
+    <!-- %1$s: the species ("brillante" doesn't change with the name). -->
+    <string name="cast_results_sparkling">✦ %1$s brillante</string>
+    <string name="cast_results_secret">✦ Secreto: %1$s</string>
+    <!-- The two spaces are on purpose (quoted). -->
+    <string name="cast_results_total">"Total  +%1$s pts"</string>
+    <string name="cast_results_collect">Cobrar</string>
+    <string name="cast_results_continue">Continuar</string>
+
+    <!-- Labels drawn on the water during a cast (small, one line). -->
+    <string name="cast_canvas_bump_free_above">Libre de golpes hasta %1$d m</string>
+    <string name="cast_canvas_rope_limit">Límite de la cuerda</string>
+</resources>

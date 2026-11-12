@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Palabras y formatos usados en toda la app: botones, unidades, números, listas. Las claves
+    empiezan por common_. Español neutro, tuteando al jugador.
+-->
+<resources>
+    <!-- Buttons. -->
+    <string name="common_ok">Aceptar</string>
+    <string name="common_cancel">Cancelar</string>
+    <string name="common_back">‹ Atrás</string>
+    <string name="common_no_thanks">No, gracias</string>
+    <string name="common_got_it">Entendido</string>
+
+    <!-- Units. -->
+    <string name="common_meters">%1$s m</string>
+    <string name="common_kg">%1$s kg</string>
+    <string name="common_meters_per_second">%1$s m/s</string>
+    <string name="common_points">%1$s pts</string>
+    <string name="common_points_plus">+%1$s pts</string>
+    <string name="common_time_on_the_hour">%1$02d:00</string>
+    <!-- Durations. -->
+    <plurals name="common_days">
+        <item quantity="one">%d día</item>
+        <item quantity="many">%d de días</item>
+        <item quantity="other">%d días</item>
+    </plurals>
+    <plurals name="common_hours">
+        <item quantity="one">%d hora</item>
+        <item quantity="many">%d de horas</item>
+        <item quantity="other">%d horas</item>
+    </plurals>
+    <plurals name="common_weeks">
+        <item quantity="one">%d semana</item>
+        <item quantity="many">%d de semanas</item>
+        <item quantity="other">%d semanas</item>
+    </plurals>
+    <plurals name="common_lanterns">
+        <item quantity="one">%d Farol</item>
+        <item quantity="many">%d de Faroles</item>
+        <item quantity="other">%d Faroles</item>
+    </plurals>
+    <!-- Short durations: d = días, h = horas, min = minutos. -->
+    <string name="common_duration_minutes">%1$d min</string>
+    <string name="common_duration_hours">%1$d h</string>
+    <string name="common_duration_hours_minutes">%1$d h %2$d min</string>
+    <string name="common_duration_days_hours">%1$d d %2$d h</string>
+    <!-- Compact numbers for small chips ("5 mil", "1,5 M"). -->
+    <string name="common_compact_thousands">%1$s mil</string>
+    <string name="common_compact_millions">%1$s M</string>
+    <string name="common_progress_of">%1$s / %2$s</string>
+
+    <!-- Lists: "a, b y c". -->
+    <string name="common_list_middle">%1$s, %2$s</string>
+    <string name="common_list_end">%1$s y %2$s</string>
+</resources>
