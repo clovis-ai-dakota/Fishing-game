@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Der Tab „Dex“ (ui/dex/): die Artenkarten, die Seite jeder Art und der Bereich „Skins“.
+    „Dex“ ist ein erfundener Name und bleibt so (der Dex). (The Dex tab. Keys start with dex_.)
+-->
+<resources>
+    <!-- Kopfzeile des Dex. -->
+    <plurals name="dex_subtitle">
+        <item quantity="one">%d Art in der Tiefe zu entdecken</item>
+        <item quantity="other">%d Arten in der Tiefe zu entdecken</item>
+    </plurals>
+    <string name="dex_aquarium_button">Aquarium</string>
+
+    <!-- Stufen der Geheimnisse. -->
+    <string name="dex_tier_legendary">Legendär</string>
+    <string name="dex_tier">Stufe %1$d</string>
+
+    <!-- Bereich „Arten“. -->
+    <string name="dex_species_completion">%1$d&#160;%%</string>
+    <string name="dex_species_counts">Gesehen %1$d · Gefangen %2$d / %3$d</string>
+    <string name="dex_species_filter_all">Alle</string>
+    <string name="dex_species_filter_caught">Nur gefangene</string>
+    <string name="dex_species_empty">Hier noch keine Fische gefangen. Angle weiter!</string>
+    <string name="dex_species_cd_seen">Gesehen</string>
+    <string name="dex_cd_sparkling_caught">Funkelnd gefangen</string>
+
+    <!-- Die Seite einer Art. -->
+    <string name="dex_fish_title">Dex %1$s</string>
+    <string name="dex_fish_previous">Vorheriger Fisch</string>
+    <string name="dex_fish_next">Nächster Fisch</string>
+    <string name="dex_fish_state_unknown">Noch nicht gesehen</string>
+    <string name="dex_fish_state_seen">Gesehen, noch nicht gefangen</string>
+    <string name="dex_fish_state_caught">Gefangen</string>
+    <string name="dex_fish_depth">Tiefe</string>
+    <string name="dex_fish_depth_range">%1$s–%2$s m</string>
+    <string name="dex_fish_weight">Gewicht</string>
+    <string name="dex_fish_base_points">Grundpunkte</string>
+    <string name="dex_fish_rarity">Seltenheit</string>
+    <string name="dex_fish_records">Deine Rekorde</string>
+    <string name="dex_fish_record_caught">Gefangen</string>
+    <string name="dex_fish_record_sparkling">Funkelnd</string>
+    <string name="dex_fish_record_deepest">Am tiefsten</string>
+    <string name="dex_fish_record_best">Bestwert</string>
+    <string name="dex_fish_hint_unknown">Angle in der Nähe dieser Tiefen, um ihn zu entdecken: Alles, was nah an deinem Haken vorbeischwimmt, kommt in den Dex.</string>
+    <string name="dex_fish_hint_seen">Fang einen, um Gewicht, Punkte, Seltenheit und deine Rekorde einzutragen.</string>
+
+    <!-- Bereich „Skins“. -->
+    <string name="dex_skins_legendary_title">Legendäre Skins</string>
+    <string name="dex_skins_your_title">Dein Titel:</string>
+    <string name="dex_skins_note">Skins ändern nur das Aussehen deiner Ausrüstung, nie das Spiel selbst. Freigeschaltete legendäre Skins: %1$d von %2$d.</string>
+    <string name="dex_skins_set">%1$s-Set</string>
+    <string name="dex_skins_set_locked">Gesperrtes Set</string>
+    <string name="dex_skins_locked">Gesperrt</string>
+    <string name="dex_skins_equipped">Ausgerüstet ✓</string>
+    <string name="dex_skins_shop_gear">Ausrüstung aus dem Shop</string>
+    <string name="dex_skins_shop_browse">Shop ansehen</string>
+    <string name="dex_skins_shop_more">Mehr im Shop</string>
+    <string name="dex_skins_boat_title">Dein Boot</string>
+    <string name="dex_skins_boat_cd">Dein selbst gestaltetes Boot</string>
+    <string name="dex_skins_boat_body">Lackiere und takle es selbst. Grundoptionen sind gratis; mehr schaltest du mit Punkten und im Spielverlauf frei.</string>
+    <string name="dex_skins_boat_worn">Ausgerüstet ✓ · klassisches Boot nutzen</string>
+    <string name="dex_skins_boat_wear">Mein Boot ausrüsten</string>
+    <string name="dex_skins_boat_customise">Boot gestalten</string>
+    <string name="dex_skins_boat_shop">Shop-Boote</string>
+    <string name="dex_skins_badge_title">Titelabzeichen</string>
+    <string name="dex_skins_cards_title">Dex-Karten</string>
+    <string name="dex_skins_badges_more">Mehr Abzeichen und Kartenstile im Shop</string>
+    <string name="dex_skins_atmosphere_title">Atmosphäre</string>
+    <string name="dex_skins_atmosphere_locked">Erreiche die Tiefseeebene, um „Albtraum“ freizuschalten: ein furchterregender Look für das tiefe Wasser.</string>
+    <string name="dex_skins_atmosphere_nightmare">Die Tiefe ist richtig gruselig. Du siehst trotzdem genau so viel wie vorher: Nur die Stimmung ändert sich.</string>
+    <string name="dex_skins_atmosphere_family">Harmlos an der Oberfläche, unheimlicher, je tiefer du kommst.</string>
+</resources>

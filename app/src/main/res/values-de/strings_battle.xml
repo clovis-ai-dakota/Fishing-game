@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Duelle 1 gegen 1 und Online-Spiel: der Tab „Duell“, der Duell-Bildschirm zwischen den Würfen,
+    Spielernamen, die Online-Lobby und die Meldungen des Duell-Servers. Namen, die Spieler
+    eingeben, werden nie übersetzt und stehen dort, wo keine Grammatik sie verändert.
+    (1v1 battles and online play. Keys start with battle_ or online_.)
+-->
+<resources>
+    <!-- Spielernamen. -->
+    <string name="battle_player_you">Du</string>
+    <string name="battle_player_rival">Rivale (%1$s)</string>
+    <string name="battle_player_one">Spieler 1</string>
+    <string name="battle_player_two">Spieler 2</string>
+
+    <!-- Online-Fehler. -->
+    <string name="online_error_code_length">Raumcodes haben %1$d Zeichen.</string>
+    <string name="online_error_unreachable">Server nicht erreichbar (%1$s).</string>
+    <string name="online_error_disconnected">Verbindung zum Server getrennt.</string>
+
+    <!-- Eine Uhr (Minuten:Sekunden) für Duelle auf Zeit. -->
+    <string name="battle_clock">%1$d:%2$02d</string>
+
+    <!-- Der Tab „Duell“. -->
+    <string name="battle_setup_title">Duell 1 gegen 1</string>
+    <string name="battle_setup_mode">Modus</string>
+    <string name="battle_setup_opponent">Gegner</string>
+    <string name="battle_setup_computer">Computer:</string>
+    <string name="battle_setup_friend">Freund an diesem Gerät (Handy weitergeben)</string>
+    <string name="battle_setup_online">Online (Raumcode oder schnelles Spiel)</string>
+    <string name="battle_setup_info_online">Online angeln beide gleichzeitig am eigenen Handy, im exakt gleichen Wasser und mit demselben Standard-Turnierseil (Stufe %1$d in allen Werten). Fänge in Duellen zählen nicht für deine Punkte oder dein Fangbuch.</string>
+    <string name="battle_setup_info_local">Beide nutzen dein aktuelles Seil und angeln bei jedem Wurf im exakt gleichen Wasser, also entscheidet das Können. Fänge in Duellen zählen nicht für deine Punkte oder dein Fangbuch.</string>
+    <string name="battle_setup_tackle_title">Zubehör für deine Würfe</string>
+    <string name="battle_setup_tackle_info">Laternen und Detektoren wirken in Duellen: Solange sie eingeschaltet sind, verbraucht jeder deiner Würfe je eins. Talisman und Funkelköder gibt es nur für Solo-Würfe.</string>
+    <string name="battle_setup_wager_title">Wette (optional)</string>
+    <string name="battle_setup_wager_none">Keine</string>
+    <string name="battle_setup_wager_terms">Bei einem Sieg bekommst du %1$s Punkte zurück (×%2$s gegen %3$s); ein Unentschieden erstattet den Einsatz; bei Niederlage oder Aufgabe ist er weg.</string>
+    <string name="battle_setup_wager_hint">Setz Punkte auf das Ergebnis: Ein Sieg gegen %1$s zahlt ×%2$s.</string>
+    <!-- S, N und U: Siege, Niederlagen, Unentschieden. -->
+    <string name="battle_setup_record">Bilanz gegen den Computer: %1$d S · %2$d N · %3$d U</string>
+    <string name="battle_setup_go_online">Online gehen</string>
+    <string name="battle_setup_start">Duell starten</string>
+    <string name="battle_tackle_lantern">Laterne ×%1$d</string>
+    <string name="battle_tackle_detector">Detektor ×%1$d</string>
+    <string name="battle_tackle_get_more">Mehr holen</string>
+
+    <!-- Der Duell-Bildschirm zwischen den Würfen. -->
+    <string name="battle_rounds_title">Runden</string>
+    <string name="battle_round">Runde %1$d</string>
+    <string name="battle_round_score">"%1$s  :  %2$s"</string>
+    <string name="battle_round_winner">"  → %1$s"</string>
+    <string name="battle_round_tie">"  → unentschieden"</string>
+    <string name="battle_outcome_draw">Unentschieden!</string>
+    <string name="battle_outcome_wins">%1$s gewinnt!</string>
+    <string name="battle_outcome_you_win">Du gewinnst!</string>
+    <string name="battle_by_forfeit">durch Aufgabe</string>
+    <string name="battle_wager_won">Wette gewonnen: %1$s</string>
+    <string name="battle_wager_refunded">Wette erstattet: %1$s</string>
+    <string name="battle_wager_lost">Wette verloren: %1$s</string>
+    <string name="battle_new_online">Neues Online-Duell</string>
+    <string name="battle_rematch">Revanche</string>
+    <string name="battle_send_gift">Geschenk an %1$s senden</string>
+    <string name="battle_back_to_menu">Zurück zum Menü</string>
+    <string name="battle_sending_cast">Dein Wurf wird gesendet…</string>
+    <string name="battle_waiting_for">Warten auf %1$s…</string>
+    <string name="battle_forfeit">Aufgeben</string>
+    <string name="battle_up_next">Als Nächstes: %1$s</string>
+    <string name="battle_up_next_round">Als Nächstes: %1$s · Runde %2$d</string>
+    <string name="battle_up_next_time">Als Nächstes: %1$s · noch %2$s</string>
+    <string name="battle_up_next_cast">Als Nächstes: %1$s · Wurf %2$d/%3$d</string>
+    <string name="battle_hand_phone">Gib das Handy an %1$s weiter.</string>
+    <string name="battle_let_fish">Angeln lassen: %1$s</string>
+    <string name="battle_cast">Auswerfen!</string>
+    <string name="battle_cast_player">%1$s: Auswerfen!</string>
+    <string name="battle_forfeit_title">Duell aufgeben?</string>
+    <string name="battle_forfeit_body">Dein Gegner wird zum Sieger erklärt.</string>
+    <string name="battle_keep_playing">Weiterspielen</string>
+    <string name="battle_player_me">%1$s (du)</string>
+    <string name="battle_time_left">Restzeit %1$s</string>
+    <string name="battle_total">Gesamt %1$s</string>
+    <string name="battle_cast_line">#%1$d: %2$s</string>
+    <plurals name="battle_fish">
+        <item quantity="one">%d Fisch</item>
+        <item quantity="other">%d Fische</item>
+    </plurals>
+    <string name="battle_opponent_live">%1$s angelt: %2$s</string>
+    <string name="battle_opponent_live_cast">Wurf %1$d</string>
+
+    <!-- Die Online-Lobby. -->
+    <string name="online_title">Online-Duell</string>
+    <string name="online_tournament_rope">Turnierseil: Stufe %1$d in allen Werten, für beide.</string>
+    <string name="online_your_name">Dein Name</string>
+    <string name="online_share_code">Teile diesen Raumcode</string>
+    <string name="online_waiting_join">Warten, bis dein Gegner beitritt…</string>
+    <string name="online_looking">Suche nach einem Gegner…</string>
+    <string name="online_paired_with">Du spielst gegen die nächste Person, die diesen Modus wählt: %1$s.</string>
+    <string name="online_create_room">Raum erstellen</string>
+    <string name="online_quick_match">Schnelles Spiel</string>
+    <string name="online_room_code">Raumcode</string>
+    <string name="online_join">Beitreten</string>
+    <string name="online_status_disconnected">Nicht verbunden. Beim Erstellen, Beitreten oder schnellen Spiel wirst du verbunden.</string>
+    <string name="online_status_connecting">Verbinde…</string>
+    <string name="online_status_connected">Verbunden.</string>
+    <string name="online_status_waiting">Verbunden · warte.</string>
+    <string name="online_status_in_match">In einem Duell.</string>
+    <string name="online_server_show">Servereinstellungen</string>
+    <string name="online_server_hide">Servereinstellungen ausblenden</string>
+    <string name="online_server_address">Serveradresse</string>
+    <string name="online_server_example">Zum Beispiel %1$s</string>
+
+    <!-- Meldungen des Duell-Servers. -->
+    <string name="online_error_cast_unexpected">Dieser Wurf wird gerade nicht erwartet.</string>
+    <string name="online_error_cast_impossible">Dieser Wurf ist mit dem Turnierseil nicht möglich.</string>
+    <string name="online_error_unreadable">Unlesbare Nachricht.</string>
+    <string name="online_error_update_app">Bitte aktualisiere die App, um online zu spielen.</string>
+    <string name="online_error_busy">Du wartest bereits auf ein Duell oder spielst gerade eins.</string>
+    <string name="online_error_no_room">Kein Raum mit dem Code %1$s.</string>
+    <string name="online_over_forfeited">%1$s hat aufgegeben.</string>
+    <string name="online_over_left">%1$s hat das Duell verlassen.</string>
+</resources>
