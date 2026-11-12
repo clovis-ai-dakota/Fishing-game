@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Einstellungen (das Zahnrad im Tab „Angeln“) und ihre Bereiche: Hilfe, Ton und Spielgefühl,
+    Benachrichtigungen, Sprache, Credits. (Settings. Keys start with settings_<section>_.)
+-->
+<resources>
+    <string name="settings_title">Einstellungen</string>
+    <string name="settings_version">Deep Line %1$s</string>
+
+    <!-- Hilfe. -->
+    <string name="settings_help_title">Hilfe</string>
+    <string name="settings_help_body">Die Tour zeigt, wie das Spiel funktioniert und wofür alles da ist.</string>
+    <string name="settings_help_tour">Tour starten</string>
+
+    <!-- Ton und Spielgefühl. -->
+    <string name="settings_sound_title">Ton und Spielgefühl</string>
+    <string name="settings_sound_volume">Lautstärke</string>
+    <string name="settings_sound_music">Musik</string>
+    <string name="settings_sound_effects">Soundeffekte</string>
+    <string name="settings_sound_percent">%1$d&#160;%%</string>
+    <string name="settings_sound_vibration">Vibration</string>
+    <string name="settings_sound_vibration_on">Ein leichtes Vibrieren bei Stößen, Fängen und großen Siegen.</string>
+    <string name="settings_sound_vibration_none">Dieses Handy kann nicht vibrieren.</string>
+    <string name="settings_sound_reduce_motion">Bewegung reduzieren</string>
+    <string name="settings_sound_reduce_motion_body">Kein Bildschirmwackeln, keine Zeitlupe und keine Blitze während der Würfe.</string>
+
+    <!-- Benachrichtigungen. -->
+    <string name="settings_notif_title">Benachrichtigungen</string>
+    <string name="settings_notif_reminders">Erinnerungen</string>
+    <string name="settings_notif_reminders_body">Wenn deine Tagesbelohnung bereit ist, deine Serie bald endet oder eine Wanderung beginnt. %1$s</string>
+    <string name="settings_notif_daily">Tagesbelohnung bereit</string>
+    <string name="settings_notif_daily_body">Ab %1$s, wenn du das Spiel an dem Tag noch nicht geöffnet hast.</string>
+    <string name="settings_notif_streak">Serie in Gefahr</string>
+    <plurals name="settings_notif_streak_body">
+        <item quantity="one">Am Abend, wenn eine Serie von %d Tag oder mehr um Mitternacht enden würde.</item>
+        <item quantity="other">Am Abend, wenn eine Serie von %d Tagen oder mehr um Mitternacht enden würde.</item>
+    </plurals>
+    <string name="settings_notif_events">Wanderungen und Events</string>
+    <string name="settings_notif_events_body">Wenn eine Wanderung oder ein Wochenend-Event beginnt.</string>
+    <string name="settings_notif_blocked">Benachrichtigungen für Deep Line sind auf diesem Handy ausgeschaltet, daher kann keine Erinnerung ankommen.</string>
+    <string name="settings_notif_phone_settings">Handy-Einstellungen öffnen</string>
+
+    <!-- Sprache. -->
+    <string name="settings_language_title">Sprache</string>
+    <string name="settings_language_system">Sprache des Handys</string>
+    <string name="settings_language_system_now">Aktuell: %1$s</string>
+    <string name="settings_language_body">Namen, die Spieler eingeben, werden nie übersetzt.</string>
+
+    <!-- Credits. -->
+    <string name="settings_credits_title">Credits</string>
+    <string name="settings_credits_body">Alle Sounds und die Musik sind freie, gemeinfreie Werke (CC0), geteilt auf OpenGameArt.org. Danke an ihre Urheber!</string>
+    <string name="settings_credits_music">Musik: %1$s</string>
+    <string name="settings_credits_sounds">Sounds: %1$s</string>
+    <string name="settings_credits_by">Von %1$s. Lizenz: %2$s.</string>
+</resources>

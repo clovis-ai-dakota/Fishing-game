@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Die App-Hülle: Tabs unten, Seiten des Shops, Bereiche des Dex und Dialoge über jedem Bildschirm.
+    (The app shell. Keys start with shell_.)
+-->
+<resources>
+    <!-- Tabs unten (je ein kurzes Wort). -->
+    <string name="shell_tab_fish">Angeln</string>
+    <string name="shell_tab_dex">Dex</string>
+    <string name="shell_tab_shop">Shop</string>
+    <string name="shell_tab_battle">Duell</string>
+
+    <!-- Seiten des Shops (Chips). -->
+    <string name="shell_shop_page_rope">Seil</string>
+    <string name="shell_shop_page_tackle">Zubehör</string>
+    <string name="shell_shop_page_style">Stil</string>
+    <string name="shell_shop_page_passes">Pässe</string>
+    <string name="shell_shop_page_aquarium">Aquarium</string>
+
+    <!-- Bereiche des Dex (Chips). -->
+    <string name="shell_dex_section_species">Arten</string>
+    <string name="shell_dex_section_secrets">Geheimnisse</string>
+    <string name="shell_dex_section_skins">Skins</string>
+
+    <!-- Am Ende der Tour. -->
+    <string name="shell_tour_again_title">Tour beim nächsten Mal zeigen?</string>
+    <string name="shell_tour_again_body">Soll die Tour beim nächsten Start von Deep Line wieder erscheinen? Du kannst sie auch jederzeit in den Einstellungen starten, über das Zahnrad oben im Tab „Angeln“.</string>
+    <string name="shell_tour_again_yes">Ja, nächstes Mal</string>
+
+    <!-- Nur Debug-Builds: ein falsches Bezahlfenster zum Testen. -->
+    <string name="shell_test_store_title">Test-Store</string>
+    <string name="shell_test_store_body">%1$s für %2$s bezahlen? Das ist ein Test-Build: Es wird kein echtes Geld abgebucht. Wähle, wie die Zahlung ausgeht.</string>
+    <string name="shell_test_store_pending">Ausstehend</string>
+    <string name="shell_test_store_fail">Fehlschlagen</string>
+    <string name="shell_test_store_approve">Genehmigen</string>
+</resources>
