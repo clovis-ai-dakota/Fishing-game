@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    1v1 battles and online play: the Battle tab, the battle screen between casts, player names
+    given by the game, the online lobby and the battle server's messages. Keys start with battle_
+    or online_. Players' names are placed where Turkish needs no suffix (subject, after a colon,
+    in parentheses, before "için" or "adlı").
+-->
+<resources>
+    <string name="battle_player_you">Sen</string>
+    <!-- %1$s: the computer's difficulty (Kolay, Normal or Zor). -->
+    <string name="battle_player_rival">Rakip (%1$s)</string>
+    <string name="battle_player_one">Oyuncu 1</string>
+    <string name="battle_player_two">Oyuncu 2</string>
+
+    <!-- %1$d: the code's length. -->
+    <string name="online_error_code_length">Oda kodları %1$d karakterlidir.</string>
+    <!-- %1$s: the technical reason (stays in English). -->
+    <string name="online_error_unreachable">Sunucuya ulaşılamadı (%1$s).</string>
+    <string name="online_error_disconnected">Sunucuyla bağlantı kesildi.</string>
+
+    <!-- A clock (minutes:seconds), e.g. "2:05". -->
+    <string name="battle_clock">%1$d:%2$02d</string>
+
+    <!-- The Battle tab (BattleSetupScreen). -->
+    <string name="battle_setup_title">1v1 Düello</string>
+    <string name="battle_setup_mode">Mod</string>
+    <string name="battle_setup_opponent">Rakip</string>
+    <string name="battle_setup_computer">Bilgisayar:</string>
+    <string name="battle_setup_friend">Bu cihazdaki bir arkadaş (sırayla oyna)</string>
+    <string name="battle_setup_online">Çevrim içi (oda kodu ya da hızlı eşleşme)</string>
+    <!-- %1$d: the level of the standard tournament rope, in every rope stat. -->
+    <string name="battle_setup_info_online">Çevrim içi düelloda iki oyuncu aynı anda kendi telefonunda, tıpatıp aynı suda ve aynı standart turnuva halatıyla (her özellikte seviye %1$d) balık tutar. Düello avları puanlarına ya da balık defterine sayılmaz.</string>
+    <string name="battle_setup_info_local">İki oyuncu da senin şu anki halatını kullanır ve her atışta tıpatıp aynı suda balık tutar, yani kazananı beceri belirler. Düello avları puanlarına ya da balık defterine sayılmaz.</string>
+    <string name="battle_setup_tackle_title">Atışların için ekipman</string>
+    <string name="battle_setup_tackle_info">Fenerler ve dedektörler düellolarda çalışır: açık oldukları sürece her atışın bir tane kullanır. Şans tılsımı ve Parıltı yemi yalnızca solo atışlar içindir.</string>
+    <string name="battle_setup_wager_title">Bahis (isteğe bağlı)</string>
+    <string name="battle_setup_wager_none">Yok</string>
+    <!-- %1$s: points paid back for a win; %2$s: the multiplier (after ×); %3$s: the computer's
+         level (an adjective: "Kolay rakibe karşı"). -->
+    <string name="battle_setup_wager_terms">Kazanırsan %1$s puan geri alırsın (%3$s rakibe karşı ×%2$s); beraberlikte bahis iade edilir; kaybedersen ya da pes edersen bahsi kaybedersin.</string>
+    <!-- %1$s: the computer's level; %2$s: the multiplier. -->
+    <string name="battle_setup_wager_hint">Sonuca puan yatır: %1$s rakibe karşı galibiyet ×%2$s öder.</string>
+    <!-- G = galibiyet, M = mağlubiyet, B = beraberlik. -->
+    <string name="battle_setup_record">Bilgisayara karşı: %1$d G · %2$d M · %3$d B</string>
+    <string name="battle_setup_go_online">Çevrim içi oyna</string>
+    <string name="battle_setup_start">Düelloyu başlat</string>
+    <!-- %1$d: how many are owned. -->
+    <string name="battle_tackle_lantern">Fener ×%1$d</string>
+    <string name="battle_tackle_detector">Dedektör ×%1$d</string>
+    <string name="battle_tackle_get_more">Daha fazla al</string>
+
+    <!-- The battle screen (between casts). -->
+    <string name="battle_rounds_title">Turlar</string>
+    <string name="battle_round">Tur %1$d</string>
+    <!-- Player 1's points against player 2's. The spaces are on purpose (quoted). -->
+    <string name="battle_round_score">"%1$s  –  %2$s"</string>
+    <string name="battle_round_winner">"  → %1$s"</string>
+    <string name="battle_round_tie">"  → berabere"</string>
+    <string name="battle_outcome_draw">Berabere!</string>
+    <!-- %1$s: the winner's name. -->
+    <string name="battle_outcome_wins">%1$s kazandı!</string>
+    <string name="battle_outcome_you_win">Kazandın!</string>
+    <!-- Under the result when the battle was given away ("hükmen" = by forfeit). -->
+    <string name="battle_by_forfeit">hükmen</string>
+    <!-- %1$s: points with their unit. -->
+    <string name="battle_wager_won">Bahis kazanıldı: %1$s</string>
+    <string name="battle_wager_refunded">Bahis iade edildi: %1$s</string>
+    <string name="battle_wager_lost">Bahis kaybedildi: %1$s</string>
+    <string name="battle_new_online">Yeni çevrim içi düello</string>
+    <string name="battle_rematch">Rövanş</string>
+    <!-- %1$s: the online opponent's name. -->
+    <string name="battle_send_gift">%1$s için hediye gönder</string>
+    <string name="battle_back_to_menu">Menüye dön</string>
+    <string name="battle_sending_cast">Atışın gönderiliyor…</string>
+    <!-- %1$s: the opponent's name. -->
+    <string name="battle_waiting_for">%1$s bekleniyor…</string>
+    <string name="battle_forfeit">Pes et</string>
+    <!-- %1$s: the player's name. -->
+    <string name="battle_up_next">Sıradaki: %1$s</string>
+    <string name="battle_up_next_round">Sıradaki: %1$s · tur %2$d</string>
+    <string name="battle_up_next_time">Sıradaki: %1$s · %2$s kaldı</string>
+    <string name="battle_up_next_cast">Sıradaki: %1$s · atış %2$d/%3$d</string>
+    <!-- %1$s: the player whose turn it is. -->
+    <string name="battle_hand_phone">Telefonu şu oyuncuya ver: %1$s.</string>
+    <!-- %1$s: the computer's name (e.g. "Rakip (Normal)"), the subject. -->
+    <string name="battle_let_fish">%1$s balık tutsun</string>
+    <string name="battle_cast">Oltayı at!</string>
+    <!-- %1$s: the name of the player whose turn it is (vocative). -->
+    <string name="battle_cast_player">Oltayı at, %1$s!</string>
+    <string name="battle_forfeit_title">Pes etmek istiyor musun?</string>
+    <string name="battle_forfeit_body">Rakibin kazanan ilan edilecek.</string>
+    <string name="battle_keep_playing">Oynamaya devam et</string>
+    <string name="battle_player_me">%1$s (sen)</string>
+    <string name="battle_time_left">Kalan süre %1$s</string>
+    <string name="battle_total">Toplam %1$s</string>
+    <!-- %1$d: the cast's number; %2$s: what it brought, joined with " · ". -->
+    <string name="battle_cast_line">#%1$d: %2$s</string>
+    <plurals name="battle_fish">
+        <item quantity="one">%d balık</item>
+        <item quantity="other">%d balık</item>
+    </plurals>
+    <!-- %1$s: the opponent's name; %2$s: the details. -->
+    <string name="battle_opponent_live">%1$s balık tutuyor: %2$s</string>
+    <string name="battle_opponent_live_cast">atış %1$d</string>
+
+    <!-- The online lobby (OnlineLobbyScreen). -->
+    <string name="online_title">Çevrim içi düello</string>
+    <string name="online_tournament_rope">Turnuva halatı: iki oyuncu için de her özellikte seviye %1$d.</string>
+    <string name="online_your_name">Adın</string>
+    <string name="online_share_code">Bu oda kodunu paylaş</string>
+    <string name="online_waiting_join">Rakibinin katılması bekleniyor…</string>
+    <string name="online_looking">Rakip aranıyor…</string>
+    <!-- %1$s: the battle mode (followed by "modunu"). -->
+    <string name="online_paired_with">%1$s modunu seçen bir sonraki oyuncuyla eşleşeceksin.</string>
+    <string name="online_create_room">Oda kur</string>
+    <string name="online_quick_match">Hızlı eşleşme</string>
+    <string name="online_room_code">Oda kodu</string>
+    <string name="online_join">Katıl</string>
+    <string name="online_status_disconnected">Bağlı değil. Oda kurduğunda, bir odaya katıldığında ya da hızlı eşleşme başlattığında bağlanırsın.</string>
+    <string name="online_status_connecting">Bağlanıyor…</string>
+    <string name="online_status_connected">Bağlandı.</string>
+    <string name="online_status_waiting">Bağlandı · bekleniyor.</string>
+    <string name="online_status_in_match">Maçta.</string>
+    <string name="online_server_show">Sunucu ayarları</string>
+    <string name="online_server_hide">Sunucu ayarlarını gizle</string>
+    <string name="online_server_address">Sunucu adresi</string>
+    <!-- %1$s: an example address (never translated). -->
+    <string name="online_server_example">Örneğin %1$s</string>
+
+    <!-- The battle server's messages. -->
+    <string name="online_error_cast_unexpected">Şu anda bu atış beklenmiyor.</string>
+    <string name="online_error_cast_impossible">Bu atış turnuva halatıyla mümkün değil.</string>
+    <string name="online_error_unreadable">Okunamayan mesaj.</string>
+    <string name="online_error_update_app">Çevrim içi oynamak için lütfen uygulamayı güncelle.</string>
+    <string name="online_error_busy">Zaten bir maç bekliyorsun ya da oynuyorsun.</string>
+    <!-- %1$s: the room code that was typed (followed by "kodlu"). -->
+    <string name="online_error_no_room">%1$s kodlu bir oda yok.</string>
+    <!-- %1$s: the player's name (the subject). -->
+    <string name="online_over_forfeited">%1$s pes etti.</string>
+    <string name="online_over_left">%1$s düellodan ayrıldı.</string>
+</resources>
