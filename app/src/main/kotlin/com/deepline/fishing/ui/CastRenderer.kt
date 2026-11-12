@@ -1,5 +1,8 @@
 package com.deepline.fishing.ui
 
+import android.content.res.Resources
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -13,10 +16,13 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.unit.sp
+import com.deepline.fishing.R
 import com.deepline.fishing.core.CastPhase
 import com.deepline.fishing.core.CastSession
 import com.deepline.fishing.core.Cosmetic
@@ -64,6 +70,44 @@ private val BumpRed = Color(0xFFFF5252)
 private val BumpFreeGreen = Color(0xFF9CFFB0)
 
 /**
+ * The words drawn on the water (depth markers, the bump-free and rope-limit lines), in the game's
+ * language. A DrawScope can't read string resources, so the composable that draws a cast resolves
+ * them ([rememberCastLabels]) and passes them down. [NONE] draws no words.
+ */
+class CastLabels(
+    /** "Bump-free above 50 m", on the line where bumps start to count. */
+    val bumpFree: String,
+    /** "Rope limit", on the line at the end of the rope. */
+    val ropeLimit: String,
+    /** "150 m", a depth marker. */
+    private val depthLabel: (meters: Int) -> String,
+) {
+    private val depths = HashMap<Int, String>()
+
+    /** A depth marker's label (cached: the same few are drawn every frame). */
+    fun depth(meters: Int): String = depths.getOrPut(meters) { depthLabel(meters) }
+
+    companion object {
+        val NONE = CastLabels(bumpFree = "", ropeLimit = "", depthLabel = { "" })
+    }
+}
+
+/** The cast's labels in the language of [resources]. */
+fun castLabels(resources: Resources): CastLabels = CastLabels(
+    bumpFree = resources.getString(R.string.cast_canvas_bump_free_above, GameConfig.BUMP_FREE_DEPTH.toInt()),
+    ropeLimit = resources.getString(R.string.cast_canvas_rope_limit),
+    depthLabel = { meters -> metersText(meters.toFloat()).resolve(resources) },
+)
+
+/** The cast's labels in the language shown now. */
+@Composable
+fun rememberCastLabels(): CastLabels {
+    val configuration = LocalConfiguration.current
+    val resources = LocalContext.current.resources
+    return remember(configuration, resources) { castLabels(resources) }
+}
+
+/**
  * Draws the whole underwater scene for [session], with the camera following the hook.
  * [aimX] is where the player's finger is (world meters), shown as a marker the hook glides to.
  */
@@ -79,16 +123,18 @@ fun DrawScope.drawCastScene(
     detect: Set<String>? = null,
     /** Game feel: screen shake, a flash and particles (render only, see `CastFx`). */
     fx: CastFx = CastFx.NONE,
+    /** The words drawn on the water ([rememberCastLabels]); none by default (the skins preview). */
+    labels: CastLabels = CastLabels.NONE,
 ) {
     // The shake moves the whole picture; the background and the darkness bleed past the edges
     // so no unlit strip ever shows.
     val dx = fx.shakeX * size.width
     val dy = fx.shakeY * size.width
     if (dx == 0f && dy == 0f) {
-        drawCastSceneContent(session, timeSeconds, textMeasurer, aimX, skins, cameraTop, detect, fx, bleed = 0f)
+        drawCastSceneContent(session, timeSeconds, textMeasurer, labels, aimX, skins, cameraTop, detect, fx, bleed = 0f)
     } else {
         translate(dx, dy) {
-            drawCastSceneContent(session, timeSeconds, textMeasurer, aimX, skins, cameraTop, detect, fx, bleed = ceil(max(abs(dx), abs(dy))) + 2f)
+            drawCastSceneContent(session, timeSeconds, textMeasurer, labels, aimX, skins, cameraTop, detect, fx, bleed = ceil(max(abs(dx), abs(dy))) + 2f)
         }
     }
 }
@@ -97,6 +143,7 @@ private fun DrawScope.drawCastSceneContent(
     session: CastSession,
     timeSeconds: Float,
     textMeasurer: TextMeasurer,
+    labels: CastLabels,
     aimX: Float?,
     skins: Skins,
     cameraTop: Float?,
@@ -192,7 +239,7 @@ private fun DrawScope.drawCastSceneContent(
     while (marker < bottom) {
         val y = sy(marker)
         drawLine(Color.White.copy(alpha = 0.10f), Offset(0f, y), Offset(size.width, y), strokeWidth = 1f)
-        drawLabel(textMeasurer, "${marker.toInt()} m", labelStyle, x = 8f, y = y + 4f)
+        drawLabel(textMeasurer, labels.depth(marker.toInt()), labelStyle, x = 8f, y = y + 4f)
         marker += 50f
     }
 
@@ -209,7 +256,7 @@ private fun DrawScope.drawCastSceneContent(
         )
         drawLabel(
             textMeasurer,
-            "Bump-free above ${bumpFreeEnd.toInt()} m",
+            labels.bumpFree,
             TextStyle(color = BumpFreeGreen.copy(alpha = 0.8f), fontSize = 11.sp),
             x = null,
             y = y - 20f,
@@ -229,7 +276,7 @@ private fun DrawScope.drawCastSceneContent(
         )
         drawLabel(
             textMeasurer,
-            "Rope limit",
+            labels.ropeLimit,
             TextStyle(color = Color(0xFFFFB74D), fontSize = 11.sp),
             x = null, // right-aligned
             y = y + 4f,
@@ -589,7 +636,7 @@ fun DrawScope.drawHook(bend: Offset, s: Float, timeSeconds: Float, withBait: Boo
  * "Rope limit" label scrolled in at the bottom of the screen.)
  */
 private fun DrawScope.drawLabel(textMeasurer: TextMeasurer, text: String, style: TextStyle, x: Float?, y: Float) {
-    if (y > size.height || y < -200f) return
+    if (text.isEmpty() || y > size.height || y < -200f) return
     val layout = textMeasurer.measure(text, style, softWrap = false, maxLines = 1)
     val left = x ?: (size.width - layout.size.width - 8f)
     drawText(layout, topLeft = Offset(left, y))
@@ -668,17 +715,20 @@ fun DrawScope.drawCastOverlay(
     detect: Set<String>? = null,
     /** The shake moves the overlay with the 3D view (its flash and particles are drawn in 3D). */
     fx: CastFx = CastFx.NONE,
+    /** The words drawn on the water ([rememberCastLabels]). */
+    labels: CastLabels = CastLabels.NONE,
 ) {
     val dx = fx.shakeX * size.width
     val dy = fx.shakeY * size.width
-    if (dx == 0f && dy == 0f) drawCastOverlayContent(session, timeSeconds, textMeasurer, aimX, cameraTop, detect)
-    else translate(dx, dy) { drawCastOverlayContent(session, timeSeconds, textMeasurer, aimX, cameraTop, detect) }
+    if (dx == 0f && dy == 0f) drawCastOverlayContent(session, timeSeconds, textMeasurer, labels, aimX, cameraTop, detect)
+    else translate(dx, dy) { drawCastOverlayContent(session, timeSeconds, textMeasurer, labels, aimX, cameraTop, detect) }
 }
 
 private fun DrawScope.drawCastOverlayContent(
     session: CastSession,
     timeSeconds: Float,
     textMeasurer: TextMeasurer,
+    labels: CastLabels,
     aimX: Float?,
     cameraTop: Float?,
     detect: Set<String>?,
@@ -697,20 +747,20 @@ private fun DrawScope.drawCastOverlayContent(
     while (marker < bottom) {
         val y = sy(marker)
         drawLine(Color.White.copy(alpha = 0.10f), Offset(0f, y), Offset(size.width, y), strokeWidth = 1f)
-        drawLabel(textMeasurer, "${marker.toInt()} m", labelStyle, x = 8f, y = y + 4f)
+        drawLabel(textMeasurer, labels.depth(marker.toInt()), labelStyle, x = 8f, y = y + 4f)
         marker += 50f
     }
     val bumpFreeEnd = GameConfig.BUMP_FREE_DEPTH
     if (bumpFreeEnd in top..bottom) {
         val y = sy(bumpFreeEnd)
         drawLine(BumpFreeGreen.copy(alpha = 0.45f), Offset(0f, y), Offset(size.width, y), strokeWidth = 2f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f)))
-        drawLabel(textMeasurer, "Bump-free above ${bumpFreeEnd.toInt()} m", TextStyle(color = BumpFreeGreen.copy(alpha = 0.8f), fontSize = 11.sp), x = null, y = y - 20f)
+        drawLabel(textMeasurer, labels.bumpFree, TextStyle(color = BumpFreeGreen.copy(alpha = 0.8f), fontSize = 11.sp), x = null, y = y - 20f)
     }
     val ropeEnd = session.specs.lengthM
     if (ropeEnd in top..bottom) {
         val y = sy(ropeEnd + GameConfig.HOOK_RADIUS)
         drawLine(Color(0xFFFFB74D).copy(alpha = 0.7f), Offset(0f, y), Offset(size.width, y), strokeWidth = 2f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(18f, 12f)))
-        drawLabel(textMeasurer, "Rope limit", TextStyle(color = Color(0xFFFFB74D), fontSize = 11.sp), x = null, y = y + 4f)
+        drawLabel(textMeasurer, labels.ropeLimit, TextStyle(color = Color(0xFFFFB74D), fontSize = 11.sp), x = null, y = y + 4f)
     }
 
     val hook = Offset(sx(session.hookX), sy(session.hookDepth))

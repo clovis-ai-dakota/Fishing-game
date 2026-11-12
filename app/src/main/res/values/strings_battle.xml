@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    1v1 battles and online play: player names given by the game (GameViewModel) and online errors.
-    Keys start with battle_ (battle setup and battle screens) or online_ (the online lobby).
-    Names that players type are never translated.
+    1v1 battles and online play: the Battle tab (battle_setup_), the battle screen between casts
+    (battle_), player names given by the game (GameViewModel), the online lobby (online_) and the
+    battle server's messages (online_error_, online_over_).
+    Keys start with battle_ or online_. Names that players type are never translated. Players' names
+    are arguments: if your language would change a name (a case ending, a suffix), reword the
+    sentence so the name needs no change, e.g. after a colon.
 -->
 <resources>
     <!-- The player's own name in a battle against the computer. -->
@@ -18,4 +21,164 @@
     <!-- The connection to the battle server failed. %1$s: the technical reason (stays in English). -->
     <string name="online_error_unreachable">Could not reach the server (%1$s).</string>
     <string name="online_error_disconnected">Disconnected from the server.</string>
+
+    <!-- A clock (minutes:seconds) for timed battles, e.g. "2:05". %1$d: minutes; %2$d: seconds
+         (always two digits). -->
+    <string name="battle_clock">%1$d:%2$02d</string>
+
+    <!-- The Battle tab (BattleSetupScreen). -->
+    <!-- The tab's title. 1v1 = one against one. -->
+    <string name="battle_setup_title">1v1 Battle</string>
+    <!-- Section titles. -->
+    <string name="battle_setup_mode">Mode</string>
+    <string name="battle_setup_opponent">Opponent</string>
+    <!-- Before the computer's levels (Easy, Normal, Hard chips). -->
+    <string name="battle_setup_computer">Computer:</string>
+    <!-- Opponent chips. -->
+    <string name="battle_setup_friend">Friend on this device (pass and play)</string>
+    <string name="battle_setup_online">Online (room code or quick match)</string>
+    <!-- Under the opponents. %1$d: the level of the standard tournament rope, in every rope stat. -->
+    <string name="battle_setup_info_online">Online, both players fish at the same time on their own phones, on the very same water, with the same standard tournament rope (level %1$d in every stat). Battle catches don\'t count for your points or fish log.</string>
+    <string name="battle_setup_info_local">Both players use your current rope and fish the very same water for each cast, so skill decides. Battle catches don\'t count for your points or fish log.</string>
+    <!-- Tackle in battles. The tackle names must match core_tackle_*. -->
+    <string name="battle_setup_tackle_title">Tackle for your casts</string>
+    <string name="battle_setup_tackle_info">Lanterns and detectors work in battles: each of your casts uses one while switched on. The Lucky charm and the Sparkle lure are for solo casts only.</string>
+    <!-- Wagers: points staked on a battle against the computer. -->
+    <string name="battle_setup_wager_title">Wager (optional)</string>
+    <!-- The chip for no wager. -->
+    <string name="battle_setup_wager_none">None</string>
+    <!-- %1$s: points paid back for a win, already formatted; %2$s: the multiplier (e.g. "1.6",
+         after the × sign); %3$s: the computer's level (Easy, Normal or Hard). -->
+    <string name="battle_setup_wager_terms">Win and get %1$s pts back (×%2$s against %3$s); a draw refunds the stake; losing or forfeiting loses it.</string>
+    <!-- Before a stake is chosen. %1$s: the computer's level; %2$s: the multiplier (e.g. "1.6"). -->
+    <string name="battle_setup_wager_hint">Stake points on the result: a win against %1$s pays ×%2$s.</string>
+    <!-- Wins, losses and draws against the computer. W, L and D are short for win, loss and draw.
+         %1$d: wins; %2$d: losses; %3$d: draws. -->
+    <string name="battle_setup_record">Record vs computer: %1$d W · %2$d L · %3$d D</string>
+    <!-- The big button: opens the online lobby, or starts the battle. -->
+    <string name="battle_setup_go_online">Go online</string>
+    <string name="battle_setup_start">Start battle</string>
+    <!-- Tackle switches before a battle cast (also on the battle screen and in the tournament).
+         %1$d: how many are owned. -->
+    <string name="battle_tackle_lantern">Lantern ×%1$d</string>
+    <string name="battle_tackle_detector">Detector ×%1$d</string>
+    <!-- Opens the Shop's Tackle page. -->
+    <string name="battle_tackle_get_more">Get more</string>
+
+    <!-- The battle screen (between casts). -->
+    <string name="battle_rounds_title">Rounds</string>
+    <!-- %1$d: the round's number. -->
+    <string name="battle_round">Round %1$d</string>
+    <!-- A round's points, player 1 against player 2. %1$s, %2$s: points, already formatted. The
+         spaces are on purpose (quoted). -->
+    <string name="battle_round_score">"%1$s  vs  %2$s"</string>
+    <!-- Who took the round. %1$s: the player's name. The leading spaces are on purpose (quoted). -->
+    <string name="battle_round_winner">"  → %1$s"</string>
+    <string name="battle_round_tie">"  → tie"</string>
+    <!-- The result. -->
+    <string name="battle_outcome_draw">It\'s a draw!</string>
+    <!-- %1$s: the winner's name (as typed online, Player 1, Rival (Hard)...). -->
+    <string name="battle_outcome_wins">%1$s wins!</string>
+    <!-- The player won against the computer. -->
+    <string name="battle_outcome_you_win">You win!</string>
+    <!-- Under the result when the battle was given away (and no reason was given). -->
+    <string name="battle_by_forfeit">by forfeit</string>
+    <!-- The wager's result. %1$s: points with their unit, already formatted ("+1,600 pts", "1,000 pts"). -->
+    <string name="battle_wager_won">Wager won: %1$s</string>
+    <string name="battle_wager_refunded">Wager refunded: %1$s</string>
+    <string name="battle_wager_lost">Wager lost: %1$s</string>
+    <!-- Buttons after the result. -->
+    <string name="battle_new_online">New online battle</string>
+    <string name="battle_rematch">Rematch</string>
+    <!-- %1$s: the online opponent's name (as typed). -->
+    <string name="battle_send_gift">Send %1$s a gift</string>
+    <string name="battle_back_to_menu">Back to menu</string>
+    <!-- Online, after the player's cast, until the server confirms it. -->
+    <string name="battle_sending_cast">Sending your cast…</string>
+    <!-- Online, while the opponent fishes. %1$s: the opponent's name. -->
+    <string name="battle_waiting_for">Waiting for %1$s…</string>
+    <string name="battle_forfeit">Forfeit</string>
+    <!-- Whose cast is next. %1$s: the player's name. -->
+    <string name="battle_up_next">Up next: %1$s</string>
+    <!-- Same, with the round. %2$d: the round. -->
+    <string name="battle_up_next_round">Up next: %1$s · round %2$d</string>
+    <!-- Same, with the time left in a timed mode. %2$s: a clock, e.g. "2:05". -->
+    <string name="battle_up_next_time">Up next: %1$s · %2$s left</string>
+    <!-- Same, with the cast number. %2$d: this cast; %3$d: casts per player. -->
+    <string name="battle_up_next_cast">Up next: %1$s · cast %2$d/%3$d</string>
+    <!-- Two players on one phone. %1$s: the player whose turn it is (Player 1 or Player 2). -->
+    <string name="battle_hand_phone">Hand the phone to %1$s.</string>
+    <!-- The big button. Against the computer, on its turn: %1$s is its name (e.g. "Rival (Normal)"). -->
+    <string name="battle_let_fish">Let %1$s fish</string>
+    <!-- Online: the player's own turn. -->
+    <string name="battle_cast">Cast!</string>
+    <!-- On this phone: %1$s is the name of the player whose turn it is (You, Player 1...). -->
+    <string name="battle_cast_player">Cast, %1$s!</string>
+    <!-- The forfeit dialog. -->
+    <string name="battle_forfeit_title">Forfeit the battle?</string>
+    <string name="battle_forfeit_body">Your opponent will be declared the winner.</string>
+    <string name="battle_keep_playing">Keep playing</string>
+    <!-- A player's card. %1$s: the player's own name online. -->
+    <string name="battle_player_me">%1$s (you)</string>
+    <!-- Time left in a timed mode. %1$s: a clock, e.g. "2:05". -->
+    <string name="battle_time_left">Time left %1$s</string>
+    <!-- %1$s: the player's points with their unit, already formatted ("1,250 pts"). -->
+    <string name="battle_total">Total %1$s</string>
+    <!-- One cast on a player's card, e.g. "#2: 450 pts · 3 fish · 4.5 kg · 230 m". %1$d: the cast's
+         number; %2$s: what it brought, joined with " · ". -->
+    <string name="battle_cast_line">#%1$d: %2$s</string>
+    <plurals name="battle_fish">
+        <!-- Fish landed in a cast. -->
+        <item quantity="one">%d fish</item>
+        <item quantity="other">%d fish</item>
+    </plurals>
+    <!-- The online opponent's cast as it happens, e.g. "Ana is fishing: cast 2 · 230 m ↑ · 3 fish ·
+         450 pts". %1$s: the opponent's name; %2$s: the details, joined with " · ". -->
+    <string name="battle_opponent_live">%1$s is fishing: %2$s</string>
+    <!-- In those details. %1$d: the cast's number. -->
+    <string name="battle_opponent_live_cast">cast %1$d</string>
+
+    <!-- The online lobby (OnlineLobbyScreen). -->
+    <string name="online_title">Online battle</string>
+    <!-- %1$d: the level of the standard tournament rope, in every rope stat. -->
+    <string name="online_tournament_rope">Tournament rope: level %1$d in every stat, for both players.</string>
+    <!-- The name shown to the opponent (typed by the player). -->
+    <string name="online_your_name">Your name</string>
+    <!-- Above the room code (5 characters, never translated). -->
+    <string name="online_share_code">Share this room code</string>
+    <string name="online_waiting_join">Waiting for your opponent to join…</string>
+    <string name="online_looking">Looking for an opponent…</string>
+    <!-- Quick match. %1$s: the battle mode (Best of 5, Heavy Haul...). -->
+    <string name="online_paired_with">You\'ll be paired with the next player who picks %1$s.</string>
+    <!-- Buttons. -->
+    <string name="online_create_room">Create room</string>
+    <string name="online_quick_match">Quick match</string>
+    <!-- The field for a room code someone shared. -->
+    <string name="online_room_code">Room code</string>
+    <string name="online_join">Join</string>
+    <!-- The connection's state. -->
+    <string name="online_status_disconnected">Not connected. Creating, joining or quick matching connects you.</string>
+    <string name="online_status_connecting">Connecting…</string>
+    <string name="online_status_connected">Connected.</string>
+    <string name="online_status_waiting">Connected · waiting.</string>
+    <string name="online_status_in_match">In a match.</string>
+    <!-- The battle server's address, for players who run their own. -->
+    <string name="online_server_show">Server settings</string>
+    <string name="online_server_hide">Hide server settings</string>
+    <string name="online_server_address">Server address</string>
+    <!-- %1$s: an example address (never translated). -->
+    <string name="online_server_example">For example %1$s</string>
+
+    <!-- The battle server's messages: it sends them in English and the app shows these instead
+         (ui/OnlineText.kt). -->
+    <string name="online_error_cast_unexpected">That cast is not expected right now.</string>
+    <string name="online_error_cast_impossible">That cast is not possible with the tournament rope.</string>
+    <string name="online_error_unreadable">Unreadable message.</string>
+    <string name="online_error_update_app">Please update the app to play online.</string>
+    <string name="online_error_busy">You are already waiting for or playing a match.</string>
+    <!-- %1$s: the room code that was typed (never translated). -->
+    <string name="online_error_no_room">No room with the code %1$s.</string>
+    <!-- Why an online battle ended, under the result. %1$s: the player's name (as typed). -->
+    <string name="online_over_forfeited">%1$s forfeited.</string>
+    <string name="online_over_left">%1$s left the battle.</string>
 </resources>

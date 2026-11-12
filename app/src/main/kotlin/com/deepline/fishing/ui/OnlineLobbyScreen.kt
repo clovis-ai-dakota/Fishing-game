@@ -1,5 +1,6 @@
 package com.deepline.fishing.ui
 
+import com.deepline.fishing.R
 import com.deepline.fishing.ui.i18n.label
 import com.deepline.fishing.ui.i18n.asString
 import com.deepline.fishing.ui.i18n.rules
@@ -29,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
@@ -45,7 +47,7 @@ fun OnlineLobbyScreen(vm: GameViewModel) {
     val waiting = status == OnlineStatus.WAITING_ROOM || status == OnlineStatus.WAITING_QUICK
     val busy = waiting || status == OnlineStatus.CONNECTING
 
-    SubScreen(title = "Online battle", onBack = vm::closeOnlineLobby) {
+    SubScreen(title = stringResource(R.string.online_title), onBack = vm::closeOnlineLobby) {
         LazyColumn(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -56,7 +58,7 @@ fun OnlineLobbyScreen(vm: GameViewModel) {
                         Text(vm.onlineMode.label(), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         Text(vm.onlineMode.rules(), style = MaterialTheme.typography.bodySmall)
                         Text(
-                            "Tournament rope: level ${OnlineProtocol.TOURNAMENT_ROPE_LEVEL} in every stat, for both players.",
+                            stringResource(R.string.online_tournament_rope, OnlineProtocol.TOURNAMENT_ROPE_LEVEL),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.tertiary,
                         )
@@ -68,7 +70,7 @@ fun OnlineLobbyScreen(vm: GameViewModel) {
                 OutlinedTextField(
                     value = vm.playerName,
                     onValueChange = vm::updatePlayerName,
-                    label = { Text("Your name") },
+                    label = { Text(stringResource(R.string.online_your_name)) },
                     singleLine = true,
                     enabled = !busy,
                     modifier = Modifier.fillMaxWidth(),
@@ -87,7 +89,7 @@ fun OnlineLobbyScreen(vm: GameViewModel) {
                         ) {
                             val room = vm.roomCode
                             if (status == OnlineStatus.WAITING_ROOM && room != null) {
-                                Text("Share this room code", style = MaterialTheme.typography.bodyMedium)
+                                Text(stringResource(R.string.online_share_code), style = MaterialTheme.typography.bodyMedium)
                                 Text(
                                     room,
                                     fontSize = 40.sp,
@@ -95,20 +97,20 @@ fun OnlineLobbyScreen(vm: GameViewModel) {
                                     letterSpacing = 6.sp,
                                     color = MaterialTheme.colorScheme.secondary,
                                 )
-                                Text("Waiting for your opponent to join…", style = MaterialTheme.typography.bodySmall)
+                                Text(stringResource(R.string.online_waiting_join), style = MaterialTheme.typography.bodySmall)
                                 // A challenge to a friend: whether it reached them.
                                 vm.social.challengeStatus?.let {
                                     Text(it.asString(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.secondary, modifier = Modifier.testTag("challenge_status"))
                                 }
                             } else {
-                                Text("Looking for an opponent…", style = MaterialTheme.typography.titleMedium)
+                                Text(stringResource(R.string.online_looking), style = MaterialTheme.typography.titleMedium)
                                 Text(
-                                    "You'll be paired with the next player who picks ${vm.onlineMode.label()}.",
+                                    stringResource(R.string.online_paired_with, vm.onlineMode.label()),
                                     style = MaterialTheme.typography.bodySmall,
                                 )
                             }
                             CircularProgressIndicator()
-                            OutlinedButton(onClick = vm::cancelWaiting) { Text("Cancel") }
+                            OutlinedButton(onClick = vm::cancelWaiting) { Text(stringResource(R.string.common_cancel)) }
                         }
                     }
                 }
@@ -121,14 +123,14 @@ fun OnlineLobbyScreen(vm: GameViewModel) {
                             modifier = Modifier
                                 .weight(1f)
                                 .height(56.dp),
-                        ) { Text("Create room") }
+                        ) { Text(stringResource(R.string.online_create_room)) }
                         FilledTonalButton(
                             onClick = vm::quickMatch,
                             enabled = !busy,
                             modifier = Modifier
                                 .weight(1f)
                                 .height(56.dp),
-                        ) { Text("Quick match") }
+                        ) { Text(stringResource(R.string.online_quick_match)) }
                     }
                 }
                 item {
@@ -136,26 +138,26 @@ fun OnlineLobbyScreen(vm: GameViewModel) {
                         OutlinedTextField(
                             value = code,
                             onValueChange = { code = it.uppercase().take(OnlineProtocol.ROOM_CODE_LENGTH) },
-                            label = { Text("Room code") },
+                            label = { Text(stringResource(R.string.online_room_code)) },
                             singleLine = true,
                             enabled = !busy,
                             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters),
                             modifier = Modifier.weight(1f),
                         )
-                        Button(onClick = { vm.joinRoom(code) }, enabled = !busy && code.isNotBlank()) { Text("Join") }
+                        Button(onClick = { vm.joinRoom(code) }, enabled = !busy && code.isNotBlank()) { Text(stringResource(R.string.online_join)) }
                     }
                 }
             }
 
             item {
                 val text = when (status) {
-                    OnlineStatus.DISCONNECTED -> "Not connected. Creating, joining or quick matching connects you."
-                    OnlineStatus.CONNECTING -> "Connecting…"
-                    OnlineStatus.CONNECTED -> "Connected."
-                    OnlineStatus.WAITING_ROOM, OnlineStatus.WAITING_QUICK -> "Connected · waiting."
-                    OnlineStatus.IN_MATCH -> "In a match."
+                    OnlineStatus.DISCONNECTED -> R.string.online_status_disconnected
+                    OnlineStatus.CONNECTING -> R.string.online_status_connecting
+                    OnlineStatus.CONNECTED -> R.string.online_status_connected
+                    OnlineStatus.WAITING_ROOM, OnlineStatus.WAITING_QUICK -> R.string.online_status_waiting
+                    OnlineStatus.IN_MATCH -> R.string.online_status_in_match
                 }
-                Text(text, style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(text), style = MaterialTheme.typography.bodySmall)
                 vm.onlineError?.let {
                     Text(it.asString(), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
                 }
@@ -163,14 +165,14 @@ fun OnlineLobbyScreen(vm: GameViewModel) {
 
             item {
                 TextButton(onClick = { showServer = !showServer }) {
-                    Text(if (showServer) "Hide server settings" else "Server settings")
+                    Text(stringResource(if (showServer) R.string.online_server_hide else R.string.online_server_show))
                 }
                 if (showServer) {
                     OutlinedTextField(
                         value = vm.serverUrl,
                         onValueChange = vm::updateServerUrl,
-                        label = { Text("Server address") },
-                        supportingText = { Text("For example wss://your-server.example.com/battle") },
+                        label = { Text(stringResource(R.string.online_server_address)) },
+                        supportingText = { Text(stringResource(R.string.online_server_example, "wss://your-server.example.com/battle")) },
                         singleLine = true,
                         enabled = !busy,
                         modifier = Modifier.fillMaxWidth(),

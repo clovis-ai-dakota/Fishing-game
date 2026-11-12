@@ -30,24 +30,27 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.deepline.fishing.GameViewModel
-import com.deepline.fishing.Screen
+import androidx.compose.ui.res.stringResource
+import com.deepline.fishing.R as Res
 import com.deepline.fishing.core.DepthZone
 import com.deepline.fishing.core.FishCatalog
 import com.deepline.fishing.core.GameConfig
 import com.deepline.fishing.core.ObstacleKind
+import com.deepline.fishing.core.SecretReward
 import com.deepline.fishing.core.SecretRewards
 import com.deepline.fishing.core.SecretRules
 import com.deepline.fishing.core.Secrets
 import com.deepline.fishing.ui.SparkleGold
-import com.deepline.fishing.ui.SubScreen
 import com.deepline.fishing.ui.drawFish
 import com.deepline.fishing.ui.drawFishGlow
 import com.deepline.fishing.ui.drawHook
 import com.deepline.fishing.ui.drawObstacleIcon
 import com.deepline.fishing.ui.formatPoints
+import com.deepline.fishing.ui.i18n.UiText
 import com.deepline.fishing.ui.i18n.asString
-import com.deepline.fishing.ui.i18n.label
+import com.deepline.fishing.ui.i18n.labelText
+import com.deepline.fishing.ui.i18n.nameText
+import com.deepline.fishing.ui.i18n.secretTitleText
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.roundToInt
@@ -60,22 +63,34 @@ import kotlin.math.sin
  */
 data class FishingSecret(
     val id: String,
-    val body: String,
-    val bonus: String,
+    val body: UiText,
+    val bonus: UiText,
     val art: (DrawScope.() -> Unit)? = null,
 ) {
     /** The secret's name (strings_core.xml): only shown once the player has found it. */
-    val title: com.deepline.fishing.ui.i18n.UiText get() = com.deepline.fishing.ui.i18n.secretTitleText(id)
+    val title: UiText get() = secretTitleText(id)
 }
 
-private fun times(m: Double) = if (m == m.roundToInt().toDouble()) "×${m.roundToInt()}" else "×$m"
+/** "2", "1.5": a multiplier, shown after the × sign. */
+private fun times(m: Double): UiText = UiText.decimal(m, 2)
+
+/** "+50 points." */
+private fun plusPoints(points: Int): UiText = UiText.plural(Res.plurals.secrets_bonus_points, points, formatPoints(points))
+
+private fun thatFish(m: Double) = UiText.res(Res.string.secrets_bonus_that_fish, times(m))
+
+private fun wholeCast(m: Double) = UiText.res(Res.string.secrets_bonus_whole_cast, times(m))
 
 /**
  * All fishing secrets. To add one: give it an id, rules and rewards in `core` (`Secrets.kt`),
- * then describe it here.
+ * then describe it here (texts in strings_secrets.xml).
  */
 object FishingSecrets {
-    private val snagList = ObstacleKind.entries.joinToString(", ") { "${it.displayName} ${it.snagPoints}" }
+    /** "Driftwood 100, Rock 200, Jelly cluster 150": the objects' base points. */
+    private val snagList = UiText.join(
+        ObstacleKind.entries.map { UiText.res(Res.string.secrets_snag_points, it.labelText(), formatPoints(it.snagPoints)) },
+        ", ",
+    )
     private val bumps = GameConfig.DESCENT_TOUCH_LIMIT
 
     private val R = SecretRules
@@ -83,176 +98,181 @@ object FishingSecrets {
     val all: List<FishingSecret> = listOf(
         FishingSecret(
             id = Secrets.LAST_BUMP,
-            body = "Your last bump (number $bumps) doesn't just send the line back up: it hooks whatever it hit. " +
-                "If it was a fish's head, that fish is on your line, even a heavy one. And it's the only way to " +
-                "land rocks, driftwood and jellies, which are worth big points ($snagList base points, multiplied " +
-                "the deeper you go). Aim your last bump at something good!",
-            bonus = "The hooked object or fish is yours.",
+            body = UiText.res(Res.string.secrets_last_bump_body, bumps, snagList),
+            bonus = UiText.res(Res.string.secrets_bonus_yours),
             art = { drawLastBumpArt() },
         ),
         // Tier 1
         FishingSecret(
             Secrets.FREE_PASS,
-            "Pass through ${R.FREE_PASS_COUNT} fish heads in the bump-free first ${GameConfig.BUMP_FREE_DEPTH.roundToInt()} m of one cast. They don't cost bumps up there.",
-            "+${R.FREE_PASS_BONUS} points.", art = { drawFishRow(listOf("silver_sprat", "coral_darter", "silver_sprat"), hook = true) },
+            UiText.res(Res.string.secrets_free_pass_body, R.FREE_PASS_COUNT, GameConfig.BUMP_FREE_DEPTH.roundToInt()),
+            plusPoints(R.FREE_PASS_BONUS), art = { drawFishRow(listOf("silver_sprat", "coral_darter", "silver_sprat"), hook = true) },
         ),
         FishingSecret(
             Secrets.SCHOOLING,
-            "Fish swim in schools. Land ${R.SCHOOLING_COUNT} or more of the same species in a single cast.",
-            "+${R.SCHOOLING_BONUS} points.", art = { drawSchoolingArt() },
+            UiText.res(Res.string.secrets_schooling_body, R.SCHOOLING_COUNT),
+            plusPoints(R.SCHOOLING_BONUS), art = { drawSchoolingArt() },
         ),
         FishingSecret(
             Secrets.SURFACE_SKIM,
-            "Catch a fish shallower than ${R.SURFACE_SKIM_DEPTH.roundToInt()} m on the way up, right before you land.",
-            "+${R.SURFACE_SKIM_BONUS} points.", art = { drawFishRow(listOf("coral_darter"), hook = true, top = true) },
+            UiText.res(Res.string.secrets_surface_skim_body, R.SURFACE_SKIM_DEPTH.roundToInt()),
+            plusPoints(R.SURFACE_SKIM_BONUS), art = { drawFishRow(listOf("coral_darter"), hook = true, top = true) },
         ),
         FishingSecret(
             Secrets.ZEN_CAST,
-            "Don't touch the screen for a whole cast, and still land ${R.ZEN_CAST_COUNT} or more fish.",
-            "+${R.ZEN_CAST_BONUS} points.", art = { drawFishRow(listOf("reed_perch", "sun_bream", "silver_sprat")) },
+            UiText.res(Res.string.secrets_zen_cast_body, R.ZEN_CAST_COUNT),
+            plusPoints(R.ZEN_CAST_BONUS), art = { drawFishRow(listOf("reed_perch", "sun_bream", "silver_sprat")) },
         ),
         // Tier 2
         FishingSecret(
             Secrets.PINBALL,
-            "Use all $bumps bumps within ${R.PINBALL_SECONDS.roundToInt()} seconds by steering into a cluster.",
-            "+${R.PINBALL_BONUS} points.", art = { drawObstacleRow() },
+            UiText.res(Res.string.secrets_pinball_body, bumps, R.PINBALL_SECONDS.roundToInt()),
+            plusPoints(R.PINBALL_BONUS), art = { drawObstacleRow() },
         ),
         FishingSecret(
             Secrets.SECOND_ENCOUNTER,
-            "A fish you bumped on the way down hasn't gone far. Catch it by the head on the way up and it's worth double.",
-            "That fish ${times(R.SECOND_ENCOUNTER_MULTIPLIER)}.", art = { drawSecondEncounterArt() },
+            UiText.res(Res.string.secrets_second_encounter_body),
+            thatFish(R.SECOND_ENCOUNTER_MULTIPLIER), art = { drawSecondEncounterArt() },
         ),
         FishingSecret(
             Secrets.CLEAN_DROP,
-            "Reach the end of a rope of at least ${R.CLEAN_DROP_MIN_ROPE_M.roundToInt()} m without a single bump.",
-            "Whole cast ${times(R.CLEAN_DROP_MULTIPLIER)}.", art = { drawCleanDropArt() },
+            UiText.res(Res.string.secrets_clean_drop_body, R.CLEAN_DROP_MIN_ROPE_M.roundToInt()),
+            wholeCast(R.CLEAN_DROP_MULTIPLIER), art = { drawCleanDropArt() },
         ),
         FishingSecret(
             Secrets.ROCK_BOTTOM,
-            "Make your last bump snag an object within ${R.ROCK_BOTTOM_WITHIN_M.roundToInt()} m of the end of your rope.",
-            "The snag ${times(R.ROCK_BOTTOM_MULTIPLIER)}.", art = { drawCleanDropArt(withRock = true) },
+            UiText.res(Res.string.secrets_rock_bottom_body, R.ROCK_BOTTOM_WITHIN_M.roundToInt()),
+            UiText.res(Res.string.secrets_bonus_snag, times(R.ROCK_BOTTOM_MULTIPLIER)), art = { drawCleanDropArt(withRock = true) },
         ),
         FishingSecret(
             Secrets.BUZZER_BEATER,
-            "In a timed battle, start a cast with under ${R.BUZZER_BEATER_SECONDS.roundToInt()} seconds on the clock and still land a fish.",
-            "+${R.BUZZER_BEATER_BONUS} points.", art = { drawFishRow(listOf("dusk_snapper"), hook = true) },
+            UiText.res(Res.string.secrets_buzzer_beater_body, R.BUZZER_BEATER_SECONDS.roundToInt()),
+            plusPoints(R.BUZZER_BEATER_BONUS), art = { drawFishRow(listOf("dusk_snapper"), hook = true) },
         ),
         // Tier 3
         FishingSecret(
             Secrets.CORNER_POCKET,
-            "On the way up, hook a fish by the head right as it turns around at the edge of the water (within ${(GameConfig.WALL_TURN_WINDOW * 10).roundToInt() / 10.0} s).",
-            "+${R.CORNER_POCKET_BONUS} points.", art = { drawCornerArt() },
+            UiText.res(Res.string.secrets_corner_pocket_body, UiText.decimal((GameConfig.WALL_TURN_WINDOW * 10).roundToInt() / 10.0)),
+            plusPoints(R.CORNER_POCKET_BONUS), art = { drawCornerArt() },
         ),
         FishingSecret(
             Secrets.GRAND_TOUR,
-            "Make your $bumps bumps hit four different things: a fish's head, a rock, driftwood and a jelly. They only share " +
-                "the water between about ${ObstacleKind.JELLY.minDepth.roundToInt()} and ${ObstacleKind.DRIFTWOOD.maxDepth.roundToInt()} m.",
-            "The last bump's catch ${times(R.GRAND_TOUR_MULTIPLIER)}.", art = { drawGrandTourArt() },
+            UiText.res(
+                Res.string.secrets_grand_tour_body,
+                bumps,
+                ObstacleKind.JELLY.minDepth.roundToInt(),
+                ObstacleKind.DRIFTWOOD.maxDepth.roundToInt(),
+            ),
+            UiText.res(Res.string.secrets_bonus_last_catch, times(R.GRAND_TOUR_MULTIPLIER)), art = { drawGrandTourArt() },
         ),
         FishingSecret(
             Secrets.SPARKLE_SNAG,
-            "Make your last bump hook a Sparkling fish by the head, on the way down.",
-            "That fish ${times(R.SPARKLE_SNAG_MULTIPLIER)} on top of Sparkling (${times(R.SPARKLE_SNAG_MULTIPLIER * GameConfig.SPARKLING_MULTIPLIER)} in all).", art = { drawFishRow(listOf("dusk_snapper"), hook = true, sparkling = true) },
+            UiText.res(Res.string.secrets_sparkle_snag_body),
+            UiText.res(
+                Res.string.secrets_bonus_sparkle_snag,
+                times(R.SPARKLE_SNAG_MULTIPLIER),
+                times(R.SPARKLE_SNAG_MULTIPLIER * GameConfig.SPARKLING_MULTIPLIER),
+            ),
+            art = { drawFishRow(listOf("dusk_snapper"), hook = true, sparkling = true) },
         ),
         FishingSecret(
             Secrets.LADDER,
-            "On the way up, catch ${R.LADDER_COUNT} or more fish in strictly increasing weight. Deep fish tend to be heavy, so pick your catches.",
-            "Whole cast ${times(R.LADDER_MULTIPLIER)}.", art = { drawLadderArt() },
+            UiText.res(Res.string.secrets_ladder_body, R.LADDER_COUNT),
+            wholeCast(R.LADDER_MULTIPLIER), art = { drawLadderArt() },
         ),
         FishingSecret(
             Secrets.PERFECT_LOAD,
-            "Surface with your line exactly at its weight limit, with at least ${R.PERFECT_LOAD_MIN_CATCHES} catches, and the fish that " +
-                "fills it weighing ${R.PERFECT_LOAD_FINAL_CATCH_KG} kg or more. Leave just the right room!",
-            "Whole cast ${times(R.PERFECT_LOAD_MULTIPLIER)}.", art = { drawFishRow(listOf("sun_bream", "reed_perch", "coral_darter"), hook = true) },
+            UiText.res(Res.string.secrets_perfect_load_body, R.PERFECT_LOAD_MIN_CATCHES, UiText.decimal(R.PERFECT_LOAD_FINAL_CATCH_KG, 2)),
+            wholeCast(R.PERFECT_LOAD_MULTIPLIER), art = { drawFishRow(listOf("sun_bream", "reed_perch", "coral_darter"), hook = true) },
         ),
         FishingSecret(
             Secrets.MOONLIT_ANGLER,
-            "Below ${GameConfig.DARK_DEPTH.roundToInt()} m and without a Lantern, catch a fish that glows on the way up, aiming only by its light.",
-            "That fish ${times(R.MOONLIT_ANGLER_MULTIPLIER)}.", art = { drawMoonlitArt() },
+            UiText.res(Res.string.secrets_moonlit_angler_body, GameConfig.DARK_DEPTH.roundToInt()),
+            thatFish(R.MOONLIT_ANGLER_MULTIPLIER), art = { drawMoonlitArt() },
         ),
         FishingSecret(
             Secrets.SHUTOUT,
-            "Win Best of 5 against the Hard rival without dropping a round (3-0).",
-            "+${formatPoints(R.SHUTOUT_BONUS)} points.", art = { drawFishRow(listOf("reef_grouper", "reef_grouper", "reef_grouper")) },
+            UiText.res(Res.string.secrets_shutout_body),
+            plusPoints(R.SHUTOUT_BONUS), art = { drawFishRow(listOf("reef_grouper", "reef_grouper", "reef_grouper")) },
         ),
         // Tier 4
         FishingSecret(
             Secrets.WHILE_IT_FLEES,
-            "Bump a fish on the way down (it darts away for a moment), then hook it by the head on the way up while it is still fleeing. Tip: make that your last bump, so the hook turns back right away.",
-            "That fish ${times(R.WHILE_IT_FLEES_MULTIPLIER)}.", art = { drawSecondEncounterArt() },
+            UiText.res(Res.string.secrets_while_it_flees_body),
+            thatFish(R.WHILE_IT_FLEES_MULTIPLIER), art = { drawSecondEncounterArt() },
         ),
         FishingSecret(
             Secrets.BLIND_DROP,
-            "Without a Lantern, drop to at least ${R.BLIND_DROP_MIN_DEPTH_M.roundToInt()} m and reach the end of your rope without a single bump.",
-            "Whole cast ${times(R.BLIND_DROP_MULTIPLIER)}.", art = { drawMoonlitArt(dark = true) },
+            UiText.res(Res.string.secrets_blind_drop_body, R.BLIND_DROP_MIN_DEPTH_M.roundToInt()),
+            wholeCast(R.BLIND_DROP_MULTIPLIER), art = { drawMoonlitArt(dark = true) },
         ),
         FishingSecret(
             Secrets.ZONE_SWEEP,
-            "Land a fish from every depth zone (${DepthZone.entries.joinToString { it.displayName }}) in a single cast.",
-            "Whole cast ${times(R.ZONE_SWEEP_MULTIPLIER)}.", art = { drawZoneSweepArt() },
+            UiText.res(Res.string.secrets_zone_sweep_body, UiText.join(DepthZone.entries.map { it.labelText() }, ", ")),
+            wholeCast(R.ZONE_SWEEP_MULTIPLIER), art = { drawZoneSweepArt() },
         ),
         FishingSecret(
             Secrets.GRAND_SLAM,
-            "In one cast, snag an object with your last bump and catch ${R.GRAND_SLAM_COUNT} or more fish on the way up.",
-            "Whole cast ${times(R.GRAND_SLAM_MULTIPLIER)}.", art = { drawLastBumpArt() },
+            UiText.res(Res.string.secrets_grand_slam_body, R.GRAND_SLAM_COUNT),
+            wholeCast(R.GRAND_SLAM_MULTIPLIER), art = { drawLastBumpArt() },
         ),
         FishingSecret(
             Secrets.DOUBLE_HEADER,
-            "On the way up, hook two fish by the head at the very same instant.",
-            "Both fish ${times(R.DOUBLE_HEADER_MULTIPLIER)}.", art = { drawFishRow(listOf("dusk_snapper", "dusk_snapper"), hook = true) },
+            UiText.res(Res.string.secrets_double_header_body),
+            UiText.res(Res.string.secrets_bonus_both_fish, times(R.DOUBLE_HEADER_MULTIPLIER)),
+            art = { drawFishRow(listOf("dusk_snapper", "dusk_snapper"), hook = true) },
         ),
         FishingSecret(
             Secrets.CROWD_SURFER,
-            "Once your line can't take another fish, don't reel in fast: brush past ${R.CROWD_SURFER_COUNT} different fish on the way up. Any part of a fish counts.",
-            "Whole cast ${times(R.CROWD_SURFER_MULTIPLIER)}.", art = { drawFishRow(listOf("silver_sprat", "coral_darter", "reed_perch", "silver_sprat"), hook = true) },
+            UiText.res(Res.string.secrets_crowd_surfer_body, R.CROWD_SURFER_COUNT),
+            wholeCast(R.CROWD_SURFER_MULTIPLIER),
+            art = { drawFishRow(listOf("silver_sprat", "coral_darter", "reed_perch", "silver_sprat"), hook = true) },
         ),
         // Tier 5
         FishingSecret(
             Secrets.DAVID_AND_GOLIATH,
-            "Hook the Pale Leviathan with your last bump while your rope is too weak to carry it. A legendary catch.",
-            "The leviathan ${times(R.DAVID_AND_GOLIATH_MULTIPLIER)}.", art = { drawGoliathArt() },
+            UiText.res(
+                Res.string.secrets_david_and_goliath_body,
+                FishCatalog.byId(R.GOLIATH_SPECIES_ID)?.nameText() ?: UiText.raw(R.GOLIATH_SPECIES_ID),
+            ),
+            UiText.res(Res.string.secrets_bonus_leviathan, times(R.DAVID_AND_GOLIATH_MULTIPLIER)), art = { drawGoliathArt() },
         ),
         FishingSecret(
             Secrets.PERFECT_CAST,
-            "Everything in one cast: your last bump snags an object within ${R.ROCK_BOTTOM_WITHIN_M.roundToInt()} m of the end of your " +
-                "rope, you catch a Sparkling fish on the way up, and you surface with a perfect load.",
-            "Whole cast ${times(R.PERFECT_CAST_MULTIPLIER)}.", art = { drawFishRow(listOf("star_drifter"), hook = true, sparkling = true) },
+            UiText.res(Res.string.secrets_perfect_cast_body, R.ROCK_BOTTOM_WITHIN_M.roundToInt()),
+            wholeCast(R.PERFECT_CAST_MULTIPLIER), art = { drawFishRow(listOf("star_drifter"), hook = true, sparkling = true) },
         ),
         FishingSecret(
             Secrets.MASTER_ANGLER,
-            "Fill the whole fish log: all ${FishCatalog.all.size} species, including the one that lives at the very bottom and only " +
-                "the last bump can land.",
-            "A legend, forever.", art = { drawSovereignArt() },
+            UiText.res(Res.string.secrets_master_angler_body, FishCatalog.all.size),
+            UiText.res(Res.string.secrets_bonus_legend), art = { drawSovereignArt() },
         ),
     )
 
     fun byId(id: String): FishingSecret? = all.firstOrNull { it.id == id }
 
-    /** "+2,000 points · 2 Lanterns · Unlocks: …" for a secret's one-time discovery reward. */
-    fun rewardText(id: String): String? {
+    /** "+2,000 points · 2 Lanterns · Skins: …" for a secret's one-time discovery reward. */
+    fun rewardText(id: String): UiText? {
         val r = SecretRewards.of(id)
-        val parts = buildList {
-            if (r.points > 0) add("+${formatPoints(r.points)} points")
-            if (r.lanterns == 1) add("1 Lantern")
-            if (r.lanterns > 1) add("${r.lanterns} Lanterns")
-            if (r.cosmetics.isNotEmpty()) add("Skins: " + r.cosmetics.joinToString(", ") { it.displayName })
-        }
-        return parts.takeIf { it.isNotEmpty() }?.joinToString(" · ")
+        return rewardParts(r, if (r.cosmetics.isEmpty()) null else UiText.res(Res.string.secrets_reward_skins, UiText.join(r.cosmetics.map { it.labelText() }, ", ")))
     }
 
     /**
      * The reward shown on a locked Dex card: points and Lanterns, and only "a legendary skin set"
      * for cosmetics (set names would hint at the secret).
      */
-    fun lockedRewardText(id: String): String? {
+    fun lockedRewardText(id: String): UiText? {
         val r = SecretRewards.of(id)
-        val parts = buildList {
-            if (r.points > 0) add("+${formatPoints(r.points)} points")
-            if (r.lanterns == 1) add("1 Lantern")
-            if (r.lanterns > 1) add("${r.lanterns} Lanterns")
-            if (r.cosmetics.isNotEmpty()) add("a legendary skin set")
-        }
-        return parts.takeIf { it.isNotEmpty() }?.joinToString(" · ")
+        return rewardParts(r, if (r.cosmetics.isEmpty()) null else UiText.res(Res.string.secrets_reward_legendary_set))
+    }
+
+    private fun rewardParts(r: SecretReward, looks: UiText?): UiText? {
+        val parts = listOfNotNull(
+            if (r.points > 0) UiText.plural(Res.plurals.secrets_reward_points, r.points, formatPoints(r.points)) else null,
+            if (r.lanterns > 0) UiText.plural(Res.plurals.common_lanterns, r.lanterns) else null,
+            looks,
+        )
+        return parts.takeIf { it.isNotEmpty() }?.let { UiText.join(it, " · ") }
     }
 }
 
@@ -427,8 +447,25 @@ internal fun SecretArt(secret: FishingSecret, height: androidx.compose.ui.unit.D
 internal fun SecretDetails(secret: FishingSecret) {
     Text(secret.title.asString(), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
     SecretArt(secret)
-    Text(secret.body, style = MaterialTheme.typography.bodyMedium)
-    Text("Each time: ${secret.bonus}", style = MaterialTheme.typography.bodyMedium, color = com.deepline.fishing.ui.rewardTextColor(), fontWeight = FontWeight.SemiBold)
+    Text(secret.body.asString(), style = MaterialTheme.typography.bodyMedium)
+    Text(
+        stringResource(Res.string.secrets_each_time, secret.bonus.asString()),
+        style = MaterialTheme.typography.bodyMedium,
+        color = com.deepline.fishing.ui.rewardTextColor(),
+        fontWeight = FontWeight.SemiBold,
+    )
+}
+
+/** "Discovery reward: +2,000 points · 2 Lanterns", under a found secret's explanation. */
+@Composable
+internal fun SecretDiscoveryReward(secretId: String) {
+    FishingSecrets.rewardText(secretId)?.let {
+        Text(
+            stringResource(Res.string.secrets_discovery_reward, it.asString()),
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.SemiBold,
+        )
+    }
 }
 
 /** Shown the first time a secret happens (during the cast, or with the results). */
@@ -437,24 +474,18 @@ fun SecretDiscoveredDialog(secret: FishingSecret, onAnswer: (showAgain: Boolean)
     AlertDialog(
         // Dismissing without answering keeps the explanation coming, the safe default.
         onDismissRequest = { onAnswer(true) },
-        title = { Text("Fishing secret discovered!") },
+        title = { Text(stringResource(Res.string.secrets_discovered_title)) },
         text = {
             Column(
                 Modifier.verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 SecretDetails(secret)
-                FishingSecrets.rewardText(secret.id)?.let {
-                    Text("Discovery reward: $it", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                }
-                Text(
-                    "You can read it again any time in the Dex, under Secrets.\n\n" +
-                        "Show this explanation again the next time it happens?",
-                    style = MaterialTheme.typography.bodySmall,
-                )
+                SecretDiscoveryReward(secret.id)
+                Text(stringResource(Res.string.secrets_discovered_footer), style = MaterialTheme.typography.bodySmall)
             }
         },
-        confirmButton = { TextButton(onClick = { onAnswer(true) }) { Text("Yes, show again") } },
-        dismissButton = { TextButton(onClick = { onAnswer(false) }) { Text("No thanks") } },
+        confirmButton = { TextButton(onClick = { onAnswer(true) }) { Text(stringResource(Res.string.secrets_show_again)) } },
+        dismissButton = { TextButton(onClick = { onAnswer(false) }) { Text(stringResource(Res.string.common_no_thanks)) } },
     )
 }

@@ -184,8 +184,9 @@ include `en-rXA` and `ar-rXB` or the build drops them.
 - **Generated club names and strangers' public names** (`Clubs.name`, `Leaderboards.anglerName`)
   stay English: every member of a club sees the same name whatever their language, and public
   names are an identity derived from the id.
-- **Server messages**: the battle server sends English error text (`ServerMessage.Error`); until
-  the online area maps the known ones to resources, they show as sent.
+- **Server messages**: the battle server sends English text (`ServerMessage.Error`,
+  `MatchOver.reason`); the app matches the texts it knows to its own strings (`ui/OnlineText.kt`),
+  so the protocol is unchanged and older apps still read it. Anything unknown shows as sent.
 - **Credits**: titles and authors of CC0 works keep their original names.
 
 ## 9. Proper nouns and species names
