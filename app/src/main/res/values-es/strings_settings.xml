@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Ajustes (el engranaje de la pestaña Pescar) y sus secciones: ayuda, sonido y sensaciones,
+    notificaciones, idioma, créditos (ui/settings/). Privacidad tiene su propio archivo. Las claves
+    empiezan por settings_<sección>_.
+-->
+<resources>
+    <string name="settings_title">Ajustes</string>
+    <string name="settings_version">Deep Line %1$s</string>
+
+    <!-- Help section. -->
+    <string name="settings_help_title">Ayuda</string>
+    <string name="settings_help_body">La guía explica cómo se juega y para qué sirve cada cosa.</string>
+    <string name="settings_help_tour">Ver la guía</string>
+
+    <!-- Sound and feel section. -->
+    <string name="settings_sound_title">Sonido y sensaciones</string>
+    <string name="settings_sound_volume">Volumen</string>
+    <string name="settings_sound_music">Música</string>
+    <string name="settings_sound_effects">Efectos de sonido</string>
+    <!-- A slider's level. %1$d: 0 to 100 (no-break space before %). -->
+    <string name="settings_sound_percent">%1$d %%</string>
+    <string name="settings_sound_vibration">Vibración</string>
+    <string name="settings_sound_vibration_on">Un toque suave con los golpes, las capturas y las grandes victorias.</string>
+    <string name="settings_sound_vibration_none">Este teléfono no puede vibrar.</string>
+    <string name="settings_sound_reduce_motion">Reducir movimiento</string>
+    <string name="settings_sound_reduce_motion_body">Sin temblores de pantalla, cámara lenta ni destellos durante los lances.</string>
+
+    <!-- Notifications section. -->
+    <string name="settings_notif_title">Notificaciones</string>
+    <string name="settings_notif_reminders">Recordatorios</string>
+    <!-- %1$s: the promise about how often reminders come (a full sentence). -->
+    <string name="settings_notif_reminders_body">Cuando tu recompensa diaria está lista, tu racha está a punto de terminar o empieza una migración. %1$s</string>
+    <string name="settings_notif_daily">Recompensa diaria lista</string>
+    <!-- %1$s: a time on the hour, e.g. 12:00. -->
+    <string name="settings_notif_daily_body">A partir de las %1$s, si aún no has abierto el juego ese día.</string>
+    <string name="settings_notif_streak">Racha en peligro</string>
+    <plurals name="settings_notif_streak_body">
+        <item quantity="one">Al final del día, cuando una racha de %d día o más terminaría a medianoche.</item>
+        <item quantity="many">Al final del día, cuando una racha de %d de días o más terminaría a medianoche.</item>
+        <item quantity="other">Al final del día, cuando una racha de %d días o más terminaría a medianoche.</item>
+    </plurals>
+    <string name="settings_notif_events">Migraciones y eventos</string>
+    <string name="settings_notif_events_body">Cuando empieza una migración o un evento de fin de semana.</string>
+    <string name="settings_notif_blocked">Las notificaciones de Deep Line están desactivadas en este teléfono, así que no puede llegar ningún recordatorio.</string>
+    <string name="settings_notif_phone_settings">Abrir ajustes del teléfono</string>
+
+    <!-- Language section. Language names stay in their own language. -->
+    <string name="settings_language_title">Idioma</string>
+    <string name="settings_language_system">Idioma del teléfono</string>
+    <!-- %1$s: the phone's language, in that language (e.g. Deutsch). -->
+    <string name="settings_language_system_now">Ahora: %1$s</string>
+    <string name="settings_language_body">Los nombres que escriben los jugadores nunca se traducen.</string>
+
+    <!-- Credits section. -->
+    <string name="settings_credits_title">Créditos</string>
+    <string name="settings_credits_body">Todos los sonidos y la música son obras libres dedicadas al dominio público (CC0) y compartidas en OpenGameArt.org. Gracias a sus autores.</string>
+    <!-- %1$s: the original English title of a track or sound pack. -->
+    <string name="settings_credits_music">Música: %1$s</string>
+    <string name="settings_credits_sounds">Sonidos: %1$s</string>
+    <!-- %1$s: the author's name; %2$s: the licence's name. -->
+    <string name="settings_credits_by">Autor: %1$s. Licencia: %2$s.</string>
+</resources>

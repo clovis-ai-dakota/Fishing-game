@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Duelos 1 contra 1 y juego en línea: la pestaña Duelo (battle_setup_), la pantalla entre lances
+    (battle_), los nombres que da el juego, la sala en línea (online_) y los mensajes del servidor
+    (online_error_, online_over_). Los nombres que escriben los jugadores nunca se traducen; van
+    donde la gramática no los toca (tras dos puntos, entre paréntesis).
+-->
+<resources>
+    <string name="battle_player_you">Tú</string>
+    <!-- %1$s: its difficulty (Fácil, Normal or Difícil). -->
+    <string name="battle_player_rival">Rival (%1$s)</string>
+    <string name="battle_player_one">Jugador 1</string>
+    <string name="battle_player_two">Jugador 2</string>
+
+    <!-- %1$d: the code's length. -->
+    <string name="online_error_code_length">Los códigos de sala tienen %1$d caracteres.</string>
+    <!-- %1$s: the technical reason (stays in English). -->
+    <string name="online_error_unreachable">No se ha podido conectar con el servidor (%1$s).</string>
+    <string name="online_error_disconnected">Desconectado del servidor.</string>
+
+    <!-- A clock (minutes:seconds), e.g. "2:05". -->
+    <string name="battle_clock">%1$d:%2$02d</string>
+
+    <!-- The Battle tab. -->
+    <string name="battle_setup_title">Duelo 1 contra 1</string>
+    <string name="battle_setup_mode">Modo</string>
+    <string name="battle_setup_opponent">Rival</string>
+    <string name="battle_setup_computer">Máquina:</string>
+    <string name="battle_setup_friend">Un amigo en este dispositivo (pasando el teléfono)</string>
+    <string name="battle_setup_online">En línea (código de sala o partida rápida)</string>
+    <!-- %1$d: the level of the standard tournament rope, in every rope stat. -->
+    <string name="battle_setup_info_online">En línea, ambos jugadores pescan a la vez, cada uno en su teléfono, en exactamente la misma agua y con la misma cuerda de torneo estándar (nivel %1$d en cada estadística). Las capturas de los duelos no cuentan para tus puntos ni para tu registro de peces.</string>
+    <string name="battle_setup_info_local">Ambos jugadores usan tu cuerda actual y pescan en exactamente la misma agua en cada lance, así que gana la habilidad. Las capturas de los duelos no cuentan para tus puntos ni para tu registro de peces.</string>
+    <string name="battle_setup_tackle_title">Aparejos para tus lances</string>
+    <string name="battle_setup_tackle_info">Los Faroles y los detectores funcionan en los duelos: mientras estén activados, cada uno de tus lances gasta uno. El Amuleto de la suerte y el Señuelo brillante son solo para lances en solitario.</string>
+    <string name="battle_setup_wager_title">Apuesta (opcional)</string>
+    <string name="battle_setup_wager_none">Ninguna</string>
+    <!-- %1$s: points paid back for a win; %2$s: the multiplier; %3$s: the computer's level. -->
+    <string name="battle_setup_wager_terms">Si ganas, recibes %1$s pts (×%2$s en nivel %3$s); un empate te devuelve la apuesta; si pierdes o abandonas, la pierdes.</string>
+    <!-- %1$s: the computer's level; %2$s: the multiplier. -->
+    <string name="battle_setup_wager_hint">Apuesta puntos al resultado: una victoria en nivel %1$s paga ×%2$s.</string>
+    <!-- V, D and E: victorias, derrotas, empates. -->
+    <string name="battle_setup_record">Historial contra la máquina: %1$d V · %2$d D · %3$d E</string>
+    <string name="battle_setup_go_online">Jugar en línea</string>
+    <string name="battle_setup_start">Empezar duelo</string>
+    <!-- %1$d: how many are owned. -->
+    <string name="battle_tackle_lantern">Farol ×%1$d</string>
+    <string name="battle_tackle_detector">Detector ×%1$d</string>
+    <string name="battle_tackle_get_more">Conseguir más</string>
+
+    <!-- The battle screen (between casts). -->
+    <string name="battle_rounds_title">Rondas</string>
+    <string name="battle_round">Ronda %1$d</string>
+    <!-- The spaces are on purpose (quoted). -->
+    <string name="battle_round_score">"%1$s  vs  %2$s"</string>
+    <string name="battle_round_winner">"  → %1$s"</string>
+    <string name="battle_round_tie">"  → empate"</string>
+    <string name="battle_outcome_draw">¡Empate!</string>
+    <!-- %1$s: the winner's name. -->
+    <string name="battle_outcome_wins">¡Gana %1$s!</string>
+    <string name="battle_outcome_you_win">¡Has ganado!</string>
+    <string name="battle_by_forfeit">por abandono</string>
+    <!-- %1$s: points with their unit. -->
+    <string name="battle_wager_won">Apuesta ganada: %1$s</string>
+    <string name="battle_wager_refunded">Apuesta devuelta: %1$s</string>
+    <string name="battle_wager_lost">Apuesta perdida: %1$s</string>
+    <string name="battle_new_online">Nuevo duelo en línea</string>
+    <string name="battle_rematch">Revancha</string>
+    <!-- %1$s: the online opponent's name (as typed). -->
+    <string name="battle_send_gift">Enviar un regalo a %1$s</string>
+    <string name="battle_back_to_menu">Volver al menú</string>
+    <string name="battle_sending_cast">Enviando tu lance…</string>
+    <string name="battle_waiting_for">Esperando a %1$s…</string>
+    <string name="battle_forfeit">Abandonar</string>
+    <string name="battle_up_next">Siguiente turno: %1$s</string>
+    <string name="battle_up_next_round">Siguiente turno: %1$s · ronda %2$d</string>
+    <string name="battle_up_next_time">Siguiente turno: %1$s · quedan %2$s</string>
+    <string name="battle_up_next_cast">Siguiente turno: %1$s · lance %2$d/%3$d</string>
+    <!-- %1$s: the player whose turn it is. -->
+    <string name="battle_hand_phone">Turno de %1$s: pásale el teléfono.</string>
+    <!-- %1$s: the computer's name (e.g. "Rival (Normal)"). -->
+    <string name="battle_let_fish">Que pesque %1$s</string>
+    <string name="battle_cast">¡Lanza!</string>
+    <string name="battle_cast_player">¡Lanza, %1$s!</string>
+    <string name="battle_forfeit_title">¿Abandonar el duelo?</string>
+    <string name="battle_forfeit_body">La victoria será para tu rival.</string>
+    <string name="battle_keep_playing">Seguir jugando</string>
+    <string name="battle_player_me">%1$s (tú)</string>
+    <string name="battle_time_left">Tiempo restante: %1$s</string>
+    <string name="battle_total">Total: %1$s</string>
+    <!-- %1$d: the cast's number; %2$s: what it brought, joined with " · ". -->
+    <string name="battle_cast_line">#%1$d: %2$s</string>
+    <plurals name="battle_fish">
+        <item quantity="one">%d pez</item>
+        <item quantity="many">%d de peces</item>
+        <item quantity="other">%d peces</item>
+    </plurals>
+    <!-- %1$s: the opponent's name; %2$s: the details, joined with " · ". -->
+    <string name="battle_opponent_live">%1$s está pescando: %2$s</string>
+    <string name="battle_opponent_live_cast">lance %1$d</string>
+
+    <!-- The online lobby. -->
+    <string name="online_title">Duelo en línea</string>
+    <string name="online_tournament_rope">Cuerda de torneo: nivel %1$d en cada estadística, para ambos jugadores.</string>
+    <string name="online_your_name">Tu nombre</string>
+    <string name="online_share_code">Comparte este código de sala</string>
+    <string name="online_waiting_join">Esperando a que se una tu rival…</string>
+    <string name="online_looking">Buscando rival…</string>
+    <!-- %1$s: the battle mode. -->
+    <string name="online_paired_with">Te emparejaremos con el próximo jugador que elija este modo: %1$s.</string>
+    <string name="online_create_room">Crear sala</string>
+    <string name="online_quick_match">Partida rápida</string>
+    <string name="online_room_code">Código de sala</string>
+    <string name="online_join">Unirse</string>
+    <string name="online_status_disconnected">Sin conexión. Te conectas al crear una sala, unirte a una o buscar una partida rápida.</string>
+    <string name="online_status_connecting">Conectando…</string>
+    <string name="online_status_connected">Conectado.</string>
+    <string name="online_status_waiting">Conectado · esperando.</string>
+    <string name="online_status_in_match">En una partida.</string>
+    <string name="online_server_show">Ajustes del servidor</string>
+    <string name="online_server_hide">Ocultar ajustes del servidor</string>
+    <string name="online_server_address">Dirección del servidor</string>
+    <!-- %1$s: an example address (never translated). -->
+    <string name="online_server_example">Por ejemplo: %1$s</string>
+
+    <!-- The battle server's messages (the app shows these instead of the server's English). -->
+    <string name="online_error_cast_unexpected">Ese lance no se esperaba en este momento.</string>
+    <string name="online_error_cast_impossible">Ese lance no es posible con la cuerda de torneo.</string>
+    <string name="online_error_unreadable">Mensaje ilegible.</string>
+    <string name="online_error_update_app">Actualiza la app para jugar en línea.</string>
+    <string name="online_error_busy">Ya estás esperando una partida o jugando una.</string>
+    <!-- %1$s: the room code that was typed (never translated). -->
+    <string name="online_error_no_room">No hay ninguna sala con el código %1$s.</string>
+    <!-- %1$s: the player's name (as typed). -->
+    <string name="online_over_forfeited">%1$s ha abandonado.</string>
+    <string name="online_over_left">%1$s ha salido del duelo.</string>
+</resources>

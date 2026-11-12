@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Privacidad: la hoja de consentimiento de la primera vez (privacy/ConsentSheet.kt), Ajustes >
+    Privacidad y la eliminación de la cuenta. Las claves empiezan por privacy_. Textos casi legales:
+    claros, exactos y completos. "Permitir" y "No permitir" deben leerse como opciones iguales.
+    Google Firebase es un nombre de producto: no se traduce.
+-->
+<resources>
+    <!-- Consent sheet. -->
+    <string name="privacy_consent_title">¿Nos ayudas a mejorar Deep Line?</string>
+    <string name="privacy_consent_body">Con tu permiso, el juego envía estadísticas de uso (qué pantallas abres, cómo van tus lances y duelos, qué compras) e informes de errores a Google Firebase. Nos ayudan a corregir fallos y a equilibrar el juego.</string>
+    <string name="privacy_consent_promise">Se asocian a un ID aleatorio, nunca a tu nombre, y nunca se usan para publicidad. No se envía nada si no lo permites, y puedes cambiar de opinión cuando quieras en Ajustes, en Privacidad.</string>
+    <string name="privacy_read_policy">Leer la política de privacidad</string>
+    <string name="privacy_consent_choose">Elegir por separado</string>
+    <string name="privacy_consent_save">Guardar mis opciones</string>
+    <!-- The two answers, side by side and styled the same. -->
+    <string name="privacy_consent_refuse">No permitir</string>
+    <string name="privacy_consent_allow">Permitir</string>
+
+    <!-- The two kinds of data, as switches. -->
+    <string name="privacy_analytics_title">Estadísticas de uso</string>
+    <string name="privacy_analytics_subtitle">Cómo se juega: pantallas, lances, duelos, compras.</string>
+    <string name="privacy_crash_title">Informes de errores</string>
+    <string name="privacy_crash_subtitle">Qué ha fallado cuando el juego se cierra de golpe o algo no funciona.</string>
+
+    <!-- Settings > Privacy. -->
+    <string name="privacy_settings_title">Privacidad</string>
+    <string name="privacy_settings_intro">Las estadísticas de uso y los informes de errores van a Google Firebase, asociados a un ID aleatorio (nunca a tu nombre), y solo si los permites. Nunca se usan para publicidad.</string>
+    <string name="privacy_settings_unavailable">Esta versión del juego no envía estadísticas ni informes de errores. Tus opciones se guardan para las versiones que sí los envían.</string>
+    <string name="privacy_reset_id">Restablecer mi ID de estadísticas</string>
+    <string name="privacy_account_explainer">Tu cuenta en línea (ID de jugador, copia de seguridad en la nube, regalos pendientes) se guarda en el servidor del juego. Al eliminarla se borra todo eso; el progreso de este teléfono se conserva.</string>
+    <string name="privacy_delete_account">Eliminar mi cuenta en línea</string>
+    <string name="privacy_deleting">Eliminando tu cuenta…</string>
+
+    <!-- Confirmation dialog before deleting the online account. -->
+    <string name="privacy_delete_confirm_title">¿Eliminar tu cuenta en línea?</string>
+    <string name="privacy_delete_confirm_body">Esto borra todo lo que el servidor del juego guarda sobre ti: tu ID de jugador, tu copia de seguridad en la nube y los regalos que te esperan. Tu código de recuperación dejará de funcionar, y no se puede deshacer.\n\nTu progreso en este teléfono se conserva, y tus compras siguen en tu cuenta de Google Play. La suscripción al Club del Capitán no se cancela: gestiónala en Google Play.</string>
+    <string name="privacy_delete_confirm_yes">Eliminar mi cuenta</string>
+    <string name="privacy_delete_confirm_no">Conservarla</string>
+
+    <!-- Messages shown after an action. -->
+    <string name="privacy_message_reset">Se han borrado las estadísticas guardadas en este teléfono y ahora tienes un nuevo ID aleatorio.</string>
+    <string name="privacy_message_deleted">Tu cuenta en línea se ha eliminado. Tu progreso en este teléfono sigue aquí, y el juego ahora usa un nuevo ID de jugador.</string>
+    <!-- %1$s: why it failed (a full sentence). -->
+    <string name="privacy_message_not_deleted">Tu cuenta no se ha eliminado: %1$s</string>
+</resources>

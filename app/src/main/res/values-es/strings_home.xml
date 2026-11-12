@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    La pestaña Pescar (ui/HomeScreen.kt): el centro del juego, con el gran botón Lanzar sedal.
+    Las claves empiezan por home_.
+-->
+<resources>
+    <string name="home_tagline">Pesca todos los peces de las profundidades</string>
+    <!-- Screen reader labels of the icons at the top right. -->
+    <string name="home_cd_milestones">Hitos</string>
+    <string name="home_cd_themes">Temas</string>
+    <string name="home_cd_settings">Ajustes</string>
+    <string name="home_boat_action">Personaliza tu barco</string>
+
+    <!-- The rope card. -->
+    <string name="home_rope_title">Tu cuerda</string>
+    <!-- %1$s: reach in meters; %2$s: the deepest zone it reaches. -->
+    <string name="home_rope_reach">Llega a %1$s · %2$s</string>
+    <string name="home_rope_stats">Lances: %1$s · Total ganado: %2$s pts</string>
+    <string name="home_rope_stats_deepest">Lances: %1$s · Total ganado: %2$s pts · Captura más profunda: %3$s</string>
+
+    <!-- The Dex card. -->
+    <string name="home_dex_title">Dex</string>
+    <string name="home_dex_caught">Capturadas %1$d / %2$d</string>
+    <string name="home_dex_seen">Vistas %1$d</string>
+    <string name="home_dex_zone">%1$s %2$d/%3$d</string>
+
+    <!-- The milestones card. -->
+    <string name="home_milestones_title">Hitos</string>
+    <plurals name="home_milestones_to_claim">
+        <item quantity="one">¡%d por reclamar!</item>
+        <item quantity="many">¡%d por reclamar!</item>
+        <item quantity="other">¡%d por reclamar!</item>
+    </plurals>
+    <string name="home_milestones_next">%1$s / %2$s · siguiente: %3$s</string>
+    <string name="home_milestones_done">¡Todos los hitos conseguidos!</string>
+
+    <!-- The Lantern switch above the Cast line button. -->
+    <string name="home_lanterns">Faroles: %1$d</string>
+    <string name="home_lanterns_hint">Ilumina la oscuridad por debajo de %1$d m en el próximo lance.</string>
+    <!-- Chips for other tackle (short forms). -->
+    <string name="home_tackle_detector">Detector ×%1$d</string>
+    <string name="home_tackle_charm">Amuleto ×%1$d</string>
+    <string name="home_tackle_lure">Señuelo ×%1$d</string>
+    <!-- The main button. Short: one line. -->
+    <string name="home_cast_button">Lanzar sedal</string>
+
+    <!-- The rules, in a dialog. -->
+    <string name="home_rules_title">Cómo pescar</string>
+    <string name="home_rules_body">• Arrastra a izquierda y derecha para guiar el anzuelo.\n• Al bajar: el anzuelo se hunde hasta que ha dado %1$d golpes o se acaba la cuerda. Un golpe es tocar la cabeza de un pez, una roca, un tronco o una medusa; rozar el cuerpo o la cola de un pez no cuenta. Los primeros %2$d m están libres de golpes.\n• Al subir: toca a un pez en la cabeza (la cara clara junto al ojo) para engancharlo. Tocarle la cola no hace nada. La cuerda solo aguanta cierto peso.\n• Las capturas más profundas valen más puntos. Los peces brillantes valen %3$d× más.\n• Por debajo de %4$d m todo se oscurece. Un Farol ilumina más parte del agua.</string>
+</resources>

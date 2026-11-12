@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    El bucle diario: recompensas diarias y racha, retos diarios, migraciones y recordatorios
+    (DailyText.kt, DailyController.kt; la tarjeta y la pantalla en ui/daily/). Las claves empiezan
+    por daily_. Las notificaciones de recordatorio también van aquí (daily_reminder_*).
+-->
+<resources>
+    <!-- %1$s and %2$s: times on the hour (start and end of the quiet hours). -->
+    <string name="daily_reminder_promise">Como mucho uno al día, nunca entre las %1$s y las %2$s, y puedes desactivarlos cuando quieras en Ajustes.</string>
+
+    <!-- Rewards, as noun phrases joined into a list. -->
+    <string name="daily_grant_shield">un escudo de racha</string>
+    <!-- Short labels on the 7-day calendar's tiles (tiny: 10 characters or so). -->
+    <!-- %1$d: number of Lanterns. -->
+    <string name="daily_tile_lanterns">%1$d × Farol</string>
+    <string name="daily_tile_detector">Detector</string>
+    <string name="daily_tile_charm">Amuleto</string>
+    <string name="daily_tile_lure">Señuelo</string>
+    <string name="daily_tile_shield">Escudo</string>
+
+    <!-- Daily challenges: one sentence each, an instruction. -->
+    <plurals name="daily_challenge_casts">
+        <item quantity="one">Lanza el sedal %d vez.</item>
+        <item quantity="many">Lanza el sedal %d de veces.</item>
+        <item quantity="other">Lanza el sedal %d veces.</item>
+    </plurals>
+    <plurals name="daily_challenge_catch_fish">
+        <item quantity="one">Captura %d pez.</item>
+        <item quantity="many">Captura %d de peces.</item>
+        <item quantity="other">Captura %d peces.</item>
+    </plurals>
+    <plurals name="daily_challenge_catch_zone">
+        <!-- %1$d: how many; %2$s: a depth zone's name, e.g. Arrecife Crepuscular. -->
+        <item quantity="one">Captura %1$d pez en la zona %2$s.</item>
+        <item quantity="many">Captura %1$d de peces en la zona %2$s.</item>
+        <item quantity="other">Captura %1$d peces en la zona %2$s.</item>
+    </plurals>
+    <!-- %1$d: a depth in meters. -->
+    <string name="daily_challenge_reach_depth">Llega a %1$d m en un lance.</string>
+    <!-- %1$s: a species' name. -->
+    <string name="daily_challenge_catch_species_one">Captura un pez de esta especie: %1$s.</string>
+    <!-- %1$d: how many (always 2 or more); %2$s: a species' name. -->
+    <string name="daily_challenge_catch_species">Captura %1$d peces de esta especie: %2$s.</string>
+    <!-- %1$s: points, already formatted. -->
+    <string name="daily_challenge_earn_points">Consigue %1$s puntos.</string>
+    <plurals name="daily_challenge_land_weight">
+        <item quantity="one">Saca %d kg de peces.</item>
+        <item quantity="many">Saca %d kg de peces.</item>
+        <item quantity="other">Saca %d kg de peces.</item>
+    </plurals>
+    <plurals name="daily_challenge_sparkling">
+        <item quantity="one">Captura %d pez brillante.</item>
+        <item quantity="many">Captura %d de peces brillantes.</item>
+        <item quantity="other">Captura %d peces brillantes.</item>
+    </plurals>
+    <plurals name="daily_challenge_big_cast">
+        <item quantity="one">Saca %d pez en un solo lance.</item>
+        <item quantity="many">Saca %d de peces en un solo lance.</item>
+        <item quantity="other">Saca %d peces en un solo lance.</item>
+    </plurals>
+    <plurals name="daily_challenge_new_species">
+        <item quantity="one">Captura %d especie que nunca hayas capturado.</item>
+        <item quantity="many">Captura %d de especies que nunca hayas capturado.</item>
+        <item quantity="other">Captura %d especies que nunca hayas capturado.</item>
+    </plurals>
+    <!-- %1$d: best so far; %2$d: goal (meters). -->
+    <string name="daily_progress_depth">Más profundo: %1$d de %2$d m</string>
+    <!-- %1$d: best so far; %2$d: goal (fish). -->
+    <string name="daily_progress_big_cast">Mejor lance: %1$d de %2$d peces</string>
+
+    <!-- After claiming the daily reward. %1$d: the calendar day (1 to 7); %2$s: the rewards. -->
+    <string name="daily_claimed">Recompensa del día %1$d: %2$s.</string>
+    <!-- %1$d: streak in days (2 or more); %2$d: calendar day; %3$s: rewards. -->
+    <string name="daily_claimed_streak">¡%1$d días seguidos! Recompensa del día %2$d: %3$s.</string>
+    <string name="daily_claimed_restarted">Hoy empieza una nueva racha. Recompensa del día %1$d: %2$s.</string>
+    <!-- %1$s: the streak (e.g. "5 días"); %2$d: calendar day; %3$s: rewards. -->
+    <string name="daily_claimed_one_shield">Un escudo de racha ha cubierto el día que te perdiste: tu racha es de %1$s. Recompensa del día %2$d: %3$s.</string>
+    <!-- %1$d: shields used; %2$s: the streak; %3$d: calendar day; %4$s: rewards. -->
+    <string name="daily_claimed_shields">%1$d escudos de racha han cubierto los días que te perdiste: tu racha es de %2$s. Recompensa del día %3$d: %4$s.</string>
+    <!-- %1$s: the rewards. -->
+    <string name="daily_collected">Hemos reclamado por ti los retos que terminaste otro día: %1$s.</string>
+    <string name="daily_challenge_claimed">¡Reto completado! Recibes %1$s.</string>
+    <!-- %1$s: its difficulty (Fácil, Intermedio, Difícil); %2$s: the new challenge. -->
+    <string name="daily_challenge_swapped">Nuevo reto (%1$s): %2$s</string>
+    <string name="daily_reminders_blocked">Los recordatorios siguen desactivados: las notificaciones de Deep Line están bloqueadas en este teléfono. Puedes permitirlas en los ajustes del teléfono.</string>
+
+    <!-- The Daily card and screen. Short title. -->
+    <string name="daily_title">Cada día</string>
+    <!-- The streak, next to a flame icon. Short. -->
+    <plurals name="daily_streak">
+        <item quantity="one">Racha de %d día</item>
+        <item quantity="many">Racha de %d de días</item>
+        <item quantity="other">Racha de %d días</item>
+    </plurals>
+    <string name="daily_streak_none">Aún sin racha</string>
+    <!-- %1$d: the calendar day (1 to 7); %2$s: its rewards. -->
+    <string name="daily_claim_button">Reclamar día %1$d: %2$s</string>
+    <!-- %1$d: the next calendar day; %2$s: its rewards; %3$s: the time until then. -->
+    <string name="daily_claim_wait">Ya has reclamado la recompensa de hoy. El día %1$d (%2$s) estará listo dentro de %3$s.</string>
+    <plurals name="daily_best_streak">
+        <item quantity="one">Mejor racha: %d día.</item>
+        <item quantity="many">Mejor racha: %d de días.</item>
+        <item quantity="other">Mejor racha: %d días.</item>
+    </plurals>
+    <!-- %1$s: the best streak (a whole sentence); %2$d: shields held; %3$d: the most shields one can
+         hold; %4$d: the calendar day that brings a new shield. -->
+    <string name="daily_streak_rules">%1$s Escudos de racha: %2$d de %3$d. Un escudo cubre por sí solo un día perdido, y el día %4$d trae uno nuevo. Perderte un día nunca hace retroceder el calendario.</string>
+    <string name="daily_challenges_title">Retos de hoy</string>
+    <!-- Short: next to the challenge's text. -->
+    <string name="daily_challenge_done">Hecho</string>
+    <string name="daily_challenge_claim">Reclamar</string>
+    <string name="daily_challenge_swap">Cambiar</string>
+    <string name="daily_swaps_none">Hoy no te quedan cambios gratis.</string>
+    <plurals name="daily_swaps_left">
+        <item quantity="one">Hoy te queda %d cambio gratis para un reto que no te apetezca.</item>
+        <item quantity="many">Hoy te quedan %d de cambios gratis para los retos que no te apetezcan.</item>
+        <item quantity="other">Hoy te quedan %d cambios gratis para los retos que no te apetezcan.</item>
+    </plurals>
+    <!-- %1$s: the free swaps left (a whole sentence). -->
+    <string name="daily_challenges_rules">%1$s Solo cuentan los lances en solitario. Los retos nuevos llegan a medianoche, y los terminados se reclaman por ti si se te olvida.</string>
+    <string name="daily_remind_button">Avísame cuando mi recompensa esté lista</string>
+
+    <!-- Turning reminders on: a dialog shown once. -->
+    <string name="daily_optin_title">¿Quieres un recordatorio?</string>
+    <!-- %1$s: how often reminders come (a whole sentence). -->
+    <string name="daily_optin_body">Deep Line puede avisarte cuando tu recompensa diaria esté lista, cuando tu racha esté a punto de terminar y cuando empiece una migración. %1$s</string>
+    <string name="daily_optin_yes">Activar</string>
+    <string name="daily_optin_no">Ahora no</string>
+
+    <!-- Migrations. -->
+    <string name="daily_migration_banner_title">Migración en curso</string>
+    <!-- %1$s: the time left. "Estas dos": the two species listed below. -->
+    <string name="daily_migration_banner_body">Estas dos especies son mucho más comunes en los lances en solitario durante %1$s.</string>
+    <string name="daily_migrating_note">En migración: mucho más común en los lances en solitario durante %1$s.</string>
+    <string name="daily_migration_live">Migración: quedan %1$s</string>
+    <string name="daily_migration_next">Próxima migración dentro de %1$s</string>
+    <!-- %d: how many days a migration lasts. -->
+    <plurals name="daily_migration_about">
+        <item quantity="one">Cada semana, durante %d día, dos especies poco comunes se vuelven mucho más comunes donde viven: una cerca de la superficie y otra en las profundidades. Solo en lances en solitario: los duelos nunca cambian.</item>
+        <item quantity="many">Cada semana, durante %d de días, dos especies poco comunes se vuelven mucho más comunes donde viven: una cerca de la superficie y otra en las profundidades. Solo en lances en solitario: los duelos nunca cambian.</item>
+        <item quantity="other">Cada semana, durante %d días, dos especies poco comunes se vuelven mucho más comunes donde viven: una cerca de la superficie y otra en las profundidades. Solo en lances en solitario: los duelos nunca cambian.</item>
+    </plurals>
+    <string name="daily_migrant_open">Abrir su página del Dex</string>
+    <!-- %1$s: its depth zone; %2$d and %3$d: the depths where it lives, in meters. -->
+    <string name="daily_migrant_where">%1$s · %2$d–%3$d m</string>
+
+    <!-- Notification channels: a short name and a one-sentence description. -->
+    <string name="daily_channel_daily_name">Recompensa diaria lista</string>
+    <string name="daily_channel_daily_description">Cuando la recompensa de hoy te espera y aún no has abierto el juego.</string>
+    <string name="daily_channel_streak_name">Racha en peligro</string>
+    <string name="daily_channel_streak_description">Al final del día, cuando tu racha de días seguidos termina a medianoche si no reclamas la recompensa de hoy.</string>
+    <string name="daily_channel_events_name">Migraciones y eventos</string>
+    <string name="daily_channel_events_description">Cuando empieza una migración o un evento de fin de semana.</string>
+
+    <!-- Reminder notifications: a short title (one line) and a text. -->
+    <string name="daily_reminder_ready_title_1">Tu recompensa diaria te espera</string>
+    <string name="daily_reminder_ready_title_2">Los peces están picando</string>
+    <string name="daily_reminder_ready_title_3">Te espera una recompensa en el muelle</string>
+    <!-- %1$d: the calendar day (1 to 7). -->
+    <string name="daily_reminder_ready_text_1">El día %1$d de tu calendario de recompensas está listo para reclamar.</string>
+    <string name="daily_reminder_ready_text_2">La recompensa de hoy y tres retos nuevos te esperan.</string>
+    <string name="daily_reminder_ready_text_3">Reclama la recompensa de hoy y descubre los retos del día.</string>
+    <plurals name="daily_reminder_streak_title">
+        <item quantity="one">Mantén tu racha de %d día</item>
+        <item quantity="many">Mantén tu racha de %d de días</item>
+        <item quantity="other">Mantén tu racha de %d días</item>
+    </plurals>
+    <string name="daily_reminder_streak_text">Reclama la recompensa de hoy antes de medianoche para no perderla.</string>
+    <string name="daily_reminder_streak_text_shield">Reclama la recompensa de hoy antes de medianoche. Si hoy no puedes, un escudo de racha lo cubrirá.</string>
+    <string name="daily_reminder_migration_title">Ha empezado una migración</string>
+    <!-- %1$d: how many days the migration lasts; %2$s: the two species, a list. -->
+    <plurals name="daily_reminder_migration_text">
+        <item quantity="one">Durante %1$d día, dos especies son mucho más comunes: %2$s.</item>
+        <item quantity="many">Durante los próximos %1$d de días, dos especies son mucho más comunes: %2$s.</item>
+        <item quantity="other">Durante los próximos %1$d días, dos especies son mucho más comunes: %2$s.</item>
+    </plurals>
+    <!-- %1$s: the depth zone it lives in. -->
+    <string name="daily_reminder_unknown_species">una especie desconocida (%1$s)</string>
+    <string name="daily_reminder_event_title">Ha empezado el evento de fin de semana</string>
+    <!-- %1$s: the event's goal (e.g. "Captura peces brillantes"); %2$d: how many it takes. -->
+    <string name="daily_reminder_event_text">Objetivo de este fin de semana: %1$s (%2$d). Te espera una recompensa cuando lo consigas.</string>
+</resources>

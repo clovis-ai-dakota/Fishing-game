@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    El editor de barcos (Dex > Aspectos > Personalizar barco): cómo se desbloquea cada opción
+    (BoatText.kt) y el texto de la pantalla del editor. Las claves empiezan por boat_.
+-->
+<resources>
+    <!-- How a locked boat option unlocks: short labels under the option (a chip). -->
+    <string name="boat_requirement_free">Gratis</string>
+    <plurals name="boat_requirement_species">
+        <item quantity="one">Captura %d especie</item>
+        <item quantity="many">Captura %d de especies</item>
+        <item quantity="other">Captura %d especies</item>
+    </plurals>
+    <!-- %1$s: the zone's name, e.g. Fosa de Medianoche. -->
+    <string name="boat_requirement_zone">Captura un pez en la zona %1$s</string>
+    <plurals name="boat_requirement_milestones">
+        <item quantity="one">Reclama %d hito</item>
+        <item quantity="many">Reclama %d de hitos</item>
+        <item quantity="other">Reclama %d hitos</item>
+    </plurals>
+    <string name="boat_requirement_shop">En la Tienda</string>
+
+    <!-- The same, as a whole sentence. -->
+    <string name="boat_unlock_free">Es gratis.</string>
+    <!-- %1$s: the points price with its unit, e.g. "1.200 pts". -->
+    <string name="boat_unlock_points">Desbloquéala por %1$s.</string>
+    <plurals name="boat_unlock_species">
+        <item quantity="one">Captura %d especie para desbloquearla.</item>
+        <item quantity="many">Captura %d de especies para desbloquearla.</item>
+        <item quantity="other">Captura %d especies para desbloquearla.</item>
+    </plurals>
+    <!-- %1$s: the zone's name. -->
+    <string name="boat_unlock_zone">Captura un pez en la zona %1$s para desbloquearla.</string>
+    <plurals name="boat_unlock_milestones">
+        <item quantity="one">Reclama %d hito para desbloquearla.</item>
+        <item quantity="many">Reclama %d de hitos para desbloquearla.</item>
+        <item quantity="other">Reclama %d hitos para desbloquearla.</item>
+    </plurals>
+    <string name="boat_unlock_shop">Cómprala en la Tienda para desbloquearla.</string>
+    <string name="boat_unlock_club">Únete al Club del Capitán para desbloquearla.</string>
+
+    <!-- The editor screen. -->
+    <string name="boat_editor_title">Personalizar barco</string>
+    <!-- %1$s: the player's points, formatted. -->
+    <string name="boat_editor_intro">Tus puntos: %1$s. Las opciones básicas son gratis; toca una bloqueada para ver cómo desbloquearla.</string>
+    <string name="boat_editor_hull_colour">Color del casco</string>
+    <string name="boat_editor_bottom_colour">Color de la quilla</string>
+    <string name="boat_editor_trim_colour">Ribetes y emblema</string>
+    <string name="boat_editor_cabin_colour">Cabina</string>
+    <string name="boat_editor_sail_colour">Color de la vela</string>
+    <string name="boat_editor_flag_colour">Color de la bandera</string>
+    <string name="boat_editor_pattern">Diseño del casco</string>
+    <string name="boat_editor_sail">Vela</string>
+    <string name="boat_editor_flag">Bandera</string>
+    <string name="boat_editor_emblem">Emblema</string>
+    <!-- %1$s: the row's heading; %2$s: the colour's name. -->
+    <string name="boat_editor_swatch_cd">%1$s: %2$s</string>
+    <string name="boat_editor_swatch_cd_locked">%1$s: %2$s (bloqueado)</string>
+    <string name="boat_editor_locked_cd">Bloqueado</string>
+    <string name="boat_editor_save">Guardar y equipar</string>
+    <!-- %1$s: the option's name, e.g. Franja deportiva. -->
+    <string name="boat_editor_unlock_title">¿Desbloquear %1$s?</string>
+    <plurals name="boat_editor_unlock_body">
+        <!-- %1$s: the option's name; %2$s: its price in points; %3$s: the player's points. -->
+        <item quantity="one">Esta opción (%1$s) cuesta %2$s punto, una sola vez. Tienes %3$s.</item>
+        <item quantity="many">Esta opción (%1$s) cuesta %2$s de puntos, una sola vez. Tienes %3$s.</item>
+        <item quantity="other">Esta opción (%1$s) cuesta %2$s puntos, una sola vez. Tienes %3$s.</item>
+    </plurals>
+    <plurals name="boat_editor_unlock_body_short">
+        <item quantity="one">Esta opción (%1$s) cuesta %2$s punto, una sola vez. Tienes %3$s. Sigue pescando para ganar más.</item>
+        <item quantity="many">Esta opción (%1$s) cuesta %2$s de puntos, una sola vez. Tienes %3$s. Sigue pescando para ganar más.</item>
+        <item quantity="other">Esta opción (%1$s) cuesta %2$s puntos, una sola vez. Tienes %3$s. Sigue pescando para ganar más.</item>
+    </plurals>
+    <!-- %1$s: the price, formatted. -->
+    <string name="boat_editor_unlock_buy">Desbloquear por %1$s pts</string>
+    <string name="boat_editor_not_now">Ahora no</string>
+    <!-- %1$s: the option's name, e.g. Cuadros. -->
+    <string name="boat_editor_locked_title">Bloqueado: %1$s</string>
+</resources>
