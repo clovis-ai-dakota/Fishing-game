@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Meilensteine (ui/MilestonesScreen.kt, über den Pokal im Tab „Angeln“): Belohnungen für alle
+    jemals verdienten Punkte. (Milestones. Keys start with milestones_.)
+-->
+<resources>
+    <string name="milestones_title">Meilensteine</string>
+    <string name="milestones_earned">Insgesamt verdient: %1$s Punkte</string>
+    <string name="milestones_explainer">Meilensteine zählen jeden Punkt, den du mit Fischen verdienst, auch wenn du ihn schon für Verbesserungen ausgegeben hast.</string>
+    <string name="milestones_threshold">%1$s Punkte</string>
+    <string name="milestones_claimed">Abgeholt ✓</string>
+    <string name="milestones_claim">Abholen</string>
+    <string name="milestones_reward_points">+%1$s Punkte</string>
+</resources>

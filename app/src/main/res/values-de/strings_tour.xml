@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Die geführte Tour (ui/tour/): pro Schritt eine Karte mit Titel und Text. Namen von
+    Bildschirmen, Buttons, Zubehör, Zonen und Modi müssen genau wie ihre Beschriftungen lauten.
+    Nie einen Hinweis auf ein Angelgeheimnis geben. (The guided tour. Keys start with tour_.)
+-->
+<resources>
+    <!-- Steuerung der Karte. -->
+    <string name="tour_counter">%1$d / %2$d</string>
+    <string name="tour_counter_whats_new">Neu · %1$d / %2$d</string>
+    <string name="tour_skip">Tour überspringen</string>
+    <string name="tour_back">Zurück</string>
+    <string name="tour_next">Weiter</string>
+    <string name="tour_finish">Fertig</string>
+
+    <string name="tour_welcome_title">Willkommen bei Deep Line!</string>
+    <string name="tour_welcome_body">Fang jeden Fisch der Tiefe. Diese kurze Tour zeigt dir, wie das Spiel funktioniert und wofür alles da ist. Tippe auf „Weiter“ oder auf „Tour überspringen“, wenn du dich schon auskennst.</string>
+
+    <string name="tour_tabs_title">Vier Tabs</string>
+    <string name="tour_tabs_body">Die Leiste unten bringt dich überallhin: Unter „Angeln“ wirfst du aus, der Dex sammelt jede Art, der du begegnest, im Shop gibt es Seilverbesserungen, Zubehör und Looks für dein Boot, und unter „Duell“ trittst du eins gegen eins an.</string>
+
+    <string name="tour_cast_title">Wirf deine Angel aus</string>
+    <string name="tour_cast_body">Der große Button „Auswerfen“ unten im Tab „Angeln“ lässt deinen Haken vom Boot hinab.</string>
+
+    <string name="tour_steer_title">Lenk den Haken</string>
+    <string name="tour_steer_body">Zieh während eines Wurfs irgendwo auf dem Bildschirm nach links und rechts. Ein Ring zeigt, wo dein Finger ist: Der Haken gleitet dorthin und folgt ihm. Mit mehr Seilwendigkeit geht das schneller.</string>
+
+    <string name="tour_descent_title">Abstieg: ausweichen</string>
+    <string name="tour_descent_body">Der Haken sinkt, bis er %1$d-mal angestoßen ist oder das Ende des Seils erreicht, dann kehrt er nach oben um. Bei einem Fisch zählt nur der Kopf als Stoß (dieselbe Stelle, auf die du beim Aufstieg zielst); Körper oder Schwanzflosse zu streifen, kostet nichts. Felsen, Treibholz und Quallen zählen, egal wo du sie berührst. Die ersten %2$d m sind stoßfrei.</string>
+
+    <string name="tour_ascent_title">Aufstieg: auf Köpfe zielen</string>
+    <string name="tour_ascent_body">Lenk beim Aufstieg so, dass der Haken den Kopf eines Fisches trifft: das helle Gesicht beim Auge. Schwanzflosse oder Körper zu berühren, bringt nichts.</string>
+
+    <string name="tour_weight_title">Achte aufs Gewicht</string>
+    <string name="tour_weight_body">Dein Seil trägt nur ein begrenztes Gewicht. Behalte die Anzeige „Last“ im Blick: Ist sie voll, entwischen schwerere Fische.</string>
+
+    <string name="tour_fast_reel_title">Schnur voll? Schnell einholen</string>
+    <string name="tour_fast_reel_body">Sobald du deine %1$d Stöße verbraucht hast oder nichts mehr an deine Schnur passt, erscheint beim Aufstieg der Button „Schnell einholen“: Er holt den Haken in höchstens %2$s Sekunden zum Boot, egal wo du bist. Danach wird nichts mehr gefangen. Praktisch gegen die Uhr in Duellen auf Zeit.</string>
+
+    <string name="tour_themes_title">Designs</string>
+    <string name="tour_themes_body">Mit dem Paletten-Button oben änderst du, wie die Menüs aussehen: standardmäßig die Lagune, mit einer Meeresszene hinter jedem Tab. Weitere Designs gibt es im Shop für Euro oder Punkte, und die aufwendigeren kosten mehr. Das Wasser, in dem du angelst, ändert sich nie.</string>
+
+    <string name="tour_night_mode_title">Nachtmodus</string>
+    <string name="tour_night_mode_body">Jedes Design hat eine Nachtversion: Wähle „Tag“, „Nacht“ oder folge dem Dunkelmodus deines Handys.</string>
+
+    <string name="tour_points_title">Punkte sammeln</string>
+    <string name="tour_points_body">Tiefere Fänge bringen mehr Punkte, die hier oben angezeigt werden. Funkelnde Fische (goldener Umriss und Glitzern) sind %1$d× so viel wert.</string>
+
+    <string name="tour_upgrades_title">Verbessere dein Seil</string>
+    <string name="tour_upgrades_body">Gib Punkte im Tab „Shop“ auf der Seite „Seil“ aus. Seillänge bringt dich in tiefere Zonen zu neuen Fischen, Seilstärke trägt mehr Gewicht und Seilwendigkeit lenkt schneller. Anders überlegt? Stufe eine Verbesserung zurück, und du bekommst jeden Punkt zurück, den sie gekostet hat.</string>
+
+    <string name="tour_tackle_title">Zubehör</string>
+    <string name="tour_tackle_body">Auf der Seite „Zubehör“ gibt es Gegenstände für einen Wurf, die du vor dem Auswerfen einschaltest. Laternen erhellen das Dunkel, ein Raritätendetektor markiert Arten, die du noch nicht gefangen hast, im Umkreis von %1$d m um den Haken, ein Talisman gibt dir beim Abstieg einen Stoß mehr, und ein Funkelköder bringt %2$d× so viele funkelnde Fische. Die Preise steigen mit der Reichweite deines Seils.</string>
+
+    <string name="tour_two_prices_title">Zwei Arten zu bezahlen</string>
+    <string name="tour_two_prices_body">Alles im Shop hat zwei Preise: Euro oder Punkte. Ein Punktepreis entspricht bei der Reichweite deines Seils etwa %1$d Minuten Angeln pro Euro (%2$s bei Laternenpaketen), Bezahlen spart also nur Zeit: Alles lässt sich auch erspielen. Beim Bezahlen mit Punkten musst du zuerst bestätigen.</string>
+
+    <string name="tour_lantern_title">Laternen erhellen die Tiefe</string>
+    <string name="tour_lantern_body">Unter %1$d m ist das Wasser dunkel. Schalte dies vor einem Wurf ein, um viel mehr Wasser um den Haken zu erhellen (%2$d m statt %3$d m). Pro Wurf wird eine Laterne verbraucht; mehr bekommst du über Meilensteine oder im Shop.</string>
+
+    <string name="tour_dex_title">Füll deinen Dex</string>
+    <string name="tour_dex_body">%1$d Arten leben in %2$d Tiefenzonen, manche davon selten, und jede hat eine nummerierte Karte. Ein Fisch, der nah an deinem Haken vorbeischwimmt, wird als „Gesehen“ markiert: Du erfährst seinen Namen und seine Tiefen. Fang ihn, um seine Karte mit Gewicht, Punkten und deinen Rekorden zu füllen.</string>
+
+    <string name="tour_dex_filters_title">Nach Zonen stöbern</string>
+    <string name="tour_dex_filters_body">Filtere die Karten nach Tiefenzone oder zeig nur die Fische, die du gefangen hast. Tippe auf eine Karte, um ihre Seite zu öffnen, und wisch dann, um durch den Dex zu blättern.</string>
+
+    <string name="tour_milestones_title">Meilenstein-Belohnungen</string>
+    <string name="tour_milestones_body">Jeder Punkt, den du verdienst, zählt für die Meilenstein-Belohnungen (Bonuspunkte und Laternen), auch nachdem du ihn ausgegeben hast. Der Pokal oben im Tab „Angeln“ öffnet sie, mit einem Hinweis, sobald eine abholbereit ist.</string>
+
+    <string name="tour_secrets_title">Angelgeheimnisse</string>
+    <string name="tour_secrets_body">Manche Tricks findest du nur beim Spielen, und sie lohnen sich: Jedes Mal, wenn dir einer gelingt, bringt er dem Wurf einen Bonus, auch in Duellen. Beim ersten Mal wird er sofort erklärt und bringt eine Entdeckerbelohnung, und im Dex erscheint der Bereich „Geheimnisse“. Die seltensten Geheimnisse schalten außerdem Skins für Haken, Schnur, Boot und Blasenspur frei, dazu einen Titel unter deinem Namen, auch in Online-Duellen. Sie sind zum Angeben da: nur Optik, nie ein Vorteil.</string>
+
+    <string name="tour_boat_title">Gestalte dein Boot</string>
+    <string name="tour_boat_body">Tippe oben im Tab „Angeln“ auf dein Boot, um im Dex den Bereich „Skins“ zu öffnen. Mit „Boot gestalten“ lackierst du Rumpf, Zierleisten und Kabine und fügst ein Muster, Segel, eine Flagge und ein Emblem hinzu. Grundfarben sind gratis; der Rest wird mit Punkten freigeschaltet oder wenn du mehr Arten fängst, neue Zonen erreichst und Meilensteine abholst.</string>
+
+    <string name="tour_shop_style_title">Stil</string>
+    <string name="tour_shop_style_body">Auf der Seite „Stil“ gibt es fertige Boote, Lackierungen, Embleme und Segeldrucke (als Vorschau an deinem eigenen Boot) sowie neue Haken, Schnüre und Spuren. Wie alle Skins ändern sie nur das Aussehen, nie das Spiel.</string>
+
+    <string name="tour_aquarium_title">Dein Aquarium</string>
+    <string name="tour_aquarium_body">Die Fische, die du gefangen hast, schwimmen in deinem Aquarium: Öffne es mit dem Button „Aquarium“ im Dex und wähle aus, wer dort schwimmt. Deko und ein größeres Becken gibt es im Shop auf der Seite „Aquarium“.</string>
+
+    <string name="tour_season_title">Saisons und Wochenend-Events</string>
+    <string name="tour_season_body">Jede Saison dauert %1$s. Jeder Solo-Wurf bringt Saison-XP und schaltet Belohnungsstufen frei: Zubehör und Punkte für alle und mit dem Saisonpass noch mehr (ein Saisonboot, ein Abzeichen). Jedes Wochenende gibt es außerdem ein Angelziel mit eigener Belohnung. Nichts davon verändert Duelle.</string>
+
+    <string name="tour_passes_title">Pässe</string>
+    <string name="tour_passes_body">Der Kapitänsclub ist eine Monatsmitgliedschaft: eine Lackierung nur für Mitglieder, ein Club-Titelabzeichen, Cloud-Speicherung und jeden Monat ein Laternenbeutel gratis. Neue Angler bekommen außerdem ein paar Tage lang ein einmaliges Angebot für das Starterpaket. Ein Punkt am Tab „Shop“ bedeutet, dass dort etwas auf dich wartet.</string>
+
+    <string name="tour_badges_title">Titelabzeichen und Dex-Karten</string>
+    <string name="tour_badges_body">Wähle den Rahmen deines Titelabzeichens (unter deinem Namen, auch online) und wie der Dex die Arten zeigt, die du gefangen hast. Weitere gibt es im Shop, mit Saisonpässen und bei Events.</string>
+
+    <string name="tour_atmosphere_title">Atmosphäre</string>
+    <string name="tour_atmosphere_body">Nahe der Oberfläche ist das Wasser harmlos, und je tiefer du kommst, desto unheimlicher wird es. Erreiche die Tiefseeebene, um „Albtraum“ freizuschalten, einen furchterregenden Look für die Tiefe: Du siehst genau so viel wie vorher, nur die Stimmung ändert sich.</string>
+
+    <string name="tour_battle_title">Duelle 1 gegen 1</string>
+    <string name="tour_battle_body">Wähle einen Modus: Best of 5, 3-Minuten-Rausch, Schwerer Fang, Artenjagd oder Tiefenrekord. Beide angeln im exakt gleichen Wasser, also entscheidet das Können.</string>
+
+    <string name="tour_opponents_title">Wähle einen Gegner</string>
+    <string name="tour_opponents_body">Spiel gegen den Computer (Leicht, Normal oder Schwer), gegen jemanden an diesem Handy oder online: Erstelle einen Raum und teile seinen Code oder nutze „Schnelles Spiel“. Online nutzen beide dasselbe Turnierseil (Stufe %1$d in allen Werten).</string>
+
+    <string name="tour_battle_tackle_title">Zubehör in Duellen</string>
+    <string name="tour_battle_tackle_body">Laternen und Raritätendetektoren wirken auch in Duellen: Schalte sie hier ein, dann verbraucht jeder deiner Würfe je eins. Alle können sie bekommen, sie gehören also zum Spiel. Talisman und Funkelköder gibt es nur für Solo-Würfe.</string>
+
+    <string name="tour_gifts_title">Geschenke und Cloud-Speicherung</string>
+    <string name="tour_gifts_body">Nach einem Online-Duell kannst du deinem Gegner ein Geschenk schicken: Zubehör oder Looks, bezahlt mit Euro oder Punkten. Geschenke für dich kommen an, wenn du das Spiel öffnest. Der Fortschritt von Mitgliedern des Kapitänsclubs wird auf dem Server gesichert: Der Konto-Button im Shop zeigt den Wiederherstellungscode, mit dem du ihn auf einem neuen Handy zurückholst.</string>
+
+    <string name="tour_wager_title">Punkte setzen</string>
+    <string name="tour_wager_body">Gegen den Computer kannst du Punkte auf das Ergebnis setzen: Ein Sieg zahlt deinen Einsatz %1$s× zurück gegen Leicht, %2$s× gegen Normal und %3$s× gegen Schwer. Bei einem Unentschieden bekommst du ihn zurück.</string>
+
+    <string name="tour_settings_title">Einstellungen</string>
+    <string name="tour_settings_body">Das Zahnrad oben im Tab „Angeln“ öffnet die Einstellungen.</string>
+
+    <string name="tour_sound_title">Ton und Spielgefühl</string>
+    <string name="tour_sound_body">Stell hier Lautstärke, Musik und Soundeffekte getrennt ein. Die Musik folgt deinem Haken: ruhig nahe der Oberfläche, düsterer in der Tiefe. Vibration lässt dich Stöße, Fänge und große Siege leicht spüren, und „Bewegung reduzieren“ schaltet Bildschirmwackeln, Zeitlupe und Blitze ab.</string>
+
+    <string name="tour_daily_title">Tagesbelohnungen</string>
+    <string name="tour_daily_body">Hol dir hier einmal am Tag eine Belohnung: Punkte und Zubehör, und alle %1$s eine größere. Ein verpasster Tag wirft den Kalender nie zurück. Deine Serie zählt die Tage am Stück, und ein Serienschild deckt einen verpassten Tag von selbst ab: Du startest mit %2$d, und alle %1$s kommt einer dazu (bis zu %3$d).</string>
+
+    <string name="tour_daily_challenges_title">Tagesaufgaben</string>
+    <string name="tour_daily_challenges_body">Jeden Tag gibt es drei Aufgaben, leicht, mittel und schwer, passend zu deinem Seil, für Zubehör und Punkte. Keine Lust auf eine? Tausch sie gratis (%1$s). Nur Solo-Würfe zählen. Um Mitternacht kommen neue, und erledigte werden für dich abgeholt, falls du es vergisst.</string>
+    <plurals name="tour_daily_swaps">
+        <item quantity="one">%d-mal pro Tag</item>
+        <item quantity="other">%d-mal pro Tag</item>
+    </plurals>
+
+    <string name="tour_migrations_title">Wanderungen</string>
+    <string name="tour_migrations_body">Jede Woche wandern %1$s lang zwei weniger häufige Arten, eine nahe der Oberfläche und eine in der Tiefe: Dort, wo sie leben, sind sie dann viel häufiger. Ein Banner zeigt sie im Tab „Angeln“ und im Dex. Wanderungen gelten nur für Solo-Würfe: Duelle ändern sich nie.</string>
+
+    <string name="tour_reminders_title">Erinnerungen</string>
+    <string name="tour_reminders_body">Möchtest du einen Hinweis, wenn deine Tagesbelohnung bereit ist, deine Serie bald endet oder eine Wanderung beginnt? Schalte Erinnerungen in den Einstellungen ein: höchstens eine pro Tag und nie zwischen %1$s und %2$s Uhr.</string>
+
+    <string name="tour_social_title">Freunde und Ranglisten</string>
+    <string name="tour_social_body">Freunde, die Wochenranglisten und das Wochenturnier öffnest du von hier aus. Dort wird alles mit dem Standardseil der Online-Duelle geangelt (Stufe %1$d in allen Werten), es zählt also das Können.</string>
+
+    <string name="tour_friend_code_title">Dein Freundescode</string>
+    <string name="tour_friend_code_body">Deine Spieler-ID ist dein Freundescode: Teile sie, damit Freunde dich hinzufügen können. Niemand kann dich über deinen Namen finden, und Fremde sehen in den Ranglisten nur einen Namen, der aus deiner ID gebildet wird.</string>
+
+    <string name="tour_friends_title">Freunde hinzufügen</string>
+    <string name="tour_friends_body">Gib die Spieler-ID eines Freundes ein, um eine Anfrage zu senden: Ihr seid Freunde, sobald sie angenommen wird. Die Karten deiner Freunde zeigen, ob sie online sind, und ihre besten Fänge der Woche, und „Herausfordern“ lädt sie in einen Raum für ein Online-Duell ein.</string>
+
+    <string name="tour_leaderboards_title">Wochenranglisten</string>
+    <string name="tour_leaderboards_body">Drei Ranglisten, „Bester Wurf“, „Tiefster Fang“ und „Seltenster Fang“, für alle, für deine Liga mit etwa %1$d Anglern oder für deine Freunde. Es zählen nur Würfe, die der Server selbst prüft: das Wochenturnier und Online-Duelle. Jede Rangliste wird montags um 00:00 UTC zurückgesetzt.</string>
+
+    <string name="tour_tournament_title">Das Wochenturnier</string>
+    <string name="tour_tournament_body">Die ganze Woche angeln alle im exakt gleichen Wasser, mit %1$d Stößen. Du hast %2$d Versuche, und dein bester zählt; einen Versuch zu starten, verbraucht ihn. Am Ende der Woche gibt es Belohnungen nach deiner Endplatzierung, und die besten %3$d&#160;%% gewinnen das Turnier-Titelabzeichen.</string>
+
+    <string name="tour_clubs_title">Clubs</string>
+    <string name="tour_clubs_body">Tritt einem Club mit seinem Code bei oder gründe einen, mit einem Namen aus Angelwörtern. Bis zu %1$d Angler angeln gemeinsam für ein Wochenziel, und alle, die geholfen haben, bekommen jede erreichte Belohnung. Einen Chat gibt es nicht.</string>
+
+    <string name="tour_privacy_title">Deine Privatsphäre</string>
+    <string name="tour_privacy_body">Nutzungsstatistiken und Absturzberichte werden nur gesendet, wenn du sie erlaubst. Du kannst deine Entscheidung jederzeit mit den beiden Schaltern in den Einstellungen unter „Datenschutz“ ändern. Dort kannst du auch dein Online-Konto löschen und die Datenschutzerklärung lesen.</string>
+
+    <string name="tour_language_title">Deine Sprache</string>
+    <string name="tour_language_body">Deep Line spricht Englisch, Französisch, Spanisch, Deutsch, brasilianisches Portugiesisch und Türkisch. Wähle hier eine Sprache aus oder behalte die Sprache deines Handys.</string>
+
+    <string name="tour_replay_title">Das war’s, Petri Heil!</string>
+    <string name="tour_replay_body">Du kannst diese Tour jederzeit in den Einstellungen wiederholen.</string>
+</resources>

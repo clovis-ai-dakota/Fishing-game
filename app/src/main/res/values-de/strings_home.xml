@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Der Tab „Angeln“ (ui/HomeScreen.kt): die Zentrale des Spiels mit dem großen Button
+    „Auswerfen“. (The Fish tab. Keys start with home_.)
+-->
+<resources>
+    <string name="home_tagline">Fang jeden Fisch der Tiefe</string>
+    <!-- Beschriftungen für Screenreader. -->
+    <string name="home_cd_milestones">Meilensteine</string>
+    <string name="home_cd_themes">Designs</string>
+    <string name="home_cd_settings">Einstellungen</string>
+    <string name="home_boat_action">Dein Boot gestalten</string>
+
+    <!-- Die Seil-Karte. -->
+    <string name="home_rope_title">Dein Seil</string>
+    <string name="home_rope_reach">Reicht bis %1$s · %2$s</string>
+    <string name="home_rope_stats">Würfe: %1$s · Insgesamt verdient: %2$s Punkte</string>
+    <string name="home_rope_stats_deepest">Würfe: %1$s · Insgesamt verdient: %2$s Punkte · Tiefster Fang: %3$s</string>
+
+    <!-- Die Dex-Karte. -->
+    <string name="home_dex_title">Dex</string>
+    <string name="home_dex_caught">Gefangen: %1$d / %2$d</string>
+    <string name="home_dex_seen">Gesehen: %1$d</string>
+    <string name="home_dex_zone">%1$s %2$d/%3$d</string>
+
+    <!-- Die Meilenstein-Karte. -->
+    <string name="home_milestones_title">Meilensteine</string>
+    <plurals name="home_milestones_to_claim">
+        <item quantity="one">%d zum Abholen!</item>
+        <item quantity="other">%d zum Abholen!</item>
+    </plurals>
+    <string name="home_milestones_next">%1$s / %2$s · nächster: %3$s</string>
+    <string name="home_milestones_done">Alle Meilensteine erreicht!</string>
+
+    <!-- Laternen-Schalter über dem Button „Auswerfen“. -->
+    <string name="home_lanterns">Laternen: %1$d</string>
+    <string name="home_lanterns_hint">Beim nächsten Wurf das Dunkel unter %1$d m erhellen.</string>
+    <string name="home_tackle_detector">Detektor ×%1$d</string>
+    <string name="home_tackle_charm">Talisman ×%1$d</string>
+    <string name="home_tackle_lure">Funkelköder ×%1$d</string>
+    <!-- Der Hauptbutton: kurz, eine Zeile. -->
+    <string name="home_cast_button">Auswerfen</string>
+
+    <!-- Die Regeln in einem Dialog. -->
+    <string name="home_rules_title">So wird geangelt</string>
+    <string name="home_rules_body">• Zieh nach links und rechts, um den Haken zu lenken.\n• Abstieg: Der Haken sinkt, bis er %1$d-mal angestoßen ist oder das Seil zu Ende ist. Ein Stoß ist eine Berührung mit dem Kopf eines Fisches, einem Felsen, Treibholz oder einer Qualle; Körper oder Schwanzflosse eines Fisches zu streifen, kostet nichts. Die ersten %2$d m sind stoßfrei.\n• Aufstieg: Tippe einen Fisch mit dem Haken am Kopf an (das helle Gesicht beim Auge), um ihn zu fangen. Die Schwanzflosse zu berühren, bringt nichts. Das Seil trägt nur ein begrenztes Gewicht.\n• Tiefere Fänge bringen mehr Punkte. Funkelnde Fische sind %3$d× so viel wert.\n• Unter %4$d m wird es dunkel. Eine Laterne erhellt mehr vom Wasser.</string>
+</resources>

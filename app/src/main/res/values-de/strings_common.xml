@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Wörter und Formate, die überall in der App vorkommen: Buttons, Einheiten, Zahlen, Listen.
+    (Words and formats used all over the app. Keys start with common_.)
+-->
+<resources>
+    <!-- Buttons. -->
+    <string name="common_ok">OK</string>
+    <string name="common_cancel">Abbrechen</string>
+    <string name="common_back">‹ Zurück</string>
+    <string name="common_no_thanks">Nein, danke</string>
+    <string name="common_got_it">Verstanden</string>
+
+    <!-- Einheiten. -->
+    <string name="common_meters">%1$s m</string>
+    <string name="common_kg">%1$s kg</string>
+    <string name="common_meters_per_second">%1$s m/s</string>
+    <string name="common_points">%1$s Punkte</string>
+    <string name="common_points_plus">+%1$s Punkte</string>
+    <string name="common_time_on_the_hour">%1$02d:00</string>
+    <!-- Dauern. -->
+    <plurals name="common_days">
+        <item quantity="one">%d Tag</item>
+        <item quantity="other">%d Tage</item>
+    </plurals>
+    <plurals name="common_hours">
+        <item quantity="one">%d Stunde</item>
+        <item quantity="other">%d Stunden</item>
+    </plurals>
+    <plurals name="common_weeks">
+        <item quantity="one">%d Woche</item>
+        <item quantity="other">%d Wochen</item>
+    </plurals>
+    <plurals name="common_lanterns">
+        <item quantity="one">%d Laterne</item>
+        <item quantity="other">%d Laternen</item>
+    </plurals>
+    <!-- Kurze Dauern: d = Tage, h = Stunden, min = Minuten. -->
+    <string name="common_duration_minutes">%1$d min</string>
+    <string name="common_duration_hours">%1$d h</string>
+    <string name="common_duration_hours_minutes">%1$d h %2$d min</string>
+    <string name="common_duration_days_hours">%1$d d %2$d h</string>
+    <!-- Kompakte Zahlen für kleine Chips. -->
+    <string name="common_compact_thousands">%1$sk</string>
+    <string name="common_compact_millions">%1$s Mio.</string>
+    <string name="common_progress_of">%1$s / %2$s</string>
+
+    <!-- Listen: „a, b und c“. -->
+    <string name="common_list_middle">%1$s, %2$s</string>
+    <string name="common_list_end">%1$s und %2$s</string>
+</resources>

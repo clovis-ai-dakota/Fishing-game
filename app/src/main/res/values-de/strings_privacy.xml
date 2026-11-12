@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Datenschutz: das Einwilligungsfenster beim ersten Start, Einstellungen > Datenschutz und das
+    Löschen des Kontos. Sachlich, genau und vollständig bleiben. „Erlauben“ und „Nicht erlauben“
+    sind gleichwertige Antworten. (Privacy. Keys start with privacy_.)
+-->
+<resources>
+    <!-- Einwilligungsfenster. -->
+    <string name="privacy_consent_title">Hilfst du mit, Deep Line besser zu machen?</string>
+    <string name="privacy_consent_body">Mit deiner Erlaubnis sendet das Spiel Nutzungsstatistiken (welche Bildschirme du öffnest, wie deine Würfe und Duelle laufen, was du kaufst) und Absturzberichte an Google Firebase. Sie helfen uns, Fehler zu beheben und das Spiel auszubalancieren.</string>
+    <string name="privacy_consent_promise">Sie sind mit einer zufälligen ID verknüpft, nie mit deinem Namen, und werden nie für Werbung genutzt. Es wird nichts gesendet, solange du es nicht erlaubst, und du kannst deine Entscheidung jederzeit in den Einstellungen unter „Datenschutz“ ändern.</string>
+    <string name="privacy_read_policy">Datenschutzerklärung lesen</string>
+    <string name="privacy_consent_choose">Einzeln auswählen</string>
+    <string name="privacy_consent_save">Auswahl speichern</string>
+    <string name="privacy_consent_refuse">Nicht erlauben</string>
+    <string name="privacy_consent_allow">Erlauben</string>
+
+    <!-- Die zwei Arten von Daten. -->
+    <string name="privacy_analytics_title">Nutzungsstatistiken</string>
+    <string name="privacy_analytics_subtitle">Wie das Spiel gespielt wird: Bildschirme, Würfe, Duelle, Käufe.</string>
+    <string name="privacy_crash_title">Absturzberichte</string>
+    <string name="privacy_crash_subtitle">Was schiefgelaufen ist, wenn das Spiel abstürzt oder etwas fehlschlägt.</string>
+
+    <!-- Einstellungen > Datenschutz. -->
+    <string name="privacy_settings_title">Datenschutz</string>
+    <string name="privacy_settings_intro">Nutzungsstatistiken und Absturzberichte gehen an Google Firebase, verknüpft mit einer zufälligen ID (nie mit deinem Namen), und nur, wenn du sie erlaubst. Sie werden nie für Werbung genutzt.</string>
+    <string name="privacy_settings_unavailable">Diese Version des Spiels sendet keine Statistiken und keine Absturzberichte. Deine Auswahl bleibt für Versionen gespeichert, die das tun.</string>
+    <string name="privacy_reset_id">Meine Statistik-ID zurücksetzen</string>
+    <string name="privacy_account_explainer">Dein Online-Konto (Spieler-ID, Cloud-Sicherung, wartende Geschenke) liegt auf dem Spielserver. Wenn du es löschst, wird all das gelöscht; der Fortschritt auf diesem Handy bleibt erhalten.</string>
+    <string name="privacy_delete_account">Mein Online-Konto löschen</string>
+    <string name="privacy_deleting">Dein Konto wird gelöscht…</string>
+
+    <!-- Bestätigung vor dem Löschen. -->
+    <string name="privacy_delete_confirm_title">Dein Online-Konto löschen?</string>
+    <string name="privacy_delete_confirm_body">Damit wird alles gelöscht, was der Spielserver über dich speichert: deine Spieler-ID, deine Cloud-Sicherung und Geschenke, die auf dich warten. Dein Wiederherstellungscode funktioniert dann nicht mehr, und das lässt sich nicht rückgängig machen.\n\nDein Fortschritt auf diesem Handy bleibt erhalten, und deine Käufe bleiben bei deinem Google-Play-Konto. Ein Abo des Kapitänsclubs wird nicht gekündigt: Verwalte es in Google Play.</string>
+    <string name="privacy_delete_confirm_yes">Mein Konto löschen</string>
+    <string name="privacy_delete_confirm_no">Behalten</string>
+
+    <!-- Meldungen nach einer Aktion. -->
+    <string name="privacy_message_reset">Die auf diesem Handy gespeicherten Statistiken wurden gelöscht, und du hast eine neue zufällige ID.</string>
+    <string name="privacy_message_deleted">Dein Online-Konto wurde gelöscht. Dein Fortschritt auf diesem Handy ist noch da, und das Spiel nutzt jetzt eine neue Spieler-ID.</string>
+    <string name="privacy_message_not_deleted">Dein Konto wurde nicht gelöscht: %1$s</string>
+</resources>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Der Bootseditor (Dex > Skins > Boot gestalten): wie eine gesperrte Option freigeschaltet wird,
+    und der Text des Editors. (The boat editor. Keys start with boat_.)
+-->
+<resources>
+    <!-- Wie eine gesperrte Option freigeschaltet wird: kurze Chips. -->
+    <string name="boat_requirement_free">Gratis</string>
+    <plurals name="boat_requirement_species">
+        <item quantity="one">Fang %d Art</item>
+        <item quantity="other">Fang %d Arten</item>
+    </plurals>
+    <string name="boat_requirement_zone">Fang einen Fisch (%1$s)</string>
+    <plurals name="boat_requirement_milestones">
+        <item quantity="one">Hol %d Meilenstein ab</item>
+        <item quantity="other">Hol %d Meilensteine ab</item>
+    </plurals>
+    <string name="boat_requirement_shop">Im Shop</string>
+
+    <!-- Dasselbe als ganzer Satz im Dialog. -->
+    <string name="boat_unlock_free">Das ist gratis.</string>
+    <string name="boat_unlock_points">Schalte es für %1$s frei.</string>
+    <plurals name="boat_unlock_species">
+        <item quantity="one">Fang %d Art, um es freizuschalten.</item>
+        <item quantity="other">Fang %d Arten, um es freizuschalten.</item>
+    </plurals>
+    <string name="boat_unlock_zone">Fang einen Fisch in dieser Zone, um es freizuschalten: %1$s.</string>
+    <plurals name="boat_unlock_milestones">
+        <item quantity="one">Hol %d Meilenstein ab, um es freizuschalten.</item>
+        <item quantity="other">Hol %d Meilensteine ab, um es freizuschalten.</item>
+    </plurals>
+    <string name="boat_unlock_shop">Kauf es im Shop, um es freizuschalten.</string>
+    <string name="boat_unlock_club">Tritt dem Kapitänsclub bei, um es freizuschalten.</string>
+
+    <!-- Der Editor. -->
+    <string name="boat_editor_title">Boot gestalten</string>
+    <string name="boat_editor_intro">Deine Punkte: %1$s. Grundoptionen sind gratis; tippe auf eine gesperrte, um zu sehen, wie du sie freischaltest.</string>
+    <string name="boat_editor_hull_colour">Rumpffarbe</string>
+    <string name="boat_editor_bottom_colour">Bodenfarbe</string>
+    <string name="boat_editor_trim_colour">Zierleisten und Emblem</string>
+    <string name="boat_editor_cabin_colour">Kabine</string>
+    <string name="boat_editor_sail_colour">Segelfarbe</string>
+    <string name="boat_editor_flag_colour">Flaggenfarbe</string>
+    <string name="boat_editor_pattern">Rumpfmuster</string>
+    <string name="boat_editor_sail">Segel</string>
+    <string name="boat_editor_flag">Flagge</string>
+    <string name="boat_editor_emblem">Emblem</string>
+    <string name="boat_editor_swatch_cd">%1$s: %2$s</string>
+    <string name="boat_editor_swatch_cd_locked">%1$s: %2$s (gesperrt)</string>
+    <string name="boat_editor_locked_cd">Gesperrt</string>
+    <string name="boat_editor_save">Speichern und ausrüsten</string>
+    <string name="boat_editor_unlock_title">Freischalten: %1$s?</string>
+    <plurals name="boat_editor_unlock_body">
+        <item quantity="one">%1$s kostet einmalig %2$s Punkt. Du hast %3$s.</item>
+        <item quantity="other">%1$s kostet einmalig %2$s Punkte. Du hast %3$s.</item>
+    </plurals>
+    <plurals name="boat_editor_unlock_body_short">
+        <item quantity="one">%1$s kostet einmalig %2$s Punkt. Du hast %3$s. Angle weiter, um mehr zu verdienen.</item>
+        <item quantity="other">%1$s kostet einmalig %2$s Punkte. Du hast %3$s. Angle weiter, um mehr zu verdienen.</item>
+    </plurals>
+    <string name="boat_editor_unlock_buy">Für %1$s Punkte freischalten</string>
+    <string name="boat_editor_not_now">Nicht jetzt</string>
+    <string name="boat_editor_locked_title">Gesperrt: %1$s</string>
+</resources>
