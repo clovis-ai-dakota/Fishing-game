@@ -82,4 +82,114 @@
     <!-- A challenge swapped for a new one. %1$s: its difficulty (Easy, Medium, Hard); %2$s: the new challenge. -->
     <string name="daily_challenge_swapped">New challenge (%1$s): %2$s</string>
     <string name="daily_reminders_blocked">Reminders stay off: notifications for Deep Line are blocked on this phone. You can allow them in the phone\'s settings.</string>
+
+    <!-- The Daily card on the Fish tab and the Daily screen (ui/daily/DailyUi.kt). -->
+    <!-- Title of the Fish tab's daily card and of the Daily screen. Short: one word if possible. -->
+    <string name="daily_title">Daily</string>
+    <!-- The streak, next to a flame icon (days in a row the reward was claimed). Short. -->
+    <plurals name="daily_streak">
+        <item quantity="one">%d-day streak</item>
+        <item quantity="other">%d-day streak</item>
+    </plurals>
+    <string name="daily_streak_none">No streak yet</string>
+    <!-- The claim button. %1$d: the calendar day (1 to 7); %2$s: its rewards, a list
+         ("200 pts and 1 Lantern"). -->
+    <string name="daily_claim_button">Claim day %1$d: %2$s</string>
+    <!-- Under the calendar once today's reward is claimed. %1$d: the next calendar day (1 to 7);
+         %2$s: its rewards, a list; %3$s: the time until then ("5 h 12 min"). -->
+    <string name="daily_claim_wait">Today\'s reward is claimed. Day %1$d (%2$s) is ready in %3$s.</string>
+    <!-- On the Daily screen, under the streak. A sentence on its own, followed by daily_streak_rules. -->
+    <plurals name="daily_best_streak">
+        <item quantity="one">Best streak: %d day.</item>
+        <item quantity="other">Best streak: %d days.</item>
+    </plurals>
+    <!-- %1$s: the best streak (daily_best_streak, a whole sentence); %2$d: streak shields held;
+         %3$d: the most shields one can hold; %4$d: the calendar day that brings a new shield (7). -->
+    <string name="daily_streak_rules">%1$s Streak shields: %2$d of %3$d. A shield covers a missed day by itself, and day %4$d brings a new one. Missing a day never sets the calendar back.</string>
+    <!-- Title of the card with the three daily challenges. -->
+    <string name="daily_challenges_title">Today\'s challenges</string>
+    <!-- A challenge's state and buttons (short: next to the challenge's text). -->
+    <string name="daily_challenge_done">Done</string>
+    <string name="daily_challenge_claim">Claim</string>
+    <!-- Replaces a challenge with another one (a "swap", see the glossary). -->
+    <string name="daily_challenge_swap">Swap</string>
+    <!-- Free swaps left today, a sentence on its own, followed by daily_challenges_rules. -->
+    <string name="daily_swaps_none">No free swaps left today.</string>
+    <plurals name="daily_swaps_left">
+        <item quantity="one">%d free swap left today for a challenge you don\'t fancy.</item>
+        <item quantity="other">%d free swaps left today for challenges you don\'t fancy.</item>
+    </plurals>
+    <!-- %1$s: the free swaps left (daily_swaps_none or daily_swaps_left, a whole sentence). -->
+    <string name="daily_challenges_rules">%1$s Only solo casts count. New challenges come at midnight, and finished ones are collected for you if you forget.</string>
+    <!-- A button at the bottom of the Daily screen while reminders are off. -->
+    <string name="daily_remind_button">Remind me when my reward is ready</string>
+
+    <!-- Turning reminders on: a dialog shown once, right after the first daily reward. -->
+    <string name="daily_optin_title">Want a reminder?</string>
+    <!-- %1$s: how often reminders come (daily_reminder_promise, a whole sentence). -->
+    <string name="daily_optin_body">Deep Line can let you know when your daily reward is ready, when your streak is about to end and when a migration starts. %1$s</string>
+    <string name="daily_optin_yes">Turn on</string>
+    <string name="daily_optin_no">Not now</string>
+
+    <!-- Migrations: two species far more common for a few days each week (see the glossary). -->
+    <!-- A banner on the Fish tab while a migration is on. -->
+    <string name="daily_migration_banner_title">Migration under way</string>
+    <!-- %1$s: the time left ("1 d 5 h"). "These two": the two species listed below. -->
+    <string name="daily_migration_banner_body">These two are far more common in solo casts for %1$s.</string>
+    <!-- On a migrating species' Dex page. %1$s: the time left ("1 d 5 h"). -->
+    <string name="daily_migrating_note">Migrating now: far more common in solo casts for %1$s.</string>
+    <!-- Title of the migration card on the Daily screen. %1$s: the time left ("1 d 5 h"). -->
+    <string name="daily_migration_live">Migration: %1$s left</string>
+    <!-- %1$s: the time until the next one starts ("3 d 2 h"). -->
+    <string name="daily_migration_next">Next migration in %1$s</string>
+    <!-- %d: how many days a migration lasts. -->
+    <plurals name="daily_migration_about">
+        <item quantity="one">Every week, for %d day, two less common species become far more common where they live: one near the surface and one in the deep. Solo casts only: battles never change.</item>
+        <item quantity="other">Every week, for %d days, two less common species become far more common where they live: one near the surface and one in the deep. Solo casts only: battles never change.</item>
+    </plurals>
+    <!-- What tapping a migrating species does (read by screen readers). -->
+    <string name="daily_migrant_open">Open its Dex page</string>
+    <!-- Under a migrating species' name. %1$s: its depth zone (e.g. Twilight Reef); %2$d and %3$d:
+         the depths where it lives, in meters. -->
+    <string name="daily_migrant_where">%1$s · %2$d–%3$d m</string>
+
+    <!-- Notification channels: Android lists them in the phone's settings for the game's
+         notifications, where players can mute each. A short name and a one-sentence description. -->
+    <string name="daily_channel_daily_name">Daily reward ready</string>
+    <string name="daily_channel_daily_description">When today\'s reward is waiting and you haven\'t opened the game yet.</string>
+    <string name="daily_channel_streak_name">Streak at risk</string>
+    <string name="daily_channel_streak_description">In the evening, when your login streak ends at midnight unless you claim today\'s reward.</string>
+    <string name="daily_channel_events_name">Migrations and events</string>
+    <string name="daily_channel_events_description">When a migration or a weekend event starts.</string>
+
+    <!-- Reminder notifications: a short title (one line) and a text. The daily reward reminder has
+         three titles and three texts, one of each picked per day so it stays fresh. -->
+    <string name="daily_reminder_ready_title_1">Your daily reward is waiting</string>
+    <string name="daily_reminder_ready_title_2">The fish are biting</string>
+    <string name="daily_reminder_ready_title_3">A reward is waiting at the dock</string>
+    <!-- %1$d: the calendar day (1 to 7). -->
+    <string name="daily_reminder_ready_text_1">Day %1$d of your reward calendar is ready to claim.</string>
+    <string name="daily_reminder_ready_text_2">Today\'s reward and three new challenges are waiting for you.</string>
+    <string name="daily_reminder_ready_text_3">Claim today\'s reward and see what today\'s challenges are.</string>
+    <!-- In the evening, when the streak ends at midnight unless today's reward is claimed. -->
+    <plurals name="daily_reminder_streak_title">
+        <item quantity="one">Keep your %d-day streak</item>
+        <item quantity="other">Keep your %d-day streak</item>
+    </plurals>
+    <string name="daily_reminder_streak_text">Claim today\'s reward before midnight to keep it going.</string>
+    <!-- The same, when the player holds a streak shield. -->
+    <string name="daily_reminder_streak_text_shield">Claim today\'s reward before midnight. If you miss today, a streak shield will cover it.</string>
+    <string name="daily_reminder_migration_title">A migration has begun</string>
+    <!-- %1$d: how many days the migration lasts; %2$s: the two species, a list ("Sun Bream and an
+         unknown species (Twilight Reef)"). -->
+    <plurals name="daily_reminder_migration_text">
+        <item quantity="one">For the next %1$d day, two species are far more common: %2$s.</item>
+        <item quantity="other">For the next %1$d days, two species are far more common: %2$s.</item>
+    </plurals>
+    <!-- A species the player hasn't met yet, in the list above (its name stays a secret).
+         %1$s: the depth zone it lives in (e.g. Twilight Reef). -->
+    <string name="daily_reminder_unknown_species">an unknown species (%1$s)</string>
+    <string name="daily_reminder_event_title">The weekend event has started</string>
+    <!-- %1$s: the event's goal (e.g. "Catch Sparkling fish"); %2$d: how many it takes. -->
+    <string name="daily_reminder_event_text">This weekend\'s goal: %1$s (%2$d). A reward waits when you reach it.</string>
 </resources>

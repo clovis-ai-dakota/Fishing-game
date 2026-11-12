@@ -20,6 +20,7 @@ import com.deepline.fishing.MainActivity
 import com.deepline.fishing.R
 import com.deepline.fishing.SharedPrefsStore
 import com.deepline.fishing.analytics.Analytics
+import com.deepline.fishing.core.Daily
 import com.deepline.fishing.core.DailyReminders
 import com.deepline.fishing.core.DexState
 import com.deepline.fishing.core.GameConfig
@@ -32,6 +33,10 @@ import com.deepline.fishing.core.Reminder
 import com.deepline.fishing.core.ReminderKind
 import com.deepline.fishing.core.ReminderSettings
 import com.deepline.fishing.core.ShopClock
+import com.deepline.fishing.ui.i18n.AppLanguages
+import com.deepline.fishing.ui.i18n.UiText
+import com.deepline.fishing.ui.i18n.labelText
+import com.deepline.fishing.ui.i18n.nameText
 import java.util.concurrent.TimeUnit
 
 /**
@@ -88,21 +93,21 @@ object ReminderChannels {
         ReminderKind.EVENT_STARTING -> EVENTS
     }
 
-    /** Creating an existing channel again does nothing, so this is safe to call any time. */
+    /**
+     * Creating an existing channel again only updates its name and description (in the game's
+     * language, which may have changed since), so this is safe to call any time.
+     */
     fun create(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val manager = context.getSystemService(NotificationManager::class.java) ?: return
+        val res = AppLanguages.localized(context).resources
+        fun channel(id: String, name: Int, description: Int, importance: Int) =
+            NotificationChannel(id, res.getString(name), importance).apply { this.description = res.getString(description) }
         manager.createNotificationChannels(
             listOf(
-                NotificationChannel(DAILY, "Daily reward ready", NotificationManager.IMPORTANCE_DEFAULT).apply {
-                    description = "When today's reward is waiting and you haven't opened the game yet."
-                },
-                NotificationChannel(STREAK, "Streak at risk", NotificationManager.IMPORTANCE_DEFAULT).apply {
-                    description = "In the evening, when your login streak ends at midnight unless you claim today's reward."
-                },
-                NotificationChannel(EVENTS, "Migrations and events", NotificationManager.IMPORTANCE_LOW).apply {
-                    description = "When a migration or a weekend event starts."
-                },
+                channel(DAILY, R.string.daily_channel_daily_name, R.string.daily_channel_daily_description, NotificationManager.IMPORTANCE_DEFAULT),
+                channel(STREAK, R.string.daily_channel_streak_name, R.string.daily_channel_streak_description, NotificationManager.IMPORTANCE_DEFAULT),
+                channel(EVENTS, R.string.daily_channel_events_name, R.string.daily_channel_events_description, NotificationManager.IMPORTANCE_LOW),
             ),
         )
     }
@@ -140,10 +145,12 @@ object ReminderNotifications {
         val pending = PendingIntent.getActivity(
             context, target.ordinal, open, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
-        val text = ReminderTexts.text(r, p)
+        // Built outside the activity: only this context has the game's language on Android 12 and lower.
+        val res = AppLanguages.localized(context).resources
+        val text = ReminderTexts.text(r, p).resolve(res)
         val notification = NotificationCompat.Builder(context, ReminderChannels.of(r.kind))
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(ReminderTexts.title(r))
+            .setContentTitle(ReminderTexts.title(r).resolve(res))
             .setContentText(text)
             .setStyle(NotificationCompat.BigTextStyle().bigText(text))
             .setCategory(NotificationCompat.CATEGORY_REMINDER)
@@ -176,39 +183,41 @@ enum class ReminderTarget(val key: String) {
     }
 }
 
-/** What reminders say. They change from day to day ([Reminder.variant]), so they stay fresh. */
+/**
+ * What reminders say (strings_daily.xml), resolved by [ReminderNotifications.post] in the game's
+ * language. They change from day to day ([Reminder.variant]), so they stay fresh.
+ */
 object ReminderTexts {
-    fun title(r: Reminder): String = when (r.kind) {
-        ReminderKind.DAILY_READY -> listOf("Your daily reward is waiting", "The fish are biting", "A reward is waiting at the dock")[r.variant % 3]
-        ReminderKind.STREAK_AT_RISK -> "Keep your ${r.streak}-day streak"
-        ReminderKind.EVENT_STARTING -> if (r.migration != null) "A migration has begun" else "The weekend event has started"
+    private val readyTitles = listOf(R.string.daily_reminder_ready_title_1, R.string.daily_reminder_ready_title_2, R.string.daily_reminder_ready_title_3)
+
+    fun title(r: Reminder): UiText = when (r.kind) {
+        ReminderKind.DAILY_READY -> UiText.res(readyTitles[r.variant % readyTitles.size])
+        ReminderKind.STREAK_AT_RISK -> UiText.plural(R.plurals.daily_reminder_streak_title, r.streak)
+        ReminderKind.EVENT_STARTING -> UiText.res(if (r.migration != null) R.string.daily_reminder_migration_title else R.string.daily_reminder_event_title)
     }
 
-    fun text(r: Reminder, p: PlayerProgress): String = when (r.kind) {
-        ReminderKind.DAILY_READY -> listOf(
-            "Day ${com.deepline.fishing.core.Daily.status(p, LocalDays.today()).nextCalendarDay} of your reward calendar is ready to claim.",
-            "Today's reward and three new challenges are waiting for you.",
-            "Claim today's reward and see what today's challenges are.",
-        )[r.variant % 3]
+    fun text(r: Reminder, p: PlayerProgress): UiText = when (r.kind) {
+        ReminderKind.DAILY_READY -> when (r.variant % 3) {
+            0 -> UiText.res(R.string.daily_reminder_ready_text_1, Daily.status(p, LocalDays.today()).nextCalendarDay)
+            1 -> UiText.res(R.string.daily_reminder_ready_text_2)
+            else -> UiText.res(R.string.daily_reminder_ready_text_3)
+        }
         ReminderKind.STREAK_AT_RISK ->
-            if (p.streakShields > 0) {
-                "Claim today's reward before midnight. If you miss today, a streak shield will cover it."
-            } else {
-                "Claim today's reward before midnight to keep it going."
-            }
+            UiText.res(if (p.streakShields > 0) R.string.daily_reminder_streak_text_shield else R.string.daily_reminder_streak_text)
         ReminderKind.EVENT_STARTING -> {
             val m = r.migration
             val e = r.weekendEvent
             when {
                 m != null -> {
+                    // A species the player hasn't met keeps its name a secret: only its zone is told.
                     val names = m.species.map { s ->
-                        if (Progression.dexState(p, s.id) == DexState.UNKNOWN) "an unknown ${s.zone.displayName} species" else "the ${s.name}"
+                        if (Progression.dexState(p, s.id) == DexState.UNKNOWN) UiText.res(R.string.daily_reminder_unknown_species, s.zone.labelText()) else s.nameText()
                     }
                     val days = GameConfig.MIGRATION_HOURS / 24
-                    "For the next $days days, ${names[0]} and ${names[1]} are far more common.".replaceFirstChar { it.uppercase() }
+                    UiText.plural(R.plurals.daily_reminder_migration_text, days, days, UiText.list(names))
                 }
-                e != null -> "This weekend's goal: ${e.goal.displayName} (${e.goal.target}). A reward waits when you reach it."
-                else -> ""
+                e != null -> UiText.res(R.string.daily_reminder_event_text, e.goal.labelText(), e.goal.target)
+                else -> UiText.raw("")
             }
         }
     }

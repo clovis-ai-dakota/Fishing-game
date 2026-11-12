@@ -1,6 +1,5 @@
 package com.deepline.fishing.ui.social
 
-import com.deepline.fishing.ui.i18n.label
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,9 +26,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.GameViewModel
+import com.deepline.fishing.R
 import com.deepline.fishing.core.BattleMode
 import com.deepline.fishing.core.GameConfig
 import com.deepline.fishing.core.PlayerId
@@ -37,6 +39,8 @@ import com.deepline.fishing.core.ShopClock
 import com.deepline.fishing.core.social.FriendDto
 import com.deepline.fishing.ui.SubScreen
 import com.deepline.fishing.ui.formatPoints
+import com.deepline.fishing.ui.i18n.label
+import com.deepline.fishing.ui.pointsLabel
 import com.deepline.fishing.ui.tour.TourTarget
 import com.deepline.fishing.ui.tour.tourTarget
 
@@ -48,7 +52,7 @@ fun FriendsScreen(vm: GameViewModel) {
     var challenging by remember { mutableStateOf<FriendDto?>(null) }
     var removing by remember { mutableStateOf<FriendDto?>(null) }
     val f = social.friends
-    SubScreen("Friends", onBack = vm::onBack) {
+    SubScreen(stringResource(R.string.social_friends_title), onBack = vm::onBack) {
         Column(
             Modifier
                 .weight(1f)
@@ -57,12 +61,12 @@ fun FriendsScreen(vm: GameViewModel) {
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             SocialStatus(vm) { social.refreshFriends() }
-            SocialCard("Add a friend", Modifier.tourTarget(TourTarget.FRIENDS_ADD)) {
+            SocialCard(stringResource(R.string.social_friends_add_title), Modifier.tourTarget(TourTarget.FRIENDS_ADD)) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedTextField(
                         value = typed,
                         onValueChange = { typed = it.take(PlayerId.ID_LENGTH + 4) },
-                        label = { Text("Their player id") },
+                        label = { Text(stringResource(R.string.social_friends_id_label)) },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters),
                         modifier = Modifier.weight(1f).testTag("friend_id"),
@@ -74,56 +78,67 @@ fun FriendsScreen(vm: GameViewModel) {
                         },
                         enabled = typed.isNotBlank() && !social.busy,
                         modifier = Modifier.testTag("friend_send"),
-                    ) { Text("Send") }
+                    ) { Text(stringResource(R.string.social_friends_send)) }
                 }
-                Hint(
-                    "They'll see your request next time they open Friends, and you'll be friends once they accept. " +
-                        "Your own id is ${vm.playerIdentity.id}.",
-                )
+                Hint(stringResource(R.string.social_friends_add_body, vm.playerIdentity.id))
             }
 
             if (f != null && f.challenges.isNotEmpty()) {
-                SocialCard("Challenges", highlighted = true) {
+                SocialCard(stringResource(R.string.social_friends_challenges_title), highlighted = true) {
                     for (c in f.challenges) {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Column(Modifier.weight(1f)) {
-                                Text("${c.fromName} challenges you to ${c.mode.label()}.", style = MaterialTheme.typography.bodyMedium)
+                                Text(stringResource(R.string.social_friends_challenged, c.fromName, c.mode.label()), style = MaterialTheme.typography.bodyMedium)
                                 Text(
-                                    "The room closes in ${timeLeft(c.expiresAtMs, ShopClock.now())}.",
+                                    stringResource(R.string.social_friends_room_closes, timeLeftLabel(c.expiresAtMs, ShopClock.now())),
                                     style = MaterialTheme.typography.bodySmall,
                                 )
                             }
-                            Button(onClick = { vm.acceptChallenge(c) }, modifier = Modifier.testTag("challenge_join_${c.code}")) { Text("Join") }
+                            Button(onClick = { vm.acceptChallenge(c) }, modifier = Modifier.testTag("challenge_join_${c.code}")) {
+                                Text(stringResource(R.string.social_friends_join))
+                            }
                         }
                     }
                 }
             }
 
             if (f != null && (f.incoming.isNotEmpty() || f.outgoing.isNotEmpty())) {
-                SocialCard("Requests") {
+                SocialCard(stringResource(R.string.social_friends_requests_title)) {
                     for (card in f.incoming) {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Column(Modifier.weight(1f)) {
                                 PlayerName(card.name, card.title, card.titleFrame)
-                                Hint("Wants to be your friend (${card.id}).")
+                                Hint(stringResource(R.string.social_friends_request_in, card.id))
                             }
-                            Button(onClick = { social.accept(card) }, modifier = Modifier.testTag("friend_accept_${card.id}")) { Text("Accept") }
-                            TextButton(onClick = { social.decline(card) }, modifier = Modifier.testTag("friend_decline_${card.id}")) { Text("Decline") }
+                            Button(onClick = { social.accept(card) }, modifier = Modifier.testTag("friend_accept_${card.id}")) {
+                                Text(stringResource(R.string.social_friends_accept))
+                            }
+                            TextButton(onClick = { social.decline(card) }, modifier = Modifier.testTag("friend_decline_${card.id}")) {
+                                Text(stringResource(R.string.social_friends_decline))
+                            }
                         }
                     }
                     for (card in f.outgoing) {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Hint("Waiting for ${card.id} to accept.", Modifier.weight(1f))
-                            TextButton(onClick = { social.decline(card) }, modifier = Modifier.testTag("friend_cancel_${card.id}")) { Text("Cancel") }
+                            Hint(stringResource(R.string.social_friends_request_out, card.id), Modifier.weight(1f))
+                            TextButton(onClick = { social.decline(card) }, modifier = Modifier.testTag("friend_cancel_${card.id}")) {
+                                Text(stringResource(R.string.common_cancel))
+                            }
                         }
                     }
                 }
             }
 
-            SocialCard(if (f == null || f.friends.isEmpty()) "Your friends" else "Your friends (${f.friends.size} of ${GameConfig.MAX_FRIENDS})") {
+            SocialCard(
+                if (f == null || f.friends.isEmpty()) {
+                    stringResource(R.string.social_friends_list_title)
+                } else {
+                    stringResource(R.string.social_friends_list_title_count, f.friends.size, GameConfig.MAX_FRIENDS)
+                },
+            ) {
                 when {
-                    f == null -> Hint("Your friends appear here once the server answers.")
-                    f.friends.isEmpty() -> Hint("No friends yet. Share your player id, or ask for theirs.")
+                    f == null -> Hint(stringResource(R.string.social_friends_list_waiting))
+                    f.friends.isEmpty() -> Hint(stringResource(R.string.social_friends_list_none))
                     else -> f.friends.forEachIndexed { i, friend ->
                         if (i > 0) HorizontalDivider()
                         FriendRow(friend, onChallenge = { challenging = friend }, onRemove = { removing = friend })
@@ -136,12 +151,11 @@ fun FriendsScreen(vm: GameViewModel) {
     challenging?.let { friend ->
         AlertDialog(
             onDismissRequest = { challenging = null },
-            title = { Text("Challenge ${friend.name}") },
+            title = { Text(stringResource(R.string.social_friends_challenge_title, friend.name)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(
-                        "Pick a mode: a battle room opens and ${friend.name} gets your challenge for " +
-                            "${GameConfig.CHALLENGE_MINUTES} minutes. Both of you use the standard tournament rope.",
+                        pluralStringResource(R.plurals.social_friends_challenge_body, GameConfig.CHALLENGE_MINUTES, friend.name, GameConfig.CHALLENGE_MINUTES),
                         style = MaterialTheme.typography.bodySmall,
                     )
                     for (mode in BattleMode.entries) {
@@ -155,18 +169,20 @@ fun FriendsScreen(vm: GameViewModel) {
                     }
                 }
             },
-            confirmButton = { TextButton(onClick = { challenging = null }) { Text("Cancel") } },
+            confirmButton = { TextButton(onClick = { challenging = null }) { Text(stringResource(R.string.common_cancel)) } },
         )
     }
     removing?.let { friend ->
         AlertDialog(
             onDismissRequest = { removing = null },
-            title = { Text("Remove ${friend.name}?") },
-            text = { Text("You'll no longer be friends. They aren't told, and you can add each other again later.") },
+            title = { Text(stringResource(R.string.social_friends_remove_title, friend.name)) },
+            text = { Text(stringResource(R.string.social_friends_remove_body)) },
             confirmButton = {
-                TextButton(onClick = { removing = null; vm.social.remove(friend) }, modifier = Modifier.testTag("friend_remove_confirm")) { Text("Remove") }
+                TextButton(onClick = { removing = null; vm.social.remove(friend) }, modifier = Modifier.testTag("friend_remove_confirm")) {
+                    Text(stringResource(R.string.social_friends_remove))
+                }
             },
-            dismissButton = { TextButton(onClick = { removing = null }) { Text("Keep") } },
+            dismissButton = { TextButton(onClick = { removing = null }) { Text(stringResource(R.string.social_friends_keep)) } },
         )
     }
 }
@@ -178,15 +194,26 @@ private fun FriendRow(friend: FriendDto, onChallenge: () -> Unit, onRemove: () -
             PlayerName(friend.name, friend.title, friend.titleFrame, Modifier.weight(1f))
             OnlineLabel(friend.online)
         }
+        // "This week: best cast 1,200 pts, deepest catch 340 m." (a plain comma list after a colon).
         val week = listOfNotNull(
-            friend.weekBestCast?.let { "best cast ${formatPoints(it)} pts" },
-            friend.weekDeepestM?.let { "deepest catch ${it.toInt()} m" },
-            friend.weekTournament?.let { "tournament ${formatPoints(it)} pts" },
+            friend.weekBestCast?.let { stringResource(R.string.social_friends_week_best_cast, pointsLabel(it.toLong())) },
+            friend.weekDeepestM?.let { stringResource(R.string.social_friends_week_deepest, stringResource(R.string.common_meters, formatPoints(it.toInt()))) },
+            friend.weekTournament?.let { stringResource(R.string.social_friends_week_tournament, pointsLabel(it.toLong())) },
         )
-        Hint(if (week.isEmpty()) "No scores this week yet." else "This week: " + week.joinToString(", ") + ".")
+        Hint(
+            if (week.isEmpty()) {
+                stringResource(R.string.social_friends_week_none)
+            } else {
+                stringResource(R.string.social_friends_week, week.joinToString(", "))
+            },
+        )
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilledTonalButton(onClick = onChallenge, modifier = Modifier.testTag("friend_challenge_${friend.id}")) { Text("Challenge") }
-            OutlinedButton(onClick = onRemove, modifier = Modifier.testTag("friend_remove_${friend.id}")) { Text("Remove") }
+            FilledTonalButton(onClick = onChallenge, modifier = Modifier.testTag("friend_challenge_${friend.id}")) {
+                Text(stringResource(R.string.social_friends_challenge))
+            }
+            OutlinedButton(onClick = onRemove, modifier = Modifier.testTag("friend_remove_${friend.id}")) {
+                Text(stringResource(R.string.social_friends_remove))
+            }
         }
     }
 }

@@ -1,7 +1,5 @@
 package com.deepline.fishing.ui.social
 
-import com.deepline.fishing.ui.i18n.label
-import com.deepline.fishing.ui.i18n.asString
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,11 +29,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.GameViewModel
+import com.deepline.fishing.R
 import com.deepline.fishing.core.GameConfig
 import com.deepline.fishing.core.ShopClock
 import com.deepline.fishing.core.social.ClubDto
@@ -44,13 +45,22 @@ import com.deepline.fishing.core.social.ClubRole
 import com.deepline.fishing.core.social.Clubs
 import com.deepline.fishing.ui.SubScreen
 import com.deepline.fishing.ui.formatPoints
+import com.deepline.fishing.ui.i18n.asString
+import com.deepline.fishing.ui.i18n.label
 import com.deepline.fishing.ui.rewardTextColor
 import com.deepline.fishing.ui.shop.ShopText
 import com.deepline.fishing.ui.tour.TourTarget
 import com.deepline.fishing.ui.tour.tourTarget
 import kotlin.random.Random
 
-/** Picks one of a few generated club names (players never type a club's name). */
+/** "1,250 fish": a number of fish caught (club goals and members' counts). */
+@Composable
+private fun fishLabel(count: Int): String = pluralStringResource(R.plurals.social_clubs_fish, count, formatPoints(count))
+
+/**
+ * Picks one of a few generated club names (players never type a club's name). Club names are made
+ * from fixed English words and never translated, so every member sees the same name.
+ */
 @Composable
 private fun NamePicker(selected: Pair<Int, Int>?, options: List<Pair<Int, Int>>, onPick: (Pair<Int, Int>) -> Unit, onShuffle: () -> Unit) {
     Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -62,7 +72,7 @@ private fun NamePicker(selected: Pair<Int, Int>?, options: List<Pair<Int, Int>>,
                 modifier = Modifier.testTag("club_name_$i"),
             )
         }
-        TextButton(onClick = onShuffle, modifier = Modifier.testTag("club_names_shuffle")) { Text("Other names") }
+        TextButton(onClick = onShuffle, modifier = Modifier.testTag("club_names_shuffle")) { Text(stringResource(R.string.social_clubs_other_names)) }
     }
 }
 
@@ -74,7 +84,7 @@ private fun NamePicker(selected: Pair<Int, Int>?, options: List<Pair<Int, Int>>,
 fun ClubsScreen(vm: GameViewModel) {
     val social = vm.social
     val mine = social.club
-    SubScreen("Clubs", onBack = vm::onBack) {
+    SubScreen(stringResource(R.string.social_clubs_title), onBack = vm::onBack) {
         Column(
             Modifier
                 .weight(1f)
@@ -87,16 +97,20 @@ fun ClubsScreen(vm: GameViewModel) {
             if (club == null) NoClub(vm) else MyClubCards(vm, club)
 
             social.topClubs?.takeIf { it.clubs.isNotEmpty() }?.let { top ->
-                SocialCard("Most active clubs this week") {
+                SocialCard(stringResource(R.string.social_clubs_top_title)) {
                     top.clubs.forEachIndexed { i, c ->
                         if (i > 0) HorizontalDivider()
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             RankLabel(c.rank)
                             Column(Modifier.weight(1f)) {
-                                Text(if (c.mine) "${c.name} (yours)" else c.name, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-                                Hint(if (c.members == 1) "1 member" else "${c.members} members")
+                                Text(
+                                    if (c.mine) stringResource(R.string.social_clubs_yours, c.name) else c.name,
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                                Hint(pluralStringResource(R.plurals.social_clubs_members, c.members, c.members))
                             }
-                            Text("${formatPoints(c.weekFish)} fish", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                            Text(fishLabel(c.weekFish), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -112,28 +126,27 @@ private fun NoClub(vm: GameViewModel) {
     var seed by rememberSaveable { mutableStateOf(1L) }
     val options = remember(seed) { Clubs.suggestions(Random(seed)) }
     var picked by remember(seed) { mutableStateOf(options.first()) }
-    SocialCard("Join a club", Modifier.tourTarget(TourTarget.CLUBS_JOIN)) {
+    SocialCard(stringResource(R.string.social_clubs_join_title), Modifier.tourTarget(TourTarget.CLUBS_JOIN)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedTextField(
                 value = code,
                 onValueChange = { code = it.take(Clubs.CODE_LENGTH + 2) },
-                label = { Text("Club code") },
+                label = { Text(stringResource(R.string.social_clubs_code)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters),
                 modifier = Modifier.weight(1f).testTag("club_code"),
             )
-            Button(onClick = { social.joinClub(code) }, enabled = code.isNotBlank() && !social.busy, modifier = Modifier.testTag("club_join")) { Text("Join") }
+            Button(onClick = { social.joinClub(code) }, enabled = code.isNotBlank() && !social.busy, modifier = Modifier.testTag("club_join")) {
+                Text(stringResource(R.string.social_clubs_join))
+            }
         }
-        Hint(
-            "Ask a club's members for its ${Clubs.CODE_LENGTH}-character code. A club has up to ${GameConfig.CLUB_MAX_MEMBERS} " +
-                "anglers who fish for a weekly goal together. There's no chat.",
-        )
+        Hint(stringResource(R.string.social_clubs_join_body, Clubs.CODE_LENGTH, GameConfig.CLUB_MAX_MEMBERS))
     }
-    SocialCard("Start a club") {
-        Hint("Pick a name: club names are made from fishing words, so they're friendly for everyone.")
+    SocialCard(stringResource(R.string.social_clubs_start_title)) {
+        Hint(stringResource(R.string.social_clubs_start_body))
         NamePicker(picked, options, onPick = { picked = it }, onShuffle = { seed++ })
         Button(onClick = { social.createClub(picked.first, picked.second) }, enabled = !social.busy, modifier = Modifier.testTag("club_create")) {
-            Text("Start the ${Clubs.name(picked.first, picked.second)}")
+            Text(stringResource(R.string.social_clubs_start_button, Clubs.name(picked.first, picked.second) ?: ""))
         }
     }
 }
@@ -148,11 +161,13 @@ private fun MyClubCards(vm: GameViewModel, club: ClubDto) {
     var renaming by remember { mutableStateOf(false) }
     var managing by remember { mutableStateOf<ClubMember?>(null) }
     val now = ShopClock.now()
+    val clipLabel = stringResource(R.string.social_clip_club_code)
+    val shareMessage = stringResource(R.string.social_clubs_share, club.name, club.code)
 
     SocialCard(club.name, Modifier.testTag("club_card")) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Column(Modifier.weight(1f)) {
-                Hint("Club code")
+                Hint(stringResource(R.string.social_clubs_code))
                 Text(
                     club.code,
                     style = MaterialTheme.typography.headlineSmall,
@@ -162,16 +177,17 @@ private fun MyClubCards(vm: GameViewModel, club: ClubDto) {
                     modifier = Modifier.testTag("club_code_shown"),
                 )
             }
-            OutlinedButton(onClick = { copyText(context, "Deep Line club code", club.code) }) { Text("Copy") }
-            Button(onClick = { shareText(context, "Join my club in Deep Line, the ${club.name}: the code is ${club.code}.") }) { Text("Share") }
+            OutlinedButton(onClick = { copyText(context, clipLabel, club.code) }) { Text(stringResource(R.string.social_copy)) }
+            Button(onClick = { shareText(context, shareMessage) }) { Text(stringResource(R.string.social_share)) }
         }
-        Hint("${club.members.size} of ${GameConfig.CLUB_MAX_MEMBERS} members." + if (owner) " You own this club." else "")
+        val members = pluralStringResource(R.plurals.social_clubs_member_count, GameConfig.CLUB_MAX_MEMBERS, club.members.size, GameConfig.CLUB_MAX_MEMBERS)
+        Hint(if (owner) members + " " + stringResource(R.string.social_clubs_you_own) else members)
     }
 
     val tiers = GameConfig.CLUB_GOAL_TIERS
-    SocialCard("This week's goal") {
+    SocialCard(stringResource(R.string.social_clubs_goal_title)) {
         Text(
-            "${formatPoints(club.weekFish)} fish caught together. The goal resets on Monday at 00:00 UTC, in ${timeLeft(club.endsAtMs, now)}.",
+            pluralStringResource(R.plurals.social_clubs_goal_body, club.weekFish, formatPoints(club.weekFish), timeLeftLabel(club.endsAtMs, now)),
             style = MaterialTheme.typography.bodyMedium,
         )
         LinearProgressIndicator(progress = { (club.weekFish.toFloat() / tiers.last()).coerceIn(0f, 1f) }, modifier = Modifier.fillMaxWidth())
@@ -179,7 +195,8 @@ private fun MyClubCards(vm: GameViewModel, club: ClubDto) {
             val tier = i + 1
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    (if (club.tiersReached >= tier) "✓ " else "") + "${formatPoints(goal)} fish",
+                    // A tick before the goals reached.
+                    (if (club.tiersReached >= tier) "✓ " else "") + fishLabel(goal),
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f),
@@ -192,15 +209,15 @@ private fun MyClubCards(vm: GameViewModel, club: ClubDto) {
                 )
             }
         }
-        Hint("Fish from your solo casts count, up to ${GameConfig.CLUB_FISH_PER_MEMBER_PER_DAY} a day. Every member who helped gets each reward reached.")
+        Hint(pluralStringResource(R.plurals.social_clubs_goal_rules, GameConfig.CLUB_FISH_PER_MEMBER_PER_DAY, GameConfig.CLUB_FISH_PER_MEMBER_PER_DAY))
         if (club.claimable.isNotEmpty()) {
             Button(onClick = social::claimClubRewards, modifier = Modifier.testTag("club_claim")) {
-                Text(if (club.claimable.size == 1) "Claim 1 reward" else "Claim ${club.claimable.size} rewards")
+                Text(pluralStringResource(R.plurals.social_clubs_claim, club.claimable.size, club.claimable.size))
             }
         }
     }
 
-    SocialCard("Members this week") {
+    SocialCard(stringResource(R.string.social_clubs_members_title)) {
         club.members.forEachIndexed { i, m ->
             if (i > 0) HorizontalDivider()
             Row(
@@ -216,36 +233,46 @@ private fun MyClubCards(vm: GameViewModel, club: ClubDto) {
                         OnlineLabel(m.online)
                     }
                 }
-                Text("${formatPoints(m.weekFish)} fish", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                Text(fishLabel(m.weekFish), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
                 if (owner && m.id != me?.id) {
-                    TextButton(onClick = { managing = m }, modifier = Modifier.testTag("club_manage_${m.id}")) { Text("Manage") }
+                    TextButton(onClick = { managing = m }, modifier = Modifier.testTag("club_manage_${m.id}")) {
+                        Text(stringResource(R.string.social_clubs_manage))
+                    }
                 }
             }
         }
     }
 
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        if (owner) OutlinedButton(onClick = { renaming = true }, modifier = Modifier.testTag("club_rename")) { Text("Rename") }
-        OutlinedButton(onClick = { confirmLeave = true }, modifier = Modifier.testTag("club_leave")) { Text("Leave the club") }
+        if (owner) {
+            OutlinedButton(onClick = { renaming = true }, modifier = Modifier.testTag("club_rename")) { Text(stringResource(R.string.social_clubs_rename)) }
+        }
+        OutlinedButton(onClick = { confirmLeave = true }, modifier = Modifier.testTag("club_leave")) { Text(stringResource(R.string.social_clubs_leave)) }
     }
 
     if (confirmLeave) {
         AlertDialog(
             onDismissRequest = { confirmLeave = false },
-            title = { Text("Leave the ${club.name}?") },
+            title = { Text(stringResource(R.string.social_clubs_leave_title, club.name)) },
             text = {
                 Text(
-                    if (owner && club.members.size > 1) {
-                        "The member who has been in the club the longest becomes the owner. Your fish this week stay in the club's goal."
-                    } else if (club.members.size == 1) {
-                        "You're the last member, so the club closes."
-                    } else {
-                        "Your fish this week stay in the club's goal. You can join another club straight away."
-                    },
+                    stringResource(
+                        if (owner && club.members.size > 1) {
+                            R.string.social_clubs_leave_owner
+                        } else if (club.members.size == 1) {
+                            R.string.social_clubs_leave_last
+                        } else {
+                            R.string.social_clubs_leave_member
+                        },
+                    ),
                 )
             },
-            confirmButton = { TextButton(onClick = { confirmLeave = false; social.leaveClub() }, modifier = Modifier.testTag("club_leave_confirm")) { Text("Leave") } },
-            dismissButton = { TextButton(onClick = { confirmLeave = false }) { Text("Stay") } },
+            confirmButton = {
+                TextButton(onClick = { confirmLeave = false; social.leaveClub() }, modifier = Modifier.testTag("club_leave_confirm")) {
+                    Text(stringResource(R.string.social_clubs_leave_confirm))
+                }
+            },
+            dismissButton = { TextButton(onClick = { confirmLeave = false }) { Text(stringResource(R.string.social_clubs_stay)) } },
         )
     }
     managing?.let { m ->
@@ -253,16 +280,17 @@ private fun MyClubCards(vm: GameViewModel, club: ClubDto) {
             onDismissRequest = { managing = null },
             title = { Text(m.name) },
             text = {
-                Text(
-                    "Make ${m.name} the owner (you become a member), or remove them from the club. A removed member can rejoin " +
-                        "after ${GameConfig.CLUB_REJOIN_HOURS} hours.",
-                )
+                Text(pluralStringResource(R.plurals.social_clubs_manage_body, GameConfig.CLUB_REJOIN_HOURS, m.name, GameConfig.CLUB_REJOIN_HOURS))
             },
             confirmButton = {
-                TextButton(onClick = { managing = null; social.transfer(m) }, modifier = Modifier.testTag("club_transfer_confirm")) { Text("Make owner") }
+                TextButton(onClick = { managing = null; social.transfer(m) }, modifier = Modifier.testTag("club_transfer_confirm")) {
+                    Text(stringResource(R.string.social_clubs_make_owner))
+                }
             },
             dismissButton = {
-                TextButton(onClick = { managing = null; social.kick(m) }, modifier = Modifier.testTag("club_kick_confirm")) { Text("Remove") }
+                TextButton(onClick = { managing = null; social.kick(m) }, modifier = Modifier.testTag("club_kick_confirm")) {
+                    Text(stringResource(R.string.social_clubs_remove))
+                }
             },
         )
     }
@@ -272,12 +300,14 @@ private fun MyClubCards(vm: GameViewModel, club: ClubDto) {
         var picked by remember(seed) { mutableStateOf(options.first()) }
         AlertDialog(
             onDismissRequest = { renaming = false },
-            title = { Text("Rename the club") },
+            title = { Text(stringResource(R.string.social_clubs_rename_title)) },
             text = { NamePicker(picked, options, onPick = { picked = it }, onShuffle = { seed++ }) },
             confirmButton = {
-                TextButton(onClick = { renaming = false; social.renameClub(picked.first, picked.second) }) { Text("Rename") }
+                TextButton(onClick = { renaming = false; social.renameClub(picked.first, picked.second) }) {
+                    Text(stringResource(R.string.social_clubs_rename))
+                }
             },
-            dismissButton = { TextButton(onClick = { renaming = false }) { Text("Cancel") } },
+            dismissButton = { TextButton(onClick = { renaming = false }) { Text(stringResource(R.string.common_cancel)) } },
         )
     }
 }

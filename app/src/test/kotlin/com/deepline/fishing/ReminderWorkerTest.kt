@@ -23,6 +23,7 @@ import com.deepline.fishing.daily.ReminderNotifications
 import com.deepline.fishing.daily.ReminderPrefs
 import com.deepline.fishing.daily.ReminderScheduler
 import com.deepline.fishing.daily.ReminderWorker
+import com.deepline.fishing.ui.i18n.labelText
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -85,6 +86,9 @@ class ReminderWorkerTest {
         val posted = notifications.allNotifications.single()
         assertEquals("streak", posted.channelId)
         assertTrue(shadowOf(posted).contentTitle.toString().contains("4-day streak"))
+        // Texts and channel names come from the game's strings (resolved in the game's language).
+        assertEquals(str(R.string.daily_reminder_streak_text), shadowOf(posted).contentText.toString())
+        assertEquals(str(R.string.daily_channel_streak_name), context.getSystemService(NotificationManager::class.java).getNotificationChannel("streak").name)
         val open = shadowOf(posted.contentIntent).savedIntent
         assertEquals("daily", open.getStringExtra(ReminderNotifications.EXTRA_OPEN))
         assertEquals(day, ReminderPrefs.load(store).lastSentDay)
@@ -119,6 +123,9 @@ class ReminderWorkerTest {
         runCheck(m.startMs + 10 * LocalDays.HOUR_MS)
         val posted = notifications.allNotifications.single()
         assertEquals("events", posted.channelId)
+        // Species the player hasn't met keep their names a secret: only their zone is told.
+        val text = shadowOf(posted).contentText.toString()
+        assertTrue(text, m.species.all { str(R.string.daily_reminder_unknown_species, it.zone.labelText()) in text })
         assertEquals("migration", shadowOf(posted.contentIntent).savedIntent.getStringExtra(ReminderNotifications.EXTRA_OPEN))
         assertEquals(m.key, ReminderPrefs.load(store).lastEventKey)
     }
