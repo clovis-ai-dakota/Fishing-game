@@ -30,7 +30,7 @@
 
     <string name="tour_descent_title">Al bajar: esquiva</string>
     <!-- %1$d: bumps allowed (4); %2$d: depth of the bump-free zone in meters. -->
-    <string name="tour_descent_body">El anzuelo se hunde hasta que ha dado %1$d golpes o llega al final de la cuerda, y luego vuelve a subir. En un pez, solo la cabeza cuenta como golpe (el mismo punto al que apuntas al subir); rozar el cuerpo o la cola no cuenta. Las rocas, los troncos y las medusas cuentan como golpe las toques por donde las toques. Los primeros %2$d m están libres de golpes.</string>
+    <string name="tour_descent_body">El anzuelo se hunde hasta que ha dado %1$d golpes o llega al final de la cuerda, y luego vuelve a subir. En un pez, solo la cabeza cuenta como golpe (el mismo punto al que apuntas al subir); rozar el cuerpo o la cola no cuenta. Las rocas, los troncos y las medusas cuentan como golpe, las toques por donde las toques. Los primeros %2$d m están libres de golpes.</string>
 
     <string name="tour_ascent_title">Al subir: apunta a las cabezas</string>
     <string name="tour_ascent_body">Al subir, guía el anzuelo para que toque la cabeza de un pez: la cara clara junto a su ojo. Tocar la cola o el cuerpo no hace nada.</string>
