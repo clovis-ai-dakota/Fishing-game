@@ -159,8 +159,12 @@ fun captureWindows(activity: Activity, transparent: Boolean = false): Bitmap {
     val bitmap = Bitmap.createBitmap(decor.width, decor.height, Bitmap.Config.ARGB_8888)
     val canvas = Canvas(bitmap)
     if (transparent) {
-        val content = activity.findViewById<android.view.ViewGroup>(android.R.id.content)
-        content.getChildAt(0).draw(canvas)
+        val view = activity.findViewById<android.view.ViewGroup>(android.R.id.content).getChildAt(0)
+        val at = IntArray(2).also(view::getLocationInWindow)
+        canvas.save()
+        canvas.translate(at[0].toFloat(), at[1].toFloat())
+        view.draw(canvas)
+        canvas.restore()
     } else {
         decor.draw(canvas)
     }

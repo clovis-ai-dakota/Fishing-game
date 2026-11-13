@@ -57,6 +57,14 @@ Write XML values carefully:
 - A literal `%` in a string that has arguments is `%%`.
 - Line breaks are `\n`; whitespace runs collapse unless the value is in double quotes.
 - A value starting with `@` or `?` needs a backslash.
+- A number and its unit never part at a line end: join them with a no-break space (U+00A0, typed
+  as the character, as French already does): `%1$s m`, `%1$s kg`, `%1$s pts`, `10 %`.
+  `LocalizationResourcesTest` fails on an ordinary space there (units, inflected or not: m, kg,
+  m/s, pts, Punkte, puan..., %, ×). Short list items ("3 fish" on battle cards and the results
+  line) join the count and its noun the same way. In code, items on one line are joined with
+  `ITEM_SEPARATOR` (`ui/Format.kt`), whose dot never starts a line.
+- A points price in a narrow button that can't fit one line shows `common_points_stacked` (the
+  number above its unit, `PointsPriceLabel`): keep it in two lines in your language.
 
 A string with context:
 
@@ -233,6 +241,18 @@ The default `Locale` follows the game's language, so these are right outside com
   concatenated) and Bidi (ar-XB) (right to left). `LanguageUiTest` checks the Settings screen
   in English (XA). Once translated, check your screens in German and French (the longest): no
   clipped buttons or chips, wrapping instead of ellipsis for anything the player must read.
+- **`LocaleLayoutTest`** (in the normal suite, about a minute per language) renders the consent
+  sheet, every tour card and the main screens (Fish tab, daily, milestones, Settings, every Shop
+  page, themes, aquarium, Dex, species pages, Skins, boat editor, Battle tab, online lobby, a
+  battle, casts with their HUD, pause and results, the social screens) in German, French and
+  Turkish into `app/build/screenshots/locales/<lang>/`, and checks every text through Compose's
+  own layouts: cut off, ellipsized, squeezed out, a word broken without a hyphen, a number torn
+  from its unit, two texts overlapping. Problems are listed in `report.txt` there and fail the
+  test. Run one language with `./gradlew :app:testDebugUnitTest --tests '*LocaleLayoutDeTest'`
+  (`Fr`, `Tr`), and look at the pictures too: the audit can't see a badly balanced wrap. Fixes go in
+  every language (layouts that wrap: `FlowRow`, `maxLines = 2`, `Hyphens.Auto` in narrow tiles,
+  equal heights with `IntrinsicSize.Min`) or in one language's file when the guide allows a
+  shorter wording; never smaller fonts.
 
 ## 9b. Reviewed and machine translations
 
