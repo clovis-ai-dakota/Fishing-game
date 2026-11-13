@@ -25,7 +25,9 @@ class AccountDeletionPage(
     fun form(error: String? = null): String = page(
         """
         <p>This page deletes your <b>Deep Line</b> online account and everything the game server
-        keeps for it: your player ID, your cloud backup (Captain's Club) and gifts waiting for you.
+        keeps for it: your player ID, your cloud backup (Captain's Club), gifts waiting for you, and
+        your social data (friends and friend requests, challenges, weekly leaderboard and
+        tournament entries, and your club membership).
         It can't be undone, and your recovery code stops working.</p>
         <p>What stays: the progress saved on your phone (uninstall the game to remove it), and your
         purchases, which belong to your Google Play account. A Captain's Club subscription isn't

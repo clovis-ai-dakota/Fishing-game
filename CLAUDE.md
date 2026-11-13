@@ -169,8 +169,9 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     `CastSession.seeded`, battles or the online protocol, so both players' water stays identical.
   - Reminders (local notifications, WorkManager, no push server): opt-in, offered once with an
     explainer after the first daily claim (never at first launch), then the Android 13+
-    permission dialog. **At most one a day**, none in quiet hours (`NOTIFY_QUIET_*`), none once
-    today's reward is claimed; the decision is the pure `DailyReminders.plan`. One channel per kind;
+    permission dialog. **At most one a day**, none in quiet hours (`NOTIFY_QUIET_*`), no
+    daily-reward or streak reminder once today's reward is claimed (an event or migration start can
+    still be announced, within the one-a-day cap); the decision is the pure `DailyReminders.plan`. One channel per kind;
     choices are device-only (`ReminderPrefs` in the key-value store, never in the save); taps open
     the right screen (`ReminderTarget`). New kinds of reminder need a channel, a Settings switch
     and a `ReminderPlanTest` case.
