@@ -272,7 +272,7 @@ object FishingSecrets {
             if (r.lanterns > 0) UiText.plural(Res.plurals.common_lanterns, r.lanterns) else null,
             looks,
         )
-        return parts.takeIf { it.isNotEmpty() }?.let { UiText.join(it, " · ") }
+        return parts.takeIf { it.isNotEmpty() }?.let { UiText.join(it, com.deepline.fishing.ui.ITEM_SEPARATOR) }
     }
 }
 

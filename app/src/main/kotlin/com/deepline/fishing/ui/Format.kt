@@ -16,6 +16,12 @@ import java.text.NumberFormat
  * the game's language (see AppLanguages.wrap), so the plain functions work outside composables too.
  */
 
+/**
+ * The separator between items on one line ("8 fish · 26.0 kg · 413 m"): a no-break space before
+ * the dot keeps it at the end of a line when the list wraps, never at the start of the next.
+ */
+const val ITEM_SEPARATOR = "\u00A0· " // i18n-ignore: a no-break space and a dot, no words
+
 /** "12,500" (English), "12 500" (French), "12.500" (German): a whole number with grouping. */
 fun formatPoints(value: Long): String = NumberFormat.getIntegerInstance().format(value)
 

@@ -262,7 +262,7 @@ private fun DexProgressCard(vm: GameViewModel) {
                 stringResource(R.string.home_dex_zone, zone.shortLabel(), species.count(p::isDiscovered), species.size)
             }
             Text(
-                stringResource(R.string.home_dex_seen, p.seenCount) + " · " + zones.joinToString("  ·  "),
+                stringResource(R.string.home_dex_seen, p.seenCount) + ITEM_SEPARATOR + zones.joinToString(ITEM_SEPARATOR),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

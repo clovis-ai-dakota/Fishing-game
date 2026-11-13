@@ -92,7 +92,13 @@ abstract class LocaleLayoutTest(private val language: String) {
     }
 
     private fun shot(name: String, overlaps: Boolean = true) {
-        if (compose.mainClock.autoAdvance) compose.waitForIdle() else repeat(3) { compose.mainClock.advanceTimeByFrame() }
+        if (compose.mainClock.autoAdvance) {
+            compose.waitForIdle()
+        } else {
+            // State changed from the test (a paused clock): let the recomposer see it, then draw.
+            androidx.compose.runtime.snapshots.Snapshot.sendApplyNotifications()
+            repeat(3) { compose.mainClock.advanceTimeByFrame() }
+        }
         val file = "%03d_%s".format(++count, name)
         scenario!!.onActivity { captureWindows(it).savePng(File(dir, "$file.png")) }
         problems += TextAudit.check(compose, file, overlaps)
@@ -223,6 +229,8 @@ abstract class LocaleLayoutTest(private val language: String) {
         val unknown = FishCatalog.all.indexOfFirst { com.deepline.fishing.core.Progression.dexState(vm.progress, it.id) == com.deepline.fishing.core.DexState.UNKNOWN }
         for ((name, index) in listOf("caught" to caught, "seen" to seen, "unknown" to unknown)) {
             if (index < 0) continue
+            vm.openDex(com.deepline.fishing.DexSection.FISH)
+            compose.waitForIdle()
             vm.openFishDetail(index)
             pages("species_$name", max = 2)
         }
@@ -275,6 +283,7 @@ abstract class LocaleLayoutTest(private val language: String) {
         vm.fastReel()
         while (s.phase != CastPhase.SURFACED) vm.onFrame(StoreScene.FRAME, null)
         shot("cast_results_snag")
+        while (vm.secretPopup != null) vm.answerSecretPopup(showAgain = false)
         leaveCast()
     }
 

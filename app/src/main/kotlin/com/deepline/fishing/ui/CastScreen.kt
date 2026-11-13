@@ -421,7 +421,9 @@ private fun CastHud(
                     .padding(top = 24.dp)
                     .background(Color(0x77001421), RoundedCornerShape(12.dp))
                     .padding(12.dp),
-                color = if (activeNotice != null) MaterialTheme.colorScheme.secondary else Color.White,
+                // On the dark notice band over the water, whatever the menu theme (a light theme's
+                // secondary colour is dark and couldn't be read there).
+                color = if (activeNotice != null) SparkleGold else Color.White,
                 style = if (activeNotice != null) MaterialTheme.typography.titleMedium else MaterialTheme.typography.bodyMedium,
                 fontWeight = if (activeNotice != null) FontWeight.Bold else FontWeight.Normal,
                 textAlign = TextAlign.Center,
@@ -468,7 +470,7 @@ private fun ResultsPanel(result: CastResult, collectLabel: String, onCollect: ()
                         pluralStringResource(R.plurals.cast_results_fish, fish, fish),
                         if (objects > 0) pluralStringResource(R.plurals.cast_results_objects, objects, objects) else null,
                         castWeightText(result.totalWeightKg).asString(),
-                    ).joinToString(" · "),
+                    ).joinToString(ITEM_SEPARATOR),
                     style = MaterialTheme.typography.bodyMedium,
                 )
                 val byLastBump = stringResource(R.string.cast_results_by_last_bump)
@@ -522,7 +524,7 @@ private fun ResultsPanel(result: CastResult, collectLabel: String, onCollect: ()
                                             metersLabel(c.depth.roundToInt()),
                                             castWeightText(c.species.weightKg).asString(),
                                             byLastBump.takeIf { c.byLastBump },
-                                        ).joinToString(" · "),
+                                        ).joinToString(ITEM_SEPARATOR),
                                         style = MaterialTheme.typography.bodySmall,
                                     )
                                 }

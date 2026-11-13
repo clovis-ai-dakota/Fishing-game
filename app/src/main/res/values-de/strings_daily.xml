@@ -87,7 +87,7 @@
         <item quantity="other">Heute kannst du noch %d-mal gratis tauschen, wenn dir eine Aufgabe nicht gefällt.</item>
     </plurals>
     <string name="daily_challenges_rules">%1$s Nur Solo-Würfe zählen. Um Mitternacht kommen neue Aufgaben, und erledigte werden für dich abgeholt, falls du es vergisst.</string>
-    <string name="daily_remind_button">Erinnere mich, wenn meine Belohnung bereit ist</string>
+    <string name="daily_remind_button">Erinnere mich an die Tagesbelohnung</string>
 
     <!-- Erinnerungen einschalten: einmal gezeigt, nach der ersten Tagesbelohnung. -->
     <string name="daily_optin_title">Möchtest du erinnert werden?</string>

@@ -446,7 +446,12 @@ fun DailyScreen(vm: GameViewModel) {
                 OutlinedButton(onClick = turnOnHere, modifier = Modifier.fillMaxWidth().testTag("daily_reminders")) {
                     Icon(DailyIcons.Bell, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text(stringResource(R.string.daily_remind_button))
+                    // Balanced lines when it needs two (long in Portuguese or German).
+                    Text(
+                        stringResource(R.string.daily_remind_button),
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                        style = androidx.compose.material3.LocalTextStyle.current.copy(lineBreak = androidx.compose.ui.text.style.LineBreak.Heading),
+                    )
                 }
             }
             Spacer(Modifier.height(8.dp))

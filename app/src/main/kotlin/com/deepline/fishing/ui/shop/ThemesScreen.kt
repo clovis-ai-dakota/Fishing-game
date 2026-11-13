@@ -7,6 +7,8 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -82,14 +84,15 @@ fun ThemesScreen(vm: GameViewModel) {
                 Card(Modifier.fillMaxWidth().tourTarget(TourTarget.THEMES_MODE), shape = RoundedCornerShape(16.dp)) {
                     Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(stringResource(R.string.shop_themes_mode_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+                        // Segments as tall as the tallest: "Like my phone" takes two lines in French or German.
+                        SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
                             NightMode.entries.forEachIndexed { i, mode ->
                                 SegmentedButton(
                                     selected = vm.nightMode == mode,
                                     onClick = { vm.setNightMode(mode) },
                                     shape = SegmentedButtonDefaults.itemShape(i, NightMode.entries.size),
-                                    modifier = Modifier.testTag("mode_${mode.name.lowercase()}"),
-                                ) { Text(mode.label(), maxLines = 2, textAlign = TextAlign.Center) } // "Like my phone" takes two lines in French or German
+                                    modifier = Modifier.fillMaxHeight().testTag("mode_${mode.name.lowercase()}"),
+                                ) { Text(mode.label(), maxLines = 2, textAlign = TextAlign.Center) }
                             }
                         }
                         Text(
