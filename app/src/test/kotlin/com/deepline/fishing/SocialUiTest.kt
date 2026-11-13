@@ -9,6 +9,9 @@ import androidx.compose.ui.test.performTextInput
 import com.deepline.fishing.analytics.Analytics
 import com.deepline.fishing.analytics.AnalyticsBackend
 import com.deepline.fishing.core.BattleMode
+import com.deepline.fishing.core.CastEvent
+import com.deepline.fishing.core.CatchRecord
+import com.deepline.fishing.core.FishCatalog
 import com.deepline.fishing.core.GameConfig
 import com.deepline.fishing.core.NightMode
 import com.deepline.fishing.core.PlayerId
@@ -398,11 +401,21 @@ class SocialTournamentUiTest : SocialUiTestBase() {
 
         // An attempt, with a Lantern (allowed, as in battles).
         vm.toggleLantern(true)
-        tap("tournament_start")
-        compose.waitUntil(5_000) { vm.screen == Screen.CAST }
+        // The clock is held at first, so the cast only moves when this test moves it.
+        compose.mainClock.autoAdvance = false
+        compose.onNodeWithTag("tournament_start").performScrollTo().performClick()
+        assertEquals(Screen.CAST, vm.screen)
         assertNotNull(vm.tournamentAttempt)
         assertEquals(Tournaments.specs, vm.session!!.specs)
         assertEquals(start.lanterns + 2 - 1, vm.progress.lanterns)
+        // It runs in real time, like a battle cast: a Sparkling catch's slow motion is for solo casts.
+        val cast = vm.session!!
+        val sparkling = CatchRecord(FishCatalog.regular.first(), sparkling = true, depth = cast.hookDepth, points = 0)
+        vm.feel.onCastFrame(cast, listOf(CastEvent.Caught(sparkling)))
+        val before = cast.elapsedSeconds
+        vm.onFrame(1f / 30f, null)
+        assertEquals(before + 1f / 30f, cast.elapsedSeconds, 1e-5f)
+        compose.mainClock.autoAdvance = true
         var guard = 0
         while (vm.pendingResult == null && guard++ < 40_000) {
             if (vm.secretPopup != null) vm.answerSecretPopup(false)

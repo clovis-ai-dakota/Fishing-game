@@ -4,7 +4,7 @@ import com.deepline.fishing.core.PlayerId
 import com.deepline.fishing.core.online.AccountApi
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.request.receiveParameters
+import io.ktor.http.parseQueryString
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
@@ -83,13 +83,17 @@ class AccountDeletionPage(
     private fun escape(s: String) = s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;")
 }
 
+private const val MAX_FORM_BYTES = 4 * 1024
+
 /** `GET` and `POST` [AccountApi.DELETE_ACCOUNT_PAGE]. */
 fun Route.accountDeletionPage(accounts: AccountStore, page: AccountDeletionPage = AccountDeletionPage()) {
     get(AccountApi.DELETE_ACCOUNT_PAGE) {
         call.respondText(page.form(), ContentType.Text.Html)
     }
     post(AccountApi.DELETE_ACCOUNT_PAGE) {
-        val code = runCatching { call.receiveParameters()["code"] }.getOrNull().orEmpty()
+        // A recovery code is short: a bigger form isn't read whole.
+        val form = call.receiveTextAtMost(MAX_FORM_BYTES).orEmpty()
+        val code = runCatching { parseQueryString(form)["code"] }.getOrNull().orEmpty()
         val who = PlayerId.fromRecoveryCode(code)
         if (who == null) {
             call.respondText(

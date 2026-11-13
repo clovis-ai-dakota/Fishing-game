@@ -58,6 +58,37 @@ class SocialRulesTest {
         assertEquals(com.deepline.fishing.core.online.OnlineProtocol.tournamentSpecs, Tournaments.specs)
     }
 
+    /**
+     * Starting an attempt reveals the week's seed, so a seed must not give away the salt: with it
+     * every later week's water could be worked out (and practised) before that week starts. The
+     * first seed function, SplitMix64 over `week * G + salt + C`, could be undone step by step.
+     */
+    @Test
+    fun aRevealedSeedDoesNotGiveAwayLaterWeeksWater() {
+        val salt = 0x2B7E151628AED2A6L
+        val week = 45L
+        val seed = Tournaments.seedOf(week, salt)
+        fun unshift(x: Long, s: Int): Long {
+            var y = x
+            repeat(64 / s + 1) { y = x xor (y ushr s) }
+            return y
+        }
+        fun inverse(m: Long): Long {
+            var inv = m
+            repeat(6) { inv *= 2 - m * inv }
+            return inv
+        }
+        var z = unshift(seed, 31)
+        z = unshift(z * inverse(-0x6b2fb644ecceee15L), 27)
+        z = unshift(z * inverse(-0x40a7b892e31b1a47L), 30)
+        val guessedSalt = z - week * -0x61c8864680b583ebL - 0x1F2E3D4C5B6A7988L
+        assertNotEquals(salt, guessedSalt)
+        assertNotEquals(Tournaments.seedOf(week + 1, salt), Tournaments.seedOf(week + 1, guessedSalt))
+        // Neighbouring weeks and salts still get unrelated water.
+        assertNotEquals(Tournaments.seedOf(week, salt), Tournaments.seedOf(week, salt + 1))
+        assertNotEquals(Tournaments.seedOf(week, salt), Tournaments.seedOf(week + 1, salt))
+    }
+
     @Test
     fun attemptsAreValidatedLikeBattleCastsAndAgainstTheWater() {
         val seed = Tournaments.seedOf(77)

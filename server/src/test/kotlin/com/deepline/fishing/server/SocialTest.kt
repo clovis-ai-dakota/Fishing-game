@@ -38,6 +38,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
 import io.ktor.websocket.Frame
+import io.ktor.utils.io.writeFully
 import io.ktor.websocket.readText
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.json.Json
@@ -195,6 +196,25 @@ class SocialTest {
         assertEquals(points, s.tournament(alice.id, alice.secret).best, "quitting never lowers the best")
         // The tournament also fills the leaderboards.
         assertEquals(points.toLong(), s.leaderboard(alice.id, alice.secret, BoardKind.BEST_CAST, BoardView.GLOBAL).me!!.value)
+    }
+
+    /**
+     * The week of an attempt comes from the app: a week that can't have a running attempt is
+     * refused before anything is looked up, so made-up weeks are never kept in the server's memory.
+     */
+    @Test
+    fun attemptsForWeeksThatCantHaveOneAreRefusedAndForgotten() {
+        val s = store()
+        s.hello(alice, "Alice")
+        val start = s.startAttempt(alice.id, alice.secret)
+        val dto = BotPlayer.playCast(Tournaments.specs, start.seed, BotDifficulty.HARD).toDto()
+        // (Fewer than the per-minute write limit.)
+        repeat(25) { i ->
+            assertEquals(SocialProblem.BAD_REQUEST, problem { s.submitAttempt(alice.id, alice.secret, start.week + 1 + i, 1, dto) })
+            assertEquals(SocialProblem.ATTEMPT_EXPIRED, problem { s.submitAttempt(alice.id, alice.secret, start.week - 2 - i, 1, dto) })
+        }
+        val weeks = SocialStore::class.java.getDeclaredField("weeks").apply { isAccessible = true }.get(s) as Map<*, *>
+        assertEquals(setOf(start.week), weeks.keys)
     }
 
     @Test
@@ -389,6 +409,31 @@ class SocialTest {
         dir.deleteRecursively()
     }
 
+    /**
+     * The account store calls the social store when an account is deleted, and every social call
+     * checks the secret with the account store: deleting accounts while others use social calls
+     * must never leave the two waiting for each other (which would hang the whole server).
+     */
+    @Test
+    fun deletingAccountsWhileOthersUseSocialCallsNeverDeadlocks() {
+        val social = store()
+        accounts.onDelete(social::forgetPlayer)
+        social.hello(bob, "Bob")
+        val stop = java.util.concurrent.atomic.AtomicBoolean(false)
+        val reader = kotlin.concurrent.thread(isDaemon = true) { while (!stop.get()) social.hello(bob, "Bob") }
+        val deleter = kotlin.concurrent.thread(isDaemon = true) {
+            repeat(5_000) {
+                val p = PlayerId.random()
+                accounts.authenticate(p.id, p.secret)
+                accounts.delete(p.id, p.secret)
+            }
+        }
+        deleter.join(20_000)
+        stop.set(true)
+        reader.join(5_000)
+        assertFalse(deleter.isAlive || reader.isAlive, "account deletion and a social call deadlocked")
+    }
+
     @Test
     fun accountDeletionErasesEverySocialTrace() {
         val dir = Files.createTempDirectory("social-delete").toFile()
@@ -495,6 +540,37 @@ class SocialTest {
         assertEquals(HttpStatusCode.OK, submit.status)
         val board = post(SocialApi.LEADERBOARD_PATH, json.encodeToString(BoardRequest.serializer(), BoardRequest(bob.id, bob.secret, BoardKind.BEST_CAST, BoardView.FRIENDS)))
         assertEquals("Alice", json.decodeFromString(BoardResponse.serializer(), board.bodyAsText()).entries.single().name)
+    }
+
+    /**
+     * A body sent without a length (chunked) is refused as soon as it passes the limit: the
+     * server never reads a huge body into memory first (social calls, account calls and the
+     * account deletion page).
+     */
+    @Test
+    fun hugeBodiesWithoutALengthAreRefusedWithoutReadingThemWhole() = testApplication {
+        application { battleServer(Lobby(), accounts, store()) }
+        val total = 64L * 1024 * 1024
+        for ((path, status) in listOf(
+            SocialApi.FRIENDS_PATH to HttpStatusCode.PayloadTooLarge,
+            com.deepline.fishing.core.online.AccountApi.SAVE_PATH to HttpStatusCode.PayloadTooLarge,
+            com.deepline.fishing.core.online.AccountApi.DELETE_ACCOUNT_PAGE to HttpStatusCode.BadRequest,
+        )) {
+            val written = java.util.concurrent.atomic.AtomicLong()
+            val r = client.post(path) {
+                setBody(object : io.ktor.http.content.OutgoingContent.WriteChannelContent() {
+                    override suspend fun writeTo(channel: io.ktor.utils.io.ByteWriteChannel) {
+                        val chunk = ByteArray(8 * 1024) { 'x'.code.toByte() }
+                        while (written.get() < total) {
+                            channel.writeFully(chunk, 0, chunk.size)
+                            written.addAndGet(chunk.size.toLong())
+                        }
+                    }
+                })
+            }
+            assertEquals(status, r.status, path)
+            assertTrue(written.get() < total, "$path read the whole ${written.get()} byte body")
+        }
     }
 
     @Test
