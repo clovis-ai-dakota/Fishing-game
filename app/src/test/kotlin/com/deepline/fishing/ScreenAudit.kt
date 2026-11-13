@@ -30,7 +30,8 @@ data class TextProblem(val shot: String, val kind: String, val text: String) {
  * - `word broken`: a line break inside a word (a word longer than its box), unless the text is
  *   hyphenated (`Hyphens.Auto`);
  * - `unit torn`: a number at the end of a line and its unit ("m", "kg", "pts"...) on the next;
- * - `overlap`: two texts drawn over each other.
+ * - `overlap`: two texts drawn over each other;
+ * - `squeezed out`: a text its row left no room for (zero width).
  */
 object TextAudit {
     /** Units that must stay on their number's line ("300 m"), as the languages write them. */
@@ -43,11 +44,16 @@ object TextAudit {
         val shown = ArrayList<Pair<SemanticsNode, Rect>>()
         for (node in nodes) {
             val clipped = node.boundsInRoot
-            if (clipped.width <= 0.5f || clipped.height <= 0.5f) continue // scrolled away or hidden
             val layout = layoutOf(node) ?: continue
             val text = layout.layoutInput.text.text
             if (text.isBlank()) continue
             fun report(kind: String) = problems.add(TextProblem(shot, kind, text))
+            // Given (almost) no room by its row: laid out, but nothing of it can be read.
+            if (node.size.width < 4 || node.size.height < 4) {
+                if (node.layoutInfo.isPlaced) report("squeezed out")
+                continue
+            }
+            if (clipped.width <= 0.5f || clipped.height <= 0.5f) continue // scrolled away or hidden
             val ellipsized = (0 until layout.lineCount).any(layout::isLineEllipsized)
             // TextLayoutResult.hasVisualOverflow can't be trusted here (the semantics action lays
             // the text out again at its box's maximum width): compare the glyphs with the box.

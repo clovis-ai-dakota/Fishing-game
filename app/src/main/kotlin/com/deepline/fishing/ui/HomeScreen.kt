@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -334,7 +333,8 @@ private fun CastArea(vm: GameViewModel) {
             }
             // The other tackle, once the player owns some (bought in the Shop).
             if (p.luckyCharms > 0 || p.sparkleLures > 0 || p.detectors > 0) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.horizontalScroll(rememberScrollState())) {
+                // Wraps onto a second line rather than hiding a chip past the edge (French and Spanish names are long).
+                androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     if (p.detectors > 0) {
                         FilterChip(
                             selected = vm.useDetector,

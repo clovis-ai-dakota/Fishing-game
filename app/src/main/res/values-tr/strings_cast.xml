@@ -59,12 +59,12 @@
     <!-- Pieces joined with " · ". %1$s: meters, already formatted ("312 m"). -->
     <string name="cast_results_deepest">En derin nokta %1$s</string>
     <plurals name="cast_results_fish">
-        <item quantity="one">%d balık</item>
-        <item quantity="other">%d balık</item>
+        <item quantity="one">%d balık</item>
+        <item quantity="other">%d balık</item>
     </plurals>
     <plurals name="cast_results_objects">
-        <item quantity="one">%d nesne</item>
-        <item quantity="other">%d nesne</item>
+        <item quantity="one">%d nesne</item>
+        <item quantity="other">%d nesne</item>
     </plurals>
     <string name="cast_results_nothing">Bu sefer misinada hiçbir şey yok. Çıkarken iğneyi balıklara doğru yönlendir ki kafalarıyla buluşsun.</string>
     <string name="cast_results_by_last_bump">son çarpmayla yakalandı</string>

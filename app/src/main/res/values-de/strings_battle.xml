@@ -79,8 +79,8 @@
     <string name="battle_total">Gesamt %1$s</string>
     <string name="battle_cast_line">#%1$d: %2$s</string>
     <plurals name="battle_fish">
-        <item quantity="one">%d Fisch</item>
-        <item quantity="other">%d Fische</item>
+        <item quantity="one">%d Fisch</item>
+        <item quantity="other">%d Fische</item>
     </plurals>
     <string name="battle_opponent_live">%1$s angelt: %2$s</string>
     <string name="battle_opponent_live_cast">Wurf %1$d</string>

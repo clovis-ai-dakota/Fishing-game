@@ -63,14 +63,14 @@
     <!-- Pieces joined with " · ". %1$s: meters, already formatted ("312 m"). -->
     <string name="cast_results_deepest">Punto más profundo: %1$s</string>
     <plurals name="cast_results_fish">
-        <item quantity="one">%d pez</item>
-        <item quantity="many">%d de peces</item>
-        <item quantity="other">%d peces</item>
+        <item quantity="one">%d pez</item>
+        <item quantity="many">%d de peces</item>
+        <item quantity="other">%d peces</item>
     </plurals>
     <plurals name="cast_results_objects">
-        <item quantity="one">%d objeto</item>
-        <item quantity="many">%d de objetos</item>
-        <item quantity="other">%d objetos</item>
+        <item quantity="one">%d objeto</item>
+        <item quantity="many">%d de objetos</item>
+        <item quantity="other">%d objetos</item>
     </plurals>
     <string name="cast_results_nothing">Esta vez no hay nada en el sedal. Al subir, lleva el anzuelo hacia los peces para que toque su cabeza.</string>
     <string name="cast_results_by_last_bump">enganchado con el último golpe</string>

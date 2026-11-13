@@ -76,9 +76,9 @@
     <string name="battle_total">Total %1$s</string>
     <string name="battle_cast_line">#%1$d: %2$s</string>
     <plurals name="battle_fish">
-        <item quantity="one">%d peixe</item>
-        <item quantity="many">%d de peixes</item>
-        <item quantity="other">%d peixes</item>
+        <item quantity="one">%d peixe</item>
+        <item quantity="many">%d de peixes</item>
+        <item quantity="other">%d peixes</item>
     </plurals>
     <string name="battle_opponent_live">%1$s está pescando: %2$s</string>
     <string name="battle_opponent_live_cast">lançamento %1$d</string>

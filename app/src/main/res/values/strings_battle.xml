@@ -129,8 +129,8 @@
     <string name="battle_cast_line">#%1$d: %2$s</string>
     <plurals name="battle_fish">
         <!-- Fish landed in a cast. -->
-        <item quantity="one">%d fish</item>
-        <item quantity="other">%d fish</item>
+        <item quantity="one">%d fish</item>
+        <item quantity="other">%d fish</item>
     </plurals>
     <!-- The online opponent's cast as it happens, e.g. "Ana is fishing: cast 2 · 230 m ↑ · 3 fish ·
          450 pts". %1$s: the opponent's name; %2$s: the details, joined with " · ". -->

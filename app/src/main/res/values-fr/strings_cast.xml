@@ -57,14 +57,14 @@
     <string name="cast_results_title">Lancer terminé</string>
     <string name="cast_results_deepest">Profondeur max. %1$s</string>
     <plurals name="cast_results_fish">
-        <item quantity="one">%d poisson</item>
-        <item quantity="many">%d poissons</item>
-        <item quantity="other">%d poissons</item>
+        <item quantity="one">%d poisson</item>
+        <item quantity="many">%d poissons</item>
+        <item quantity="other">%d poissons</item>
     </plurals>
     <plurals name="cast_results_objects">
-        <item quantity="one">%d objet</item>
-        <item quantity="many">%d objets</item>
-        <item quantity="other">%d objets</item>
+        <item quantity="one">%d objet</item>
+        <item quantity="many">%d objets</item>
+        <item quantity="other">%d objets</item>
     </plurals>
     <string name="cast_results_nothing">Rien sur la ligne cette fois. À la remontée, dirigez l\'hameçon vers les poissons pour qu\'il touche leur tête.</string>
     <string name="cast_results_by_last_bump">ferré par le dernier choc</string>

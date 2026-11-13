@@ -96,8 +96,8 @@
     <!-- %1$d: the cast's number; %2$s: what it brought, joined with " · ". -->
     <string name="battle_cast_line">#%1$d: %2$s</string>
     <plurals name="battle_fish">
-        <item quantity="one">%d balık</item>
-        <item quantity="other">%d balık</item>
+        <item quantity="one">%d balık</item>
+        <item quantity="other">%d balık</item>
     </plurals>
     <!-- %1$s: the opponent's name; %2$s: the details. -->
     <string name="battle_opponent_live">%1$s balık tutuyor: %2$s</string>

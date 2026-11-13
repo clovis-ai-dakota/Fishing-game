@@ -91,9 +91,9 @@
     <!-- %1$d: the cast's number; %2$s: what it brought, joined with " · ". -->
     <string name="battle_cast_line">#%1$d: %2$s</string>
     <plurals name="battle_fish">
-        <item quantity="one">%d pez</item>
-        <item quantity="many">%d de peces</item>
-        <item quantity="other">%d peces</item>
+        <item quantity="one">%d pez</item>
+        <item quantity="many">%d de peces</item>
+        <item quantity="other">%d peces</item>
     </plurals>
     <!-- %1$s: the opponent's name; %2$s: the details, joined with " · ". -->
     <string name="battle_opponent_live">%1$s está pescando: %2$s</string>

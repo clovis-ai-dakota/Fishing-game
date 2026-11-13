@@ -54,12 +54,12 @@
     <string name="cast_results_title">Wurf beendet</string>
     <string name="cast_results_deepest">Tiefster Punkt: %1$s</string>
     <plurals name="cast_results_fish">
-        <item quantity="one">%d Fisch</item>
-        <item quantity="other">%d Fische</item>
+        <item quantity="one">%d Fisch</item>
+        <item quantity="other">%d Fische</item>
     </plurals>
     <plurals name="cast_results_objects">
-        <item quantity="one">%d Objekt</item>
-        <item quantity="other">%d Objekte</item>
+        <item quantity="one">%d Objekt</item>
+        <item quantity="other">%d Objekte</item>
     </plurals>
     <string name="cast_results_nothing">Diesmal nichts an der Schnur. Lenk beim Aufstieg auf Fische zu, damit der Haken ihren Kopf trifft.</string>
     <string name="cast_results_by_last_bump">vom letzten Stoß gefangen</string>

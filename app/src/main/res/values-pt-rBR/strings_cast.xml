@@ -55,14 +55,14 @@
     <string name="cast_results_title">Lançamento concluído</string>
     <string name="cast_results_deepest">Ponto mais fundo %1$s</string>
     <plurals name="cast_results_fish">
-        <item quantity="one">%d peixe</item>
-        <item quantity="many">%d de peixes</item>
-        <item quantity="other">%d peixes</item>
+        <item quantity="one">%d peixe</item>
+        <item quantity="many">%d de peixes</item>
+        <item quantity="other">%d peixes</item>
     </plurals>
     <plurals name="cast_results_objects">
-        <item quantity="one">%d objeto</item>
-        <item quantity="many">%d de objetos</item>
-        <item quantity="other">%d objetos</item>
+        <item quantity="one">%d objeto</item>
+        <item quantity="many">%d de objetos</item>
+        <item quantity="other">%d objetos</item>
     </plurals>
     <string name="cast_results_nothing">Nada na linha desta vez. Na subida, guie o anzol até os peixes para ele encontrar a cabeça deles.</string>
     <string name="cast_results_by_last_bump">fisgado pela última batida</string>

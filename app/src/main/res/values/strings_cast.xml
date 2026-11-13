@@ -85,13 +85,13 @@
     <string name="cast_results_deepest">Deepest point %1$s</string>
     <plurals name="cast_results_fish">
         <!-- Fish landed in the cast. -->
-        <item quantity="one">%d fish</item>
-        <item quantity="other">%d fish</item>
+        <item quantity="one">%d fish</item>
+        <item quantity="other">%d fish</item>
     </plurals>
     <plurals name="cast_results_objects">
         <!-- Objects (a rock, driftwood, a jelly cluster) hooked in the cast. -->
-        <item quantity="one">%d object</item>
-        <item quantity="other">%d objects</item>
+        <item quantity="one">%d object</item>
+        <item quantity="other">%d objects</item>
     </plurals>
     <string name="cast_results_nothing">Nothing on the line this time. On the way up, steer into fish so the hook meets their head.</string>
     <!-- After a catch's depth and weight (joined with " · "): the last bump of the way down hooked it. -->

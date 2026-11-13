@@ -457,8 +457,12 @@ private fun TackleCard(vm: GameViewModel, t: Tackle, actions: ShopActions, modif
             for (pack in packs) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Column(Modifier.weight(1f)) {
-                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Text(pack.label(), style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        // The badge goes under a long name ("Tonneau de Lanternes") instead of being squeezed out.
+                        androidx.compose.foundation.layout.FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            itemVerticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(pack.label(), style = MaterialTheme.typography.titleSmall)
                             pack.badgeText()?.let { Badge(it.asString()) }
                         }
                         Text(ShopText.contents(pack, p).asString(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
