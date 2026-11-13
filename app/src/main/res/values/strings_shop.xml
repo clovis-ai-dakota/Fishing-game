@@ -85,7 +85,7 @@
     <!-- %1$s: who sent it (a player's name); %2$s: the item; %3$s: what it gives. -->
     <string name="shop_gift_received">%1$s sent you %2$s: %3$s.</string>
     <!-- %1$s: who sent it; %2$s: the item; %3$s: points given instead, already formatted. -->
-    <string name="shop_gift_received_owned">%1$s sent you %2$s. You had it already, so here are %3$s pts instead.</string>
+    <string name="shop_gift_received_owned">%1$s sent you %2$s. You had it already, so here are %3$s pts instead.</string>
     <!-- Who a gift is from when the player bought it for themselves. -->
     <string name="shop_gift_from_you">You</string>
 
@@ -107,15 +107,15 @@
 
     <!-- ==== The Shop tab (ui/shop/ShopScreen.kt) ==== -->
     <!-- Under the Shop's title: the points the player can spend. %1$s: the balance, formatted. -->
-    <string name="shop_balance">%1$s pts to spend</string>
+    <string name="shop_balance">%1$s pts to spend</string>
 
     <!-- Buying with points asks first. %1$s: the item's name. -->
     <string name="shop_confirm_title">Buy %1$s?</string>
     <!-- %1$s: what the item gives (a list); %2$s: its points price; %3$s: points left after
          buying. Numbers are formatted already. -->
-    <string name="shop_confirm_body">You get: %1$s.\n\nIt costs %2$s pts; you\'ll have %3$s pts left.</string>
+    <string name="shop_confirm_body">You get: %1$s.\n\nIt costs %2$s pts; you\'ll have %3$s pts left.</string>
     <!-- The dialog's button. %1$s: the points price, formatted. -->
-    <string name="shop_confirm_buy">Buy for %1$s pts</string>
+    <string name="shop_confirm_buy">Buy for %1$s pts</string>
 
     <!-- A banner at the top of the Shop: the Captain's Club's free monthly gift is ready.
          "Lantern pouch" is a shop item: write it as in core_shop_item_lantern_pouch. -->
@@ -157,7 +157,7 @@
     <!-- Lv = level. %1$d: the level now; %2$d: the highest level. Tight. -->
     <string name="shop_rope_level">Lv %1$d / %2$d</string>
     <!-- A button. %1$s: the stat one level lower (e.g. "110 m"); %2$s: points given back, formatted. -->
-    <string name="shop_rope_downgrade">Downgrade to %1$s · refund %2$s pts</string>
+    <string name="shop_rope_downgrade">Downgrade to %1$s · refund %2$s pts</string>
     <!-- At the highest level. %1$s: the stat now, e.g. "600 m". -->
     <string name="shop_rope_maxed">%1$s · maxed out</string>
 

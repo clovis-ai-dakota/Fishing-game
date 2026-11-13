@@ -10,7 +10,7 @@
     <!-- Belohnungen als Nominalgruppen in einer Liste. -->
     <string name="daily_grant_shield">1 Serienschild</string>
     <!-- Kurze Beschriftungen auf den Kacheln des 7-Tage-Kalenders (winzig). -->
-    <string name="daily_tile_lanterns">%1$d × Laterne</string>
+    <string name="daily_tile_lanterns">%1$d × Laterne</string>
     <string name="daily_tile_detector">Detektor</string>
     <string name="daily_tile_charm">Talisman</string>
     <string name="daily_tile_lure">Köder</string>
@@ -29,10 +29,10 @@
         <item quantity="one">Fang %1$d Fisch in dieser Zone: %2$s.</item>
         <item quantity="other">Fang %1$d Fische in dieser Zone: %2$s.</item>
     </plurals>
-    <string name="daily_challenge_reach_depth">Erreiche in einem Wurf %1$d m.</string>
+    <string name="daily_challenge_reach_depth">Erreiche in einem Wurf %1$d m.</string>
     <string name="daily_challenge_catch_species_one">Fang einen Fisch dieser Art: %1$s.</string>
     <string name="daily_challenge_catch_species">Fang %1$d Fische dieser Art: %2$s.</string>
-    <string name="daily_challenge_earn_points">Sammle %1$s Punkte.</string>
+    <string name="daily_challenge_earn_points">Sammle %1$s Punkte.</string>
     <plurals name="daily_challenge_land_weight">
         <item quantity="one">Fang %d kg Fisch.</item>
         <item quantity="other">Fang %d kg Fisch.</item>
@@ -49,7 +49,7 @@
         <item quantity="one">Fang %d Art, die du noch nie gefangen hast.</item>
         <item quantity="other">Fang %d Arten, die du noch nie gefangen hast.</item>
     </plurals>
-    <string name="daily_progress_depth">Am tiefsten: %1$d von %2$d m</string>
+    <string name="daily_progress_depth">Am tiefsten: %1$d von %2$d m</string>
     <string name="daily_progress_big_cast">Bester Wurf: %1$d von %2$d Fischen</string>
 
     <!-- Nach dem Abholen der Tagesbelohnung. -->
@@ -106,7 +106,7 @@
         <item quantity="other">Jede Woche werden %d Tage lang zwei weniger häufige Arten dort, wo sie leben, viel häufiger: eine nahe der Oberfläche und eine in der Tiefe. Nur in Solo-Würfen: Duelle ändern sich nie.</item>
     </plurals>
     <string name="daily_migrant_open">Ihre Dex-Seite öffnen</string>
-    <string name="daily_migrant_where">%1$s · %2$d–%3$d m</string>
+    <string name="daily_migrant_where">%1$s · %2$d–%3$d m</string>
 
     <!-- Benachrichtigungskanäle. -->
     <string name="daily_channel_daily_name">Tagesbelohnung bereit</string>

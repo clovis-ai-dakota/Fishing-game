@@ -138,7 +138,7 @@ object StoreScenes {
             headOn(0, species("reef_grouper"), LINE_UP, 205f),
             headOn(1, species("ribbon_eel"), LINE_UP, 196f, sparkling = true, dir = -1),
             headOn(2, species("dusk_snapper"), LINE_UP, 186f),
-            fish(3, species("veil_ray"), c - 6f, 176f, 1),
+            fish(3, species("veil_ray"), c - 5.5f, 181f, 1),
             fish(4, at(170f, 5) { it.zone == DepthZone.TWILIGHT }, c + 8f, 171f, -1),
             fish(5, at(160f, 9) { it.zone == DepthZone.TWILIGHT }, c - 5f, 163f, 1),
             fish(6, at(214f, 3) { it.zone == DepthZone.TWILIGHT }, c - 5.5f, 214f, 1),

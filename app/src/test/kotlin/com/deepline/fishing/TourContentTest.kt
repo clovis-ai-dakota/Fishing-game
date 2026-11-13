@@ -55,11 +55,11 @@ class TourContentTest {
         for (topic in listOf("Lantern", "Sparkling", "head", "Load", "Dex", "Milestone", "online", "Quick match", "Fishing secrets", "Skins")) {
             assertTrue("Tour doesn't mention $topic", text.contains(topic, ignoreCase = true))
         }
-        assertTrue("${GameConfig.BUMP_FREE_DEPTH.toInt()} m" in text)
+        assertTrue("${GameConfig.BUMP_FREE_DEPTH.toInt()}\u00A0m" in text) // a number and its unit never part
         assertTrue("${GameConfig.DESCENT_TOUCH_LIMIT}" in text)
         // Version 7: the fast reel and the Lantern's reach.
         assertTrue("reel in fast" in text.lowercase())
-        assertTrue("${GameConfig.VISIBLE_RADIUS_LANTERN.toInt()} m" in text)
+        assertTrue("${GameConfig.VISIBLE_RADIUS_LANTERN.toInt()}\u00A0m" in text)
         // Version 4: downgrades, the species count, titles and every drawn skin slot.
         assertTrue("downgrade" in text.lowercase())
         assertTrue("${com.deepline.fishing.core.FishCatalog.all.size} species" in text)

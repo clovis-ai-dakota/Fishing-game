@@ -157,7 +157,8 @@ private fun PointsPill(points: Long, modifier: Modifier = Modifier) {
         ) {
             Icon(GameIcons.Coin, contentDescription = null, tint = SparkleGold, modifier = Modifier.size(18.dp))
             Spacer(Modifier.width(6.dp))
-            Text(formatPoints(points), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
+            // From a million on, "1.2M": the exact balance is on the Shop tab, and the game's name keeps its room.
+            Text(if (points >= 1_000_000) compactPoints(points) else formatPoints(points), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
         }
     }
 }

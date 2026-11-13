@@ -77,7 +77,7 @@
         <item quantity="other">%1$s costs %2$s points, once. You have %3$s. Keep fishing to earn more.</item>
     </plurals>
     <!-- The dialog's button. %1$s: the price, formatted. -->
-    <string name="boat_editor_unlock_buy">Unlock for %1$s pts</string>
+    <string name="boat_editor_unlock_buy">Unlock for %1$s pts</string>
     <string name="boat_editor_not_now">Not now</string>
     <!-- A locked option unlocked by progress or in the Shop. %1$s: the option's name, e.g. Checkers.
          The dialog's text is one of the boat_unlock_* sentences. -->

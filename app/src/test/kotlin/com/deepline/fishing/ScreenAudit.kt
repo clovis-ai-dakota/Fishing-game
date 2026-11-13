@@ -10,6 +10,7 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.style.Hyphens
 import java.io.File
 
 /**
@@ -26,7 +27,8 @@ data class TextProblem(val shot: String, val kind: String, val text: String) {
  *
  * - `cut off`: the text doesn't fit its box, or a parent clips it (outside scrolling lists);
  * - `ellipsized`: a line ends in "…" (truncated on purpose: fine for names, never for sentences);
- * - `word broken`: a line break inside a word (a word longer than its box);
+ * - `word broken`: a line break inside a word (a word longer than its box), unless the text is
+ *   hyphenated (`Hyphens.Auto`);
  * - `unit torn`: a number at the end of a line and its unit ("m", "kg", "pts"...) on the next;
  * - `overlap`: two texts drawn over each other.
  */
@@ -47,15 +49,21 @@ object TextAudit {
             if (text.isBlank()) continue
             fun report(kind: String) = problems.add(TextProblem(shot, kind, text))
             val ellipsized = (0 until layout.lineCount).any(layout::isLineEllipsized)
+            // TextLayoutResult.hasVisualOverflow can't be trusted here (the semantics action lays
+            // the text out again at its box's maximum width): compare the glyphs with the box.
+            val widest = (0 until layout.lineCount).maxOf { layout.getLineRight(it) - layout.getLineLeft(it) }
+            val paragraph = layout.multiParagraph
+            val cut = widest > layout.size.width + 1f || paragraph.height > layout.size.height + 1f || paragraph.didExceedMaxLines
             if (ellipsized) report("ellipsized")
-            else if (layout.hasVisualOverflow) report("cut off")
-            else if (clippedByParent(node, clipped)) report("cut off")
+            else if (cut || clippedByParent(node, clipped)) report("cut off")
+            val hyphenated = layout.layoutInput.style.hyphens == Hyphens.Auto
             for (line in 0 until layout.lineCount - 1) {
                 val end = layout.getLineEnd(line)
                 if (end <= 0 || end >= text.length) continue
                 val before = text[end - 1]
                 val after = text[end]
-                if (before.isLetterOrDigit() && after.isLetterOrDigit()) report("word broken")
+                // A hyphenated text (Hyphens.Auto) breaks long words at syllables, with a hyphen.
+                if (before.isLetterOrDigit() && after.isLetterOrDigit() && !hyphenated) report("word broken")
                 if (before == ' ' && end >= 2 && text[end - 2].isDigit()) {
                     val next = text.substring(end).takeWhile { !it.isWhitespace() }.trimEnd(',', '.', ':', ';', ')', '!', '?')
                     if (next in units) report("unit torn")

@@ -81,7 +81,7 @@ fun GiftDialog(vm: GameViewModel) {
                                 onClick = { vm.sendGiftWithPoints(item) },
                                 enabled = vm.progress.pointsBalance >= points,
                                 modifier = Modifier.testTag("gift_pts_${item.id}"),
-                            ) { Text(stringResource(R.string.common_points, compactPoints(points))) }
+                            ) { PointsPriceLabel(compactPoints(points)) }
                         }
                     }
                 }

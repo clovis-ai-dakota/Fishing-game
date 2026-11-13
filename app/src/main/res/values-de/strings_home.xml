@@ -14,8 +14,8 @@
     <!-- Die Seil-Karte. -->
     <string name="home_rope_title">Dein Seil</string>
     <string name="home_rope_reach">Reicht bis %1$s · %2$s</string>
-    <string name="home_rope_stats">Würfe: %1$s · Insgesamt verdient: %2$s Punkte</string>
-    <string name="home_rope_stats_deepest">Würfe: %1$s · Insgesamt verdient: %2$s Punkte · Tiefster Fang: %3$s</string>
+    <string name="home_rope_stats">Würfe: %1$s · Insgesamt verdient: %2$s Punkte</string>
+    <string name="home_rope_stats_deepest">Würfe: %1$s · Insgesamt verdient: %2$s Punkte · Tiefster Fang: %3$s</string>
 
     <!-- Die Dex-Karte. -->
     <string name="home_dex_title">Dex</string>
@@ -34,7 +34,7 @@
 
     <!-- Laternen-Schalter über dem Button „Auswerfen“. -->
     <string name="home_lanterns">Laternen: %1$d</string>
-    <string name="home_lanterns_hint">Beim nächsten Wurf das Dunkel unter %1$d m erhellen.</string>
+    <string name="home_lanterns_hint">Beim nächsten Wurf das Dunkel unter %1$d m erhellen.</string>
     <string name="home_tackle_detector">Detektor ×%1$d</string>
     <string name="home_tackle_charm">Talisman ×%1$d</string>
     <string name="home_tackle_lure">Funkelköder ×%1$d</string>
@@ -43,5 +43,5 @@
 
     <!-- Die Regeln in einem Dialog. -->
     <string name="home_rules_title">So wird geangelt</string>
-    <string name="home_rules_body">• Zieh nach links und rechts, um den Haken zu lenken.\n• Abstieg: Der Haken sinkt, bis er %1$d-mal angestoßen ist oder das Seil zu Ende ist. Ein Stoß ist eine Berührung mit dem Kopf eines Fisches, einem Felsen, Treibholz oder einer Qualle; Körper oder Schwanzflosse eines Fisches zu streifen, kostet nichts. Die ersten %2$d m sind stoßfrei.\n• Aufstieg: Tippe einen Fisch mit dem Haken am Kopf an (das helle Gesicht beim Auge), um ihn zu fangen. Die Schwanzflosse zu berühren, bringt nichts. Das Seil trägt nur ein begrenztes Gewicht.\n• Tiefere Fänge bringen mehr Punkte. Funkelnde Fische sind %3$d× so viel wert.\n• Unter %4$d m wird es dunkel. Eine Laterne erhellt mehr vom Wasser.</string>
+    <string name="home_rules_body">• Zieh nach links und rechts, um den Haken zu lenken.\n• Abstieg: Der Haken sinkt, bis er %1$d-mal angestoßen ist oder das Seil zu Ende ist. Ein Stoß ist eine Berührung mit dem Kopf eines Fisches, einem Felsen, Treibholz oder einer Qualle; Körper oder Schwanzflosse eines Fisches zu streifen, kostet nichts. Die ersten %2$d m sind stoßfrei.\n• Aufstieg: Tippe einen Fisch mit dem Haken am Kopf an (das helle Gesicht beim Auge), um ihn zu fangen. Die Schwanzflosse zu berühren, bringt nichts. Das Seil trägt nur ein begrenztes Gewicht.\n• Tiefere Fänge bringen mehr Punkte. Funkelnde Fische sind %3$d× so viel wert.\n• Unter %4$d m wird es dunkel. Eine Laterne erhellt mehr vom Wasser.</string>
 </resources>

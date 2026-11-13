@@ -20,16 +20,19 @@
     <!-- Units. %1$s is a number already formatted for the language (e.g. "1,250" or "4.5"). Keep
          the unit symbol (m, kg, m/s) and add the space your language puts before units. -->
     <!-- Meters (depth, distance). -->
-    <string name="common_meters">%1$s m</string>
+    <string name="common_meters">%1$s m</string>
     <!-- Kilograms (weight). -->
-    <string name="common_kg">%1$s kg</string>
+    <string name="common_kg">%1$s kg</string>
     <!-- Meters per second (steering speed). -->
-    <string name="common_meters_per_second">%1$s m/s</string>
+    <string name="common_meters_per_second">%1$s m/s</string>
     <!-- Points, the game's score and currency, as a short unit after a number: "1,250 pts". %1$s:
          the number, already formatted. -->
-    <string name="common_points">%1$s pts</string>
+    <string name="common_points">%1$s pts</string>
     <!-- A gain of points, e.g. "+1,250 pts". -->
-    <string name="common_points_plus">+%1$s pts</string>
+    <string name="common_points_plus">+%1$s pts</string>
+    <!-- A points price in a narrow button, used only when "%1$s pts" doesn't fit on one line:
+         the number above its unit. %1$s: the number, already formatted. -->
+    <string name="common_points_stacked">%1$s\npts</string>
     <!-- A clock time on the hour, 24-hour style ("21:00"). %1$d: the hour (0 to 23). -->
     <string name="common_time_on_the_hour">%1$02d:00</string>
     <!-- Durations. -->

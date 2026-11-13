@@ -49,7 +49,7 @@
     <string name="battle_setup_wager_none">None</string>
     <!-- %1$s: points paid back for a win, already formatted; %2$s: the multiplier (e.g. "1.6",
          after the × sign); %3$s: the computer's level (Easy, Normal or Hard). -->
-    <string name="battle_setup_wager_terms">Win and get %1$s pts back (×%2$s against %3$s); a draw refunds the stake; losing or forfeiting loses it.</string>
+    <string name="battle_setup_wager_terms">Win and get %1$s pts back (×%2$s against %3$s); a draw refunds the stake; losing or forfeiting loses it.</string>
     <!-- Before a stake is chosen. %1$s: the computer's level; %2$s: the multiplier (e.g. "1.6"). -->
     <string name="battle_setup_wager_hint">Stake points on the result: a win against %1$s pays ×%2$s.</string>
     <!-- Wins, losses and draws against the computer. W, L and D are short for win, loss and draw.

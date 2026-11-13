@@ -39,7 +39,7 @@
     <!-- The way down: avoid bumping into things. -->
     <string name="tour_descent_title">Going down: dodge</string>
     <!-- %1$d: bumps allowed (4); %2$d: depth of the bump-free zone in meters. -->
-    <string name="tour_descent_body">The hook sinks until it has bumped %1$d times or reaches the end of the rope, then it turns back up. On a fish, only the head counts as a bump (the same spot you aim for on the way up); brushing a body or tail is free. Rocks, driftwood and jellies count wherever you touch them. The first %2$d m are bump-free.</string>
+    <string name="tour_descent_body">The hook sinks until it has bumped %1$d times or reaches the end of the rope, then it turns back up. On a fish, only the head counts as a bump (the same spot you aim for on the way up); brushing a body or tail is free. Rocks, driftwood and jellies count wherever you touch them. The first %2$d m are bump-free.</string>
 
     <string name="tour_ascent_title">Coming up: aim for heads</string>
     <string name="tour_ascent_body">On the way up, steer so the hook meets a fish\'s head: the pale face by its eye. Touching the tail or body does nothing.</string>
@@ -72,7 +72,7 @@
     <string name="tour_tackle_title">Tackle</string>
     <!-- The four tackle names must match core_tackle_*. %1$d: the detector's radius in meters;
          %2$d: how many times more Sparkling fish the lure brings. -->
-    <string name="tour_tackle_body">The Tackle page sells one-cast items to switch on before you cast. Lanterns light the dark, a Rare fish detector marks species you haven\'t caught yet within %1$d m of the hook, a Lucky charm gives one extra bump on the way down, and a Sparkle lure brings %2$d× as many Sparkling fish. Prices grow with your rope\'s reach.</string>
+    <string name="tour_tackle_body">The Tackle page sells one-cast items to switch on before you cast. Lanterns light the dark, a Rare fish detector marks species you haven\'t caught yet within %1$d m of the hook, a Lucky charm gives one extra bump on the way down, and a Sparkle lure brings %2$d× as many Sparkling fish. Prices grow with your rope\'s reach.</string>
 
     <string name="tour_two_prices_title">Two ways to pay</string>
     <!-- %1$d: minutes of fishing per euro; %2$s: the time per euro for Lantern packs (e.g. "1 hour"). -->
@@ -80,7 +80,7 @@
 
     <string name="tour_lantern_title">Lanterns light the deep</string>
     <!-- %1$d: depth where the water goes dark; %2$d: the lit radius with a Lantern; %3$d: without (meters). -->
-    <string name="tour_lantern_body">Below %1$d m the water is dark. Switch this on before a cast to light up much more water around the hook (%2$d m instead of %3$d m). One Lantern is used per cast; earn more from milestones or buy them in the Shop.</string>
+    <string name="tour_lantern_body">Below %1$d m the water is dark. Switch this on before a cast to light up much more water around the hook (%2$d m instead of %3$d m). One Lantern is used per cast; earn more from milestones or buy them in the Shop.</string>
 
     <string name="tour_dex_title">Fill your Dex</string>
     <!-- %1$d: number of species; %2$d: number of depth zones. "Seen" is a Dex state (a species met but not caught). -->

@@ -105,16 +105,17 @@ fun FriendsScreen(vm: GameViewModel) {
             if (f != null && (f.incoming.isNotEmpty() || f.outgoing.isNotEmpty())) {
                 SocialCard(stringResource(R.string.social_friends_requests_title)) {
                     for (card in f.incoming) {
-                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Column(Modifier.weight(1f)) {
-                                PlayerName(card.name, card.title, card.titleFrame)
-                                Hint(stringResource(R.string.social_friends_request_in, card.id))
-                            }
-                            Button(onClick = { social.accept(card) }, modifier = Modifier.testTag("friend_accept_${card.id}")) {
-                                Text(stringResource(R.string.social_friends_accept))
-                            }
-                            TextButton(onClick = { social.decline(card) }, modifier = Modifier.testTag("friend_decline_${card.id}")) {
-                                Text(stringResource(R.string.social_friends_decline))
+                        // The answers under the name, so a long name or answer is never squeezed.
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            PlayerName(card.name, card.title, card.titleFrame)
+                            Hint(stringResource(R.string.social_friends_request_in, card.id))
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Button(onClick = { social.accept(card) }, modifier = Modifier.testTag("friend_accept_${card.id}")) {
+                                    Text(stringResource(R.string.social_friends_accept))
+                                }
+                                TextButton(onClick = { social.decline(card) }, modifier = Modifier.testTag("friend_decline_${card.id}")) {
+                                    Text(stringResource(R.string.social_friends_decline))
+                                }
                             }
                         }
                     }

@@ -55,8 +55,8 @@
     <!-- %1$d: hours to wait. -->
     <string name="social_problem_rejoin_later">Bu kulüpten çıkarıldın, bu yüzden ancak %1$d saat sonra yeniden katılabilirsin.</string>
     <string name="social_problem_no_attempts">Bu haftaki tüm denemelerini kullandın. Yeni turnuva Pazartesi 00:00 UTC\'de başlar.</string>
-    <string name="social_problem_attempt_expired">Bu denemenin sonucu çok geç geldi, bu yüzden 0 puan aldı.</string>
-    <string name="social_problem_cast_rejected">Sunucu bu denemeyi kabul edemedi, bu yüzden 0 puan aldı.</string>
+    <string name="social_problem_attempt_expired">Bu denemenin sonucu çok geç geldi, bu yüzden 0 puan aldı.</string>
+    <string name="social_problem_cast_rejected">Sunucu bu denemeyi kabul edemedi, bu yüzden 0 puan aldı.</string>
     <string name="social_problem_too_big">Bu, sunucu için fazla büyük.</string>
     <string name="social_problem_too_many_requests">Aynı anda çok fazla istek var. Lütfen biraz bekleyip tekrar dene.</string>
 

@@ -27,7 +27,7 @@
     <string name="tour_steer_body">Durante um lançamento, arraste para a esquerda e para a direita em qualquer lugar da tela. Um anel mostra onde está o seu dedo: o anzol desliza até ele e o acompanha. A Agilidade da corda deixa isso mais rápido.</string>
 
     <string name="tour_descent_title">Descendo: desvie</string>
-    <string name="tour_descent_body">O anzol afunda até bater %1$d vezes ou chegar ao fim da corda, e então volta para cima. Num peixe, só a cabeça conta como batida (o mesmo ponto em que você mira na subida); roçar o corpo ou o rabo não conta. Pedras, troncos e águas-vivas contam onde quer que você encoste. Os primeiros %2$d m são livres de batidas.</string>
+    <string name="tour_descent_body">O anzol afunda até bater %1$d vezes ou chegar ao fim da corda, e então volta para cima. Num peixe, só a cabeça conta como batida (o mesmo ponto em que você mira na subida); roçar o corpo ou o rabo não conta. Pedras, troncos e águas-vivas contam onde quer que você encoste. Os primeiros %2$d m são livres de batidas.</string>
 
     <string name="tour_ascent_title">Subindo: mire nas cabeças</string>
     <string name="tour_ascent_body">Na subida, guie o anzol até a cabeça de um peixe: a parte clara perto do olho. Encostar no rabo ou no corpo não faz nada.</string>
@@ -51,13 +51,13 @@
     <string name="tour_upgrades_body">Gaste pontos na aba Loja, na página Corda. Comprimento da corda deixa você chegar a zonas mais fundas e a peixes novos, Força da corda carrega mais peso e Agilidade da corda guia mais rápido. Mudou de ideia? Volte um nível e receba de volta cada ponto que ele custou.</string>
 
     <string name="tour_tackle_title">Apetrechos</string>
-    <string name="tour_tackle_body">A página Apetrechos vende itens para um lançamento, que você ativa antes de lançar. Lanternas iluminam o escuro, um Detector de peixes raros marca as espécies que você ainda não capturou a até %1$d m do anzol, um Amuleto da sorte dá uma batida extra na descida e uma Isca cintilante traz %2$d× mais peixes cintilantes. Os preços crescem com o alcance da sua corda.</string>
+    <string name="tour_tackle_body">A página Apetrechos vende itens para um lançamento, que você ativa antes de lançar. Lanternas iluminam o escuro, um Detector de peixes raros marca as espécies que você ainda não capturou a até %1$d m do anzol, um Amuleto da sorte dá uma batida extra na descida e uma Isca cintilante traz %2$d× mais peixes cintilantes. Os preços crescem com o alcance da sua corda.</string>
 
     <string name="tour_two_prices_title">Duas formas de pagar</string>
     <string name="tour_two_prices_body">Tudo na loja tem dois preços: em euros ou em pontos. Um preço em pontos equivale a cerca de %1$d minutos de pesca por euro no alcance da sua corda (%2$s para pacotes de Lanternas), então pagar só economiza tempo: tudo pode ser ganho jogando. Pagar com pontos pede confirmação antes.</string>
 
     <string name="tour_lantern_title">Lanternas iluminam as profundezas</string>
-    <string name="tour_lantern_body">Abaixo de %1$d m a água é escura. Ative isto antes de um lançamento para iluminar muito mais água em volta do anzol (%2$d m em vez de %3$d m). Uma Lanterna é gasta por lançamento; ganhe mais com os marcos ou compre na Loja.</string>
+    <string name="tour_lantern_body">Abaixo de %1$d m a água é escura. Ative isto antes de um lançamento para iluminar muito mais água em volta do anzol (%2$d m em vez de %3$d m). Uma Lanterna é gasta por lançamento; ganhe mais com os marcos ou compre na Loja.</string>
 
     <string name="tour_dex_title">Complete seu Dex</string>
     <string name="tour_dex_body">%1$d espécies vivem em %2$d zonas de profundidade, algumas delas raras, e cada uma tem uma carta numerada. Um peixe que nada perto do seu anzol fica marcado como Visto: você descobre o nome e as profundidades dele. Pesque-o para completar a carta com o peso, os pontos e seus recordes.</string>

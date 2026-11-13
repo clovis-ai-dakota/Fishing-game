@@ -12,11 +12,12 @@
     <string name="common_got_it">Verstanden</string>
 
     <!-- Einheiten. -->
-    <string name="common_meters">%1$s m</string>
-    <string name="common_kg">%1$s kg</string>
-    <string name="common_meters_per_second">%1$s m/s</string>
-    <string name="common_points">%1$s Punkte</string>
-    <string name="common_points_plus">+%1$s Punkte</string>
+    <string name="common_meters">%1$s m</string>
+    <string name="common_kg">%1$s kg</string>
+    <string name="common_meters_per_second">%1$s m/s</string>
+    <string name="common_points">%1$s Punkte</string>
+    <string name="common_points_plus">+%1$s Punkte</string>
+    <string name="common_points_stacked">%1$s\nPunkte</string>
     <string name="common_time_on_the_hour">%1$02d:00</string>
     <!-- Dauern. -->
     <plurals name="common_days">

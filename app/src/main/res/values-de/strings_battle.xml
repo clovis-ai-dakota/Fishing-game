@@ -33,7 +33,7 @@
     <string name="battle_setup_tackle_info">Laternen und Detektoren wirken in Duellen: Solange sie eingeschaltet sind, verbraucht jeder deiner Würfe je eins. Talisman und Funkelköder gibt es nur für Solo-Würfe.</string>
     <string name="battle_setup_wager_title">Wette (optional)</string>
     <string name="battle_setup_wager_none">Keine</string>
-    <string name="battle_setup_wager_terms">Bei einem Sieg bekommst du %1$s Punkte zurück (×%2$s gegen %3$s); ein Unentschieden erstattet den Einsatz; bei Niederlage oder Aufgabe ist er weg.</string>
+    <string name="battle_setup_wager_terms">Bei einem Sieg bekommst du %1$s Punkte zurück (×%2$s gegen %3$s); ein Unentschieden erstattet den Einsatz; bei Niederlage oder Aufgabe ist er weg.</string>
     <string name="battle_setup_wager_hint">Setz Punkte auf das Ergebnis: Ein Sieg gegen %1$s zahlt ×%2$s.</string>
     <!-- S, N und U: Siege, Niederlagen, Unentschieden. -->
     <string name="battle_setup_record">Bilanz gegen den Computer: %1$d S · %2$d N · %3$d U</string>

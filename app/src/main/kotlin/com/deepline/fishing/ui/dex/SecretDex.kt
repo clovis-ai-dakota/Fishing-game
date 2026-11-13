@@ -185,8 +185,6 @@ private fun LockedSecretCard(number: Int, id: String) {
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 minLines = 2,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis,
             )
         }
     }

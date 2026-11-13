@@ -50,7 +50,7 @@
     <!-- Small labels above the species' facts (tiles). -->
     <string name="dex_fish_depth">Depth</string>
     <!-- Where it lives. %1$s: shallowest depth; %2$s: deepest depth, both in meters, formatted. -->
-    <string name="dex_fish_depth_range">%1$s–%2$s m</string>
+    <string name="dex_fish_depth_range">%1$s–%2$s m</string>
     <string name="dex_fish_weight">Weight</string>
     <!-- Points a catch of this species is worth before bonuses. -->
     <string name="dex_fish_base_points">Base points</string>

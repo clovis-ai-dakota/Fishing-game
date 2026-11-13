@@ -41,6 +41,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -88,7 +89,7 @@ fun ThemesScreen(vm: GameViewModel) {
                                     onClick = { vm.setNightMode(mode) },
                                     shape = SegmentedButtonDefaults.itemShape(i, NightMode.entries.size),
                                     modifier = Modifier.testTag("mode_${mode.name.lowercase()}"),
-                                ) { Text(mode.label(), maxLines = 1) }
+                                ) { Text(mode.label(), maxLines = 2, textAlign = TextAlign.Center) } // "Like my phone" takes two lines in French or German
                             }
                         }
                         Text(
@@ -119,7 +120,7 @@ private fun ThemeCard(vm: GameViewModel, theme: MenuTheme, night: Boolean, actio
                 Text(theme.label(), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
                 if (theme.tier > 0) Text("★".repeat(theme.tier), color = MaterialTheme.colorScheme.tertiary, style = MaterialTheme.typography.labelMedium)
             }
-            Text(theme.description(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, minLines = 2, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Text(theme.description(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, minLines = 2)
             when {
                 vm.menuTheme == theme -> OwnedRow(stringResource(R.string.shop_in_use))
                 theme.isAvailable(p, ShopClock.now()) -> OwnedRow {

@@ -70,7 +70,7 @@
     <!-- %1$s: who sent it (a player's name, or "Sen"); %2$s: the item; %3$s: what it gives. -->
     <string name="shop_gift_received">Hediyen geldi: %2$s (%3$s). Gönderen: %1$s.</string>
     <!-- %1$s: who sent it; %2$s: the item; %3$s: points given instead, already formatted. -->
-    <string name="shop_gift_received_owned">Hediyen geldi: %2$s. Gönderen: %1$s. Bu sende zaten vardı, bunun yerine %3$s puan aldın.</string>
+    <string name="shop_gift_received_owned">Hediyen geldi: %2$s. Gönderen: %1$s. Bu sende zaten vardı, bunun yerine %3$s puan aldın.</string>
     <!-- Who a gift is from when the player bought it for themselves (after "Gönderen:"). -->
     <string name="shop_gift_from_you">Sen</string>
 
@@ -96,8 +96,8 @@
     <!-- %1$s: the item's name. -->
     <string name="shop_confirm_title">%1$s satın alınsın mı?</string>
     <!-- %1$s: what the item gives; %2$s: its points price; %3$s: points left after buying. -->
-    <string name="shop_confirm_body">Alacakların: %1$s.\n\nFiyatı %2$s puan; geriye %3$s puanın kalacak.</string>
-    <string name="shop_confirm_buy">%1$s puana satın al</string>
+    <string name="shop_confirm_body">Alacakların: %1$s.\n\nFiyatı %2$s puan; geriye %3$s puanın kalacak.</string>
+    <string name="shop_confirm_buy">%1$s puana satın al</string>
 
     <string name="shop_club_pouch_title">Kaptan Kulübü hediyesi</string>
     <string name="shop_club_pouch_body">Ücretsiz aylık Fener kesen hazır: %1$s.</string>
@@ -124,7 +124,7 @@
     <!-- Sv. = seviye (level). -->
     <string name="shop_rope_level">Sv. %1$d / %2$d</string>
     <!-- %1$s: the stat one level lower (e.g. "110 m"); %2$s: points given back. -->
-    <string name="shop_rope_downgrade">Düşür: %1$s · %2$s puan iade</string>
+    <string name="shop_rope_downgrade">Düşür: %1$s · %2$s puan iade</string>
     <string name="shop_rope_maxed">%1$s · en üst seviye</string>
 
     <!-- Tackle page. -->

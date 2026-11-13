@@ -64,7 +64,7 @@
     <string name="shop_gift_refunded">%1$s Seus pontos foram devolvidos.</string>
     <string name="shop_gift_kept">%1$s Em vez disso, o item fica com você: %2$s.</string>
     <string name="shop_gift_received">%1$s enviou um presente para você. %2$s: %3$s.</string>
-    <string name="shop_gift_received_owned">%1$s enviou um presente para você: %2$s. Você já tinha esse item, então aqui estão %3$s pts no lugar.</string>
+    <string name="shop_gift_received_owned">%1$s enviou um presente para você: %2$s. Você já tinha esse item, então aqui estão %3$s pts no lugar.</string>
     <string name="shop_gift_from_you">Você</string>
 
     <!-- Salvamento na nuvem e código de recuperação. -->
@@ -82,11 +82,11 @@
     <string name="shop_account_server_problem">O servidor teve um problema (%1$d).</string>
 
     <!-- ==== A aba Loja ==== -->
-    <string name="shop_balance">%1$s pts para gastar</string>
+    <string name="shop_balance">%1$s pts para gastar</string>
 
     <string name="shop_confirm_title">Comprar %1$s?</string>
-    <string name="shop_confirm_body">Você recebe: %1$s.\n\nCusta %2$s pts; você vai ficar com %3$s pts.</string>
-    <string name="shop_confirm_buy">Comprar por %1$s pts</string>
+    <string name="shop_confirm_body">Você recebe: %1$s.\n\nCusta %2$s pts; você vai ficar com %3$s pts.</string>
+    <string name="shop_confirm_buy">Comprar por %1$s pts</string>
 
     <string name="shop_club_pouch_title">Presente do Clube do Capitão</string>
     <string name="shop_club_pouch_body">Sua Bolsinha de Lanternas mensal grátis está pronta: %1$s.</string>
@@ -110,7 +110,7 @@
     <string name="shop_rope_note">Compradas com pontos. Comprimento da corda alcança zonas mais fundas e peixes novos, Força carrega mais peso, Agilidade guia mais rápido. Mudou de ideia? Volte um nível e receba o reembolso total.</string>
     <!-- Nv. = nível. -->
     <string name="shop_rope_level">Nv. %1$d / %2$d</string>
-    <string name="shop_rope_downgrade">Voltar para %1$s · reembolso de %2$s pts</string>
+    <string name="shop_rope_downgrade">Voltar para %1$s · reembolso de %2$s pts</string>
     <string name="shop_rope_maxed">%1$s · no máximo</string>
 
     <!-- Página Apetrechos. -->

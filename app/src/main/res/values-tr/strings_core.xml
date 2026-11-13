@@ -34,13 +34,13 @@
 
     <!-- Tackle: one-cast items switched on before a cast. -->
     <string name="core_tackle_lantern">Fener</string>
-    <string name="core_tackle_lantern_desc">Bir atış boyunca %1$d m altındaki karanlık suyun çok daha fazlasını aydınlatır.</string>
+    <string name="core_tackle_lantern_desc">Bir atış boyunca %1$d m altındaki karanlık suyun çok daha fazlasını aydınlatır.</string>
     <string name="core_tackle_lucky_charm">Şans tılsımı</string>
     <string name="core_tackle_lucky_charm_desc">Bir atış boyunca inişte bir ekstra çarpma hakkı (%2$d yerine %1$d).</string>
     <string name="core_tackle_sparkle_lure">Parıltı yemi</string>
     <string name="core_tackle_sparkle_lure_desc">Bir atış boyunca suda %1$d× daha fazla Parıldayan balık.</string>
     <string name="core_tackle_detector">Nadir balık dedektörü</string>
-    <string name="core_tackle_detector_desc">Bir atış boyunca iğnenin %1$d m yakınındaki, henüz yakalamadığın türleri karanlıkta bile işaretler.</string>
+    <string name="core_tackle_detector_desc">Bir atış boyunca iğnenin %1$d m yakınındaki, henüz yakalamadığın türleri karanlıkta bile işaretler.</string>
 
     <!-- Battle modes: the title, then the rules. -->
     <string name="core_mode_best_of_five">5\'te En İyi</string>
@@ -424,13 +424,13 @@
         <item quantity="one">%d tur</item>
         <item quantity="other">%d tur</item>
     </plurals>
-    <string name="core_score_best_cast">en iyi atış %1$s puan</string>
-    <string name="core_score_kg">%1$s kg</string>
+    <string name="core_score_best_cast">en iyi atış %1$s puan</string>
+    <string name="core_score_kg">%1$s kg</string>
     <plurals name="core_score_species">
         <item quantity="one">%d tür</item>
         <item quantity="other">%d tür</item>
     </plurals>
-    <string name="core_score_deepest">en derin av %1$s m</string>
+    <string name="core_score_deepest">en derin av %1$s m</string>
 
     <!-- Fishing secrets' titles: only shown once found, never in the tour. -->
     <string name="core_secret_last_bump">Son çarpma, çarptığını yakalar</string>

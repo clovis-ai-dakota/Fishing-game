@@ -5,10 +5,10 @@
 -->
 <resources>
     <string name="milestones_title">Marcos</string>
-    <string name="milestones_earned">Total ganho: %1$s pts</string>
+    <string name="milestones_earned">Total ganho: %1$s pts</string>
     <string name="milestones_explainer">Os marcos contam todos os pontos que você ganha com peixes, mesmo depois de gastá-los em melhorias.</string>
-    <string name="milestones_threshold">%1$s pts</string>
+    <string name="milestones_threshold">%1$s pts</string>
     <string name="milestones_claimed">Resgatado ✓</string>
     <string name="milestones_claim">Resgatar</string>
-    <string name="milestones_reward_points">+%1$s pts</string>
+    <string name="milestones_reward_points">+%1$s pts</string>
 </resources>

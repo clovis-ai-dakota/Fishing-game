@@ -80,7 +80,7 @@
     <!-- %1$s: who sent it (a player's name, or shop_gift_from_you); %2$s: the item; %3$s: what it gives. -->
     <string name="shop_gift_received">Regalo de %1$s. %2$s: %3$s.</string>
     <!-- %1$s: who sent it; %2$s: the item; %3$s: points given instead. -->
-    <string name="shop_gift_received_owned">Regalo de %1$s: %2$s. Ya lo tenías, así que recibes %3$s pts a cambio.</string>
+    <string name="shop_gift_received_owned">Regalo de %1$s: %2$s. Ya lo tenías, así que recibes %3$s pts a cambio.</string>
     <!-- Who a gift is from when the player bought it for themselves: used after "Regalo de". -->
     <string name="shop_gift_from_you">ti</string>
 
@@ -101,13 +101,13 @@
     <string name="shop_account_server_problem">El servidor ha tenido un problema (%1$d).</string>
 
     <!-- ==== The Shop tab ==== -->
-    <string name="shop_balance">%1$s pts para gastar</string>
+    <string name="shop_balance">%1$s pts para gastar</string>
 
     <!-- Buying with points asks first. %1$s: the item's name. -->
     <string name="shop_confirm_title">¿Comprar %1$s?</string>
     <!-- %1$s: what the item gives; %2$s: its price; %3$s: points left after buying. -->
-    <string name="shop_confirm_body">Recibes: %1$s.\n\nCuesta %2$s pts; te quedarán %3$s pts.</string>
-    <string name="shop_confirm_buy">Comprar por %1$s pts</string>
+    <string name="shop_confirm_body">Recibes: %1$s.\n\nCuesta %2$s pts; te quedarán %3$s pts.</string>
+    <string name="shop_confirm_buy">Comprar por %1$s pts</string>
 
     <!-- The Captain's Club's free monthly gift. -->
     <string name="shop_club_pouch_title">Regalo del Club del Capitán</string>
@@ -138,7 +138,7 @@
     <!-- Nv. = nivel. Tight. -->
     <string name="shop_rope_level">Nv. %1$d / %2$d</string>
     <!-- %1$s: the stat one level lower; %2$s: points given back. -->
-    <string name="shop_rope_downgrade">Bajar a %1$s · recuperas %2$s pts</string>
+    <string name="shop_rope_downgrade">Bajar a %1$s · recuperas %2$s pts</string>
     <string name="shop_rope_maxed">%1$s · al máximo</string>
 
     <!-- Tackle page. -->

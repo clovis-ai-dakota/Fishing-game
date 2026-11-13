@@ -13,8 +13,8 @@
     <!-- O cartão da corda. -->
     <string name="home_rope_title">Sua corda</string>
     <string name="home_rope_reach">Alcança %1$s · %2$s</string>
-    <string name="home_rope_stats">Lançamentos: %1$s · Total ganho: %2$s pts</string>
-    <string name="home_rope_stats_deepest">Lançamentos: %1$s · Total ganho: %2$s pts · Captura mais funda: %3$s</string>
+    <string name="home_rope_stats">Lançamentos: %1$s · Total ganho: %2$s pts</string>
+    <string name="home_rope_stats_deepest">Lançamentos: %1$s · Total ganho: %2$s pts · Captura mais funda: %3$s</string>
 
     <!-- O cartão do Dex. -->
     <string name="home_dex_title">Dex</string>
@@ -34,7 +34,7 @@
 
     <!-- A Lanterna e os outros apetrechos, acima do botão Lançar linha. -->
     <string name="home_lanterns">Lanternas: %1$d</string>
-    <string name="home_lanterns_hint">Ilumine o escuro abaixo de %1$d m no próximo lançamento.</string>
+    <string name="home_lanterns_hint">Ilumine o escuro abaixo de %1$d m no próximo lançamento.</string>
     <string name="home_tackle_detector">Detector ×%1$d</string>
     <string name="home_tackle_charm">Amuleto da sorte ×%1$d</string>
     <string name="home_tackle_lure">Isca cintilante ×%1$d</string>
@@ -42,5 +42,5 @@
 
     <!-- As regras, numa caixa de diálogo. -->
     <string name="home_rules_title">Como pescar</string>
-    <string name="home_rules_body">• Arraste para a esquerda e para a direita para guiar o anzol.\n• Descendo: o anzol afunda até bater %1$d vezes ou até a corda acabar. Uma batida é encostar na cabeça de um peixe, numa pedra, num tronco ou numa água-viva; roçar o corpo ou o rabo de um peixe não conta. Os primeiros %2$d m são livres de batidas.\n• Subindo: encoste o anzol na cabeça de um peixe (a parte clara perto do olho) para fisgá-lo. Encostar no rabo não faz nada. A corda só aguenta um certo peso.\n• Capturas mais fundas valem mais pontos. Peixes cintilantes valem %3$d× mais.\n• Abaixo de %4$d m fica escuro. Uma Lanterna ilumina mais a água.</string>
+    <string name="home_rules_body">• Arraste para a esquerda e para a direita para guiar o anzol.\n• Descendo: o anzol afunda até bater %1$d vezes ou até a corda acabar. Uma batida é encostar na cabeça de um peixe, numa pedra, num tronco ou numa água-viva; roçar o corpo ou o rabo de um peixe não conta. Os primeiros %2$d m são livres de batidas.\n• Subindo: encoste o anzol na cabeça de um peixe (a parte clara perto do olho) para fisgá-lo. Encostar no rabo não faz nada. A corda só aguenta um certo peso.\n• Capturas mais fundas valem mais pontos. Peixes cintilantes valem %3$d× mais.\n• Abaixo de %4$d m fica escuro. Uma Lanterna ilumina mais a água.</string>
 </resources>

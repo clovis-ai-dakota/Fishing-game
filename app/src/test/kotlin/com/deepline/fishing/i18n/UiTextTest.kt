@@ -48,11 +48,11 @@ class UiTextTest {
 
     @Test
     fun numbersFollowTheLanguage() {
-        assertEquals("12,500 pts", pointsText(12_500).resolve(resourcesIn("en")))
+        assertEquals("12,500\u00A0pts", pointsText(12_500).resolve(resourcesIn("en"))) // never split at a line end
         // French groups with a (narrow) no-break space, German with a dot.
         assertEquals("12500", pointsText(12_500).resolve(resourcesIn("fr")).filter { it.isDigit() })
         assertEquals(false, pointsText(12_500).resolve(resourcesIn("fr")).contains(','))
-        assertEquals("12.500 Punkte", pointsText(12_500).resolve(resourcesIn("de")))
+        assertEquals("12.500\u00A0Punkte", pointsText(12_500).resolve(resourcesIn("de")))
         assertEquals("1,5", UiText.decimal(1.5).resolve(resourcesIn("de")))
         assertEquals("1.5", UiText.decimal(1.5).resolve(resourcesIn("en")))
         assertEquals("25k", compactPointsText(25_000).resolve(resourcesIn("en")))

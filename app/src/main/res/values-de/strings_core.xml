@@ -35,13 +35,13 @@
 
     <!-- Zubehör: Gegenstände für einen Wurf. -->
     <string name="core_tackle_lantern">Laterne</string>
-    <string name="core_tackle_lantern_desc">Erhellt einen Wurf lang viel mehr vom dunklen Wasser unter %1$d m.</string>
+    <string name="core_tackle_lantern_desc">Erhellt einen Wurf lang viel mehr vom dunklen Wasser unter %1$d m.</string>
     <string name="core_tackle_lucky_charm">Talisman</string>
     <string name="core_tackle_lucky_charm_desc">Einen Wurf lang ein Stoß mehr beim Abstieg (%1$d statt %2$d).</string>
     <string name="core_tackle_sparkle_lure">Funkelköder</string>
     <string name="core_tackle_sparkle_lure_desc">Einen Wurf lang %1$d× so viele funkelnde Fische im Wasser.</string>
     <string name="core_tackle_detector">Raritätendetektor</string>
-    <string name="core_tackle_detector_desc">Markiert einen Wurf lang Arten, die du noch nicht gefangen hast, im Umkreis von %1$d m um den Haken, auch im Dunkeln.</string>
+    <string name="core_tackle_detector_desc">Markiert einen Wurf lang Arten, die du noch nicht gefangen hast, im Umkreis von %1$d m um den Haken, auch im Dunkeln.</string>
 
     <!-- Duellmodi: Name, dann die Regeln. -->
     <string name="core_mode_best_of_five">Best of 5</string>
@@ -419,13 +419,13 @@
         <item quantity="one">%d Runde</item>
         <item quantity="other">%d Runden</item>
     </plurals>
-    <string name="core_score_best_cast">%1$s Punkte (bester Wurf)</string>
-    <string name="core_score_kg">%1$s kg</string>
+    <string name="core_score_best_cast">%1$s Punkte (bester Wurf)</string>
+    <string name="core_score_kg">%1$s kg</string>
     <plurals name="core_score_species">
         <item quantity="one">%d Art</item>
         <item quantity="other">%d Arten</item>
     </plurals>
-    <string name="core_score_deepest">tiefster Fang: %1$s m</string>
+    <string name="core_score_deepest">tiefster Fang: %1$s m</string>
 
     <!-- Angelgeheimnisse: Namen, nur sichtbar, wenn das Geheimnis gefunden ist. -->
     <string name="core_secret_last_bump">Der letzte Stoß fängt, was er trifft</string>
