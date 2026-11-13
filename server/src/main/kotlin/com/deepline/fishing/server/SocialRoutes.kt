@@ -16,13 +16,16 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.plugins.origin
-import io.ktor.server.request.receiveText
+import io.ktor.server.request.contentCharset
+import io.ktor.server.request.receiveChannel
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
+import io.ktor.utils.io.readRemaining
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
+import kotlinx.io.readByteArray
 import kotlinx.serialization.json.Json
 
 private val socialJson = Json {
@@ -92,13 +95,24 @@ fun Route.socialRoutes(social: SocialStore, limiter: RateLimiter = RateLimiter()
     endpoint(SocialApi.FORGET_PATH, SocialRequest.serializer()) { social.forget(it.id, it.secret); null }
 }
 
+/**
+ * The request's body as text, or null when it is longer than [maxBytes]. At most one byte more
+ * than the limit is read, so a huge body sent without a length (chunked) is never held in memory.
+ */
+internal suspend fun ApplicationCall.receiveTextAtMost(maxBytes: Int): String? {
+    val declared = request.headers[HttpHeaders.ContentLength]?.toLongOrNull()
+    if (declared != null && declared > maxBytes) return null
+    val bytes = receiveChannel().readRemaining(maxBytes + 1L).readByteArray()
+    if (bytes.size > maxBytes) return null
+    return String(bytes, request.contentCharset() ?: Charsets.UTF_8)
+}
+
 private suspend fun ApplicationCall.answer(limiter: RateLimiter, clientIpHeader: String?, block: (String) -> String?) {
     val declared = request.headers[HttpHeaders.ContentLength]?.toLongOrNull()
     if (declared != null && declared > SocialApi.MAX_BODY_BYTES) return problem(SocialProblem.TOO_BIG)
     val ip = clientIpHeader?.let { request.headers[it]?.substringBefore(',')?.trim()?.takeIf(String::isNotEmpty) } ?: request.origin.remoteHost
     if (!limiter.allow("ip:$ip", REQUESTS_PER_IP_PER_MINUTE, 60_000L)) return problem(SocialProblem.TOO_MANY_REQUESTS)
-    val body = receiveText()
-    if (body.length > SocialApi.MAX_BODY_BYTES) return problem(SocialProblem.TOO_BIG)
+    val body = receiveTextAtMost(SocialApi.MAX_BODY_BYTES) ?: return problem(SocialProblem.TOO_BIG)
     try {
         val out = block(body)
         if (out == null) respond(HttpStatusCode.NoContent) else respondText(out, ContentType.Application.Json)
