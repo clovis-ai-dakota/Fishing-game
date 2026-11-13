@@ -1196,7 +1196,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             )
             Opponent.Online -> return openOnlineLobby(mode)
         }
-        battle = Battle(mode, players, Random.nextLong())
+        battle = Battle(mode, players, battleSeeds())
         battleOpponent = opponent
         battleRecorded = false
         battleTurn = null
@@ -1204,6 +1204,9 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         onBattleChanged()
         screen = Screen.BATTLE
     }
+
+    /** The seed of a new battle's water. Tests (the store screenshots) pick a fixed one. */
+    internal var battleSeeds: () -> Long = { Random.nextLong() }
 
     fun rematch() {
         val b = battle ?: return

@@ -92,7 +92,9 @@ fun CastScreen(vm: GameViewModel) {
     val skins = vm.skins
     // The 3D renderer where the phone supports it (and it hasn't failed), otherwise 2D.
     val context = androidx.compose.ui.platform.LocalContext.current
-    val use3d = remember { com.deepline.fishing.ui.render3d.gl.Render3d.isSupported(context) } &&
+    // Store screenshots draw the 3D frame elsewhere: here only what goes on top of it.
+    val overlayOnly = com.deepline.fishing.ui.render3d.gl.Render3d.overlayOnly
+    val use3d = !overlayOnly && remember { com.deepline.fishing.ui.render3d.gl.Render3d.isSupported(context) } &&
         !com.deepline.fishing.ui.render3d.gl.Render3d.failed
     val scene3d = remember(session) { com.deepline.fishing.ui.render3d.gl.Scene3dHandle() }
     val sceneBuilder = remember(session) { com.deepline.fishing.ui.render3d.SceneBuilder() }
@@ -167,7 +169,7 @@ fun CastScreen(vm: GameViewModel) {
             val detect = vm.detectorTargets
             // Shake, flash and particles (render only: steering and hits never move).
             val fx = vm.feel.fx(session)
-            if (use3d && scene3d.ready) drawCastOverlay(session, time, textMeasurer, aimX = steer.targetX(), detect = detect, fx = fx, labels = labels)
+            if (overlayOnly || (use3d && scene3d.ready)) drawCastOverlay(session, time, textMeasurer, aimX = steer.targetX(), detect = detect, fx = fx, labels = labels)
             else drawCastScene(session, time, textMeasurer, aimX = steer.targetX(), skins = skins, detect = detect, fx = fx, labels = labels)
         }
 
