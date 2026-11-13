@@ -169,8 +169,9 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     `CastSession.seeded`, battles or the online protocol, so both players' water stays identical.
   - Reminders (local notifications, WorkManager, no push server): opt-in, offered once with an
     explainer after the first daily claim (never at first launch), then the Android 13+
-    permission dialog. **At most one a day**, none in quiet hours (`NOTIFY_QUIET_*`), none once
-    today's reward is claimed; the decision is the pure `DailyReminders.plan`. One channel per kind;
+    permission dialog. **At most one a day**, none in quiet hours (`NOTIFY_QUIET_*`), no
+    daily-reward or streak reminder once today's reward is claimed (an event or migration start can
+    still be announced, within the one-a-day cap); the decision is the pure `DailyReminders.plan`. One channel per kind;
     choices are device-only (`ReminderPrefs` in the key-value store, never in the save); taps open
     the right screen (`ReminderTarget`). New kinds of reminder need a channel, a Settings switch
     and a `ReminderPlanTest` case.
@@ -302,6 +303,10 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     ids are checked by `CoreTextTest`, whose English must equal core's. Species names go through
     `strings_species.xml` by id (ids and the generator never change) and stay in English in every
     language for now (`translatable="false"`, the developer's choice).
+  - French is reviewed by the developer and uses "vous". Spanish, German, Brazilian Portuguese and
+    Turkish are machine translations (`AppLanguage.machineTranslated`): the game says so in that
+    language, once on the Fish tab (`MachineTranslationNotice`) and always in Settings > Language.
+    When a native speaker has reviewed one, set its flag to false.
   - Numbers, prices, units and times go through `ui/Format.kt` / `UiText.number`.
   - Never translate analytics names, keys, ids, codes, server paths or names players type.
   - The language picker (Settings > Language, `AppLanguages`): `LocaleManager` on Android 13+ (same

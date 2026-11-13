@@ -48,6 +48,20 @@ Expect about **four weeks** end to end: a week of setup, at least **14 days** of
 - [ ] Check `https://<host>/delete-account` opens and deletes an account (it is the **account
       deletion URL** Play asks for).
 - [ ] Set up a backup of the volume and an uptime check (the review and testers need the server).
+- [ ] **Per-address rate limit at the proxy** (Cloudflare rate-limiting rules, nginx
+      `limit_req`, Caddy's rate-limit module or the host's equivalent) on `/api/` and
+      `/delete-account`, e.g. 60 requests a minute per IP. The server limits social calls per
+      address itself, but any first call with a new player ID creates an account file, so without
+      a limit in front a script could fill the disk with accounts.
+
+**Known server limits** (fine for a launch, revisit as the game grows; from the final review):
+- New accounts are created on first use and are unbounded per address (hence the proxy limit
+  above); an ID is claimed by the first secret used with it.
+- `SocialStore.forgetPlayer` sweeps every social file under the social lock, so one account
+  deletion pauses social calls longer as players grow, and week files are rewritten whole on each
+  write: move social data to a database (or index players' files) before tens of thousands of
+  players.
+- The rate limiter keeps a key per address in memory and prunes it past 100,000 keys.
 
 ## 4. The upload key (once, then keep it safe)
 

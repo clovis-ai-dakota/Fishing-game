@@ -18,14 +18,24 @@ import java.util.Locale
  * debug-only test languages (accented and longer English, and right-to-left), see
  * docs/localization.md. `res/xml/locales_config.xml` lists exactly the real ones (a test checks).
  */
-enum class AppLanguage(val tag: String?, val endonym: String, val debugOnly: Boolean = false) {
+enum class AppLanguage(
+    val tag: String?,
+    val endonym: String,
+    val debugOnly: Boolean = false,
+    /**
+     * Translated automatically and not yet reviewed by a native speaker: the game says so in that
+     * language (Settings > Language, and once on the Fish tab). Set it to false once a native
+     * speaker has reviewed the translation.
+     */
+    val machineTranslated: Boolean = false,
+) {
     SYSTEM(null, ""),
     ENGLISH("en", "English"), // i18n-ignore: each language's own name
     FRENCH("fr", "Français"), // i18n-ignore
-    SPANISH("es", "Español"), // i18n-ignore
-    GERMAN("de", "Deutsch"), // i18n-ignore
-    PORTUGUESE_BR("pt-BR", "Português (Brasil)"), // i18n-ignore
-    TURKISH("tr", "Türkçe"), // i18n-ignore
+    SPANISH("es", "Español", machineTranslated = true), // i18n-ignore
+    GERMAN("de", "Deutsch", machineTranslated = true), // i18n-ignore
+    PORTUGUESE_BR("pt-BR", "Português (Brasil)", machineTranslated = true), // i18n-ignore
+    TURKISH("tr", "Türkçe", machineTranslated = true), // i18n-ignore
     PSEUDO_ACCENTS("en-XA", "[Ëñĝļîšĥ] (en-XA)", debugOnly = true), // i18n-ignore: debug-only test language
     PSEUDO_BIDI("ar-XB", "Bidi (ar-XB)", debugOnly = true), // i18n-ignore: debug-only test language
     ;
@@ -63,6 +73,23 @@ enum class AppLanguage(val tag: String?, val endonym: String, val debugOnly: Boo
 object AppLanguages {
     /** The chosen language's tag ("" for the phone's language), in the app's preferences. */
     const val KEY = "app.language"
+
+    /** Set (per language tag) once the "automatic translation" notice has been dismissed. */
+    private const val KEY_MACHINE_NOTICE_SEEN = "app.language.machineNoticeSeen."
+
+    /** The language the game is shown in right now (whatever chose it: this setting or the phone). */
+    fun shown(context: Context): AppLanguage = AppLanguage.of(context.resources.configuration.locales[0] ?: Locale.getDefault())
+
+    /** Whether to show the one-time "automatic translation" notice: the shown language is machine-translated and it hasn't been dismissed. */
+    fun machineNoticePending(context: Context): Boolean {
+        val language = shown(context)
+        return language.machineTranslated && !prefs(context).getBoolean(KEY_MACHINE_NOTICE_SEEN + language.tag, false)
+    }
+
+    /** The player dismissed the notice for the language shown now. */
+    fun dismissMachineNotice(context: Context) {
+        prefs(context).edit().putBoolean(KEY_MACHINE_NOTICE_SEEN + shown(context).tag, true).apply()
+    }
 
     /** Set once the Android 12 choice has been handed to the system after an upgrade to 13+. */
     private const val KEY_HANDED_TO_SYSTEM = "app.language.handedToSystem"

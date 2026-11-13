@@ -79,8 +79,16 @@ open class SocialClient(private val baseUrl: () -> String) {
         text
     }
 
-    private suspend fun <Q, A> call(path: String, request: KSerializer<Q>, body: Q, answer: KSerializer<A>): A =
-        json.decodeFromString(answer, post(path, json.encodeToString(request, body)))
+    private suspend fun <Q, A> call(path: String, request: KSerializer<Q>, body: Q, answer: KSerializer<A>): A {
+        val text = post(path, json.encodeToString(request, body))
+        // An answer the game can't read (a page in front of the server, a newer server's values)
+        // is a failed call too: anything but a SocialException would crash the screen that asked.
+        return try {
+            json.decodeFromString(answer, text)
+        } catch (e: IllegalArgumentException) {
+            throw SocialException(null)
+        }
+    }
 
     private suspend fun <Q> send(path: String, request: KSerializer<Q>, body: Q) {
         post(path, json.encodeToString(request, body))

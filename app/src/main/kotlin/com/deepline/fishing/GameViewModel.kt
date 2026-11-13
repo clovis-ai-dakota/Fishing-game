@@ -889,8 +889,9 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     fun onFrame(dt: Float, steerTargetX: Float?) {
         val s = session ?: return
         if (paused || pendingResult != null || secretPopup != null) return
-        // Slow motion (a rare catch) only ever slows solo casts: battles run in real time.
-        s.update(feel.simDt(dt, solo = battleTurn == null), steerTargetX)
+        // Slow motion (a rare catch) only ever slows solo casts: battles and tournament attempts
+        // (ranked against everyone, Reduce motion or not) run in real time.
+        s.update(feel.simDt(dt, solo = battleTurn == null && tournamentAttempt == null), steerTargetX)
         val events = s.drainEvents()
         feel.onCastFrame(s, events)
         // A last-bump hook comes with the line turning back; its notice is the one worth showing.

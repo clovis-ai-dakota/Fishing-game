@@ -47,6 +47,8 @@
     <string name="settings_language_system">Telefonun dili</string>
     <string name="settings_language_system_now">Şu an: %1$s</string>
     <string name="settings_language_body">Oyuncuların yazdığı adlar asla çevrilmez.</string>
+    <string name="settings_language_machine_note">Bu çeviri otomatik olarak oluşturuldu, bu yüzden bazı ifadeler tam doğru olmayabilir.</string>
+    <string name="settings_language_machine_notice_title">Otomatik çeviri</string>
 
     <!-- Credits section. -->
     <string name="settings_credits_title">Emeği geçenler</string>

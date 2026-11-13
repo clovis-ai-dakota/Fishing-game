@@ -57,6 +57,11 @@
     <!-- Under "Phone's language": what that is now. %1$s: the phone's language, in that language (e.g. Deutsch). -->
     <string name="settings_language_system_now">Now: %1$s</string>
     <string name="settings_language_body">Names typed by players are never translated.</string>
+    <!-- Shown in Spanish, German, Brazilian Portuguese and Turkish only (machine translations), in
+         Settings > Language and once on the Fish tab: the translation was generated automatically. -->
+    <string name="settings_language_machine_note">This translation was generated automatically, so some wording may be approximate.</string>
+    <!-- Title of the one-time card on the Fish tab with the note above. Short. -->
+    <string name="settings_language_machine_notice_title">Automatic translation</string>
 
     <!-- Credits section: where the sounds and music come from. -->
     <string name="settings_credits_title">Credits</string>

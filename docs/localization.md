@@ -234,6 +234,15 @@ The default `Locale` follows the game's language, so these are right outside com
   in English (XA). Once translated, check your screens in German and French (the longest): no
   clipped buttons or chips, wrapping instead of ellipsis for anything the player must read.
 
+## 9b. Reviewed and machine translations
+
+French is reviewed by the developer (register: "vous"). Spanish, German, Brazilian Portuguese and
+Turkish are machine translations: `AppLanguage.machineTranslated` is true for them, and the game
+tells the player in their language (`settings_language_machine_note`), once on the Fish tab
+(`ui/i18n/MachineTranslationNotice.kt`, dismissed per language) and always in Settings > Language.
+When a native speaker has reviewed a language, set its flag to false (and update
+`MachineTranslationUiTest`).
+
 ## 10. Translators
 
 You translate one language, in its folder. For each English file `values/strings_<area>.xml`:

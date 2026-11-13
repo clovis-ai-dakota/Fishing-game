@@ -115,6 +115,8 @@ fun HomeScreen(vm: GameViewModel) {
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            // Once per machine-translated language: the translation may be approximate.
+            com.deepline.fishing.ui.i18n.MachineTranslationNotice()
             // Your boat at the surface, wearing your skins (live 3D where available). Tap it to
             // customise it in the Dex's Skins section.
             SkinPreview(

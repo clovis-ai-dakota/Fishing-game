@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.GameViewModel
@@ -54,6 +55,16 @@ fun LanguageSettingsSection(vm: GameViewModel) {
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+        // Spanish, German, Portuguese and Turkish are machine translations: say so, in that language.
+        if (AppLanguages.shown(context).machineTranslated) {
+            Text(
+                stringResource(R.string.settings_language_machine_note),
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier.testTag("language_machine_note"),
+            )
+        }
         Column(Modifier.selectableGroup()) {
             for (language in AppLanguages.choices) {
                 LanguageRow(

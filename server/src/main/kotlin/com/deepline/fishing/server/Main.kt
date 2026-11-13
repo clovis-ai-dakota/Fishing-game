@@ -11,7 +11,6 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationCall
-import io.ktor.server.request.receiveText
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
@@ -81,10 +80,13 @@ fun Application.battleServer(
 
 private val apiJson = Json { ignoreUnknownKeys = true }
 
+/** The biggest account request: a cloud save, even with every character escaped in the JSON. */
+private const val MAX_ACCOUNT_BODY_BYTES = 6 * AccountApi.MAX_SAVE_BYTES + 64 * 1024
+
 /** The gift and cloud save API (see [AccountApi]). */
 private fun Route.accountRoutes(accounts: AccountStore) {
     suspend fun ApplicationCall.handle(block: suspend (String) -> String?) {
-        val body = receiveText()
+        val body = receiveTextAtMost(MAX_ACCOUNT_BODY_BYTES) ?: return respond(HttpStatusCode.PayloadTooLarge)
         try {
             val out = block(body)
             if (out == null) respond(HttpStatusCode.NoContent) else respondText(out, ContentType.Application.Json)

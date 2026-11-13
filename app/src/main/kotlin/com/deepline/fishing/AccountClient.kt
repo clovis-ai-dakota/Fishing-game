@@ -22,6 +22,7 @@ import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 
 /**
@@ -78,10 +79,20 @@ open class AccountClient(private val baseUrl: () -> String) {
         check(post(AccountApi.SAVE_PATH, json.encodeToString(SaveRequest.serializer(), SaveRequest(who.id, who.secret, data))).first)
     }
 
+    /**
+     * An answer the game can't read (a page in front of the server, a newer server's values) is a
+     * failed call too: anything but an AccountException would crash the screen that asked.
+     */
+    private fun <T> decode(serializer: KSerializer<T>, body: String): T = try {
+        json.decodeFromString(serializer, body)
+    } catch (e: IllegalArgumentException) {
+        throw AccountException(UiText.res(R.string.shop_account_unreachable), "unreadable answer") // i18n-ignore: technical, for crash reports
+    }
+
     open suspend fun load(who: PlayerId): SaveResponse {
         val (status, body) = post(AccountApi.LOAD_PATH, json.encodeToString(AuthRequest.serializer(), AuthRequest(who.id, who.secret)))
         check(status)
-        return json.decodeFromString(SaveResponse.serializer(), body)
+        return decode(SaveResponse.serializer(), body)
     }
 
     open suspend fun sendGift(from: PlayerId, fromName: String, to: String, itemId: String) {
@@ -91,7 +102,7 @@ open class AccountClient(private val baseUrl: () -> String) {
     open suspend fun inbox(who: PlayerId): List<Gift> {
         val (status, body) = post(AccountApi.INBOX_PATH, json.encodeToString(AuthRequest.serializer(), AuthRequest(who.id, who.secret)))
         check(status)
-        return json.decodeFromString(Inbox.serializer(), body).gifts
+        return decode(Inbox.serializer(), body).gifts
     }
 
     open suspend fun ack(who: PlayerId, giftIds: List<String>) {

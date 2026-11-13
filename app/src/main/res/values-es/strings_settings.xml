@@ -51,6 +51,8 @@
     <!-- %1$s: the phone's language, in that language (e.g. Deutsch). -->
     <string name="settings_language_system_now">Ahora: %1$s</string>
     <string name="settings_language_body">Los nombres que escriben los jugadores nunca se traducen.</string>
+    <string name="settings_language_machine_note">Esta traducción se ha generado automáticamente, así que algunas frases pueden ser aproximadas.</string>
+    <string name="settings_language_machine_notice_title">Traducción automática</string>
 
     <!-- Credits section. -->
     <string name="settings_credits_title">Créditos</string>

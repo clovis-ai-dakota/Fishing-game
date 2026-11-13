@@ -295,8 +295,12 @@ first, nothing given for a review; the game never knows whether the player rated
 
 The game speaks **English, French, Spanish, German, Brazilian Portuguese and Turkish**: every
 screen, the tour, notifications and the store listing are translated (species names stay in
-English as proper names). Each language's term choices are in `docs/l10n-glossary/<lang>.md`;
-machine-quality translations should get a native speaker's review before release.
+English as proper names). French is reviewed (and uses "vous"); Spanish, German, Brazilian
+Portuguese and Turkish are automatic translations, and the game says so in each of them: a
+one-time card on the Fish tab and a note in Settings > Language ("generated automatically, some
+wording may be approximate"). Once a native speaker has reviewed one, its
+`AppLanguage.machineTranslated` flag goes to false and the notice disappears. Each language's term
+choices are in `docs/l10n-glossary/<lang>.md`.
 Settings > Language lists each language in its own words, plus "Phone's language" (the default);
 on Android 13+ it is the same setting as the system's per-app language (Settings > Apps > Deep
 Line > Language), and on older phones the game keeps the choice itself. Changing it redraws the
