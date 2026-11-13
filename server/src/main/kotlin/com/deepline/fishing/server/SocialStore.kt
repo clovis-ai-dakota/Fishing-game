@@ -528,6 +528,11 @@ class SocialStore(
     fun submitAttempt(id: String, secret: String, week: Long, attempt: Int, dto: CastDto): SubmitResponse = synchronized(lock) {
         auth(id, secret, write = true)
         val now = now()
+        // An attempt lasts minutes: only this week's, or one started just before Monday, can still
+        // be scored. Other weeks (they come from the app) are refused before being looked up.
+        val current = Weeks.indexAt(now)
+        if (week > current) fail(SocialProblem.BAD_REQUEST)
+        if (week < current - 1) fail(SocialProblem.ATTEMPT_EXPIRED)
         val rec = weekRecord(week)
         val e = rec.entries[id] ?: fail(SocialProblem.BAD_REQUEST)
         val a = e.attempts.firstOrNull { it.number == attempt } ?: fail(SocialProblem.BAD_REQUEST)

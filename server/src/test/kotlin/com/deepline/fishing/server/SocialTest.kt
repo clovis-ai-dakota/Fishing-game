@@ -198,6 +198,25 @@ class SocialTest {
         assertEquals(points.toLong(), s.leaderboard(alice.id, alice.secret, BoardKind.BEST_CAST, BoardView.GLOBAL).me!!.value)
     }
 
+    /**
+     * The week of an attempt comes from the app: a week that can't have a running attempt is
+     * refused before anything is looked up, so made-up weeks are never kept in the server's memory.
+     */
+    @Test
+    fun attemptsForWeeksThatCantHaveOneAreRefusedAndForgotten() {
+        val s = store()
+        s.hello(alice, "Alice")
+        val start = s.startAttempt(alice.id, alice.secret)
+        val dto = BotPlayer.playCast(Tournaments.specs, start.seed, BotDifficulty.HARD).toDto()
+        // (Fewer than the per-minute write limit.)
+        repeat(25) { i ->
+            assertEquals(SocialProblem.BAD_REQUEST, problem { s.submitAttempt(alice.id, alice.secret, start.week + 1 + i, 1, dto) })
+            assertEquals(SocialProblem.ATTEMPT_EXPIRED, problem { s.submitAttempt(alice.id, alice.secret, start.week - 2 - i, 1, dto) })
+        }
+        val weeks = SocialStore::class.java.getDeclaredField("weeks").apply { isAccessible = true }.get(s) as Map<*, *>
+        assertEquals(setOf(start.week), weeks.keys)
+    }
+
     @Test
     fun attemptsAreCheckedAgainstTheWaterAndTheClock() {
         val s = store()
