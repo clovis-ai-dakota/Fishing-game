@@ -335,7 +335,17 @@ object StorePlayers {
             val r = BoatParts.requirement(part)
             check(r != PartRequirement.PremiumOnly && r != PartRequirement.ClubOnly) { "${part.key} is sold for money" }
         }
+        // The Dex's first rows show all three states: Reed Perch only seen, Ribbon Eel not met yet
+        // (two other species caught instead, so still 50).
+        val seenOnly = "reed_perch"
+        val unknown = "ribbon_eel"
+        val extra = com.deepline.fishing.core.FishCatalog.all
+            .filter { !it.lastBumpOnly && it.zone in setOf(DepthZone.SHALLOWS, DepthZone.TWILIGHT) && it.id !in base.collection && it.id !in base.seenSpecies }
+            .take(2)
+        val collection = base.collection - seenOnly - unknown + extra.associate { it.id to com.deepline.fishing.core.CollectionEntry(1, 0, it.minDepth + 12f, it.basePoints * 2) }
         return base.copy(
+            collection = collection,
+            seenSpecies = base.seenSpecies - unknown + extra.map { it.id },
             pointsBalance = 48_210,
             discoveredSecrets = emptySet(),
             boatDesign = boat,
