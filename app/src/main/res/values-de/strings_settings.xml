@@ -45,6 +45,8 @@
     <string name="settings_language_system">Sprache des Handys</string>
     <string name="settings_language_system_now">Aktuell: %1$s</string>
     <string name="settings_language_body">Namen, die Spieler eingeben, werden nie übersetzt.</string>
+    <string name="settings_language_machine_note">Diese Übersetzung wurde automatisch erstellt, daher können manche Formulierungen ungenau sein.</string>
+    <string name="settings_language_machine_notice_title">Automatische Übersetzung</string>
 
     <!-- Credits. -->
     <string name="settings_credits_title">Credits</string>

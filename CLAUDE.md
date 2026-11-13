@@ -302,6 +302,10 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     ids are checked by `CoreTextTest`, whose English must equal core's. Species names go through
     `strings_species.xml` by id (ids and the generator never change) and stay in English in every
     language for now (`translatable="false"`, the developer's choice).
+  - French is reviewed by the developer and uses "vous". Spanish, German, Brazilian Portuguese and
+    Turkish are machine translations (`AppLanguage.machineTranslated`): the game says so in that
+    language, once on the Fish tab (`MachineTranslationNotice`) and always in Settings > Language.
+    When a native speaker has reviewed one, set its flag to false.
   - Numbers, prices, units and times go through `ui/Format.kt` / `UiText.number`.
   - Never translate analytics names, keys, ids, codes, server paths or names players type.
   - The language picker (Settings > Language, `AppLanguages`): `LocaleManager` on Android 13+ (same

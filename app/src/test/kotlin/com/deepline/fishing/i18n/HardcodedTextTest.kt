@@ -97,6 +97,7 @@ class HardcodedTextTest {
             "ui/settings/SoundSettings.kt",
             "ui/settings/NotificationSettings.kt",
             "ui/settings/LanguageSettings.kt",
+            "ui/i18n/MachineTranslationNotice.kt",
             "ui/settings/PrivacySettings.kt",
             "ui/settings/Credits.kt",
             "privacy/ConsentSheet.kt",

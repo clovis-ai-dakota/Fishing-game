@@ -46,6 +46,8 @@
     <string name="settings_language_system">Langue du téléphone</string>
     <string name="settings_language_system_now">Actuellement : %1$s</string>
     <string name="settings_language_body">Les noms saisis par les joueurs ne sont jamais traduits.</string>
+    <string name="settings_language_machine_note">Cette traduction a été générée automatiquement : certaines formulations peuvent être approximatives.</string>
+    <string name="settings_language_machine_notice_title">Traduction automatique</string>
 
     <!-- Credits section. -->
     <string name="settings_credits_title">Crédits</string>

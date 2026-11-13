@@ -47,6 +47,8 @@
     <string name="settings_language_system">Idioma do celular</string>
     <string name="settings_language_system_now">Agora: %1$s</string>
     <string name="settings_language_body">Os nomes digitados pelos jogadores nunca são traduzidos.</string>
+    <string name="settings_language_machine_note">Esta tradução foi gerada automaticamente, por isso algumas frases podem ser aproximadas.</string>
+    <string name="settings_language_machine_notice_title">Tradução automática</string>
 
     <!-- Créditos. -->
     <string name="settings_credits_title">Créditos</string>
