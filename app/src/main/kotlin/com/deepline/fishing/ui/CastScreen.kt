@@ -92,7 +92,9 @@ fun CastScreen(vm: GameViewModel) {
     val skins = vm.skins
     // The 3D renderer where the phone supports it (and it hasn't failed), otherwise 2D.
     val context = androidx.compose.ui.platform.LocalContext.current
-    val use3d = remember { com.deepline.fishing.ui.render3d.gl.Render3d.isSupported(context) } &&
+    // Store screenshots draw the 3D frame elsewhere: here only what goes on top of it.
+    val overlayOnly = com.deepline.fishing.ui.render3d.gl.Render3d.overlayOnly
+    val use3d = !overlayOnly && remember { com.deepline.fishing.ui.render3d.gl.Render3d.isSupported(context) } &&
         !com.deepline.fishing.ui.render3d.gl.Render3d.failed
     val scene3d = remember(session) { com.deepline.fishing.ui.render3d.gl.Scene3dHandle() }
     val sceneBuilder = remember(session) { com.deepline.fishing.ui.render3d.SceneBuilder() }
@@ -167,7 +169,7 @@ fun CastScreen(vm: GameViewModel) {
             val detect = vm.detectorTargets
             // Shake, flash and particles (render only: steering and hits never move).
             val fx = vm.feel.fx(session)
-            if (use3d && scene3d.ready) drawCastOverlay(session, time, textMeasurer, aimX = steer.targetX(), detect = detect, fx = fx, labels = labels)
+            if (overlayOnly || (use3d && scene3d.ready)) drawCastOverlay(session, time, textMeasurer, aimX = steer.targetX(), detect = detect, fx = fx, labels = labels)
             else drawCastScene(session, time, textMeasurer, aimX = steer.targetX(), skins = skins, detect = detect, fx = fx, labels = labels)
         }
 
@@ -419,7 +421,9 @@ private fun CastHud(
                     .padding(top = 24.dp)
                     .background(Color(0x77001421), RoundedCornerShape(12.dp))
                     .padding(12.dp),
-                color = if (activeNotice != null) MaterialTheme.colorScheme.secondary else Color.White,
+                // On the dark notice band over the water, whatever the menu theme (a light theme's
+                // secondary colour is dark and couldn't be read there).
+                color = if (activeNotice != null) SparkleGold else Color.White,
                 style = if (activeNotice != null) MaterialTheme.typography.titleMedium else MaterialTheme.typography.bodyMedium,
                 fontWeight = if (activeNotice != null) FontWeight.Bold else FontWeight.Normal,
                 textAlign = TextAlign.Center,
@@ -466,7 +470,7 @@ private fun ResultsPanel(result: CastResult, collectLabel: String, onCollect: ()
                         pluralStringResource(R.plurals.cast_results_fish, fish, fish),
                         if (objects > 0) pluralStringResource(R.plurals.cast_results_objects, objects, objects) else null,
                         castWeightText(result.totalWeightKg).asString(),
-                    ).joinToString(" · "),
+                    ).joinToString(ITEM_SEPARATOR),
                     style = MaterialTheme.typography.bodyMedium,
                 )
                 val byLastBump = stringResource(R.string.cast_results_by_last_bump)
@@ -520,7 +524,7 @@ private fun ResultsPanel(result: CastResult, collectLabel: String, onCollect: ()
                                             metersLabel(c.depth.roundToInt()),
                                             castWeightText(c.species.weightKg).asString(),
                                             byLastBump.takeIf { c.byLastBump },
-                                        ).joinToString(" · "),
+                                        ).joinToString(ITEM_SEPARATOR),
                                         style = MaterialTheme.typography.bodySmall,
                                     )
                                 }

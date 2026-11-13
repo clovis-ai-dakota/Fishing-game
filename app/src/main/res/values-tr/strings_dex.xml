@@ -33,7 +33,7 @@
     <string name="dex_fish_state_seen">Görüldü, henüz yakalanmadı</string>
     <string name="dex_fish_state_caught">Yakalandı</string>
     <string name="dex_fish_depth">Derinlik</string>
-    <string name="dex_fish_depth_range">%1$s–%2$s m</string>
+    <string name="dex_fish_depth_range">%1$s–%2$s m</string>
     <string name="dex_fish_weight">Ağırlık</string>
     <string name="dex_fish_base_points">Temel puan</string>
     <string name="dex_fish_rarity">Nadirlik</string>

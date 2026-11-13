@@ -26,7 +26,7 @@
     <string name="tour_steer_body">Zieh während eines Wurfs irgendwo auf dem Bildschirm nach links und rechts. Ein Ring zeigt, wo dein Finger ist: Der Haken gleitet dorthin und folgt ihm. Mit mehr Seilwendigkeit geht das schneller.</string>
 
     <string name="tour_descent_title">Abstieg: ausweichen</string>
-    <string name="tour_descent_body">Der Haken sinkt, bis er %1$d-mal angestoßen ist oder das Ende des Seils erreicht, dann kehrt er nach oben um. Bei einem Fisch zählt nur der Kopf als Stoß (dieselbe Stelle, auf die du beim Aufstieg zielst); Körper oder Schwanzflosse zu streifen, kostet nichts. Felsen, Treibholz und Quallen zählen, egal wo du sie berührst. Die ersten %2$d m sind stoßfrei.</string>
+    <string name="tour_descent_body">Der Haken sinkt, bis er %1$d-mal angestoßen ist oder das Ende des Seils erreicht, dann kehrt er nach oben um. Bei einem Fisch zählt nur der Kopf als Stoß (dieselbe Stelle, auf die du beim Aufstieg zielst); Körper oder Schwanzflosse zu streifen, kostet nichts. Felsen, Treibholz und Quallen zählen, egal wo du sie berührst. Die ersten %2$d m sind stoßfrei.</string>
 
     <string name="tour_ascent_title">Aufstieg: auf Köpfe zielen</string>
     <string name="tour_ascent_body">Lenk beim Aufstieg so, dass der Haken den Kopf eines Fisches trifft: das helle Gesicht beim Auge. Schwanzflosse oder Körper zu berühren, bringt nichts.</string>
@@ -50,13 +50,13 @@
     <string name="tour_upgrades_body">Gib Punkte im Tab „Shop“ auf der Seite „Seil“ aus. Seillänge bringt dich in tiefere Zonen zu neuen Fischen, Seilstärke trägt mehr Gewicht und Seilwendigkeit lenkt schneller. Anders überlegt? Stufe eine Verbesserung zurück, und du bekommst jeden Punkt zurück, den sie gekostet hat.</string>
 
     <string name="tour_tackle_title">Zubehör</string>
-    <string name="tour_tackle_body">Auf der Seite „Zubehör“ gibt es Gegenstände für einen Wurf, die du vor dem Auswerfen einschaltest. Laternen erhellen das Dunkel, ein Raritätendetektor markiert Arten, die du noch nicht gefangen hast, im Umkreis von %1$d m um den Haken, ein Talisman gibt dir beim Abstieg einen Stoß mehr, und ein Funkelköder bringt %2$d× so viele funkelnde Fische. Die Preise steigen mit der Reichweite deines Seils.</string>
+    <string name="tour_tackle_body">Auf der Seite „Zubehör“ gibt es Gegenstände für einen Wurf, die du vor dem Auswerfen einschaltest. Laternen erhellen das Dunkel, ein Raritätendetektor markiert Arten, die du noch nicht gefangen hast, im Umkreis von %1$d m um den Haken, ein Talisman gibt dir beim Abstieg einen Stoß mehr, und ein Funkelköder bringt %2$d× so viele funkelnde Fische. Die Preise steigen mit der Reichweite deines Seils.</string>
 
     <string name="tour_two_prices_title">Zwei Arten zu bezahlen</string>
     <string name="tour_two_prices_body">Alles im Shop hat zwei Preise: Euro oder Punkte. Ein Punktepreis entspricht bei der Reichweite deines Seils etwa %1$d Minuten Angeln pro Euro (%2$s bei Laternenpaketen), Bezahlen spart also nur Zeit: Alles lässt sich auch erspielen. Beim Bezahlen mit Punkten musst du zuerst bestätigen.</string>
 
     <string name="tour_lantern_title">Laternen erhellen die Tiefe</string>
-    <string name="tour_lantern_body">Unter %1$d m ist das Wasser dunkel. Schalte dies vor einem Wurf ein, um viel mehr Wasser um den Haken zu erhellen (%2$d m statt %3$d m). Pro Wurf wird eine Laterne verbraucht; mehr bekommst du über Meilensteine oder im Shop.</string>
+    <string name="tour_lantern_body">Unter %1$d m ist das Wasser dunkel. Schalte dies vor einem Wurf ein, um viel mehr Wasser um den Haken zu erhellen (%2$d m statt %3$d m). Pro Wurf wird eine Laterne verbraucht; mehr bekommst du über Meilensteine oder im Shop.</string>
 
     <string name="tour_dex_title">Füll deinen Dex</string>
     <string name="tour_dex_body">%1$d Arten leben in %2$d Tiefenzonen, manche davon selten, und jede hat eine nummerierte Karte. Ein Fisch, der nah an deinem Haken vorbeischwimmt, wird als „Gesehen“ markiert: Du erfährst seinen Namen und seine Tiefen. Fang ihn, um seine Karte mit Gewicht, Punkten und deinen Rekorden zu füllen.</string>

@@ -32,7 +32,7 @@
     <string name="dex_fish_state_seen">Visto, ainda não capturado</string>
     <string name="dex_fish_state_caught">Capturado</string>
     <string name="dex_fish_depth">Profundidade</string>
-    <string name="dex_fish_depth_range">%1$s–%2$s m</string>
+    <string name="dex_fish_depth_range">%1$s–%2$s m</string>
     <string name="dex_fish_weight">Peso</string>
     <string name="dex_fish_base_points">Pontos base</string>
     <string name="dex_fish_rarity">Raridade</string>

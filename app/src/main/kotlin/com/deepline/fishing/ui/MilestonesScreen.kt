@@ -36,7 +36,7 @@ fun milestoneRewardText(m: Milestone): UiText = UiText.join(
         if (m.rewardPoints > 0) UiText.res(R.string.milestones_reward_points, UiText.number(m.rewardPoints)) else null,
         if (m.rewardLanterns > 0) UiText.plural(R.plurals.common_lanterns, m.rewardLanterns) else null,
     ),
-    " · ",
+    ITEM_SEPARATOR,
 )
 
 @Composable

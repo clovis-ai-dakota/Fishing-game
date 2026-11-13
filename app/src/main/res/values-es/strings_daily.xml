@@ -12,7 +12,7 @@
     <string name="daily_grant_shield">un escudo de racha</string>
     <!-- Short labels on the 7-day calendar's tiles (tiny: 10 characters or so). -->
     <!-- %1$d: number of Lanterns. -->
-    <string name="daily_tile_lanterns">%1$d × Farol</string>
+    <string name="daily_tile_lanterns">%1$d × Farol</string>
     <string name="daily_tile_detector">Detector</string>
     <string name="daily_tile_charm">Amuleto</string>
     <string name="daily_tile_lure">Señuelo</string>
@@ -36,7 +36,7 @@
         <item quantity="other">Captura %1$d peces en la zona %2$s.</item>
     </plurals>
     <!-- %1$d: a depth in meters. -->
-    <string name="daily_challenge_reach_depth">Llega a %1$d m en un lance.</string>
+    <string name="daily_challenge_reach_depth">Llega a %1$d m en un lance.</string>
     <!-- %1$s: a species' name. -->
     <string name="daily_challenge_catch_species_one">Captura un pez de esta especie: %1$s.</string>
     <!-- %1$d: how many (always 2 or more); %2$s: a species' name. -->
@@ -64,7 +64,7 @@
         <item quantity="other">Captura %d especies que nunca hayas capturado.</item>
     </plurals>
     <!-- %1$d: best so far; %2$d: goal (meters). -->
-    <string name="daily_progress_depth">Más profundo: %1$d de %2$d m</string>
+    <string name="daily_progress_depth">Más profundo: %1$d de %2$d m</string>
     <!-- %1$d: best so far; %2$d: goal (fish). -->
     <string name="daily_progress_big_cast">Mejor lance: %1$d de %2$d peces</string>
 
@@ -142,7 +142,7 @@
     </plurals>
     <string name="daily_migrant_open">Abrir su página del Dex</string>
     <!-- %1$s: its depth zone; %2$d and %3$d: the depths where it lives, in meters. -->
-    <string name="daily_migrant_where">%1$s · %2$d–%3$d m</string>
+    <string name="daily_migrant_where">%1$s · %2$d–%3$d m</string>
 
     <!-- Notification channels: a short name and a one-sentence description. -->
     <string name="daily_channel_daily_name">Recompensa diaria lista</string>

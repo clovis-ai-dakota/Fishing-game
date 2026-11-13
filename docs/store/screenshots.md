@@ -22,7 +22,9 @@ caption is at most 32 characters.
   frame needed. Nothing that shows a fishing secret's name or explanation.
 - Alt text (Play Console asks for it per image): use the "Alt text" column, translated with the
   captions.
-- File names for fastlane: `listings/<locale>/images/phoneScreenshots/<n>_<locale>.png`.
+- File names for fastlane: `listings/<locale>/images/phoneScreenshots/<n>_<locale>.jpg`
+  (high-quality JPEG, 4:4:4 chroma, about 230 KB a shot and 11 MB for all 48; the same shots as
+  24-bit PNGs would be about 40 MB. `STORE_SCREENSHOTS_PNG=1` makes `<n>_<locale>.png` instead).
 
 ## The shots
 
@@ -61,11 +63,65 @@ caption is at most 32 characters.
 | 7 | Duelle mit Freunden und online | Desafie amigos e rivais online | Arkadaşlarınla ve online düello |
 | 8 | Dein eigenes Boot | Crie o seu próprio barco | Kendi tekneni tasarla |
 
+## Making them
+
+```bash
+tools/store-screenshots/make-store-screenshots.sh              # all six languages (about 10 min)
+tools/store-screenshots/make-store-screenshots.sh de-DE fr-FR  # some of them
+```
+
+Needs the Android SDK (the scenes run as Robolectric tests), Node with Playwright and ffmpeg. Then
+look at every image before committing them (`montage` makes a quick contact sheet).
+
+1. **`StoreScreenshotsTest`** (`app/src/test/.../StoreScreenshotsTest.kt`, one class per listing
+   language, run only with `DEEPLINE_STORE_SCREENSHOTS=1`) starts the app in that language on a
+   400 × 800 dp phone at 3x (1200 × 2400 px) with the store player (`StorePlayers`: about 50
+   species caught across three zones, a boat designed from earned options, no secret found, the
+   one-time "automatic translation" card dismissed, Reduce motion on so no shake or flash).
+   - Shots 1 to 5 play the scripted casts of `StoreScenes` (`StoreScenes.kt`: hand-placed fish and
+     obstacles at their real depths, a rope a player can buy, steered like a finger) frame by
+     frame through the view model, as a cast does. At the shot's moment it saves the cast
+     screen's own overlay and HUD on a transparent background (`Render3d.overlayOnly`: the 2D
+     labels, aim ring, notices and results card, exactly what sits on the GL view on a phone) and
+     the same moment as a 3D frame (`SceneBuilder`, `Render3dExport`). `StoreScenesTest` checks
+     the scenes still show what the table says (depths, bumps left, load, Lantern, a Sparkling
+     catch, no secret).
+   - Shots 6 to 8 are the app's own screens (the Dex, a battle, the boat editor).
+   - Captions are drawn by the test in the game's font (Roboto bold, 76 px, down to 64 px if a
+     caption needs more than two lines), with the band's colours and the measured contrast in
+     `shots.json`.
+2. **`tools/store-screenshots/compose.cjs`** draws each 3D frame with the game's shaders (the
+   WebGL preview's `drawFrame`), puts the HUD on top, and lays the shot out: the caption centred
+   in the top 18% on the band (Lagoon's day sky; the Midnight Trench's water for shot 4), the
+   phone's screen scaled to 950 px wide (88%) with rounded corners, a soft shadow and a thin
+   light rim, starting just under the band and running off the bottom edge (the HUD and the top
+   of every screen are never cropped).
+3. The shell script writes the shots without alpha to `listings/<locale>/images/phoneScreenshots/`
+   and prints their sizes and pixel formats.
+
+What each shot shows (the same in every language; only the captions, the HUD and the app's text
+change, species names stay English as in the game):
+
+1. A fresh cast at 21 m in the Sunlit Shallows: 4 bumps left, the bump-free zone's chip, the
+   opening hint, the aim ring beside the hook, a rock and shallows fish below.
+2. 153 m in the Twilight Reef, a moment after the second bump on a jelly: the puff of bubbles,
+   the notice "Bump! 2 left", two of four bumps lit.
+3. 185 m on the way up after reaching the end of the rope: a Dusk Snapper hooked by the head with
+   the catch sparkle, a Reef Grouper and a Sparkling Ribbon Eel already on the line, the load at
+   9.2 of 18 kg.
+4. 353 m in the Midnight Trench with a Lantern lit: the lit circle around the hook and glowing
+   anglers at its edge, exactly as in play.
+5. The results of the same cast as shot 3, played to the surface: five fish, the Sparkling Ribbon
+   Eel at 3×, 567 points, no secret line.
+6. The Dex: the completion ring (50 of 200, 25%), the zone counts, caught cards, one only seen
+   (Reed Perch) and one silhouette.
+7. A Best of 5 against the computer rival (Normal), after two rounds won one each, round 3 next.
+8. The boat editor with the store player's design: a tangerine and navy striped hull, a seafoam
+   triangle sail, a pink pennant and a star emblem, all earned with points or progress.
+
 ## Notes for the screenshot step
 
-- The app's own text in the shots should be in the shot's language once the localisation work
-  lands; until then, keep English UI and localised captions (acceptable, but redo them when the
-  UI is translated).
+- The app's own text is in the shot's language (redo the shots when the UI or the captions change).
 - The "300 m" in caption 4 is `GameConfig.DARK_DEPTH` (`StoreListingTest` checks it, the species count and
   the bump count against the game): if they change, change the listing too.
 - Shot 7: online opponents' typed names must not appear (privacy); use the computer rival or a

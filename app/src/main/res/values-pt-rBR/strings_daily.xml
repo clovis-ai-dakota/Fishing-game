@@ -10,7 +10,7 @@
     <!-- Recompensas, como expressões juntadas numa lista. -->
     <string name="daily_grant_shield">um escudo de sequência</string>
     <!-- Rótulos curtos nos quadrinhos do calendário (uns 10 caracteres). -->
-    <string name="daily_tile_lanterns">%1$d × Lanterna</string>
+    <string name="daily_tile_lanterns">%1$d × Lanterna</string>
     <string name="daily_tile_detector">Detector</string>
     <string name="daily_tile_charm">Amuleto</string>
     <string name="daily_tile_lure">Isca</string>
@@ -32,7 +32,7 @@
         <item quantity="many">Pesque %1$d de peixes na zona %2$s.</item>
         <item quantity="other">Pesque %1$d peixes na zona %2$s.</item>
     </plurals>
-    <string name="daily_challenge_reach_depth">Chegue a %1$d m em um lançamento.</string>
+    <string name="daily_challenge_reach_depth">Chegue a %1$d m em um lançamento.</string>
     <string name="daily_challenge_catch_species_one">Pesque um peixe desta espécie: %1$s.</string>
     <string name="daily_challenge_catch_species">Pesque %1$d peixes desta espécie: %2$s.</string>
     <string name="daily_challenge_earn_points">Faça %1$s pontos.</string>
@@ -56,7 +56,7 @@
         <item quantity="many">Pesque %d de espécies que você nunca pescou.</item>
         <item quantity="other">Pesque %d espécies que você nunca pescou.</item>
     </plurals>
-    <string name="daily_progress_depth">Mais fundo: %1$d de %2$d m</string>
+    <string name="daily_progress_depth">Mais fundo: %1$d de %2$d m</string>
     <string name="daily_progress_big_cast">Melhor lançamento: %1$d de %2$d peixes</string>
 
     <!-- Depois de resgatar a recompensa diária. -->
@@ -117,7 +117,7 @@
         <item quantity="other">Toda semana, por %d dias, duas espécies menos comuns ficam muito mais comuns onde vivem: uma perto da superfície e outra nas profundezas. Só nos lançamentos solo: os duelos nunca mudam.</item>
     </plurals>
     <string name="daily_migrant_open">Abrir a página no Dex</string>
-    <string name="daily_migrant_where">%1$s · %2$d–%3$d m</string>
+    <string name="daily_migrant_where">%1$s · %2$d–%3$d m</string>
 
     <!-- Canais de notificação (aparecem nas configurações do celular). -->
     <string name="daily_channel_daily_name">Recompensa diária pronta</string>

@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -159,7 +158,8 @@ private fun PointsPill(points: Long, modifier: Modifier = Modifier) {
         ) {
             Icon(GameIcons.Coin, contentDescription = null, tint = SparkleGold, modifier = Modifier.size(18.dp))
             Spacer(Modifier.width(6.dp))
-            Text(formatPoints(points), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
+            // From a million on, "1.2M": the exact balance is on the Shop tab, and the game's name keeps its room.
+            Text(if (points >= 1_000_000) compactPoints(points) else formatPoints(points), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
         }
     }
 }
@@ -263,7 +263,7 @@ private fun DexProgressCard(vm: GameViewModel) {
                 stringResource(R.string.home_dex_zone, zone.shortLabel(), species.count(p::isDiscovered), species.size)
             }
             Text(
-                stringResource(R.string.home_dex_seen, p.seenCount) + " · " + zones.joinToString("  ·  "),
+                stringResource(R.string.home_dex_seen, p.seenCount) + ITEM_SEPARATOR + zones.joinToString(ITEM_SEPARATOR),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -335,7 +335,8 @@ private fun CastArea(vm: GameViewModel) {
             }
             // The other tackle, once the player owns some (bought in the Shop).
             if (p.luckyCharms > 0 || p.sparkleLures > 0 || p.detectors > 0) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.horizontalScroll(rememberScrollState())) {
+                // Wraps onto a second line rather than hiding a chip past the edge (French and Spanish names are long).
+                androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     if (p.detectors > 0) {
                         FilterChip(
                             selected = vm.useDetector,

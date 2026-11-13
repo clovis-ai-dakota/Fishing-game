@@ -70,6 +70,6 @@ class WagerUiTest : BoatUiTestBase() {
         assertEquals(false, vm.lastWagerResult?.won)
         assertEquals(10_000 - stake, vm.progress.pointsBalance)
         assertEquals(BotDifficulty.NORMAL, vm.lastWagerResult?.rival)
-        compose.onNodeWithText("Wager lost: ${formatPoints(stake)} pts").assertExists()
+        compose.onNodeWithText(str(R.string.battle_wager_lost, str(R.string.common_points, formatPoints(stake)))).assertExists()
     }
 }

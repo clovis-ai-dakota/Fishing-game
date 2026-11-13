@@ -60,7 +60,7 @@
     <string name="shop_gift_kept">%1$s Stattdessen gehört dir: %2$s.</string>
     <!-- %1$s: der Absender (oder shop_gift_from_you). -->
     <string name="shop_gift_received">Geschenk von %1$s: %2$s (%3$s).</string>
-    <string name="shop_gift_received_owned">Geschenk von %1$s: %2$s. Das hattest du schon, darum bekommst du stattdessen %3$s Punkte.</string>
+    <string name="shop_gift_received_owned">Geschenk von %1$s: %2$s. Das hattest du schon, darum bekommst du stattdessen %3$s Punkte.</string>
     <!-- Steht nach „Geschenk von“ (shop_gift_received), daher im Dativ. -->
     <string name="shop_gift_from_you">dir</string>
 
@@ -79,11 +79,11 @@
     <string name="shop_account_server_problem">Der Server hatte ein Problem (%1$d).</string>
 
     <!-- ==== Der Tab „Shop“ ==== -->
-    <string name="shop_balance">%1$s Punkte zum Ausgeben</string>
+    <string name="shop_balance">%1$s Punkte zum Ausgeben</string>
 
     <string name="shop_confirm_title">%1$s kaufen?</string>
-    <string name="shop_confirm_body">Du bekommst: %1$s.\n\nEs kostet %2$s Punkte; danach hast du noch %3$s Punkte.</string>
-    <string name="shop_confirm_buy">Für %1$s Punkte kaufen</string>
+    <string name="shop_confirm_body">Du bekommst: %1$s.\n\nEs kostet %2$s Punkte; danach hast du noch %3$s Punkte.</string>
+    <string name="shop_confirm_buy">Für %1$s Punkte kaufen</string>
 
     <string name="shop_club_pouch_title">Geschenk des Kapitänsclubs</string>
     <string name="shop_club_pouch_body">Dein Gratis-Laternenbeutel des Monats ist bereit: %1$s.</string>
@@ -106,7 +106,7 @@
     <string name="shop_rope_title">Seilverbesserungen</string>
     <string name="shop_rope_note">Mit Punkten gekauft. Seillänge erreicht tiefere Zonen und neue Fische, Stärke trägt mehr Gewicht, Wendigkeit lenkt schneller. Anders überlegt? Stufe zurück, und du bekommst alles erstattet.</string>
     <string name="shop_rope_level">Stufe %1$d/%2$d</string>
-    <string name="shop_rope_downgrade">Auf %1$s senken · %2$s Punkte zurück</string>
+    <string name="shop_rope_downgrade">Auf %1$s senken · %2$s Punkte zurück</string>
     <string name="shop_rope_maxed">%1$s · Maximum erreicht</string>
 
     <!-- Seite „Zubehör“. -->

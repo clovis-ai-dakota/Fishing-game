@@ -45,7 +45,7 @@
     <!-- Tackle: one-cast items switched on before a cast. -->
     <string name="core_tackle_lantern">Lantern</string>
     <!-- %1$d: depth in meters where the water goes dark. -->
-    <string name="core_tackle_lantern_desc">Lights up much more of the dark water below %1$d m for one cast.</string>
+    <string name="core_tackle_lantern_desc">Lights up much more of the dark water below %1$d m for one cast.</string>
     <string name="core_tackle_lucky_charm">Lucky charm</string>
     <!-- %1$d: bumps with the charm; %2$d: the usual number of bumps. -->
     <string name="core_tackle_lucky_charm_desc">One extra bump on the way down for one cast (%1$d instead of %2$d).</string>
@@ -54,7 +54,7 @@
     <string name="core_tackle_sparkle_lure_desc">%1$d× as many Sparkling fish in the water for one cast.</string>
     <string name="core_tackle_detector">Rare fish detector</string>
     <!-- %1$d: radius in meters. -->
-    <string name="core_tackle_detector_desc">For one cast, marks species you haven\'t caught yet within %1$d m of the hook, even in the dark.</string>
+    <string name="core_tackle_detector_desc">For one cast, marks species you haven\'t caught yet within %1$d m of the hook, even in the dark.</string>
 
     <!-- Battle modes: the title, then the rules shown on the Battle tab. -->
     <string name="core_mode_best_of_five">Best of 5</string>
@@ -445,16 +445,16 @@
         <item quantity="other">%d rounds</item>
     </plurals>
     <!-- 3-Minute Rush: the best single cast. %1$s: points, already formatted. -->
-    <string name="core_score_best_cast">%1$s pts best cast</string>
+    <string name="core_score_best_cast">%1$s pts best cast</string>
     <!-- Heavy Haul: kilograms landed. %1$s: a decimal number, already formatted. -->
-    <string name="core_score_kg">%1$s kg</string>
+    <string name="core_score_kg">%1$s kg</string>
     <plurals name="core_score_species">
         <!-- Species Hunt: different species caught. -->
         <item quantity="one">%d species</item>
         <item quantity="other">%d species</item>
     </plurals>
     <!-- Deep Dive: the deepest catch. %1$s: meters, already formatted. -->
-    <string name="core_score_deepest">deepest catch %1$s m</string>
+    <string name="core_score_deepest">deepest catch %1$s m</string>
 
     <!-- Fishing secrets: hidden tricks, each named once the player has pulled it off (Dex >
          Secrets, the discovery dialog, cast results). A title is only ever shown after its secret

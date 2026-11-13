@@ -57,15 +57,15 @@
     <string name="boat_editor_unlock_title">%1$s açılsın mı?</string>
     <plurals name="boat_editor_unlock_body">
         <!-- %1$s: the option's name; %2$s: its price in points; %3$s: the player's points. -->
-        <item quantity="one">%1$s: bir kerelik %2$s puan. Puanın: %3$s.</item>
-        <item quantity="other">%1$s: bir kerelik %2$s puan. Puanın: %3$s.</item>
+        <item quantity="one">%1$s: bir kerelik %2$s puan. Puanın: %3$s.</item>
+        <item quantity="other">%1$s: bir kerelik %2$s puan. Puanın: %3$s.</item>
     </plurals>
     <plurals name="boat_editor_unlock_body_short">
-        <item quantity="one">%1$s: bir kerelik %2$s puan. Puanın: %3$s. Daha fazla kazanmak için balık tutmaya devam et.</item>
-        <item quantity="other">%1$s: bir kerelik %2$s puan. Puanın: %3$s. Daha fazla kazanmak için balık tutmaya devam et.</item>
+        <item quantity="one">%1$s: bir kerelik %2$s puan. Puanın: %3$s. Daha fazla kazanmak için balık tutmaya devam et.</item>
+        <item quantity="other">%1$s: bir kerelik %2$s puan. Puanın: %3$s. Daha fazla kazanmak için balık tutmaya devam et.</item>
     </plurals>
     <!-- %1$s: the price, formatted. -->
-    <string name="boat_editor_unlock_buy">%1$s puana aç</string>
+    <string name="boat_editor_unlock_buy">%1$s puana aç</string>
     <string name="boat_editor_not_now">Şimdi değil</string>
     <!-- %1$s: the option's name, e.g. Damalı. -->
     <string name="boat_editor_locked_title">%1$s kilitli</string>

@@ -37,7 +37,7 @@
     <!-- Tackle: one-cast items. -->
     <string name="core_tackle_lantern">Farol</string>
     <!-- %1$d: depth in meters where the water goes dark. -->
-    <string name="core_tackle_lantern_desc">Ilumina mucho más el agua oscura por debajo de %1$d m durante un lance.</string>
+    <string name="core_tackle_lantern_desc">Ilumina mucho más el agua oscura por debajo de %1$d m durante un lance.</string>
     <string name="core_tackle_lucky_charm">Amuleto de la suerte</string>
     <!-- %1$d: bumps with the charm; %2$d: the usual number of bumps. -->
     <string name="core_tackle_lucky_charm_desc">Un golpe más al bajar durante un lance (%1$d en vez de %2$d).</string>
@@ -46,7 +46,7 @@
     <string name="core_tackle_sparkle_lure_desc">%1$d× más peces brillantes en el agua durante un lance.</string>
     <string name="core_tackle_detector">Detector de peces raros</string>
     <!-- %1$d: radius in meters. -->
-    <string name="core_tackle_detector_desc">Durante un lance, marca las especies que aún no has capturado a menos de %1$d m del anzuelo, incluso a oscuras.</string>
+    <string name="core_tackle_detector_desc">Durante un lance, marca las especies que aún no has capturado a menos de %1$d m del anzuelo, incluso a oscuras.</string>
 
     <!-- Battle modes: the title, then the rules. -->
     <string name="core_mode_best_of_five">Al mejor de 5</string>
@@ -435,16 +435,16 @@
         <item quantity="other">%d rondas</item>
     </plurals>
     <!-- 3-Minute Rush: the best single cast. %1$s: points, already formatted. -->
-    <string name="core_score_best_cast">mejor lance: %1$s pts</string>
+    <string name="core_score_best_cast">mejor lance: %1$s pts</string>
     <!-- Heavy Haul: kilograms landed. -->
-    <string name="core_score_kg">%1$s kg</string>
+    <string name="core_score_kg">%1$s kg</string>
     <plurals name="core_score_species">
         <item quantity="one">%d especie</item>
         <item quantity="many">%d de especies</item>
         <item quantity="other">%d especies</item>
     </plurals>
     <!-- Deep Dive: the deepest catch. %1$s: meters, already formatted. -->
-    <string name="core_score_deepest">captura más profunda: %1$s m</string>
+    <string name="core_score_deepest">captura más profunda: %1$s m</string>
 
     <!-- Fishing secrets: short, catchy names, like a sports move. Only shown once found. -->
     <string name="core_secret_last_bump">El último golpe engancha lo que toca</string>

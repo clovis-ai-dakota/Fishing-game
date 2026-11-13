@@ -36,7 +36,7 @@
     <string name="battle_setup_wager_title">Apuesta (opcional)</string>
     <string name="battle_setup_wager_none">Ninguna</string>
     <!-- %1$s: points paid back for a win; %2$s: the multiplier; %3$s: the computer's level. -->
-    <string name="battle_setup_wager_terms">Si ganas, recibes %1$s pts (×%2$s en nivel %3$s); un empate te devuelve la apuesta; si pierdes o abandonas, la pierdes.</string>
+    <string name="battle_setup_wager_terms">Si ganas, recibes %1$s pts (×%2$s en nivel %3$s); un empate te devuelve la apuesta; si pierdes o abandonas, la pierdes.</string>
     <!-- %1$s: the computer's level; %2$s: the multiplier. -->
     <string name="battle_setup_wager_hint">Apuesta puntos al resultado: una victoria en nivel %1$s paga ×%2$s.</string>
     <!-- V, D and E: victorias, derrotas, empates. -->
@@ -91,9 +91,9 @@
     <!-- %1$d: the cast's number; %2$s: what it brought, joined with " · ". -->
     <string name="battle_cast_line">#%1$d: %2$s</string>
     <plurals name="battle_fish">
-        <item quantity="one">%d pez</item>
-        <item quantity="many">%d de peces</item>
-        <item quantity="other">%d peces</item>
+        <item quantity="one">%d pez</item>
+        <item quantity="many">%d de peces</item>
+        <item quantity="other">%d peces</item>
     </plurals>
     <!-- %1$s: the opponent's name; %2$s: the details, joined with " · ". -->
     <string name="battle_opponent_live">%1$s está pescando: %2$s</string>

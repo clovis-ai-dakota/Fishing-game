@@ -24,6 +24,14 @@ object Render3d {
     /** Set when the GL renderer failed on this device: the rest of the session uses 2D. */
     var failed by mutableStateOf(false)
 
+    /**
+     * Store screenshots only (`StoreScreenshotsTest`, never set by the app): the cast screen
+     * draws just what goes over the 3D view (the 2D overlay and the HUD) on a transparent
+     * background, with no GL view, so the WebGL preview can draw the same frame underneath.
+     */
+    @androidx.annotation.VisibleForTesting
+    internal var overlayOnly = false
+
     fun isSupported(context: Context): Boolean {
         if (failed) return false
         // Robolectric (the UI tests) has no GPU.

@@ -24,8 +24,8 @@
     <string name="cast_hud_phase_surfaced">Na superfície</string>
     <string name="cast_hud_pause">Pausar</string>
     <string name="cast_hud_bumps">Batidas</string>
-    <string name="cast_hud_load">Carga %1$s / %2$s kg</string>
-    <string name="cast_hud_bump_free">Zona livre de batidas · batidas contam abaixo de %1$d m</string>
+    <string name="cast_hud_load">Carga %1$s / %2$s kg</string>
+    <string name="cast_hud_bump_free">Zona livre de batidas · batidas contam abaixo de %1$d m</string>
     <string name="cast_hud_lantern_lit">Lanterna acesa</string>
     <string name="cast_hud_battle_round">%1$s · Rodada %2$d</string>
     <string name="cast_hud_battle_cast_of">%1$s · Lançamento %2$d/%3$d</string>
@@ -34,7 +34,7 @@
     <string name="cast_hud_tournament_attempt">Torneio · Tentativa %1$d de %2$d</string>
 
     <!-- Dicas no meio da tela. -->
-    <string name="cast_hint_steer">Arraste para guiar: o anzol desliza até o seu dedo. Abaixo de %1$d m, evite cabeças de peixe e objetos: com %2$d batidas, a linha sobe.</string>
+    <string name="cast_hint_steer">Arraste para guiar: o anzol desliza até o seu dedo. Abaixo de %1$d m, evite cabeças de peixe e objetos: com %2$d batidas, a linha sobe.</string>
     <string name="cast_hint_heads">Encoste na CABEÇA dos peixes para fisgá-los. O rabo não conta.</string>
 
     <!-- O botão que puxa a linha direto para cima. -->
@@ -55,24 +55,24 @@
     <string name="cast_results_title">Lançamento concluído</string>
     <string name="cast_results_deepest">Ponto mais fundo %1$s</string>
     <plurals name="cast_results_fish">
-        <item quantity="one">%d peixe</item>
-        <item quantity="many">%d de peixes</item>
-        <item quantity="other">%d peixes</item>
+        <item quantity="one">%d peixe</item>
+        <item quantity="many">%d de peixes</item>
+        <item quantity="other">%d peixes</item>
     </plurals>
     <plurals name="cast_results_objects">
-        <item quantity="one">%d objeto</item>
-        <item quantity="many">%d de objetos</item>
-        <item quantity="other">%d objetos</item>
+        <item quantity="one">%d objeto</item>
+        <item quantity="many">%d de objetos</item>
+        <item quantity="other">%d objetos</item>
     </plurals>
     <string name="cast_results_nothing">Nada na linha desta vez. Na subida, guie o anzol até os peixes para ele encontrar a cabeça deles.</string>
     <string name="cast_results_by_last_bump">fisgado pela última batida</string>
     <string name="cast_results_sparkling">✦ %1$s cintilante</string>
     <string name="cast_results_secret">✦ Segredo: %1$s</string>
-    <string name="cast_results_total">"Total  +%1$s pts"</string>
+    <string name="cast_results_total">"Total  +%1$s pts"</string>
     <string name="cast_results_collect">Coletar</string>
     <string name="cast_results_continue">Continuar</string>
 
     <!-- Rótulos desenhados na água. -->
-    <string name="cast_canvas_bump_free_above">Livre de batidas acima de %1$d m</string>
+    <string name="cast_canvas_bump_free_above">Livre de batidas acima de %1$d m</string>
     <string name="cast_canvas_rope_limit">Limite da corda</string>
 </resources>

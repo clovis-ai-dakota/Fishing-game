@@ -11,7 +11,7 @@
     <!-- Rewards, as noun phrases joined into a list. -->
     <string name="daily_grant_shield">bir seri kalkanı</string>
     <!-- Short labels on the 7-day calendar's tiles (tiny). -->
-    <string name="daily_tile_lanterns">%1$d × Fener</string>
+    <string name="daily_tile_lanterns">%1$d × Fener</string>
     <string name="daily_tile_detector">Dedektör</string>
     <string name="daily_tile_charm">Şans tılsımı</string>
     <string name="daily_tile_lure">Parıltı yemi</string>
@@ -32,13 +32,13 @@
         <item quantity="other">%2$s bölgesinden %1$d balık yakala.</item>
     </plurals>
     <!-- %1$d: a depth in meters. -->
-    <string name="daily_challenge_reach_depth">Bir atışta %1$d m derinliğe in.</string>
+    <string name="daily_challenge_reach_depth">Bir atışta %1$d m derinliğe in.</string>
     <!-- %1$s: a species' name. -->
     <string name="daily_challenge_catch_species_one">Bu türden bir balık yakala: %1$s.</string>
     <!-- %1$d: how many (always 2 or more); %2$s: a species' name. -->
     <string name="daily_challenge_catch_species">Bu türden %1$d balık yakala: %2$s.</string>
     <!-- %1$s: points, already formatted. -->
-    <string name="daily_challenge_earn_points">%1$s puan kazan.</string>
+    <string name="daily_challenge_earn_points">%1$s puan kazan.</string>
     <plurals name="daily_challenge_land_weight">
         <item quantity="one">%d kg balık çıkar.</item>
         <item quantity="other">%d kg balık çıkar.</item>
@@ -56,7 +56,7 @@
         <item quantity="other">Daha önce hiç yakalamadığın %d tür yakala.</item>
     </plurals>
     <!-- %1$d: best so far; %2$d: goal (meters). -->
-    <string name="daily_progress_depth">En derin: %1$d / %2$d m</string>
+    <string name="daily_progress_depth">En derin: %1$d / %2$d m</string>
     <!-- %1$d: best so far; %2$d: goal (fish). -->
     <string name="daily_progress_big_cast">En iyi atış: %1$d / %2$d balık</string>
 
@@ -128,7 +128,7 @@
     </plurals>
     <string name="daily_migrant_open">Dex sayfasını aç</string>
     <!-- %1$s: its depth zone; %2$d and %3$d: the depths where it lives, in meters. -->
-    <string name="daily_migrant_where">%1$s · %2$d–%3$d m</string>
+    <string name="daily_migrant_where">%1$s · %2$d–%3$d m</string>
 
     <!-- Notification channels: a short name and a one-sentence description. -->
     <string name="daily_channel_daily_name">Günlük ödül hazır</string>

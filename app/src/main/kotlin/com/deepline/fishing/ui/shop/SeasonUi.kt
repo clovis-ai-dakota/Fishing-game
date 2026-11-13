@@ -31,6 +31,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.Hyphens
+import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -131,7 +133,7 @@ private fun TierCell(vm: GameViewModel, reward: SeasonReward, reached: Boolean, 
     Box(
         Modifier
             .width(86.dp)
-            .height(64.dp)
+            .height(76.dp)
             .clip(RoundedCornerShape(10.dp))
             .background(bg)
             .padding(6.dp),
@@ -142,14 +144,15 @@ private fun TierCell(vm: GameViewModel, reward: SeasonReward, reached: Boolean, 
                 claimed -> "✓ " + ShopText.seasonGrants(reward.grants, vm.progress).asString()
                 else -> ShopText.seasonGrants(reward.grants, vm.progress).asString()
             },
-            style = MaterialTheme.typography.labelSmall,
+            // Hyphenated in the tile's narrow column: German and French reward names are long words.
+            style = MaterialTheme.typography.labelSmall.copy(hyphens = Hyphens.Auto, lineBreak = LineBreak.Paragraph),
             color = when {
                 !reached || (reward.premium && !unlocked) -> Color.White.copy(alpha = 0.55f)
                 reward.premium -> Color(0xFFFFE082)
                 else -> Color.White
             },
             textAlign = TextAlign.Center,
-            maxLines = 3,
+            maxLines = 4,
             overflow = TextOverflow.Ellipsis,
         )
     }

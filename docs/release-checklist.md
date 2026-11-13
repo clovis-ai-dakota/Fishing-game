@@ -121,8 +121,11 @@ tools/release/check-release.sh
 - [ ] *Main store listing* in English from `docs/store/listings/en-US/`, then *Translations*:
       fr-FR, es-ES, de-DE, pt-BR, tr-TR (also es-419 if you want Latin America,
       [`store/keywords.md`](store/keywords.md)). Graphics: `docs/store/graphics/play-icon-512.png`,
-      `docs/store/graphics/feature-graphic.png`, phone screenshots (the localised screenshot step,
-      [`store/screenshots.md`](store/screenshots.md)), promo video URL (upload the MP4 to YouTube,
+      `docs/store/graphics/feature-graphic.png`, phone screenshots (done: 8 per language in
+      `docs/store/listings/<locale>/images/phoneScreenshots/`, 1080 × 1920 JPEG, made from the game
+      by `tools/store-screenshots/make-store-screenshots.sh`; add each one's alt text from
+      [`store/screenshots.md`](store/screenshots.md), and remake them when the UI or a caption
+      changes), promo video URL (upload the MP4 to YouTube,
       unlisted is fine, monetisation off; [`tools/promo-video/README.md`](../tools/promo-video/README.md)).
 - [ ] *Policy > App content*:
   - [ ] Privacy policy URL (the published page);

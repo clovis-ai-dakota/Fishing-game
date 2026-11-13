@@ -394,9 +394,9 @@
 
     <!-- Final placings of the weekly tournament. -->
     <string name="core_tier_champion">Champion</string>
-    <string name="core_tier_gold">Top 10 %</string>
-    <string name="core_tier_silver">Top 25 %</string>
-    <string name="core_tier_bronze">Top 50 %</string>
+    <string name="core_tier_gold">Top 10 %</string>
+    <string name="core_tier_silver">Top 25 %</string>
+    <string name="core_tier_bronze">Top 50 %</string>
     <string name="core_tier_took_part">Participation</string>
 
     <!-- Roles in a club. -->

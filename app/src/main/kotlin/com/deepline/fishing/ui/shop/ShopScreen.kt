@@ -21,6 +21,9 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -62,6 +65,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.GameViewModel
@@ -143,8 +147,13 @@ fun ShopScreen(vm: GameViewModel) {
                 )
             }
         }
+        // One scroll position per page: a new page starts at its top.
+        val gridState = androidx.compose.runtime.saveable.rememberSaveable(page, saver = androidx.compose.foundation.lazy.grid.LazyGridState.Saver) {
+            androidx.compose.foundation.lazy.grid.LazyGridState()
+        }
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 156.dp),
+            state = gridState,
             contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 24.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -290,31 +299,56 @@ private fun ClubChip() {
 internal fun PriceButtons(item: ShopItem, actions: ShopActions, wide: Boolean = false, modifier: Modifier = Modifier) {
     val vm = actions.vm
     val points = vm.shopPointsPrice(item)
-    Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = modifier.fillMaxWidth()) {
+    // Both buttons as tall as the taller one: a points price too long for one line ("1,1 Mio.
+    // Punkte") shows its unit on a second line (PointsPriceLabel) instead of being cut off.
+    Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
         Button(
             onClick = { actions.buyWithMoney(item) },
             contentPadding = PaddingValues(horizontal = 8.dp),
-            modifier = Modifier.weight(1f).testTag("buy_eur_${item.id}"),
+            modifier = Modifier.weight(1f).fillMaxHeight().testTag("buy_eur_${item.id}"),
         ) { Text(vm.billing.priceOf(item) ?: formatEuros(item.euroCents), maxLines = 1, fontWeight = FontWeight.Bold) }
         OutlinedButton(
             onClick = { actions.onPoints(item) },
             enabled = vm.progress.pointsBalance >= points,
             contentPadding = PaddingValues(horizontal = 8.dp),
-            modifier = Modifier.weight(1f).testTag("buy_pts_${item.id}"),
-        ) { Text(stringResource(R.string.common_points, if (wide) formatPoints(points) else compactPoints(points)), maxLines = 1) }
+            modifier = Modifier.weight(1f).fillMaxHeight().testTag("buy_pts_${item.id}"),
+        ) { PointsPriceLabel(if (wide) formatPoints(points) else compactPoints(points)) }
+    }
+}
+
+/**
+ * A points price ([number] already formatted) inside a narrow button: "260k pts" on one line when
+ * it fits, otherwise the number above its unit (`common_points_stacked`), never cut off. A number
+ * and its unit are joined by a no-break space, so they can't wrap on their own.
+ */
+@Composable
+internal fun PointsPriceLabel(number: String) {
+    val oneLine = stringResource(R.string.common_points, number)
+    // Tried on one line first; if it doesn't fit, the stacked form from the next frame on.
+    var stacked by remember(oneLine) { mutableStateOf(false) }
+    if (stacked) {
+        Text(stringResource(R.string.common_points_stacked, number), maxLines = 2, textAlign = TextAlign.Center)
+    } else {
+        Text(oneLine, maxLines = 1, softWrap = false, onTextLayout = { if (it.didOverflowWidth) stacked = true })
     }
 }
 
 /** Shown instead of the prices once a permanent item is owned. */
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 internal fun OwnedRow(label: String = stringResource(R.string.shop_owned), action: (@Composable () -> Unit)? = null) {
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+    // In a narrow card the button moves under a long label ("Kapitänsclub") rather than
+    // squeezing it into broken words.
+    androidx.compose.foundation.layout.FlowRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        itemVerticalAlignment = Alignment.CenterVertically,
+    ) {
         Text(
             label,
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.secondary,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.weight(1f),
         )
         action?.invoke()
     }
@@ -423,8 +457,12 @@ private fun TackleCard(vm: GameViewModel, t: Tackle, actions: ShopActions, modif
             for (pack in packs) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Column(Modifier.weight(1f)) {
-                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Text(pack.label(), style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        // The badge goes under a long name ("Tonneau de Lanternes") instead of being squeezed out.
+                        androidx.compose.foundation.layout.FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            itemVerticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(pack.label(), style = MaterialTheme.typography.titleSmall)
                             pack.badgeText()?.let { Badge(it.asString()) }
                         }
                         Text(ShopText.contents(pack, p).asString(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -487,7 +525,8 @@ internal fun Tile(name: String, badge: String?, preview: @Composable () -> Unit,
                 preview()
                 if (badge != null) Box(Modifier.align(Alignment.TopEnd).padding(4.dp)) { Badge(badge) }
             }
-            Text(name, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            // Two lines, hyphenated: German item names are long compounds ("Sternennacht-Lackierung").
+            Text(name, style = MaterialTheme.typography.titleSmall.copy(hyphens = androidx.compose.ui.text.style.Hyphens.Auto), fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
             bottom()
         }
     }

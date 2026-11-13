@@ -14,7 +14,7 @@
     <string name="daily_grant_shield">a streak shield</string>
     <!-- Short labels on the 7-day calendar's tiles (tiny: 10 characters or so). -->
     <!-- %1$d: number of Lanterns. -->
-    <string name="daily_tile_lanterns">%1$d × Lantern</string>
+    <string name="daily_tile_lanterns">%1$d × Lantern</string>
     <string name="daily_tile_detector">Detector</string>
     <string name="daily_tile_charm">Lucky charm</string>
     <string name="daily_tile_lure">Sparkle lure</string>
@@ -36,7 +36,7 @@
         <item quantity="other">Catch %1$d fish from the %2$s.</item>
     </plurals>
     <!-- %1$d: a depth in meters. -->
-    <string name="daily_challenge_reach_depth">Reach %1$d m in a cast.</string>
+    <string name="daily_challenge_reach_depth">Reach %1$d m in a cast.</string>
     <!-- %1$s: a species' name (e.g. Sun Bream). -->
     <string name="daily_challenge_catch_species_one">Catch a fish of this species: %1$s.</string>
     <!-- %1$d: how many (always 2 or more); %2$s: a species' name. -->
@@ -61,7 +61,7 @@
         <item quantity="other">Catch %d species you\'ve never caught.</item>
     </plurals>
     <!-- Progress on a challenge whose goal is one cast. %1$d: best so far; %2$d: goal (meters). -->
-    <string name="daily_progress_depth">Deepest: %1$d of %2$d m</string>
+    <string name="daily_progress_depth">Deepest: %1$d of %2$d m</string>
     <!-- %1$d: best so far; %2$d: goal (fish). -->
     <string name="daily_progress_big_cast">Best cast: %1$d of %2$d fish</string>
 
@@ -151,7 +151,7 @@
     <string name="daily_migrant_open">Open its Dex page</string>
     <!-- Under a migrating species' name. %1$s: its depth zone (e.g. Twilight Reef); %2$d and %3$d:
          the depths where it lives, in meters. -->
-    <string name="daily_migrant_where">%1$s · %2$d–%3$d m</string>
+    <string name="daily_migrant_where">%1$s · %2$d–%3$d m</string>
 
     <!-- Notification channels: Android lists them in the phone's settings for the game's
          notifications, where players can mute each. A short name and a one-sentence description. -->

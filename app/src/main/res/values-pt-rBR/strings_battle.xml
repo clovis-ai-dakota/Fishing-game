@@ -30,7 +30,7 @@
     <string name="battle_setup_tackle_info">Lanternas e detectores funcionam nos duelos: cada lançamento seu gasta um enquanto estiver ligado. O Amuleto da sorte e a Isca cintilante são só para lançamentos solo.</string>
     <string name="battle_setup_wager_title">Aposta (opcional)</string>
     <string name="battle_setup_wager_none">Nenhuma</string>
-    <string name="battle_setup_wager_terms">Vença e receba %1$s pts de volta (×%2$s no nível %3$s); um empate devolve a aposta; perder ou desistir faz você perdê-la.</string>
+    <string name="battle_setup_wager_terms">Vença e receba %1$s pts de volta (×%2$s no nível %3$s); um empate devolve a aposta; perder ou desistir faz você perdê-la.</string>
     <string name="battle_setup_wager_hint">Aposte pontos no resultado: uma vitória no nível %1$s paga ×%2$s.</string>
     <!-- V = vitórias, D = derrotas, E = empates. -->
     <string name="battle_setup_record">Retrospecto contra o computador: %1$d V · %2$d D · %3$d E</string>
@@ -76,9 +76,9 @@
     <string name="battle_total">Total %1$s</string>
     <string name="battle_cast_line">#%1$d: %2$s</string>
     <plurals name="battle_fish">
-        <item quantity="one">%d peixe</item>
-        <item quantity="many">%d de peixes</item>
-        <item quantity="other">%d peixes</item>
+        <item quantity="one">%d peixe</item>
+        <item quantity="many">%d de peixes</item>
+        <item quantity="other">%d peixes</item>
     </plurals>
     <string name="battle_opponent_live">%1$s está pescando: %2$s</string>
     <string name="battle_opponent_live_cast">lançamento %1$d</string>

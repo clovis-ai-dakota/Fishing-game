@@ -37,7 +37,7 @@
     <string name="battle_setup_wager_none">Yok</string>
     <!-- %1$s: points paid back for a win; %2$s: the multiplier (after ×); %3$s: the computer's
          level (an adjective: "Kolay rakibe karşı"). -->
-    <string name="battle_setup_wager_terms">Kazanırsan %1$s puan geri alırsın (%3$s rakibe karşı ×%2$s); beraberlikte bahis iade edilir; kaybedersen ya da pes edersen bahsi kaybedersin.</string>
+    <string name="battle_setup_wager_terms">Kazanırsan %1$s puan geri alırsın (%3$s rakibe karşı ×%2$s); beraberlikte bahis iade edilir; kaybedersen ya da pes edersen bahsi kaybedersin.</string>
     <!-- %1$s: the computer's level; %2$s: the multiplier. -->
     <string name="battle_setup_wager_hint">Sonuca puan yatır: %1$s rakibe karşı galibiyet ×%2$s öder.</string>
     <!-- G = galibiyet, M = mağlubiyet, B = beraberlik. -->
@@ -96,8 +96,8 @@
     <!-- %1$d: the cast's number; %2$s: what it brought, joined with " · ". -->
     <string name="battle_cast_line">#%1$d: %2$s</string>
     <plurals name="battle_fish">
-        <item quantity="one">%d balık</item>
-        <item quantity="other">%d balık</item>
+        <item quantity="one">%d balık</item>
+        <item quantity="other">%d balık</item>
     </plurals>
     <!-- %1$s: the opponent's name; %2$s: the details. -->
     <string name="battle_opponent_live">%1$s balık tutuyor: %2$s</string>

@@ -207,9 +207,9 @@
     <string name="social_tournament_rewards_title">Récompenses</string>
     <string name="social_tournament_rewards_body">Les récompenses dépendent de votre classement final une fois la semaine terminée, et se récupèrent ici.</string>
     <!-- No arguments: the % sign is written as is, with French spacing. -->
-    <string name="social_tournament_tier_champion">Le vainqueur et le top 1 %</string>
-    <string name="social_tournament_tier_gold">Le top 10 %</string>
-    <string name="social_tournament_tier_silver">Le top 25 %</string>
+    <string name="social_tournament_tier_champion">Le vainqueur et le top 1 %</string>
+    <string name="social_tournament_tier_gold">Le top 10 %</string>
+    <string name="social_tournament_tier_silver">Le top 25 %</string>
     <string name="social_tournament_tier_bronze">La première moitié</string>
     <string name="social_tournament_tier_took_part">Tous les autres participants</string>
 

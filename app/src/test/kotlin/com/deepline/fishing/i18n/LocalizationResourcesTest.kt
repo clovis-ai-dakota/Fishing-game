@@ -137,6 +137,8 @@ class LocalizationResourcesTest {
                 if (Regex("%\\d+\\$(?![-#+ 0,(]*\\d*(\\.\\d+)?[sdfxXcboegEG])").containsMatchIn(value)) problems += "$where: '$key' has a broken placeholder"
                 val unnumbered = Regex("%(?!\\d+\\$)[-#+ 0,(]*\\d*(\\.\\d+)?[sdfxXcboegEG]").findAll(value.replace("%%", "")).count()
                 if (unnumbered > 1) problems += "$where: '$key' has several placeholders without positions: write %1\$s, %2\$d..."
+                // "50 m" must never break at a line end: a no-break space (U+00A0) joins a number and its unit.
+                unitAfterSpace.find(value)?.let { problems += "$where: '$key' has \"${it.value}\": join the number and its unit with a no-break space (U+00A0)" }
             }
             file.strings.forEach { (k, v) -> check(k, v) }
             file.plurals.forEach { (k, items) -> items.forEach { (q, v) -> check("$k[$q]", v) } }
@@ -228,6 +230,9 @@ class LocalizationResourcesTest {
          * language goes here once it is complete.
          */
         val REQUIRED_LANGUAGES: Set<String> = setOf("fr", "es", "de", "pt-rBR", "tr")
+
+        /** A number (or its placeholder), an ordinary space, then a unit, inflected or not: "%1$s m", "10 %", "%1$s puanın". */
+        private val unitAfterSpace = Regex("(?U)(%\\d+\\$[sd]|\\d) (m/s|m|kg|pts|Pkt\\.|Punkten?|puan\\w*|%%|%|×)(?!\\w)")
 
         /**
          * The plural categories each language uses for whole numbers (Unicode CLDR, as in Android's

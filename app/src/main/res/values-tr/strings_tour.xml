@@ -28,7 +28,7 @@
     <!-- The way down: avoid bumping into things. -->
     <string name="tour_descent_title">İnerken: kaç</string>
     <!-- %1$d: bumps allowed (4); %2$d: depth of the bump-free zone in meters. -->
-    <string name="tour_descent_body">İğne %1$d kez çarpana ya da halatın sonuna gelene kadar batar, sonra yukarı döner. Bir balıkta yalnızca kafa çarpma sayılır (çıkarken hedeflediğin yerin ta kendisi); gövdeye ya da kuyruğa sürtünmek sayılmaz. Kayalar, kütükler ve denizanaları ise neresine dokunursan dokun sayılır. İlk %2$d m çarpmasızdır.</string>
+    <string name="tour_descent_body">İğne %1$d kez çarpana ya da halatın sonuna gelene kadar batar, sonra yukarı döner. Bir balıkta yalnızca kafa çarpma sayılır (çıkarken hedeflediğin yerin ta kendisi); gövdeye ya da kuyruğa sürtünmek sayılmaz. Kayalar, kütükler ve denizanaları ise neresine dokunursan dokun sayılır. İlk %2$d m çarpmasızdır.</string>
 
     <string name="tour_ascent_title">Çıkarken: kafaları hedefle</string>
     <string name="tour_ascent_body">Yukarı çıkarken iğneyi bir balığın kafasıyla buluşacak şekilde yönlendir: gözünün yanındaki açık renkli yüz. Kuyruğa ya da gövdeye dokunmak hiçbir şey yapmaz.</string>
@@ -55,7 +55,7 @@
 
     <string name="tour_tackle_title">Ekipman</string>
     <!-- %1$d: the detector's radius in meters; %2$d: how many times more Sparkling fish the lure brings. -->
-    <string name="tour_tackle_body">Ekipman sayfası, atıştan önce açacağın tek atışlık eşyalar satar. Fenerler karanlığı aydınlatır; Nadir balık dedektörü, iğnenin %1$d m yakınındaki henüz yakalamadığın türleri işaretler; Şans tılsımı inişte bir ekstra çarpma hakkı verir; Parıltı yemi ise %2$d× daha fazla Parıldayan balık getirir. Fiyatlar halatının erişimiyle birlikte artar.</string>
+    <string name="tour_tackle_body">Ekipman sayfası, atıştan önce açacağın tek atışlık eşyalar satar. Fenerler karanlığı aydınlatır; Nadir balık dedektörü, iğnenin %1$d m yakınındaki henüz yakalamadığın türleri işaretler; Şans tılsımı inişte bir ekstra çarpma hakkı verir; Parıltı yemi ise %2$d× daha fazla Parıldayan balık getirir. Fiyatlar halatının erişimiyle birlikte artar.</string>
 
     <string name="tour_two_prices_title">İki ödeme yolu</string>
     <!-- %1$d: minutes of fishing per euro; %2$s: the time per euro for Lantern packs (e.g. "1 saat"). -->
@@ -63,7 +63,7 @@
 
     <string name="tour_lantern_title">Fenerler derinleri aydınlatır</string>
     <!-- %1$d: depth where the water goes dark; %2$d: the lit radius with a Lantern; %3$d: without (meters). -->
-    <string name="tour_lantern_body">%1$d m altında su karanlıktır. İğnenin çevresinde çok daha fazla suyu aydınlatmak için bunu atıştan önce aç (%3$d m yerine %2$d m). Her atışta bir Fener kullanılır; kilometre taşlarından daha fazlasını kazan ya da Mağaza\'dan satın al.</string>
+    <string name="tour_lantern_body">%1$d m altında su karanlıktır. İğnenin çevresinde çok daha fazla suyu aydınlatmak için bunu atıştan önce aç (%3$d m yerine %2$d m). Her atışta bir Fener kullanılır; kilometre taşlarından daha fazlasını kazan ya da Mağaza\'dan satın al.</string>
 
     <string name="tour_dex_title">Dex\'ini doldur</string>
     <!-- %1$d: number of species; %2$d: number of depth zones. -->

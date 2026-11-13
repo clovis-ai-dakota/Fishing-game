@@ -15,8 +15,8 @@
     <string name="home_rope_title">Tu cuerda</string>
     <!-- %1$s: reach in meters; %2$s: the deepest zone it reaches. -->
     <string name="home_rope_reach">Llega a %1$s · %2$s</string>
-    <string name="home_rope_stats">Lances: %1$s · Total ganado: %2$s pts</string>
-    <string name="home_rope_stats_deepest">Lances: %1$s · Total ganado: %2$s pts · Captura más profunda: %3$s</string>
+    <string name="home_rope_stats">Lances: %1$s · Total ganado: %2$s pts</string>
+    <string name="home_rope_stats_deepest">Lances: %1$s · Total ganado: %2$s pts · Captura más profunda: %3$s</string>
 
     <!-- The Dex card. -->
     <string name="home_dex_title">Dex</string>
@@ -36,7 +36,7 @@
 
     <!-- The Lantern switch above the Cast line button. -->
     <string name="home_lanterns">Faroles: %1$d</string>
-    <string name="home_lanterns_hint">Ilumina la oscuridad por debajo de %1$d m en el próximo lance.</string>
+    <string name="home_lanterns_hint">Ilumina la oscuridad por debajo de %1$d m en el próximo lance.</string>
     <!-- Chips for other tackle (short forms). -->
     <string name="home_tackle_detector">Detector ×%1$d</string>
     <string name="home_tackle_charm">Amuleto ×%1$d</string>
@@ -46,5 +46,5 @@
 
     <!-- The rules, in a dialog. -->
     <string name="home_rules_title">Cómo pescar</string>
-    <string name="home_rules_body">• Arrastra a izquierda y derecha para guiar el anzuelo.\n• Al bajar: el anzuelo se hunde hasta que ha dado %1$d golpes o se acaba la cuerda. Un golpe es tocar la cabeza de un pez, una roca, un tronco o una medusa; rozar el cuerpo o la cola de un pez no cuenta. Los primeros %2$d m están libres de golpes.\n• Al subir: toca a un pez en la cabeza (la cara clara junto al ojo) para engancharlo. Tocarle la cola no hace nada. La cuerda solo aguanta cierto peso.\n• Las capturas más profundas valen más puntos. Los peces brillantes valen %3$d× más.\n• Por debajo de %4$d m todo se oscurece. Un Farol ilumina más parte del agua.</string>
+    <string name="home_rules_body">• Arrastra a izquierda y derecha para guiar el anzuelo.\n• Al bajar: el anzuelo se hunde hasta que ha dado %1$d golpes o se acaba la cuerda. Un golpe es tocar la cabeza de un pez, una roca, un tronco o una medusa; rozar el cuerpo o la cola de un pez no cuenta. Los primeros %2$d m están libres de golpes.\n• Al subir: toca a un pez en la cabeza (la cara clara junto al ojo) para engancharlo. Tocarle la cola no hace nada. La cuerda solo aguanta cierto peso.\n• Las capturas más profundas valen más puntos. Los peces brillantes valen %3$d× más.\n• Por debajo de %4$d m todo se oscurece. Un Farol ilumina más parte del agua.</string>
 </resources>

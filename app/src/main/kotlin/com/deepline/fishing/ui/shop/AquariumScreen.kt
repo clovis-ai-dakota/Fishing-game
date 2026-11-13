@@ -68,7 +68,8 @@ fun AquariumScreen(vm: GameViewModel) {
     val inTank = Showcase.tankFish(p).map { it.id }.toSet()
     SubScreen(title = stringResource(R.string.shop_aquarium_title), onBack = vm::onBack) {
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 110.dp),
+            // Two columns on a phone: species and decor names are read in full (two lines at most).
+            columns = GridCells.Adaptive(minSize = 150.dp),
             contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 24.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -98,7 +99,7 @@ fun AquariumScreen(vm: GameViewModel) {
                 FilterChip(
                     selected = d.name !in p.hiddenDecor,
                     onClick = { vm.toggleDecor(d) },
-                    label = { Text(d.label(), maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                    label = { Text(d.label(), maxLines = 2, overflow = TextOverflow.Ellipsis) },
                 )
             }
             item(span = { GridItemSpan(maxLineSpan) }) {
@@ -111,7 +112,7 @@ fun AquariumScreen(vm: GameViewModel) {
                 FilterChip(
                     selected = s.id in inTank,
                     onClick = { vm.toggleTankFish(s.id) },
-                    label = { Text(s.label(), maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                    label = { Text(s.label(), maxLines = 2, overflow = TextOverflow.Ellipsis) },
                     modifier = Modifier.testTag("tank_${s.id}"),
                 )
             }

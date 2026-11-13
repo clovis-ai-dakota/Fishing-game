@@ -7,6 +7,8 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -41,6 +43,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -81,14 +84,15 @@ fun ThemesScreen(vm: GameViewModel) {
                 Card(Modifier.fillMaxWidth().tourTarget(TourTarget.THEMES_MODE), shape = RoundedCornerShape(16.dp)) {
                     Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(stringResource(R.string.shop_themes_mode_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+                        // Segments as tall as the tallest: "Like my phone" takes two lines in French or German.
+                        SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
                             NightMode.entries.forEachIndexed { i, mode ->
                                 SegmentedButton(
                                     selected = vm.nightMode == mode,
                                     onClick = { vm.setNightMode(mode) },
                                     shape = SegmentedButtonDefaults.itemShape(i, NightMode.entries.size),
-                                    modifier = Modifier.testTag("mode_${mode.name.lowercase()}"),
-                                ) { Text(mode.label(), maxLines = 1) }
+                                    modifier = Modifier.fillMaxHeight().testTag("mode_${mode.name.lowercase()}"),
+                                ) { Text(mode.label(), maxLines = 2, textAlign = TextAlign.Center) }
                             }
                         }
                         Text(
@@ -119,7 +123,7 @@ private fun ThemeCard(vm: GameViewModel, theme: MenuTheme, night: Boolean, actio
                 Text(theme.label(), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
                 if (theme.tier > 0) Text("★".repeat(theme.tier), color = MaterialTheme.colorScheme.tertiary, style = MaterialTheme.typography.labelMedium)
             }
-            Text(theme.description(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, minLines = 2, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Text(theme.description(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, minLines = 2)
             when {
                 vm.menuTheme == theme -> OwnedRow(stringResource(R.string.shop_in_use))
                 theme.isAvailable(p, ShopClock.now()) -> OwnedRow {

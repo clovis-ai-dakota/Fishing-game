@@ -30,7 +30,7 @@
 
     <string name="tour_descent_title">Al bajar: esquiva</string>
     <!-- %1$d: bumps allowed (4); %2$d: depth of the bump-free zone in meters. -->
-    <string name="tour_descent_body">El anzuelo se hunde hasta que ha dado %1$d golpes o llega al final de la cuerda, y luego vuelve a subir. En un pez, solo la cabeza cuenta como golpe (el mismo punto al que apuntas al subir); rozar el cuerpo o la cola no cuenta. Las rocas, los troncos y las medusas cuentan como golpe, las toques por donde las toques. Los primeros %2$d m están libres de golpes.</string>
+    <string name="tour_descent_body">El anzuelo se hunde hasta que ha dado %1$d golpes o llega al final de la cuerda, y luego vuelve a subir. En un pez, solo la cabeza cuenta como golpe (el mismo punto al que apuntas al subir); rozar el cuerpo o la cola no cuenta. Las rocas, los troncos y las medusas cuentan como golpe, las toques por donde las toques. Los primeros %2$d m están libres de golpes.</string>
 
     <string name="tour_ascent_title">Al subir: apunta a las cabezas</string>
     <string name="tour_ascent_body">Al subir, guía el anzuelo para que toque la cabeza de un pez: la cara clara junto a su ojo. Tocar la cola o el cuerpo no hace nada.</string>
@@ -62,7 +62,7 @@
     <string name="tour_tackle_title">Aparejos</string>
     <!-- The four tackle names match core_tackle_*. %1$d: the detector's radius in meters;
          %2$d: how many times more Sparkling fish the lure brings. -->
-    <string name="tour_tackle_body">La página Aparejos vende objetos de un solo lance que se activan antes de lanzar. Los Faroles iluminan la oscuridad, un Detector de peces raros marca las especies que aún no has capturado a menos de %1$d m del anzuelo, un Amuleto de la suerte da un golpe más al bajar y un Señuelo brillante trae %2$d× más peces brillantes. Los precios suben con el alcance de tu cuerda.</string>
+    <string name="tour_tackle_body">La página Aparejos vende objetos de un solo lance que se activan antes de lanzar. Los Faroles iluminan la oscuridad, un Detector de peces raros marca las especies que aún no has capturado a menos de %1$d m del anzuelo, un Amuleto de la suerte da un golpe más al bajar y un Señuelo brillante trae %2$d× más peces brillantes. Los precios suben con el alcance de tu cuerda.</string>
 
     <string name="tour_two_prices_title">Dos formas de pagar</string>
     <!-- %1$d: minutes of fishing per euro; %2$s: the time per euro for Lantern packs (e.g. "1 hora"). -->
@@ -70,7 +70,7 @@
 
     <string name="tour_lantern_title">Los Faroles iluminan el fondo</string>
     <!-- %1$d: depth where the water goes dark; %2$d: the lit radius with a Lantern; %3$d: without (meters). -->
-    <string name="tour_lantern_body">Por debajo de %1$d m el agua está oscura. Activa esto antes de un lance para iluminar mucha más agua alrededor del anzuelo (%2$d m en vez de %3$d m). Se gasta un Farol por lance; consigue más con los hitos o cómpralos en la Tienda.</string>
+    <string name="tour_lantern_body">Por debajo de %1$d m el agua está oscura. Activa esto antes de un lance para iluminar mucha más agua alrededor del anzuelo (%2$d m en vez de %3$d m). Se gasta un Farol por lance; consigue más con los hitos o cómpralos en la Tienda.</string>
 
     <string name="tour_dex_title">Completa tu Dex</string>
     <!-- %1$d: number of species; %2$d: number of depth zones. "Vista" is a Dex state. -->

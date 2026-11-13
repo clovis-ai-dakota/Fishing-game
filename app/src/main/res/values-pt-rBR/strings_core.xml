@@ -35,13 +35,13 @@
 
     <!-- Apetrechos: itens para um lançamento. -->
     <string name="core_tackle_lantern">Lanterna</string>
-    <string name="core_tackle_lantern_desc">Ilumina muito mais da água escura abaixo de %1$d m por um lançamento.</string>
+    <string name="core_tackle_lantern_desc">Ilumina muito mais da água escura abaixo de %1$d m por um lançamento.</string>
     <string name="core_tackle_lucky_charm">Amuleto da sorte</string>
     <string name="core_tackle_lucky_charm_desc">Uma batida extra na descida por um lançamento (%1$d em vez de %2$d).</string>
     <string name="core_tackle_sparkle_lure">Isca cintilante</string>
     <string name="core_tackle_sparkle_lure_desc">%1$d× mais peixes cintilantes na água por um lançamento.</string>
     <string name="core_tackle_detector">Detector de peixes raros</string>
-    <string name="core_tackle_detector_desc">Por um lançamento, marca as espécies que você ainda não capturou a até %1$d m do anzol, mesmo no escuro.</string>
+    <string name="core_tackle_detector_desc">Por um lançamento, marca as espécies que você ainda não capturou a até %1$d m do anzol, mesmo no escuro.</string>
 
     <!-- Modos de duelo: o nome e as regras. -->
     <string name="core_mode_best_of_five">Melhor de 5</string>
@@ -419,14 +419,14 @@
         <item quantity="many">%d de rodadas</item>
         <item quantity="other">%d rodadas</item>
     </plurals>
-    <string name="core_score_best_cast">%1$s pts no melhor lançamento</string>
-    <string name="core_score_kg">%1$s kg</string>
+    <string name="core_score_best_cast">%1$s pts no melhor lançamento</string>
+    <string name="core_score_kg">%1$s kg</string>
     <plurals name="core_score_species">
         <item quantity="one">%d espécie</item>
         <item quantity="many">%d de espécies</item>
         <item quantity="other">%d espécies</item>
     </plurals>
-    <string name="core_score_deepest">captura mais funda: %1$s m</string>
+    <string name="core_score_deepest">captura mais funda: %1$s m</string>
 
     <!-- Segredos de pesca: nomes curtos e marcantes, como lances de esporte. Só aparecem depois
          que o segredo é descoberto, nunca no tour. -->

@@ -52,13 +52,13 @@
     <string name="boat_editor_unlock_title">Freischalten: %1$s?</string>
     <plurals name="boat_editor_unlock_body">
         <item quantity="one">%1$s kostet einmalig %2$s Punkt. Du hast %3$s.</item>
-        <item quantity="other">%1$s kostet einmalig %2$s Punkte. Du hast %3$s.</item>
+        <item quantity="other">%1$s kostet einmalig %2$s Punkte. Du hast %3$s.</item>
     </plurals>
     <plurals name="boat_editor_unlock_body_short">
         <item quantity="one">%1$s kostet einmalig %2$s Punkt. Du hast %3$s. Angle weiter, um mehr zu verdienen.</item>
-        <item quantity="other">%1$s kostet einmalig %2$s Punkte. Du hast %3$s. Angle weiter, um mehr zu verdienen.</item>
+        <item quantity="other">%1$s kostet einmalig %2$s Punkte. Du hast %3$s. Angle weiter, um mehr zu verdienen.</item>
     </plurals>
-    <string name="boat_editor_unlock_buy">Für %1$s Punkte freischalten</string>
+    <string name="boat_editor_unlock_buy">Für %1$s Punkte freischalten</string>
     <string name="boat_editor_not_now">Nicht jetzt</string>
     <string name="boat_editor_locked_title">Gesperrt: %1$s</string>
 </resources>

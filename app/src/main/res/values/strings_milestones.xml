@@ -6,14 +6,14 @@
 <resources>
     <string name="milestones_title">Milestones</string>
     <!-- %1$s: points earned in total, already formatted. -->
-    <string name="milestones_earned">Earned in total: %1$s pts</string>
+    <string name="milestones_earned">Earned in total: %1$s pts</string>
     <string name="milestones_explainer">Milestones count every point you earn from fish, even after spending them on upgrades.</string>
     <!-- A milestone's threshold. %1$s: points, already formatted. -->
-    <string name="milestones_threshold">%1$s pts</string>
+    <string name="milestones_threshold">%1$s pts</string>
     <!-- Already claimed (✓ is a check mark). -->
     <string name="milestones_claimed">Claimed ✓</string>
     <string name="milestones_claim">Claim</string>
     <!-- A milestone's reward, parts joined with " · ". -->
     <!-- %1$s: bonus points, already formatted. -->
-    <string name="milestones_reward_points">+%1$s pts</string>
+    <string name="milestones_reward_points">+%1$s pts</string>
 </resources>

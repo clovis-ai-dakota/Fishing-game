@@ -28,9 +28,9 @@
     <string name="cast_hud_pause">Pausa</string>
     <string name="cast_hud_bumps">Golpes</string>
     <!-- The weight bar. %1$s: kg on the line now; %2$s: the most the rope can carry. Short. -->
-    <string name="cast_hud_load">Carga %1$s / %2$s kg</string>
+    <string name="cast_hud_load">Carga %1$s / %2$s kg</string>
     <!-- %1$d: the depth (m) below which bumps count. -->
-    <string name="cast_hud_bump_free">Zona libre de golpes · cuentan por debajo de %1$d m</string>
+    <string name="cast_hud_bump_free">Zona libre de golpes · cuentan por debajo de %1$d m</string>
     <string name="cast_hud_lantern_lit">Farol encendido</string>
     <!-- %1$s: the player's name; %2$d: the round. -->
     <string name="cast_hud_battle_round">%1$s · Ronda %2$d</string>
@@ -40,7 +40,7 @@
     <string name="cast_hud_tournament_attempt">Torneo · Intento %1$d de %2$d</string>
 
     <!-- Hints in the middle of the screen. -->
-    <string name="cast_hint_steer">Arrastra para guiar: el anzuelo va hacia tu dedo. Por debajo de %1$d m, evita las cabezas de los peces y los objetos: con %2$d golpes, el sedal sube.</string>
+    <string name="cast_hint_steer">Arrastra para guiar: el anzuelo va hacia tu dedo. Por debajo de %1$d m, evita las cabezas de los peces y los objetos: con %2$d golpes, el sedal sube.</string>
     <!-- CABEZA is in capitals for emphasis. -->
     <string name="cast_hint_heads">Toca a los peces en la CABEZA para engancharlos. Las colas no cuentan.</string>
 
@@ -63,14 +63,14 @@
     <!-- Pieces joined with " · ". %1$s: meters, already formatted ("312 m"). -->
     <string name="cast_results_deepest">Punto más profundo: %1$s</string>
     <plurals name="cast_results_fish">
-        <item quantity="one">%d pez</item>
-        <item quantity="many">%d de peces</item>
-        <item quantity="other">%d peces</item>
+        <item quantity="one">%d pez</item>
+        <item quantity="many">%d de peces</item>
+        <item quantity="other">%d peces</item>
     </plurals>
     <plurals name="cast_results_objects">
-        <item quantity="one">%d objeto</item>
-        <item quantity="many">%d de objetos</item>
-        <item quantity="other">%d objetos</item>
+        <item quantity="one">%d objeto</item>
+        <item quantity="many">%d de objetos</item>
+        <item quantity="other">%d objetos</item>
     </plurals>
     <string name="cast_results_nothing">Esta vez no hay nada en el sedal. Al subir, lleva el anzuelo hacia los peces para que toque su cabeza.</string>
     <string name="cast_results_by_last_bump">enganchado con el último golpe</string>
@@ -78,11 +78,11 @@
     <string name="cast_results_sparkling">✦ %1$s brillante</string>
     <string name="cast_results_secret">✦ Secreto: %1$s</string>
     <!-- The two spaces are on purpose (quoted). -->
-    <string name="cast_results_total">"Total  +%1$s pts"</string>
+    <string name="cast_results_total">"Total  +%1$s pts"</string>
     <string name="cast_results_collect">Cobrar</string>
     <string name="cast_results_continue">Continuar</string>
 
     <!-- Labels drawn on the water during a cast (small, one line). -->
-    <string name="cast_canvas_bump_free_above">Libre de golpes hasta %1$d m</string>
+    <string name="cast_canvas_bump_free_above">Libre de golpes hasta %1$d m</string>
     <string name="cast_canvas_rope_limit">Límite de la cuerda</string>
 </resources>

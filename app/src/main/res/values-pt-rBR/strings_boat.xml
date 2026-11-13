@@ -65,7 +65,7 @@
         <item quantity="many">%1$s custa %2$s de pontos, uma única vez. Você tem %3$s. Continue pescando para ganhar mais.</item>
         <item quantity="other">%1$s custa %2$s pontos, uma única vez. Você tem %3$s. Continue pescando para ganhar mais.</item>
     </plurals>
-    <string name="boat_editor_unlock_buy">Desbloquear por %1$s pts</string>
+    <string name="boat_editor_unlock_buy">Desbloquear por %1$s pts</string>
     <string name="boat_editor_not_now">Agora não</string>
     <string name="boat_editor_locked_title">Bloqueado: %1$s</string>
 </resources>

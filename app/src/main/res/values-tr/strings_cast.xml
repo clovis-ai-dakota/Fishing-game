@@ -25,9 +25,9 @@
     <string name="cast_hud_pause">Duraklat</string>
     <string name="cast_hud_bumps">Çarpma</string>
     <!-- %1$s: kilograms on the line now; %2$s: the most the rope can carry. -->
-    <string name="cast_hud_load">Yük %1$s / %2$s kg</string>
+    <string name="cast_hud_load">Yük %1$s / %2$s kg</string>
     <!-- %1$d: the depth (m) below which bumps count. -->
-    <string name="cast_hud_bump_free">Çarpmasız bölge · %1$d m altında çarpmalar sayılır</string>
+    <string name="cast_hud_bump_free">Çarpmasız bölge · %1$d m altında çarpmalar sayılır</string>
     <string name="cast_hud_lantern_lit">Fener yanıyor</string>
     <!-- %1$s: the player's name; %2$d: the round. -->
     <string name="cast_hud_battle_round">%1$s · Tur %2$d</string>
@@ -37,7 +37,7 @@
     <string name="cast_hud_tournament_attempt">Turnuva · Deneme %1$d/%2$d</string>
 
     <!-- Hints. %1$d: depth (m) of the bump-free zone; %2$d: bumps allowed. -->
-    <string name="cast_hint_steer">Yönlendirmek için kaydır: iğne parmağına doğru süzülür. %1$d m altında balık kafalarından ve nesnelerden kaç: %2$d çarpmadan sonra misina yukarı döner.</string>
+    <string name="cast_hint_steer">Yönlendirmek için kaydır: iğne parmağına doğru süzülür. %1$d m altında balık kafalarından ve nesnelerden kaç: %2$d çarpmadan sonra misina yukarı döner.</string>
     <!-- KAFALARINA is in capitals for emphasis. -->
     <string name="cast_hint_heads">Balıkları yakalamak için KAFALARINA dokun. Kuyruklar sayılmaz.</string>
 
@@ -49,7 +49,7 @@
     <string name="cast_pause_body_solo">Çıkarsan bu atış biter ve misinadaki balıkların hiçbiri puan getirmez.</string>
     <string name="cast_pause_body_battle">Çıkarsan düelloda hükmen yenilirsin. Duraklatıldığında düello saati durur.</string>
     <string name="cast_pause_body_online">Çıkarsan düelloda hükmen yenilirsin. Çevrim içi düelloda sen duraklatmışken rakibin balık tutmaya devam eder.</string>
-    <string name="cast_pause_body_tournament">Çıkarsan bu turnuva denemesi 0 puan alır ve yine de denemelerinden biri sayılır.</string>
+    <string name="cast_pause_body_tournament">Çıkarsan bu turnuva denemesi 0 puan alır ve yine de denemelerinden biri sayılır.</string>
     <string name="cast_pause_resume">Devam et</string>
     <string name="cast_pause_quit">Atıştan çık</string>
     <string name="cast_pause_forfeit">Pes et</string>
@@ -59,22 +59,22 @@
     <!-- Pieces joined with " · ". %1$s: meters, already formatted ("312 m"). -->
     <string name="cast_results_deepest">En derin nokta %1$s</string>
     <plurals name="cast_results_fish">
-        <item quantity="one">%d balık</item>
-        <item quantity="other">%d balık</item>
+        <item quantity="one">%d balık</item>
+        <item quantity="other">%d balık</item>
     </plurals>
     <plurals name="cast_results_objects">
-        <item quantity="one">%d nesne</item>
-        <item quantity="other">%d nesne</item>
+        <item quantity="one">%d nesne</item>
+        <item quantity="other">%d nesne</item>
     </plurals>
     <string name="cast_results_nothing">Bu sefer misinada hiçbir şey yok. Çıkarken iğneyi balıklara doğru yönlendir ki kafalarıyla buluşsun.</string>
     <string name="cast_results_by_last_bump">son çarpmayla yakalandı</string>
     <string name="cast_results_sparkling">✦ Parıldayan %1$s</string>
     <string name="cast_results_secret">✦ Sır: %1$s</string>
-    <string name="cast_results_total">"Toplam  +%1$s puan"</string>
+    <string name="cast_results_total">"Toplam  +%1$s puan"</string>
     <string name="cast_results_collect">Topla</string>
     <string name="cast_results_continue">Devam</string>
 
     <!-- Labels drawn on the water during a cast. "m\'ye" = "metreye". -->
-    <string name="cast_canvas_bump_free_above">%1$d m\'ye kadar çarpmasız</string>
+    <string name="cast_canvas_bump_free_above">%1$d m\'ye kadar çarpmasız</string>
     <string name="cast_canvas_rope_limit">Halat sınırı</string>
 </resources>

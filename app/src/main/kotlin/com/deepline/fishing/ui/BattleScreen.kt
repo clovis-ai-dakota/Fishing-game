@@ -306,7 +306,7 @@ private fun castLine(i: Int, c: BattleCast): UiText {
         castWeightText(c.result.totalWeightKg),
         deepest?.let { UiText.res(R.string.common_meters, UiText.number(it)) },
     )
-    return UiText.res(R.string.battle_cast_line, i + 1, UiText.join(parts, " · "))
+    return UiText.res(R.string.battle_cast_line, i + 1, UiText.join(parts, ITEM_SEPARATOR))
 }
 
 /** "Ana is fishing: cast 2 · 230 m ↑ · 3 fish · 450 pts", while the online opponent is mid-cast. */
@@ -322,7 +322,7 @@ fun opponentLiveText(vm: GameViewModel): UiText? {
         UiText.plural(R.plurals.battle_fish, live.fish),
         pointsText(live.points.toLong()),
     )
-    return UiText.res(R.string.battle_opponent_live, name, UiText.join(details, " · "))
+    return UiText.res(R.string.battle_opponent_live, name, UiText.join(details, ITEM_SEPARATOR))
 }
 
 /** "2:05": a battle clock (minutes and seconds). */
