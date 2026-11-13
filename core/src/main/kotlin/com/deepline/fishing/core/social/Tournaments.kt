@@ -57,12 +57,13 @@ object Tournaments {
      * player starts their first attempt.
      */
     fun seedOf(week: Long, salt: Long = 0L): Long {
-        // SplitMix64: neighbouring weeks get unrelated water.
-        var z = week * -0x61c8864680b583ebL + salt + 0x1F2E3D4C5B6A7988L
-        z = (z xor (z ushr 30)) * -0x40a7b892e31b1a47L
-        z = (z xor (z ushr 27)) * -0x6b2fb644ecceee15L
-        return z xor (z ushr 31)
+        // A keyed one-way hash: neighbouring weeks get unrelated water, and a seed revealed by an
+        // attempt can't be turned back into the salt (and so into later weeks' water).
+        val input = java.nio.ByteBuffer.allocate(3 * Long.SIZE_BYTES).putLong(SEED_DOMAIN).putLong(salt).putLong(week).array()
+        return java.nio.ByteBuffer.wrap(java.security.MessageDigest.getInstance("SHA-256").digest(input)).long
     }
+
+    private const val SEED_DOMAIN = 0x1F2E3D4C5B6A7988L
 
     /** The turn a tournament attempt is validated as (one player, no clock). */
     fun turnOf(attempt: Int, seed: Long): BattleTurn = BattleTurn(playerIndex = 0, castNumber = attempt, round = 0, seed = seed, timeLimitSec = null)
