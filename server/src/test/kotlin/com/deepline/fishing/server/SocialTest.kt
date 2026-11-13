@@ -389,6 +389,31 @@ class SocialTest {
         dir.deleteRecursively()
     }
 
+    /**
+     * The account store calls the social store when an account is deleted, and every social call
+     * checks the secret with the account store: deleting accounts while others use social calls
+     * must never leave the two waiting for each other (which would hang the whole server).
+     */
+    @Test
+    fun deletingAccountsWhileOthersUseSocialCallsNeverDeadlocks() {
+        val social = store()
+        accounts.onDelete(social::forgetPlayer)
+        social.hello(bob, "Bob")
+        val stop = java.util.concurrent.atomic.AtomicBoolean(false)
+        val reader = kotlin.concurrent.thread(isDaemon = true) { while (!stop.get()) social.hello(bob, "Bob") }
+        val deleter = kotlin.concurrent.thread(isDaemon = true) {
+            repeat(5_000) {
+                val p = PlayerId.random()
+                accounts.authenticate(p.id, p.secret)
+                accounts.delete(p.id, p.secret)
+            }
+        }
+        deleter.join(20_000)
+        stop.set(true)
+        reader.join(5_000)
+        assertFalse(deleter.isAlive || reader.isAlive, "account deletion and a social call deadlocked")
+    }
+
     @Test
     fun accountDeletionErasesEverySocialTrace() {
         val dir = Files.createTempDirectory("social-delete").toFile()

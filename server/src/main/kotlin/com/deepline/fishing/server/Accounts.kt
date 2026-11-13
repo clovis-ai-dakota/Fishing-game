@@ -114,16 +114,21 @@ class AccountStore(private val dir: File? = null, private val clock: () -> Long 
      * call; an id that was never claimed (only gifts sent to it) is the first caller's, as in
      * [authenticate]. True if there was something to delete; deleting twice is harmless.
      */
-    fun delete(id: String, secret: String): Boolean = synchronized(lock) {
-        if (!PlayerId.isValid(id) || !PlayerId.isValidSecret(secret)) throw Failure(Problem.BAD_REQUEST)
-        val existing = read(id)
-        if (existing?.secretHash != null && existing.secretHash != PlayerId.hash(secret)) throw Failure(Problem.FORBIDDEN)
-        memory.remove(id)
-        dir?.let {
-            File(it, "$id.json.tmp").delete()
-            File(it, "$id.json").delete()
+    fun delete(id: String, secret: String): Boolean {
+        val existed = synchronized(lock) {
+            if (!PlayerId.isValid(id) || !PlayerId.isValidSecret(secret)) throw Failure(Problem.BAD_REQUEST)
+            val existing = read(id)
+            if (existing?.secretHash != null && existing.secretHash != PlayerId.hash(secret)) throw Failure(Problem.FORBIDDEN)
+            memory.remove(id)
+            dir?.let {
+                File(it, "$id.json.tmp").delete()
+                File(it, "$id.json").delete()
+            }
+            existing != null
         }
+        // Outside this store's lock: listeners take their own lock, and the social store calls
+        // [authenticate] while holding it, so calling them in here could deadlock the server.
         deletionListeners.forEach { it(id) }
-        existing != null
+        return existed
     }
 }
