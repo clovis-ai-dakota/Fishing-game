@@ -61,7 +61,9 @@ import org.robolectric.annotation.Config
 class CoreTextTest {
     private fun same(expected: String, actual: UiText, what: String) {
         assertTrue("$what has no string resource", actual !is UiText.Raw)
-        assertEquals(what, expected, actual.text)
+        // The resource joins a number and its unit with a no-break space ("300 m" never splits
+        // at a line end); core's plain English says the same words.
+        assertEquals(what, expected, actual.text.replace('\u00A0', ' '))
     }
 
     @Test
