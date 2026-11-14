@@ -8,8 +8,8 @@ the end.
 ## 1. Words: names, numbers and pictograms
 
 - A main screen shows **names, numbers and pictograms**, not sentences. The first view of a tab
-  has a **word budget** (`WORD_BUDGET` in `LocaleLayoutTest.kt`: 40 words with a letter, in every
-  language; numbers don't count). The test writes each screen's count to
+  has a **word budget** (`WORD_BUDGET` in `LocaleLayoutTest.kt`: 40 words of two letters or more, in
+  every language; numbers and one-letter units don't count). The test writes each screen's count to
   `app/build/screenshots/locales/<lang>/words.txt` and fails over budget.
 - **Explanations go behind an (i)** (`InfoButton`, or `SectionTitle(title, info = ...)`) and in
   the tour: the text still exists, on demand. Never a permanent paragraph under a title.

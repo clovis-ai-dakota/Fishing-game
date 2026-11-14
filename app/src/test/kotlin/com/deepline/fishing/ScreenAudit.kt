@@ -93,8 +93,9 @@ object TextAudit {
     }
 
     /**
-     * How many words are on the screen now: every word with a letter, in every text at least
-     * partly visible (numbers and symbols don't count: they are read at a glance). The menus have
+     * How many words are on the screen now: every word of two letters or more, in every text at
+     * least partly visible (numbers, symbols and one-letter units don't count: they are read at a
+     * glance). The menus have
      * a budget of them (see docs/ui-design.md).
      */
     fun words(rule: ComposeTestRule): Int {
@@ -105,7 +106,8 @@ object TextAudit {
             val clipped = node.boundsInRoot
             if (clipped.width <= 0.5f || clipped.height <= 0.5f) continue
             val text = layoutOf(node)?.layoutInput?.text?.text ?: continue
-            words += text.split(Regex("\\s+")).count { w -> w.any(Char::isLetter) }
+            // A lone letter is a unit ("1 k", "240 m"), read with its number.
+            words += text.split(Regex("\\s+")).count { w -> w.count(Char::isLetter) >= 2 }
         }
         return words
     }
