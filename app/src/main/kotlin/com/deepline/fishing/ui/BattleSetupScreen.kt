@@ -31,6 +31,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.deepline.fishing.ui.kit.pressTilt
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.GameViewModel
@@ -117,7 +118,7 @@ private fun ChoiceTile(
     val scheme = MaterialTheme.colorScheme
     Card(
         onClick = onClick,
-        modifier = modifier.semantics { this.selected = selected; if (description != null) contentDescription = description },
+        modifier = modifier.pressTilt(sheen = false).semantics { this.selected = selected; if (description != null) contentDescription = description },
         border = if (selected) BorderStroke(2.5.dp, GameColors.of(ActionRole.PLAY, com.deepline.fishing.ui.theme.LocalMenuPalette.current).bottom) else null,
         colors = CardDefaults.cardColors(containerColor = if (selected) scheme.secondaryContainer else scheme.surface),
     ) {

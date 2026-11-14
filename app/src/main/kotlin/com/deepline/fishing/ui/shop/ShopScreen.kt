@@ -58,6 +58,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.deepline.fishing.ui.kit.pressTilt
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -251,7 +252,7 @@ private fun LazyGridScope.banners(vm: GameViewModel, page: ShopPage, actions: Sh
                 title = stringResource(R.string.shop_club_pouch_title),
                 text = stringResource(R.string.shop_club_pouch_body, ShopText.contents(pouch, vm.progress).asString()),
             ) {
-                Button(onClick = vm::claimClubPouch, modifier = Modifier.testTag("claim_club_pouch")) { Text(stringResource(R.string.shop_claim)) }
+                GameButton(stringResource(R.string.shop_claim), onClick = vm::claimClubPouch, modifier = Modifier.testTag("claim_club_pouch"), role = ActionRole.CLAIM)
             }
         }
     }
@@ -596,7 +597,7 @@ private fun LazyGridScope.stylePage(vm: GameViewModel, actions: ShopActions, tim
 
 @Composable
 internal fun Tile(name: String, badge: String?, preview: @Composable () -> Unit, bottom: @Composable () -> Unit) {
-    Card(shape = RoundedCornerShape(14.dp)) {
+    Card(Modifier.pressTilt(sheen = false), shape = RoundedCornerShape(14.dp)) {
         Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Box(
                 Modifier

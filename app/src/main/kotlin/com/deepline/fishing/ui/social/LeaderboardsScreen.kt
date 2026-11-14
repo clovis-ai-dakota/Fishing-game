@@ -1,5 +1,8 @@
 package com.deepline.fishing.ui.social
 
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import com.deepline.fishing.ui.kit.KitIcons
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -91,14 +94,13 @@ fun LeaderboardsScreen(vm: GameViewModel) {
                     }
                 }
             }
-            Hint(
-                stringResource(
-                    R.string.social_leaderboards_about,
-                    social.boardKind.description(),
-                    timeLeftLabel(Weeks.endOf(Weeks.indexAt(now)), now),
-                    OnlineProtocol.TOURNAMENT_ROPE_LEVEL,
-                ),
-            )
+            // What the board counts and who can enter is behind the (i); the week's end is a countdown.
+            val about = stringResource(
+                R.string.social_leaderboards_about,
+                social.boardKind.description(),
+                timeLeftLabel(Weeks.endOf(Weeks.indexAt(now)), now),
+                OnlineProtocol.TOURNAMENT_ROPE_LEVEL,
+            ) + if (social.boardView == BoardView.GLOBAL) "\n\n" + stringResource(R.string.social_leaderboards_strangers) else ""
             SocialStatus(vm) { social.refreshBoard() }
 
             val board = social.board?.takeIf { it.board == social.boardKind && it.view == social.boardView }
@@ -115,7 +117,12 @@ fun LeaderboardsScreen(vm: GameViewModel) {
                     BoardView.LEAGUE -> stringResource(R.string.social_leaderboards_league)
                     BoardView.FRIENDS -> stringResource(R.string.social_leaderboards_friends)
                 },
+                info = about,
             ) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                    Icon(KitIcons.Clock, contentDescription = null, tint = LocalHintColor.current ?: MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(15.dp))
+                    Hint(timeLeftLabel(Weeks.endOf(Weeks.indexAt(now)), now))
+                }
                 when {
                     board == null -> Hint(stringResource(if (social.busy) R.string.social_loading else R.string.social_leaderboards_waiting))
                     board.entries.isEmpty() -> Hint(
@@ -129,9 +136,6 @@ fun LeaderboardsScreen(vm: GameViewModel) {
                         if (i > 0) HorizontalDivider()
                         BoardRow(social.boardKind, entry)
                     }
-                }
-                if (social.boardView == BoardView.GLOBAL) {
-                    Hint(stringResource(R.string.social_leaderboards_strangers))
                 }
             }
         }

@@ -34,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.deepline.fishing.ui.kit.pressTilt
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -227,7 +228,7 @@ private fun SkinTile(c: Cosmetic, unlocked: Boolean, equipped: Boolean, time: Fl
         }
     }
     if (unlocked) {
-        Card(onClick = onClick, shape = RoundedCornerShape(14.dp), border = border) { content() }
+        Card(onClick = onClick, modifier = Modifier.pressTilt(), shape = RoundedCornerShape(14.dp), border = border) { content() }
     } else {
         Card(
             shape = RoundedCornerShape(14.dp),

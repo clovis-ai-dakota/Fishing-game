@@ -48,7 +48,7 @@ import com.deepline.fishing.ui.shop.timeLeftLabel
 
 /** A titled glass card, like the other menus' cards. */
 @Composable
-fun SocialCard(title: String?, modifier: Modifier = Modifier, highlighted: Boolean = false, content: @Composable ColumnScope.() -> Unit) {
+fun SocialCard(title: String?, modifier: Modifier = Modifier, highlighted: Boolean = false, info: String? = null, content: @Composable ColumnScope.() -> Unit) {
     Card(
         modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -65,7 +65,8 @@ fun SocialCard(title: String?, modifier: Modifier = Modifier, highlighted: Boole
         val hint = if (highlighted) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
         CompositionLocalProvider(LocalHintColor provides hint) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (title != null) Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                // The explanation, when there is one, is behind the title's (i).
+                if (title != null) com.deepline.fishing.ui.kit.SectionTitle(title, info)
                 content()
             }
         }
@@ -178,7 +179,7 @@ fun PlayerIdRow(vm: GameViewModel) {
             color = MaterialTheme.colorScheme.secondary,
             modifier = Modifier.weight(1f).testTag("my_player_id"),
         )
-        OutlinedButton(onClick = { copyText(context, clipLabel, id) }) { Text(stringResource(R.string.social_copy)) }
-        Button(onClick = { shareText(context, shareMessage) }) { Text(stringResource(R.string.social_share)) }
+        com.deepline.fishing.ui.kit.RoundIconButton(com.deepline.fishing.ui.kit.KitIcons.Copy, stringResource(R.string.social_copy), onClick = { copyText(context, clipLabel, id) }, modifier = Modifier.testTag("id_copy"))
+        com.deepline.fishing.ui.kit.RoundIconButton(com.deepline.fishing.ui.kit.KitIcons.Share, stringResource(R.string.social_share), onClick = { shareText(context, shareMessage) }, modifier = Modifier.testTag("id_share"))
     }
 }

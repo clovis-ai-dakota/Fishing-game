@@ -22,13 +22,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -41,8 +37,27 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import com.deepline.fishing.core.DailyGrant
+import com.deepline.fishing.ui.SparkleGold
+import com.deepline.fishing.ui.compactPoints
+import com.deepline.fishing.ui.dockBackground
+import com.deepline.fishing.ui.kit.ActionRole
+import com.deepline.fishing.ui.kit.ButtonSize
+import com.deepline.fishing.ui.kit.GameButton
+import com.deepline.fishing.ui.kit.GameColors
+import com.deepline.fishing.ui.kit.InfoButton
+import com.deepline.fishing.ui.kit.KitIcons
+import com.deepline.fishing.ui.kit.Pips
+import com.deepline.fishing.ui.kit.RewardChest
+import com.deepline.fishing.ui.kit.RingProgress
+import com.deepline.fishing.ui.kit.RoundIconButton
+import com.deepline.fishing.ui.kit.SectionTitle
+import com.deepline.fishing.ui.shop.icon
+import com.deepline.fishing.ui.theme.LocalMenuPalette
 import com.deepline.fishing.GameViewModel
 import com.deepline.fishing.R
 import com.deepline.fishing.ui.hourText
@@ -180,9 +195,34 @@ private fun tileState(day: Int, p: PlayerProgress, s: StreakStatus): TileState {
     }
 }
 
-/** One day of the calendar: claimed (filled), today's (outlined) or later. */
+/** One reward as a pictogram and an amount (the coin, a tackle's icon, the shield); its name is read aloud. */
 @Composable
-private fun CalendarDay(day: Int, state: TileState, modifier: Modifier = Modifier, label: String? = null) {
+private fun GrantChip(g: DailyGrant, p: PlayerProgress, modifier: Modifier = Modifier, large: Boolean = false) {
+    val description = DailyText.tile(g, p).asString()
+    val icon = if (large) 20.dp else 14.dp
+    val style = if (large) MaterialTheme.typography.titleMedium else MaterialTheme.typography.labelMedium
+    Row(
+        modifier.semantics { contentDescription = description },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(3.dp),
+    ) {
+        when (g) {
+            is DailyGrant.Points -> {
+                Icon(GameIcons.Coin, contentDescription = null, tint = SparkleGold, modifier = Modifier.size(icon))
+                Text(compactPoints(DailyRewards.pointsFor(p, g.casts)), style = style, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
+            }
+            is DailyGrant.Tackle -> {
+                Icon(g.tackle.icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(icon))
+                Text(stringResource(R.string.common_times, g.count), style = style, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
+            }
+            DailyGrant.Shield -> Icon(DailyIcons.Shield, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(icon))
+        }
+    }
+}
+
+/** One day of the calendar: claimed (ticked), today's (outlined) or later, with its rewards as pictograms. */
+@Composable
+private fun CalendarDay(day: Int, state: TileState, modifier: Modifier = Modifier, grants: List<DailyGrant> = emptyList(), p: PlayerProgress? = null) {
     val c = MaterialTheme.colorScheme
     val (bg, fg) = when (state) {
         TileState.CLAIMED -> c.primary to c.onPrimary
@@ -190,124 +230,101 @@ private fun CalendarDay(day: Int, state: TileState, modifier: Modifier = Modifie
         TileState.LATER -> c.surfaceVariant to c.onSurfaceVariant
     }
     val last = day == DailyRewards.calendar.size
-    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(3.dp)) {
         Box(
             Modifier
-                .size(if (label != null) 40.dp else 30.dp)
+                .size(if (p != null) 36.dp else 30.dp)
                 .clip(CircleShape)
                 .background(bg)
-                .then(if (state == TileState.TODAY) Modifier.border(BorderStroke(2.dp, c.primary), CircleShape) else Modifier),
+                .then(if (state == TileState.TODAY) Modifier.border(BorderStroke(2.5.dp, GameColors.of(ActionRole.CLAIM, LocalMenuPalette.current).bottom), CircleShape) else Modifier),
             contentAlignment = Alignment.Center,
         ) {
-            if (last && state != TileState.CLAIMED) {
-                Icon(GameIcons.Star, contentDescription = null, tint = rewardTextColor(), modifier = Modifier.size(18.dp))
-            } else {
-                Text("$day", style = MaterialTheme.typography.labelLarge, color = fg, fontWeight = FontWeight.Bold)
+            when {
+                state == TileState.CLAIMED -> Icon(KitIcons.Check, contentDescription = null, tint = fg, modifier = Modifier.size(18.dp))
+                last -> Icon(GameIcons.Star, contentDescription = null, tint = rewardTextColor(), modifier = Modifier.size(18.dp))
+                else -> Text("$day", style = MaterialTheme.typography.labelLarge, color = fg, fontWeight = FontWeight.Bold) // i18n-ignore: digits
             }
         }
-        if (label != null) {
-            Text(
-                label,
-                style = MaterialTheme.typography.labelSmall,
-                color = if (last) rewardTextColor() else c.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-                maxLines = 3,
-            )
-        }
+        if (p != null) for (g in grants) GrantChip(g, p)
     }
 }
 
-/** The claim button, or when the next reward comes. */
+/**
+ * The reward itself: a chest (restless while today's reward waits, open once it's claimed), what
+ * the next claim gives, and when it comes if today's is taken.
+ */
 @Composable
-private fun ClaimOrWait(vm: GameViewModel, s: StreakStatus) {
+private fun ChestRow(vm: GameViewModel, s: StreakStatus) {
     val p = vm.progress
-    val next = DailyText.grants(Daily.nextReward(p), p).asString()
-    if (s.canClaim) {
-        Button(onClick = vm.daily::claimReward, modifier = Modifier.fillMaxWidth().testTag("daily_claim")) {
-            Text(stringResource(R.string.daily_claim_button, s.nextCalendarDay, next), textAlign = TextAlign.Center)
+    val next = Daily.nextReward(p)
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+        RewardChest(open = s.claimedToday, ready = s.canClaim, modifier = Modifier.size(width = 104.dp, height = 96.dp).testTag("daily_chest"))
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                CalendarDay(s.nextCalendarDay, if (s.canClaim) TileState.TODAY else TileState.LATER)
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) { for (g in next) GrantChip(g, p, large = true) }
+            }
+            if (!s.canClaim) {
+                // "Today's reward is claimed. Day 3 (...) is ready in 5 h": a clock and the time left.
+                val wait = ShopText.timeLeftLabel(LocalDays.msUntilTomorrow(ShopClock.now()))
+                val sentence = stringResource(R.string.daily_claim_wait, s.nextCalendarDay, DailyText.grants(next, p).asString(), wait)
+                Row(
+                    Modifier.semantics { contentDescription = sentence }.testTag("daily_wait"),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(5.dp),
+                ) {
+                    Icon(KitIcons.Clock, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(16.dp))
+                    Text(wait, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold)
+                }
+            }
         }
-    } else {
-        val wait = ShopText.timeLeftLabel(LocalDays.msUntilTomorrow(ShopClock.now()))
-        Text(
-            stringResource(R.string.daily_claim_wait, s.nextCalendarDay, next, wait),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
     }
 }
 
 private fun difficultyTag(d: ChallengeDifficulty) = d.name.lowercase()
 
-/** A challenge: what to do, how far along, and its claim (and, on the Daily screen, swap) button. */
-@Composable
-private fun ChallengeRow(vm: GameViewModel, c: DailyChallenge, full: Boolean) {
-    val p = vm.progress
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Column(Modifier.weight(1f)) {
-                Text(c.difficulty.label(), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Bold)
-                Text(DailyText.challenge(c).asString(), style = MaterialTheme.typography.bodyMedium)
-            }
-            when {
-                c.claimed -> Text(
-                    stringResource(R.string.daily_challenge_done),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.secondary,
-                    fontWeight = FontWeight.Bold,
-                )
-                c.claimable -> FilledTonalButton(
-                    onClick = { vm.daily.claimChallenge(c.difficulty) },
-                    modifier = Modifier.testTag("challenge_claim_${difficultyTag(c.difficulty)}"),
-                ) { Text(stringResource(R.string.daily_challenge_claim)) }
-                full && vm.daily.canReroll(c.difficulty) -> TextButton(
-                    onClick = { vm.daily.reroll(c.difficulty) },
-                    modifier = Modifier.testTag("challenge_reroll_${difficultyTag(c.difficulty)}"),
-                ) {
-                    Icon(DailyIcons.Swap, contentDescription = null, modifier = Modifier.size(16.dp))
-                    Spacer(Modifier.width(4.dp))
-                    Text(stringResource(R.string.daily_challenge_swap))
-                }
-            }
-        }
-        LinearProgressIndicator(progress = { (c.progress.toFloat() / c.target).coerceIn(0f, 1f) }, modifier = Modifier.fillMaxWidth())
-        Row {
-            Text(DailyText.progress(c).asString(), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.weight(1f))
-            if (full) {
-                Text(
-                    DailyText.grants(DailyRewards.challengeReward(c.difficulty), p).asString(),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = rewardTextColor(),
-                    fontWeight = FontWeight.Bold,
-                )
-            }
-        }
-    }
-}
-
 /**
- * The Fish tab's daily card: the streak, the week's calendar, the claim button and today's
- * challenges. Tapping it opens the Daily screen.
+ * A challenge: a ring for how far along, its difficulty as pips, what to do, its reward as
+ * pictograms and its action (claim in green, or swap).
  */
 @Composable
-fun DailyCard(vm: GameViewModel, modifier: Modifier = Modifier) {
+private fun ChallengeRow(vm: GameViewModel, c: DailyChallenge) {
     val p = vm.progress
-    val s = Daily.status(p, vm.daily.today)
-    val turnOn = rememberReminderOptIn(vm, "explainer")
-    Card(onClick = vm::openDaily, modifier = modifier.fillMaxWidth().testTag("daily_card")) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.daily_title), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-                StreakLine(s)
+    val scheme = MaterialTheme.colorScheme
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        RingProgress((c.progress.toFloat() / c.target).coerceIn(0f, 1f), diameter = 44.dp, color = if (c.claimed) scheme.secondary else scheme.primary) {
+            if (c.claimed) Icon(KitIcons.Check, contentDescription = stringResource(R.string.daily_challenge_done), tint = scheme.secondary, modifier = Modifier.size(20.dp))
+        }
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+            Text(DailyText.challenge(c).asString(), style = MaterialTheme.typography.bodyMedium)
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                // Easy, medium or hard: one, two or three pips.
+                val difficulty = c.difficulty.label()
+                Pips(c.difficulty.ordinal + 1, ChallengeDifficulty.entries.size, Modifier.semantics { contentDescription = difficulty }, color = scheme.secondary)
+                Text(DailyText.progress(c).asString(), style = MaterialTheme.typography.labelSmall, color = scheme.onSurfaceVariant)
             }
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                for (day in 1..DailyRewards.calendar.size) CalendarDay(day, tileState(day, p, s))
+        }
+        Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            if (!c.claimed) for (g in DailyRewards.challengeReward(c.difficulty)) GrantChip(g, p)
+            when {
+                c.claimed -> Unit
+                c.claimable -> GameButton(
+                    stringResource(R.string.daily_challenge_claim),
+                    onClick = { vm.daily.claimChallenge(c.difficulty) },
+                    modifier = Modifier.testTag("challenge_claim_${difficultyTag(c.difficulty)}"),
+                    role = ActionRole.CLAIM,
+                    size = ButtonSize.SMALL,
+                )
+                vm.daily.canReroll(c.difficulty) -> RoundIconButton(
+                    DailyIcons.Swap,
+                    stringResource(R.string.daily_challenge_swap),
+                    onClick = { vm.daily.reroll(c.difficulty) },
+                    modifier = Modifier.testTag("challenge_reroll_${difficultyTag(c.difficulty)}"),
+                    diameter = 34.dp,
+                )
             }
-            ClaimOrWait(vm, s)
-            for (c in vm.daily.challenges) ChallengeRow(vm, c, full = false)
-            DailyMessage(vm)
         }
     }
-    ReminderOptInDialog(vm, turnOn)
 }
 
 /** The species of a migration, as the Dex knows them (unknown ones stay "???"). */
@@ -341,23 +358,17 @@ private fun MigrantRow(vm: GameViewModel, species: FishSpecies) {
     }
 }
 
-/** A migration under way: shown on the Fish tab and in the Dex (nothing between migrations). */
+/** A migration under way, in the Dex (nothing between migrations): the two species, the rest behind the (i). */
 @Composable
 fun MigrationBanner(vm: GameViewModel, modifier: Modifier = Modifier) {
     val m = vm.daily.migration ?: return
     Card(modifier.fillMaxWidth().testTag("migration_banner")) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Icon(DailyIcons.School, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                Column(Modifier.weight(1f)) {
-                    Text(stringResource(R.string.daily_migration_banner_title), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-                    Text(
-                        stringResource(R.string.daily_migration_banner_body, ShopText.timeLeftLabel(m.msLeft(ShopClock.now()))),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
+            SectionTitle(
+                stringResource(R.string.daily_migration_banner_title),
+                info = stringResource(R.string.daily_migration_banner_body, ShopText.timeLeftLabel(m.msLeft(ShopClock.now()))),
+                icon = DailyIcons.School,
+            )
             for (s in m.species) MigrantRow(vm, s)
         }
     }
@@ -379,7 +390,11 @@ fun MigratingNote(species: FishSpecies) {
     }
 }
 
-/** The Daily screen: the reward calendar in full, today's challenges, migrations and reminders. */
+/**
+ * The Daily screen: the streak, the week's rewards as pictograms around the chest, today's
+ * challenges and the migration. The claim is the screen's one main action, docked at the bottom;
+ * the rules are behind the (i) buttons.
+ */
 @Composable
 fun DailyScreen(vm: GameViewModel) {
     val p = vm.progress
@@ -396,65 +411,84 @@ fun DailyScreen(vm: GameViewModel) {
         ) {
             DailyMessage(vm)
             Card(Modifier.fillMaxWidth().tourTarget(TourTarget.DAILY_CALENDAR)) {
-                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    StreakLine(s, large = true)
-                    Text(
-                        stringResource(
-                            R.string.daily_streak_rules,
-                            pluralStringResource(R.plurals.daily_best_streak, p.dailyBestStreak, p.dailyBestStreak),
-                            s.shields,
-                            GameConfig.MAX_STREAK_SHIELDS,
-                            DailyRewards.calendar.size,
-                        ),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    // Two rows (days 1 to 4, then 5 to 7), the last day twice as wide: it's the big one.
-                    val days = DailyRewards.calendar.indices.toList()
-                    for (row in days.chunked((days.size + 1) / 2)) {
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            for (i in row) {
-                                CalendarDay(
-                                    i + 1,
-                                    tileState(i + 1, p, s),
-                                    Modifier.weight(if (i == days.last()) 2f else 1f),
-                                    label = DailyRewards.calendar[i].map { DailyText.tile(it, p).asString() }.joinToString("\n"),
-                                )
+                Column(Modifier.padding(start = 16.dp, end = 8.dp, top = 10.dp, bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(Modifier.weight(1f)) { StreakLine(s, large = true) }
+                        InfoButton(
+                            stringResource(R.string.daily_title),
+                            stringResource(
+                                R.string.daily_streak_rules,
+                                pluralStringResource(R.plurals.daily_best_streak, p.dailyBestStreak, p.dailyBestStreak),
+                                s.shields,
+                                GameConfig.MAX_STREAK_SHIELDS,
+                                DailyRewards.calendar.size,
+                            ),
+                            tag = "daily_info",
+                        )
+                    }
+                    Column(Modifier.padding(end = 8.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        ChestRow(vm, s)
+                        // Two rows (days 1 to 4, then 5 to 7), the last day twice as wide: it's the big one.
+                        val days = DailyRewards.calendar.indices.toList()
+                        for (row in days.chunked((days.size + 1) / 2)) {
+                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                for (i in row) {
+                                    CalendarDay(i + 1, tileState(i + 1, p, s), Modifier.weight(if (i == days.last()) 2f else 1f), grants = DailyRewards.calendar[i], p = p)
+                                }
                             }
                         }
                     }
-                    ClaimOrWait(vm, s)
                 }
             }
             Card(Modifier.fillMaxWidth().tourTarget(TourTarget.DAILY_CHALLENGES)) {
-                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text(stringResource(R.string.daily_challenges_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    for (c in vm.daily.challenges) ChallengeRow(vm, c, full = true)
+                Column(Modifier.padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     val left = vm.daily.rerollsLeft
-                    Text(
-                        stringResource(
+                    SectionTitle(
+                        stringResource(R.string.daily_challenges_title),
+                        info = stringResource(
                             R.string.daily_challenges_rules,
                             if (left > 0) pluralStringResource(R.plurals.daily_swaps_left, left, left) else stringResource(R.string.daily_swaps_none),
                         ),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        trailing = {
+                            // Free swaps left today.
+                            if (left > 0) {
+                                Icon(DailyIcons.Swap, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(16.dp))
+                                Text(stringResource(R.string.common_times, left), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                        },
                     )
+                    Column(Modifier.padding(end = 8.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                        for (c in vm.daily.challenges) ChallengeRow(vm, c)
+                    }
                 }
             }
             MigrationCard(vm, vm.daily.nextMigration, Modifier.tourTarget(TourTarget.DAILY_MIGRATION))
             if (!vm.daily.reminders.enabled) {
-                OutlinedButton(onClick = turnOnHere, modifier = Modifier.fillMaxWidth().testTag("daily_reminders")) {
+                GameButton(onClick = turnOnHere, modifier = Modifier.fillMaxWidth().testTag("daily_reminders")) {
                     Icon(DailyIcons.Bell, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(8.dp))
                     // Balanced lines when it needs two (long in Portuguese or German).
                     Text(
                         stringResource(R.string.daily_remind_button),
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                        modifier = Modifier.weight(1f, fill = false),
                         style = androidx.compose.material3.LocalTextStyle.current.copy(lineBreak = androidx.compose.ui.text.style.LineBreak.Heading),
                     )
                 }
             }
             Spacer(Modifier.height(8.dp))
+        }
+        // The one main action: today's reward, in the thumb zone.
+        if (s.canClaim) {
+            val sentence = stringResource(R.string.daily_claim_button, s.nextCalendarDay, DailyText.grants(Daily.nextReward(p), p).asString())
+            Box(Modifier.fillMaxWidth().dockBackground().navigationBarsPadding().padding(horizontal = 16.dp, vertical = 12.dp)) {
+                GameButton(
+                    stringResource(R.string.daily_challenge_claim),
+                    onClick = vm.daily::claimReward,
+                    modifier = Modifier.fillMaxWidth().testTag("daily_claim").semantics { contentDescription = sentence },
+                    role = ActionRole.CLAIM,
+                    size = ButtonSize.HERO,
+                    icon = KitIcons.Gift,
+                )
+            }
         }
     }
     ReminderOptInDialog(vm, turnOn)
@@ -466,26 +500,20 @@ private fun MigrationCard(vm: GameViewModel, m: Migration, modifier: Modifier = 
     val now = ShopClock.now()
     val live = m.isLive(now)
     Card(modifier.fillMaxWidth()) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Icon(DailyIcons.School, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                Text(
-                    if (live) {
-                        stringResource(R.string.daily_migration_live, ShopText.timeLeftLabel(m.msLeft(now)))
-                    } else {
-                        stringResource(R.string.daily_migration_next, ShopText.timeLeftLabel(m.msUntilStart(now)))
-                    },
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
+        Column(Modifier.padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             val days = GameConfig.MIGRATION_HOURS / 24
-            Text(
-                pluralStringResource(R.plurals.daily_migration_about, days, days),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            SectionTitle(
+                if (live) {
+                    stringResource(R.string.daily_migration_live, ShopText.timeLeftLabel(m.msLeft(now)))
+                } else {
+                    stringResource(R.string.daily_migration_next, ShopText.timeLeftLabel(m.msUntilStart(now)))
+                },
+                info = pluralStringResource(R.plurals.daily_migration_about, days, days),
+                icon = DailyIcons.School,
             )
-            for (s in m.species) MigrantRow(vm, s)
+            Column(Modifier.padding(end = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                for (s in m.species) MigrantRow(vm, s)
+            }
         }
     }
 }

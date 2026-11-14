@@ -35,6 +35,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.deepline.fishing.ui.kit.pressTilt
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -143,6 +144,7 @@ private fun FoundSecretCard(number: Int, secret: FishingSecret, onClick: () -> U
     val tier = Secrets.tierOf(secret.id)
     Card(
         onClick = onClick,
+        modifier = Modifier.pressTilt(),
         shape = RoundedCornerShape(14.dp),
         border = BorderStroke(2.dp, tierColor(tier)),
     ) {

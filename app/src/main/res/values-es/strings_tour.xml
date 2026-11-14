@@ -21,6 +21,8 @@
 
     <string name="tour_tabs_title">Cuatro pestañas</string>
     <string name="tour_tabs_body">La barra inferior te lleva a todas partes: en Pescar lanzas el sedal, el Dex reúne todas las especies que encuentras, la Tienda tiene mejoras de cuerda, aparejos y aspectos para tu barco, y Duelo es para partidas 1 contra 1.</string>
+    <string name="tour_look_title">Un nuevo aspecto</string>
+    <string name="tour_look_body">Los menús dicen menos y muestran más. El color indica qué hace un botón: ámbar para la acción principal, verde para una recompensa gratis lista para reclamar, dorado para un precio en puntos y violeta para un precio en euros. Los botones (i) guardan los detalles.</string>
 
     <string name="tour_cast_title">Lanza el sedal</string>
     <string name="tour_cast_body">El gran botón Lanzar sedal, abajo en la pestaña Pescar, deja caer tu anzuelo desde el barco.</string>
@@ -88,13 +90,13 @@
 
     <string name="tour_boat_title">Personaliza tu barco</string>
     <!-- "Personalizar barco" is the button's label in the Skins section. -->
-    <string name="tour_boat_body">Toca tu barco, arriba en la pestaña Pescar, para abrir la sección Aspectos del Dex. Personalizar barco te permite pintar el casco, los ribetes y la cabina, y añadir un diseño, velas, una bandera y un emblema. Los colores básicos son gratis; el resto se desbloquea con puntos, o a medida que capturas más especies, llegas a zonas nuevas y reclamas hitos.</string>
+    <string name="tour_boat_body">Toca tu barco en la pestaña Pescar para abrir la sección Aspectos del Dex. Personalizar barco te permite pintar el casco, los ribetes y la cabina, y añadir un diseño, velas, una bandera y un emblema. Los colores básicos son gratis; el resto se desbloquea con puntos, o a medida que capturas más especies, llegas a zonas nuevas y reclamas hitos.</string>
 
     <string name="tour_shop_style_title">Estilo</string>
     <string name="tour_shop_style_body">La página Estilo tiene barcos prediseñados, pinturas, emblemas y estampados de vela (que se previsualizan en tu propio barco), además de nuevos anzuelos, sedales y estelas. Como todos los aspectos, solo cambian la apariencia, nunca el juego.</string>
 
     <string name="tour_aquarium_title">Tu acuario</string>
-    <string name="tour_aquarium_body">Los peces que has capturado nadan en tu acuario: ábrelo con el botón Acuario del Dex y elige quién nada en él. La decoración y una pecera más grande están en la página Acuario de la Tienda.</string>
+    <string name="tour_aquarium_body">Los peces que has capturado nadan en tu acuario: ábrelo con el botón de la pecera, arriba en el Dex, y elige quién nada en él. La decoración y una pecera más grande están en la página Acuario de la Tienda.</string>
 
     <string name="tour_season_title">Temporadas y eventos de fin de semana</string>
     <!-- %1$s: how long a season lasts (e.g. "6 semanas"). -->
@@ -139,7 +141,7 @@
     <string name="tour_daily_title">Recompensas diarias</string>
     <!-- %1$s: the calendar's length (e.g. "7 días", used twice); %2$d: shields a new player starts
          with; %3$d: the most shields one can hold. -->
-    <string name="tour_daily_body">Reclama aquí una recompensa una vez al día: puntos y aparejos, y una mayor cada %1$s. Perderte un día nunca hace retroceder el calendario. Tu racha cuenta los días seguidos, y un escudo de racha cubre por sí solo un día perdido: empiezas con %2$d, y cada %1$s recibes otro (hasta %3$d).</string>
+    <string name="tour_daily_body">La llama abre tus recompensas diarias. Reclama una al día: puntos y aparejos, y una mayor cada %1$s. Perderte un día nunca hace retroceder el calendario. Tu racha cuenta los días seguidos, y un escudo de racha cubre por sí solo un día perdido: empiezas con %2$d, y cada %1$s recibes otro (hasta %3$d).</string>
 
     <string name="tour_daily_challenges_title">Retos diarios</string>
     <!-- %1$s: free swaps a day (tour_daily_swaps, e.g. "1 cambio al día"). -->
@@ -152,7 +154,7 @@
 
     <string name="tour_migrations_title">Migraciones</string>
     <!-- %1$s: how long a migration lasts (e.g. "2 días"). -->
-    <string name="tour_migrations_body">Cada semana, durante %1$s, migran dos especies poco comunes: una cerca de la superficie y otra en las profundidades, las dos mucho más comunes donde viven. Un aviso las muestra en la pestaña Pescar y en el Dex. Las migraciones son para lances en solitario: los duelos nunca cambian.</string>
+    <string name="tour_migrations_body">Cada semana, durante %1$s, migran dos especies poco comunes: una cerca de la superficie y otra en las profundidades, las dos mucho más comunes donde viven. Un botón con un banco de peces las muestra en la pestaña Pescar, y una tarjeta en el Dex. Las migraciones son para lances en solitario: los duelos nunca cambian.</string>
 
     <string name="tour_reminders_title">Recordatorios</string>
     <!-- %1$s and %2$s: times on the hour, start and end of the quiet hours. -->

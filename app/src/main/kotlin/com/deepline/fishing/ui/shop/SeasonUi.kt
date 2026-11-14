@@ -1,5 +1,17 @@
 package com.deepline.fishing.ui.shop
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import com.deepline.fishing.core.SeasonGrant
+import com.deepline.fishing.ui.kit.GameButton
+import com.deepline.fishing.ui.kit.ActionRole
 import com.deepline.fishing.ui.shop.timeLeftLabel
 import com.deepline.fishing.ui.i18n.asString
 import com.deepline.fishing.ui.i18n.label
@@ -126,6 +138,11 @@ fun SeasonCard(vm: GameViewModel, modifier: Modifier = Modifier) {
     }
 }
 
+/**
+ * One reward of the season track as pictograms (the coin and an amount, a tackle's icon and a
+ * count, a boat, a star for a badge or a card style), ticked once claimed. Tapping it says what
+ * it is in words.
+ */
 @Composable
 private fun TierCell(vm: GameViewModel, reward: SeasonReward, reached: Boolean, unlocked: Boolean) {
     val claimed = reward.key in vm.progress.seasonClaims && vm.progress.seasonNumber == Seasons.at(ShopClock.now()).number
@@ -134,30 +151,60 @@ private fun TierCell(vm: GameViewModel, reward: SeasonReward, reached: Boolean, 
         reward.premium -> Color(0xFF3B2F12)
         else -> Color(0xFF12304A)
     }
+    val ink = when {
+        !reached || (reward.premium && !unlocked) -> Color.White.copy(alpha = 0.55f)
+        reward.premium -> Color(0xFFFFE082)
+        else -> Color.White
+    }
+    val words = ShopText.seasonGrants(reward.grants, vm.progress).asString()
+    var shown by remember { mutableStateOf(false) }
     Box(
         Modifier
-            .width(86.dp)
-            .height(76.dp)
+            .width(72.dp)
+            .height(54.dp)
             .clip(RoundedCornerShape(10.dp))
             .background(bg)
-            .padding(6.dp),
+            .clickable(role = androidx.compose.ui.semantics.Role.Button) { shown = true }
+            .semantics { contentDescription = words }
+            .padding(4.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Text(
-            when {
-                claimed -> "✓ " + ShopText.seasonGrants(reward.grants, vm.progress).asString()
-                else -> ShopText.seasonGrants(reward.grants, vm.progress).asString()
-            },
-            // Hyphenated in the tile's narrow column: German and French reward names are long words.
-            style = MaterialTheme.typography.labelSmall.copy(hyphens = Hyphens.Auto, lineBreak = LineBreak.Paragraph),
-            color = when {
-                !reached || (reward.premium && !unlocked) -> Color.White.copy(alpha = 0.55f)
-                reward.premium -> Color(0xFFFFE082)
-                else -> Color.White
-            },
-            textAlign = TextAlign.Center,
-            maxLines = 4,
-            overflow = TextOverflow.Ellipsis,
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(1.dp)) {
+            androidx.compose.runtime.CompositionLocalProvider(androidx.compose.material3.LocalContentColor provides ink) {
+                androidx.compose.material3.ProvideTextStyle(MaterialTheme.typography.labelMedium) {
+                    for (g in reward.grants) {
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+                            when (g) {
+                                is SeasonGrant.Points -> {
+                                    Icon(com.deepline.fishing.ui.GameIcons.Coin, contentDescription = null, modifier = Modifier.size(14.dp))
+                                    Text(com.deepline.fishing.ui.compactPoints(Seasons.pointsFor(vm.progress, g.minutes)), fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
+                                }
+                                is SeasonGrant.Tackle -> {
+                                    Icon(g.tackle.icon, contentDescription = null, modifier = Modifier.size(15.dp))
+                                    Text(stringResource(R.string.common_times, g.count), fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
+                                }
+                                is SeasonGrant.Boat -> Icon(com.deepline.fishing.ui.kit.KitIcons.Boat, contentDescription = null, modifier = Modifier.size(22.dp))
+                                is SeasonGrant.Unlock -> Icon(com.deepline.fishing.ui.GameIcons.Star, contentDescription = null, modifier = Modifier.size(20.dp))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (claimed) {
+            Icon(
+                com.deepline.fishing.ui.kit.KitIcons.Check,
+                contentDescription = null,
+                tint = Color(0xFF7CFF9B),
+                modifier = Modifier.align(Alignment.TopEnd).size(14.dp),
+            )
+        }
+    }
+    if (shown) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { shown = false },
+            text = { Text(words, style = MaterialTheme.typography.bodyLarge) },
+            confirmButton = { androidx.compose.material3.TextButton(onClick = { shown = false }) { Text(stringResource(R.string.common_got_it)) } },
         )
     }
 }
@@ -208,7 +255,7 @@ fun EventCard(vm: GameViewModel, modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.bodySmall,
             )
             if (Seasons.eventClaimable(p, now).isNotEmpty()) {
-                Button(onClick = vm::claimEventReward, modifier = Modifier.testTag("claim_event")) { Text(stringResource(R.string.shop_event_claim)) }
+                GameButton(stringResource(R.string.shop_event_claim), onClick = vm::claimEventReward, modifier = Modifier.testTag("claim_event"), role = ActionRole.CLAIM)
             }
         }
     }

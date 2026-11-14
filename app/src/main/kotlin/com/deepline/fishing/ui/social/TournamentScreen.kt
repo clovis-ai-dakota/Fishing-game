@@ -1,5 +1,14 @@
 package com.deepline.fishing.ui.social
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import com.deepline.fishing.ui.dockBackground
+import com.deepline.fishing.ui.kit.ActionRole
+import com.deepline.fishing.ui.kit.ButtonSize
+import com.deepline.fishing.ui.kit.GameButton
+import com.deepline.fishing.ui.kit.KitIcons
 import android.icu.text.MessageFormat
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
@@ -98,21 +107,26 @@ fun TournamentScreen(vm: GameViewModel) {
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
                     )
-                    Button(onClick = { social.claimReward(r) }, modifier = Modifier.testTag("tournament_claim")) {
-                        Text(stringResource(R.string.social_tournament_claim))
-                    }
+                    GameButton(
+                        stringResource(R.string.social_tournament_claim),
+                        onClick = { social.claimReward(r) },
+                        modifier = Modifier.testTag("tournament_claim"),
+                        role = ActionRole.CLAIM,
+                        icon = KitIcons.Gift,
+                    )
                 }
             }
 
-            SocialCard(stringResource(R.string.social_tournament_water_title), Modifier.tourTarget(TourTarget.TOURNAMENT_ENTER)) {
-                Hint(
-                    stringResource(
-                        R.string.social_tournament_water_body,
-                        OnlineProtocol.TOURNAMENT_ROPE_LEVEL,
-                        GameConfig.DESCENT_TOUCH_LIMIT,
-                        GameConfig.TOURNAMENT_ATTEMPTS,
-                    ),
-                )
+            SocialCard(
+                stringResource(R.string.social_tournament_water_title),
+                Modifier.tourTarget(TourTarget.TOURNAMENT_ENTER),
+                info = stringResource(
+                    R.string.social_tournament_water_body,
+                    OnlineProtocol.TOURNAMENT_ROPE_LEVEL,
+                    GameConfig.DESCENT_TOUCH_LIMIT,
+                    GameConfig.TOURNAMENT_ATTEMPTS,
+                ),
+            ) {
                 if (t != null) {
                     val left = t.attemptsMax - t.attemptsUsed
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -136,21 +150,6 @@ fun TournamentScreen(vm: GameViewModel) {
                         )
                     }
                     SightTackleChips(vm)
-                    Button(
-                        onClick = vm::startTournamentAttempt,
-                        enabled = left > 0 && !social.busy,
-                        modifier = Modifier.fillMaxWidth().height(56.dp).testTag("tournament_start"),
-                    ) {
-                        Text(
-                            if (left > 0) {
-                                stringResource(R.string.social_tournament_start, t.attemptsUsed + 1, t.attemptsMax)
-                            } else {
-                                stringResource(R.string.social_tournament_no_attempts)
-                            },
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                        )
-                    }
                 } else {
                     Hint(stringResource(R.string.social_tournament_waiting))
                 }
@@ -187,8 +186,7 @@ fun TournamentScreen(vm: GameViewModel) {
                 }
             }
 
-            SocialCard(stringResource(R.string.social_tournament_rewards_title)) {
-                Hint(stringResource(R.string.social_tournament_rewards_body))
+            SocialCard(stringResource(R.string.social_tournament_rewards_title), info = stringResource(R.string.social_tournament_rewards_body)) {
                 for (tier in TournamentTier.entries) {
                     Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(stringResource(tierRule(tier)), style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
@@ -199,6 +197,31 @@ fun TournamentScreen(vm: GameViewModel) {
                             modifier = Modifier.weight(1.4f),
                         )
                     }
+                }
+            }
+        }
+        // The one main action, in the thumb zone: fish an attempt.
+        if (t != null) {
+            val left = t.attemptsMax - t.attemptsUsed
+            Box(Modifier.fillMaxWidth().dockBackground().navigationBarsPadding().padding(horizontal = 16.dp, vertical = 12.dp)) {
+                GameButton(
+                    onClick = vm::startTournamentAttempt,
+                    modifier = Modifier.fillMaxWidth().testTag("tournament_start"),
+                    role = ActionRole.PLAY,
+                    size = ButtonSize.HERO,
+                    enabled = left > 0 && !social.busy,
+                ) {
+                    Icon(KitIcons.Hook, contentDescription = null, modifier = Modifier.size(ButtonSize.HERO.icon))
+                    Text(
+                        if (left > 0) {
+                            stringResource(R.string.social_tournament_start, t.attemptsUsed + 1, t.attemptsMax)
+                        } else {
+                            stringResource(R.string.social_tournament_no_attempts)
+                        },
+                        modifier = Modifier.weight(1f, fill = false),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Black,
+                    )
                 }
             }
         }

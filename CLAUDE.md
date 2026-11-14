@@ -9,7 +9,8 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
 - **Keep the in-app tour up to date.** Every new player-facing feature (screen, mode, rule,
   upgrade, item) needs a step, or an updated step, in
   `app/src/main/kotlin/com/deepline/fishing/ui/tour/Tour.kt`. When you add steps, bump
-  `Tour.VERSION` and set `sinceVersion = Tour.VERSION` on them: returning players then get a short
+  `Tour.VERSION` and set `sinceVersion` to the new number on them (the number itself, not
+  `Tour.VERSION`, which would move with the next bump): returning players then get a short
   "What's new" tour of just those steps. Point steps at UI with `Modifier.tourTarget(...)`.
   `TourContentTest` fails when a screen, battle mode or rope upgrade isn't covered; extend it
   when you add new kinds of features.
@@ -67,6 +68,15 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     (`dockBackground()`), never in the scrolling content.
   - **Pictograms are drawn in code** (`GameIcons`, `KitIcons`, `DailyIcons`), never system emoji;
     a pictogram-only control keeps the sentence it replaced as its `contentDescription`.
+  - **One world**: every menu has a place on the coast (`Place.of` in `ui/theme/World.kt`: sea,
+    deep water, port, arena, lighthouse); `ThemeBackdrop` moves its camera there and `ScreenMotion`
+    moves the screens the same way (under a second; casting dives, collecting surfaces). What
+    stands on the coast stays small, hazy and under the titles: never something that looks
+    tappable or hides text.
+  - **Depth is looks only and stops with Reduce motion** (`LocalCalmMotion`): cards lean under
+    the finger (`Modifier.pressTilt()`), the backdrop shifts with the phone's tilt, the daily
+    reward is a chest that opens (`RewardChest`), and `CLAIM` buttons burst coins (`RewardFx`).
+    At most one live GL view per screen.
 - **Navigation**: four bottom tabs (`MainTab`: Fish = `Screen.HOME`, Dex, Shop = `Screen.SHOP`,
   Battle = `Screen.BATTLE_SETUP`) in `MainScaffold`; the Shop's pages are `ShopPage` (tour steps
   pick one with `shopPage`); everything else is a full screen pushed on top (no

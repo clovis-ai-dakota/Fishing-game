@@ -70,8 +70,9 @@ internal fun text(id: Int, vararg args: Any): UiText = UiText.res(id, *args)
  * The guided tour of the app.
  *
  * KEEP THIS UP TO DATE: every new player-facing feature gets a step (or an updated step) here.
- * When adding steps, bump [VERSION] and give the new steps `sinceVersion = VERSION`, so returning
- * players get a short "What's new" tour of just those steps. `TourContentTest` checks that every
+ * When adding steps, bump [VERSION] and give the new steps that number as their `sinceVersion`
+ * (the number itself: `VERSION` would move with the next bump), so returning players get a short
+ * "What's new" tour of just those steps. `TourContentTest` checks that every
  * screen, battle mode and rope upgrade is covered. Write the text in strings_tour.xml, with the
  * numbers from [GameConfig] passed as arguments (never typed into the text).
  */
@@ -89,8 +90,9 @@ object Tour {
      * 10: themes for the menus (a sea scene behind them) and a night mode.
      * 11: Settings (the gear), sound and haptics, daily rewards and challenges, friends,
      *     leaderboards, tournaments and clubs, privacy choices and languages.
+     * 12: the redesigned menus: fewer words, colours that say what a button does, (i) buttons.
      */
-    const val VERSION = 11
+    const val VERSION = 12
 
     private val bumps = GameConfig.DESCENT_TOUCH_LIMIT
     private val calendarDays get() = UiText.plural(R.plurals.common_days, com.deepline.fishing.core.DailyRewards.calendar.size)
@@ -110,6 +112,14 @@ object Tour {
             screen = Screen.HOME,
             target = TourTarget.NAV_BAR,
             sinceVersion = 9,
+        ),
+        TourStep(
+            id = "look",
+            title = text(R.string.tour_look_title),
+            body = text(R.string.tour_look_body),
+            screen = Screen.HOME,
+            target = TourTarget.HOME_CAST,
+            sinceVersion = 12,
         ),
         TourStep(
             id = "cast",
@@ -369,7 +379,7 @@ object Tour {
             body = text(R.string.tour_settings_body),
             screen = Screen.HOME,
             target = TourTarget.HOME_SETTINGS,
-            sinceVersion = VERSION,
+            sinceVersion = 11,
         ),
         // -- Game feel (sound, haptics) steps below.
         TourStep(
@@ -378,7 +388,7 @@ object Tour {
             body = text(R.string.tour_sound_body),
             screen = Screen.SETTINGS,
             target = TourTarget.SETTINGS_SOUND,
-            sinceVersion = VERSION,
+            sinceVersion = 11,
         ),
 
         // -- Daily loop steps below.
@@ -388,7 +398,7 @@ object Tour {
             body = text(R.string.tour_daily_body, calendarDays, GameConfig.STARTING_STREAK_SHIELDS, GameConfig.MAX_STREAK_SHIELDS),
             screen = Screen.HOME,
             target = TourTarget.HOME_DAILY,
-            sinceVersion = VERSION,
+            sinceVersion = 11,
         ),
         TourStep(
             id = "daily_challenges",
@@ -396,7 +406,7 @@ object Tour {
             body = text(R.string.tour_daily_challenges_body, UiText.plural(R.plurals.tour_daily_swaps, GameConfig.DAILY_FREE_REROLLS)),
             screen = Screen.DAILY,
             target = TourTarget.DAILY_CHALLENGES,
-            sinceVersion = VERSION,
+            sinceVersion = 11,
         ),
         TourStep(
             id = "migrations",
@@ -404,7 +414,7 @@ object Tour {
             body = text(R.string.tour_migrations_body, UiText.plural(R.plurals.common_days, GameConfig.MIGRATION_HOURS / 24)),
             screen = Screen.DAILY,
             target = TourTarget.DAILY_MIGRATION,
-            sinceVersion = VERSION,
+            sinceVersion = 11,
         ),
         TourStep(
             id = "reminders",
@@ -412,11 +422,11 @@ object Tour {
             body = text(R.string.tour_reminders_body, hourText(GameConfig.NOTIFY_QUIET_START_HOUR), hourText(GameConfig.NOTIFY_QUIET_END_HOUR)),
             screen = Screen.SETTINGS,
             target = TourTarget.SETTINGS_NOTIFICATIONS,
-            sinceVersion = VERSION,
+            sinceVersion = 11,
         ),
 
         // -- Social steps below.
-        *SocialTour.steps(VERSION).toTypedArray(),
+        *SocialTour.steps(11).toTypedArray(),
 
         // -- Privacy steps below.
         TourStep(
@@ -425,7 +435,7 @@ object Tour {
             body = text(R.string.tour_privacy_body),
             screen = Screen.SETTINGS,
             target = TourTarget.SETTINGS_PRIVACY,
-            sinceVersion = VERSION,
+            sinceVersion = 11,
         ),
 
         // -- Language steps below.
@@ -435,7 +445,7 @@ object Tour {
             body = text(R.string.tour_language_body),
             screen = Screen.SETTINGS,
             target = TourTarget.SETTINGS_LANGUAGE,
-            sinceVersion = VERSION,
+            sinceVersion = 11,
         ),
 
         TourStep(
@@ -444,7 +454,7 @@ object Tour {
             body = text(R.string.tour_replay_body),
             screen = Screen.SETTINGS,
             target = TourTarget.SETTINGS_TOUR,
-            sinceVersion = VERSION,
+            sinceVersion = 11,
         ),
     )
 

@@ -18,6 +18,8 @@
 
     <string name="tour_tabs_title">Dört sekme</string>
     <string name="tour_tabs_body">Alttaki çubuk seni her yere götürür: Balık sekmesinde olta atarsın, Dex karşılaştığın her türü toplar, Mağaza sekmesinde halat geliştirmeleri, ekipman ve teknen için görünümler bulunur, Düello sekmesi ise 1v1 maçlar içindir.</string>
+    <string name="tour_look_title">Yeni bir görünüm</string>
+    <string name="tour_look_body">Menüler artık daha az söyleyip daha çok gösteriyor. Renk, bir düğmenin ne yaptığını söyler: kehribar ana eylem, yeşil almaya hazır ücretsiz ödül, altın puan fiyatı, mor ise euro fiyatıdır. Ayrıntılar (i) düğmelerinde.</string>
 
     <string name="tour_cast_title">Oltanı at</string>
     <string name="tour_cast_body">Balık sekmesinin altındaki büyük Oltayı at düğmesi, iğneni tekneden suya bırakır.</string>
@@ -81,13 +83,13 @@
 
     <string name="tour_boat_title">Tekneni özelleştir</string>
     <!-- "Tekneyi özelleştir" is the button's label in the Skins section. -->
-    <string name="tour_boat_body">Dex\'in Görünümler bölümünü açmak için Balık sekmesinin üstündeki teknene dokun. Tekneyi özelleştir düğmesiyle gövdeyi, süslemeleri ve kabini boyayabilir; desen, yelken, bayrak ve amblem ekleyebilirsin. Temel renkler ücretsiz; geri kalanların kilidi puanla ya da daha çok tür yakaladıkça, yeni bölgelere ulaştıkça ve kilometre taşlarını aldıkça açılır.</string>
+    <string name="tour_boat_body">Dex\'in Görünümler bölümünü açmak için Balık sekmesindeki teknene dokun. Tekneyi özelleştir düğmesiyle gövdeyi, süslemeleri ve kabini boyayabilir; desen, yelken, bayrak ve amblem ekleyebilirsin. Temel renkler ücretsiz; geri kalanların kilidi puanla ya da daha çok tür yakaladıkça, yeni bölgelere ulaştıkça ve kilometre taşlarını aldıkça açılır.</string>
 
     <string name="tour_shop_style_title">Stil</string>
     <string name="tour_shop_style_body">Stil sayfasında hazır tekneler, boyalar, amblemler ve yelken desenleri (kendi teknende önizlenir), ayrıca yeni iğneler, misinalar ve izler var. Her görünüm gibi bunlar da yalnızca görüntüyü değiştirir, oyunu asla.</string>
 
     <string name="tour_aquarium_title">Akvaryumun</string>
-    <string name="tour_aquarium_body">Yakaladığın balıklar akvaryumunda yüzer: onu Dex\'teki Akvaryum düğmesiyle aç ve orada kimlerin yüzeceğini seç. Dekorlar ve daha büyük bir tank Mağaza\'nın Akvaryum sayfasında.</string>
+    <string name="tour_aquarium_body">Yakaladığın balıklar akvaryumunda yüzer: onu Dex\'in üstündeki akvaryum düğmesiyle aç ve orada kimlerin yüzeceğini seç. Dekorlar ve daha büyük bir tank Mağaza\'nın Akvaryum sayfasında.</string>
 
     <string name="tour_season_title">Sezonlar ve hafta sonu etkinlikleri</string>
     <!-- %1$s: how long a season lasts (e.g. "6 hafta"). -->
@@ -130,7 +132,7 @@
     <string name="tour_daily_title">Günlük ödüller</string>
     <!-- %1$s: the calendar's length (e.g. "7 gün", used twice); %2$d: shields a new player starts
          with; %3$d: the most shields one can hold. -->
-    <string name="tour_daily_body">Burada günde bir kez ödül al: puan ve ekipman, her %1$s sonunda da daha büyüğü. Bir günü kaçırmak takvimi asla geri almaz. Serin, ödülü üst üste aldığın günleri sayar ve bir seri kalkanı kaçırılan bir günü kendiliğinden kapatır: %2$d kalkanla başlarsın ve her %1$s sonunda bir tane daha gelir (en fazla %3$d).</string>
+    <string name="tour_daily_body">Alev günlük ödüllerini açar. Günde bir kez ödül al: puan ve ekipman, her %1$s sonunda da daha büyüğü. Bir günü kaçırmak takvimi asla geri almaz. Serin, ödülü üst üste aldığın günleri sayar ve bir seri kalkanı kaçırılan bir günü kendiliğinden kapatır: %2$d kalkanla başlarsın ve her %1$s sonunda bir tane daha gelir (en fazla %3$d).</string>
 
     <string name="tour_daily_challenges_title">Günlük görevler</string>
     <!-- %1$s: free swaps a day (tour_daily_swaps). -->
@@ -142,7 +144,7 @@
 
     <string name="tour_migrations_title">Göçler</string>
     <!-- %1$s: how long a migration lasts (e.g. "2 gün"). -->
-    <string name="tour_migrations_body">Her hafta %1$s boyunca, daha az yaygın iki tür göç eder: biri yüzeye yakın, biri derinlerde; ikisi de yaşadıkları yerde çok daha yaygın olur. Balık sekmesinde ve Dex\'te bir afiş onları gösterir. Göçler solo atışlar içindir: düellolar asla değişmez.</string>
+    <string name="tour_migrations_body">Her hafta %1$s boyunca, daha az yaygın iki tür göç eder: biri yüzeye yakın, biri derinlerde; ikisi de yaşadıkları yerde çok daha yaygın olur. Balık sekmesinde balık sürüsü düğmesi, Dex\'te ise bir kart onları gösterir. Göçler solo atışlar içindir: düellolar asla değişmez.</string>
 
     <string name="tour_reminders_title">Hatırlatmalar</string>
     <!-- %1$s and %2$s: times on the hour, start and end of the quiet hours. -->

@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.lerp
 import com.deepline.fishing.Screen
@@ -105,50 +106,57 @@ internal fun DrawScope.drawPlaces(p: MenuPalette, t: Float, horizon: Float, u: F
     }
 }
 
+/**
+ * A colour seen from far across the water: washed towards the sky, so the coast reads as distant
+ * and the menus' text stays readable over it.
+ */
+private fun far(c: Color, p: MenuPalette, amount: Float = 0.45f) = lerp(c, p.sky.last(), amount)
+
 private fun DrawScope.drawPort(p: MenuPalette, t: Float, horizon: Float, u: Float) {
     val w = size.width
-    val wood = if (p.night) Color(0xFF4A3524) else Color(0xFF9A6A3C)
-    val woodDark = lerp(wood, Color.Black, 0.35f)
-    val deck = horizon - 6f * u
-    // The pier: planks along the waterline on posts, with their reflection.
-    var x = -10f * u
-    while (x < w + 10f * u) {
-        drawRect(woodDark, topLeft = Offset(x, deck), size = Size(5f * u, 46f * u))
-        drawRect(woodDark.copy(alpha = 0.25f), topLeft = Offset(x + sin(t * 1.5f + x) * u, deck + 46f * u), size = Size(5f * u, 30f * u))
-        x += 58f * u
-    }
-    drawRect(wood, topLeft = Offset(0f, deck - 7f * u), size = Size(w, 9f * u))
-    x = 0f
+    val wood = far(if (p.night) Color(0xFF4A3524) else Color(0xFF9A6A3C), p)
+    val woodDark = far(if (p.night) Color(0xFF2E2117) else Color(0xFF6B4826), p)
+    // Just under the horizon, where a tab's first title ends and its first card starts.
+    val deck = horizon + 7f * u
+    // The quay: a line of planks on short posts, mirrored in the water.
+    var x = 6f * u
     while (x < w) {
-        drawLine(woodDark, Offset(x, deck - 7f * u), Offset(x, deck + 2f * u), strokeWidth = u)
-        x += 22f * u
+        drawRect(woodDark, topLeft = Offset(x, deck), size = Size(4f * u, 12f * u))
+        drawRect(woodDark.copy(alpha = 0.3f), topLeft = Offset(x + sin(t * 1.5f + x) * u, deck + 12f * u), size = Size(4f * u, 10f * u))
+        x += 46f * u
     }
+    drawRect(wood, topLeft = Offset(0f, deck - 4f * u), size = Size(w, 5f * u))
     // The market stall: a counter under a striped awning, crates beside it, a string of lights.
-    val sx = w * 0.56f
-    val counter = if (p.night) Color(0xFF6A5A46) else Color(0xFFF1DFBE)
-    drawRect(counter, topLeft = Offset(sx, deck - 44f * u), size = Size(72f * u, 37f * u))
-    drawRect(woodDark, topLeft = Offset(sx - 4f * u, deck - 26f * u), size = Size(80f * u, 4f * u))
+    val sx = w * 0.6f
+    val counter = far(if (p.night) Color(0xFF6A5A46) else Color(0xFFF1DFBE), p, 0.25f)
+    drawRect(counter, topLeft = Offset(sx, deck - 22f * u), size = Size(44f * u, 18f * u))
     val awning = Path().apply {
-        moveTo(sx - 10f * u, deck - 44f * u); lineTo(sx + 82f * u, deck - 44f * u); lineTo(sx + 72f * u, deck - 64f * u); lineTo(sx, deck - 64f * u); close()
+        moveTo(sx - 6f * u, deck - 22f * u); lineTo(sx + 50f * u, deck - 22f * u); lineTo(sx + 44f * u, deck - 33f * u); lineTo(sx, deck - 33f * u); close()
     }
-    drawPath(awning, if (p.night) Color(0xFF8A3A30) else Color(0xFFE2573F))
+    drawPath(awning, far(if (p.night) Color(0xFF8A3A30) else Color(0xFFE2573F), p, 0.3f))
     for (k in 0 until 4) {
-        val a = sx + 6f * u + k * 20f * u
+        val a = sx + 3f * u + k * 12.5f * u
         val stripe = Path().apply {
-            moveTo(a - 6f * u, deck - 44f * u); lineTo(a + 4f * u, deck - 44f * u); lineTo(a + 6f * u, deck - 64f * u); lineTo(a - 2f * u, deck - 64f * u); close()
+            moveTo(a - 4f * u, deck - 22f * u); lineTo(a + 2f * u, deck - 22f * u); lineTo(a + 3.5f * u, deck - 33f * u); lineTo(a - 1.5f * u, deck - 33f * u); close()
         }
-        drawPath(stripe, Color.White.copy(alpha = if (p.night) 0.5f else 0.92f))
+        drawPath(stripe, Color.White.copy(alpha = if (p.night) 0.4f else 0.8f))
     }
     for (k in 0 until 3) {
-        val c = Offset(w * 0.3f + k * 24f * u, deck - 7f * u - 16f * u)
-        drawRoundRect(lerp(wood, Color.White, 0.12f * k), topLeft = c, size = Size(20f * u, 16f * u), cornerRadius = CornerRadius(2f * u))
-        drawLine(woodDark, c + Offset(0f, 8f * u), c + Offset(20f * u, 8f * u), strokeWidth = u)
+        val c = Offset(w * 0.3f + k * 15f * u, deck - 4f * u - 10f * u)
+        drawRoundRect(lerp(wood, Color.White, 0.12f * k), topLeft = c, size = Size(13f * u, 10f * u), cornerRadius = CornerRadius(1.5f * u))
+        drawLine(woodDark, c + Offset(0f, 5f * u), c + Offset(13f * u, 5f * u), strokeWidth = 0.8f * u)
     }
-    for (k in 0..9) {
-        val lx = w * 0.08f + k * (w * 0.84f / 9f)
-        val ly = deck - 78f * u + sin(k * 0.7f) * 5f * u + 8f * u * (1f - abs(k - 4.5f) / 4.5f)
+    // A moored mast or two, far along the quay.
+    for (mx in listOf(0.1f, 0.17f, 0.9f)) {
+        val bob = sin(t * 0.9f + mx * 20f) * u
+        drawLine(woodDark, Offset(w * mx, deck - 4f * u + bob), Offset(w * mx, deck - 34f * u + bob), strokeWidth = 1.4f * u)
+        drawLine(woodDark, Offset(w * mx - 7f * u, deck - 8f * u + bob), Offset(w * mx + 7f * u, deck - 8f * u + bob), strokeWidth = 3f * u, cap = StrokeCap.Round)
+    }
+    for (k in 0..5) {
+        val lx = sx - 8f * u + k * 12f * u
+        val ly = deck - 38f * u + 4f * u * (1f - abs(k - 2.5f) / 2.5f)
         val on = 0.6f + 0.4f * sin(t * 2f + k * 1.3f)
-        drawCircle(p.accentA.copy(alpha = if (p.night) on else 0.85f), radius = 2.6f * u, center = Offset(lx, ly))
+        drawCircle(p.accentA.copy(alpha = if (p.night) on else 0.8f), radius = 1.8f * u, center = Offset(lx, ly))
     }
 }
 
@@ -165,7 +173,7 @@ private fun DrawScope.drawArena(p: MenuPalette, t: Float, horizon: Float, u: Flo
         drawLine(glow.copy(alpha = 0.5f - k * 0.07f), Offset(sun.x - half, y), Offset(sun.x + half, y), strokeWidth = 3f * u, cap = StrokeCap.Round)
     }
     // The rival's boat, facing yours across the water.
-    val ink = lerp(p.silhouette, Color.Black, 0.55f)
+    val ink = far(lerp(p.silhouette, Color.Black, 0.55f), p, 0.3f)
     fun boat(cx: Float, flip: Float, flag: Color) {
         val bob = sin(t * 1.1f + cx) * 1.5f * u
         val y = horizon + bob
@@ -181,14 +189,18 @@ private fun DrawScope.drawArena(p: MenuPalette, t: Float, horizon: Float, u: Flo
         }
         drawPath(pennant, flag)
     }
-    boat(w * 0.2f, 1f, Color(0xFF4FC3F7))
-    boat(w * 0.8f, -1f, Color(0xFFFF5A4A))
+    scale(0.7f, 0.7f, pivot = Offset(w * 0.5f, horizon)) {
+        boat(w * 0.14f, 1f, Color(0xFF4FC3F7))
+        boat(w * 0.86f, -1f, Color(0xFFFF5A4A))
+    }
 }
 
-private fun DrawScope.drawLighthouse(p: MenuPalette, t: Float, horizon: Float, u: Float) {
+private fun DrawScope.drawLighthouse(p: MenuPalette, t: Float, horizon: Float, u0: Float) {
     val w = size.width
-    val cx = w * 0.72f
-    val rock = lerp(p.silhouette, Color.Black, 0.4f)
+    // Far out on its rock: small, so it stays under the screens' titles.
+    val u = u0 * 0.6f
+    val cx = w * 0.8f
+    val rock = far(lerp(p.silhouette, Color.Black, 0.4f), p, 0.3f)
     val base = Path().apply {
         moveTo(cx - 60f * u, horizon + 4f * u); quadraticTo(cx - 20f * u, horizon - 22f * u, cx + 10f * u, horizon - 14f * u); quadraticTo(cx + 46f * u, horizon - 16f * u, cx + 70f * u, horizon + 4f * u); close()
     }

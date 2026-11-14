@@ -184,4 +184,16 @@ object KitIcons {
     val Plus = icon("Plus") {
         stroked(2.6f) { moveTo(12f, 5f); verticalLineTo(19f); moveTo(5f, 12f); horizontalLineTo(19f) }
     }
+
+    /** Copy to the clipboard: two sheets. */
+    val Copy = icon("Copy") {
+        stroked { rect(8.5f, 8.5f, 19.5f, 20f) }
+        stroked { moveTo(15.5f, 5f); horizontalLineTo(4.5f); verticalLineTo(16f) }
+    }
+
+    /** Share: three linked dots. */
+    val Share = icon("Share") {
+        stroked { moveTo(15.5f, 6.5f); lineTo(8f, 11f); moveTo(8f, 13f); lineTo(15.5f, 17.5f) }
+        filled { circle(17.5f, 5.5f, 2.6f); circle(6f, 12f, 2.6f); circle(17.5f, 18.5f, 2.6f) }
+    }
 }

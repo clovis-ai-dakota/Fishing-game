@@ -19,6 +19,8 @@
 
     <string name="tour_tabs_title">Quatre onglets</string>
     <string name="tour_tabs_body">La barre du bas vous emmène partout : Pêche, c\'est là que vous lancez votre ligne ; le Dex rassemble toutes les espèces que vous rencontrez ; la Boutique propose des améliorations de corde, du matériel et des looks pour votre bateau ; et Duel sert aux matchs en 1 contre 1.</string>
+    <string name="tour_look_title">Un nouveau look</string>
+    <string name="tour_look_body">Les menus en disent moins et en montrent plus. La couleur indique ce que fait un bouton : ambre pour l\'action principale, vert pour une récompense gratuite prête à être récupérée, or pour un prix en points et violet pour un prix en euros. Les boutons (i) donnent les détails.</string>
 
     <string name="tour_cast_title">Lancez votre ligne</string>
     <string name="tour_cast_body">Le grand bouton Lancer la ligne, en bas de l\'onglet Pêche, fait descendre votre hameçon depuis le bateau.</string>
@@ -74,13 +76,13 @@
 
     <string name="tour_boat_title">Personnalisez votre bateau</string>
     <!-- "Personnaliser" is the button's label in the Skins section (dex_skins_boat_customise). -->
-    <string name="tour_boat_body">Touchez votre bateau en haut de l\'onglet Pêche pour ouvrir la rubrique Apparences du Dex. Le bouton Personnaliser vous permet de peindre la coque, le liseré et la cabine, et d\'ajouter un motif, des voiles, un pavillon et un emblème. Les couleurs de base sont gratuites ; le reste se débloque avec des points, ou à mesure que vous pêchez plus d\'espèces, atteignez de nouvelles zones et récupérez des paliers.</string>
+    <string name="tour_boat_body">Touchez votre bateau sur l\'onglet Pêche pour ouvrir la rubrique Apparences du Dex. Le bouton Personnaliser vous permet de peindre la coque, le liseré et la cabine, et d\'ajouter un motif, des voiles, un pavillon et un emblème. Les couleurs de base sont gratuites ; le reste se débloque avec des points, ou à mesure que vous pêchez plus d\'espèces, atteignez de nouvelles zones et récupérez des paliers.</string>
 
     <string name="tour_shop_style_title">Style</string>
     <string name="tour_shop_style_body">La page Style propose des bateaux tout faits, des peintures, des emblèmes et des imprimés de voile (en aperçu sur votre propre bateau), ainsi que de nouveaux hameçons, lignes et traînées. Comme toutes les apparences, ils ne changent que le look, jamais le jeu.</string>
 
     <string name="tour_aquarium_title">Votre aquarium</string>
-    <string name="tour_aquarium_body">Les poissons que vous avez pêchés nagent dans votre aquarium : ouvrez-le avec le bouton Aquarium du Dex et choisissez qui y nage. Le décor et un bac plus grand sont sur la page Aquarium de la Boutique.</string>
+    <string name="tour_aquarium_body">Les poissons que vous avez pêchés nagent dans votre aquarium : ouvrez-le avec le bouton en forme d\'aquarium en haut du Dex et choisissez qui y nage. Le décor et un bac plus grand sont sur la page Aquarium de la Boutique.</string>
 
     <string name="tour_season_title">Saisons et événements du week-end</string>
     <!-- %1$s: how long a season lasts (e.g. "6 semaines"). -->
@@ -119,7 +121,7 @@
 
     <string name="tour_daily_title">Récompenses du jour</string>
     <!-- %1$s: the calendar's length (e.g. "7 jours", used twice). -->
-    <string name="tour_daily_body">Récupérez ici une récompense une fois par jour : des points et du matériel, et une plus grosse tous les %1$s. Manquer un jour ne fait jamais reculer le calendrier. Votre série compte les jours d\'affilée, et un bouclier de série couvre de lui-même un jour manqué : vous commencez avec %2$d, et vous en recevez un autre tous les %1$s (jusqu\'à %3$d).</string>
+    <string name="tour_daily_body">La flamme ouvre vos récompenses du jour. Récupérez-en une par jour : des points et du matériel, et une plus grosse tous les %1$s. Manquer un jour ne fait jamais reculer le calendrier. Votre série compte les jours d\'affilée, et un bouclier de série couvre de lui-même un jour manqué : vous commencez avec %2$d, et vous en recevez un autre tous les %1$s (jusqu\'à %3$d).</string>
 
     <string name="tour_daily_challenges_title">Défis du jour</string>
     <string name="tour_daily_challenges_body">Chaque jour apporte trois défis, facile, moyen et difficile, adaptés à votre corde, contre du matériel et des points. Un défi ne vous plaît pas ? Changez-le gratuitement (%1$s). Seuls les lancers en solo comptent. De nouveaux défis arrivent à minuit, et ceux que vous avez terminés sont récupérés pour vous si vous oubliez.</string>
@@ -131,7 +133,7 @@
 
     <string name="tour_migrations_title">Migrations</string>
     <!-- %1$s: how long a migration lasts (e.g. "2 jours"). -->
-    <string name="tour_migrations_body">Chaque semaine, pendant %1$s, deux espèces moins communes migrent : une près de la surface et une dans les profondeurs, toutes deux bien plus fréquentes là où elles vivent. Une bannière les affiche sur l\'onglet Pêche et dans le Dex. Les migrations concernent les lancers en solo : les duels ne changent jamais.</string>
+    <string name="tour_migrations_body">Chaque semaine, pendant %1$s, deux espèces moins communes migrent : une près de la surface et une dans les profondeurs, toutes deux bien plus fréquentes là où elles vivent. Un bouton avec un banc de poissons les affiche sur l\'onglet Pêche, et une carte dans le Dex. Les migrations concernent les lancers en solo : les duels ne changent jamais.</string>
 
     <string name="tour_reminders_title">Rappels</string>
     <string name="tour_reminders_body">Envie d\'un petit rappel quand votre récompense du jour est prête, que votre série va s\'arrêter ou qu\'une migration commence ? Activez les rappels dans les Paramètres : au maximum un par jour, et jamais entre %1$s et %2$s.</string>

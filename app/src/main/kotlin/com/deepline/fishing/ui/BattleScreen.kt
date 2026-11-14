@@ -1,5 +1,7 @@
 package com.deepline.fishing.ui
 
+import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.size
 import com.deepline.fishing.R
 import com.deepline.fishing.ui.i18n.UiText
 import com.deepline.fishing.ui.i18n.rules
@@ -143,19 +145,26 @@ fun BattleScreen(vm: GameViewModel) {
                                     fontWeight = FontWeight.Bold,
                                 )
                             }
-                            Button(onClick = vm::rematch, modifier = Modifier.fillMaxWidth()) {
-                                Text(stringResource(if (online != null) R.string.battle_new_online else R.string.battle_rematch))
-                            }
+                            com.deepline.fishing.ui.kit.GameButton(
+                                stringResource(if (online != null) R.string.battle_new_online else R.string.battle_rematch),
+                                onClick = vm::rematch,
+                                modifier = Modifier.fillMaxWidth(),
+                                role = com.deepline.fishing.ui.kit.ActionRole.PLAY,
+                                icon = GameIcons.Battle,
+                            )
                             // A good game? Send the opponent a gift (looks or tackle).
                             val opponentId = online?.playerIds?.getOrNull(online.opponentIndex)
                             if (online != null && opponentId != null) {
                                 val name = b.players[online.opponentIndex].name
-                                OutlinedButton(
+                                com.deepline.fishing.ui.kit.GameButton(
                                     onClick = { vm.openGifts(GameViewModel.GiftTarget(opponentId, name)) },
                                     modifier = Modifier.fillMaxWidth().testTag("send_gift"),
-                                ) { Text(stringResource(R.string.battle_send_gift, name)) }
+                                ) {
+                                    Icon(com.deepline.fishing.ui.kit.KitIcons.Gift, contentDescription = null, modifier = Modifier.size(20.dp))
+                                    Text(stringResource(R.string.battle_send_gift, name), modifier = Modifier.weight(1f, fill = false))
+                                }
                             }
-                            OutlinedButton(onClick = vm::leaveBattle, modifier = Modifier.fillMaxWidth()) {
+                            TextButton(onClick = vm::leaveBattle, modifier = Modifier.fillMaxWidth()) {
                                 Text(stringResource(R.string.battle_back_to_menu))
                             }
                         }
@@ -197,20 +206,22 @@ fun BattleScreen(vm: GameViewModel) {
                         }
                         // Sight tackle can be switched on before each of the device owner's casts.
                         if (!player.isBot) SightTackleChips(vm)
-                        Button(
+                        com.deepline.fishing.ui.kit.GameButton(
                             onClick = vm::playNextTurn,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp),
+                            modifier = Modifier.fillMaxWidth(),
+                            role = com.deepline.fishing.ui.kit.ActionRole.PLAY,
+                            size = com.deepline.fishing.ui.kit.ButtonSize.HERO,
                         ) {
+                            Icon(com.deepline.fishing.ui.kit.KitIcons.Hook, contentDescription = null, modifier = Modifier.size(24.dp))
                             Text(
                                 when {
                                     player.isBot -> stringResource(R.string.battle_let_fish, player.name)
                                     online != null -> stringResource(R.string.battle_cast)
                                     else -> stringResource(R.string.battle_cast_player, player.name)
                                 },
+                                modifier = Modifier.weight(1f, fill = false),
                                 style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Black,
                             )
                         }
                         TextButton(onClick = { confirmForfeit = true }, modifier = Modifier.fillMaxWidth()) {

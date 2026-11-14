@@ -49,10 +49,12 @@ fun SettingsScreen(vm: GameViewModel) {
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                OutlinedButton(
+                com.deepline.fishing.ui.kit.GameButton(
+                    stringResource(R.string.settings_help_tour),
                     onClick = vm::startTour,
                     modifier = Modifier.testTag("settings_tour").tourTarget(TourTarget.SETTINGS_TOUR),
-                ) { Text(stringResource(R.string.settings_help_tour)) }
+                    size = com.deepline.fishing.ui.kit.ButtonSize.SMALL,
+                )
             }
             SoundSettingsSection(vm)
             NotificationSettingsSection(vm)

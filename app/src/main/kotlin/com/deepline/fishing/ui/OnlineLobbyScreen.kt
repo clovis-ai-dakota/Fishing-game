@@ -1,5 +1,8 @@
 package com.deepline.fishing.ui
 
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import com.deepline.fishing.ui.kit.GameButton
 import com.deepline.fishing.R
 import com.deepline.fishing.ui.i18n.label
 import com.deepline.fishing.ui.i18n.asString
@@ -117,20 +120,15 @@ fun OnlineLobbyScreen(vm: GameViewModel) {
             } else {
                 item {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Button(
-                            onClick = vm::createRoom,
-                            enabled = !busy,
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(56.dp),
-                        ) { Text(stringResource(R.string.online_create_room)) }
-                        FilledTonalButton(
-                            onClick = vm::quickMatch,
-                            enabled = !busy,
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(56.dp),
-                        ) { Text(stringResource(R.string.online_quick_match)) }
+                        // Two ways in: a room for a friend, or the next angler who shows up.
+                        GameButton(onClick = vm::createRoom, enabled = !busy, modifier = Modifier.weight(1f).height(60.dp)) {
+                            Icon(com.deepline.fishing.ui.kit.KitIcons.Plus, contentDescription = null, modifier = Modifier.size(20.dp))
+                            Text(stringResource(R.string.online_create_room), modifier = Modifier.weight(1f, fill = false))
+                        }
+                        GameButton(onClick = vm::quickMatch, enabled = !busy, modifier = Modifier.weight(1f).height(60.dp), role = com.deepline.fishing.ui.kit.ActionRole.PLAY) {
+                            Icon(GameIcons.Battle, contentDescription = null, modifier = Modifier.size(20.dp))
+                            Text(stringResource(R.string.online_quick_match), modifier = Modifier.weight(1f, fill = false))
+                        }
                     }
                 }
                 item {
@@ -144,7 +142,7 @@ fun OnlineLobbyScreen(vm: GameViewModel) {
                             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters),
                             modifier = Modifier.weight(1f),
                         )
-                        Button(onClick = { vm.joinRoom(code) }, enabled = !busy && code.isNotBlank()) { Text(stringResource(R.string.online_join)) }
+                        GameButton(stringResource(R.string.online_join), onClick = { vm.joinRoom(code) }, enabled = !busy && code.isNotBlank())
                     }
                 }
             }

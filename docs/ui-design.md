@@ -60,7 +60,46 @@ day and by night:
 A tab's layout: the content (a scene or a list), then a **dock** on deep water holding the main
 action, then the tab bar. The main action never scrolls away.
 
-## 4. What the most played games do (summary of the analysis)
+## 4. One world, and moves that mean something
+
+The menus are places along one coast (`Place` in `ui/theme/World.kt`), in the tabs' order:
+
+| Place | Menus | What shows it |
+| --- | --- | --- |
+| `SEA` | Fish tab and what opens from it (Daily, Milestones, Themes, Settings) | The boat's scene. |
+| `DEEP` | Dex, a species' page, the aquarium | The camera sinks: the waterline leaves by the top, the water darkens. |
+| `PORT` | Shop | A quay, a market stall, moored masts, warm morning light. |
+| `ARENA` | Battle setup, battles, the online lobby | The setting sun and two rival boats. |
+| `LIGHTHOUSE` | Friends, leaderboards, the tournament, clubs | A lighthouse and its beam, evening blue. |
+
+- `ThemeBackdrop(place = ...)` moves a camera between places (`CAMERA_MS`, 340 ms) and the scene's
+  layers slide by at different speeds (sky 0.25, shoal 0.5, particles 0.75, decor 1): parallax.
+- What stands on the coast is **far away**: small, washed towards the sky's colour (`far()`), and
+  under the screens' titles. It must never look like something to tap, nor make text hard to read.
+- `ScreenMotion` decides every move, and none lasts a second: tabs slide the way the camera goes
+  (sideways along the coast, down for the Dex); a pushed screen grows out of the menu (240 ms) and
+  shrinks back faster (170 ms); casting **dives** (600 ms) and collecting **surfaces** (450 ms).
+- A new menu gets a place (add it to `Place.of`); a new place gets a light and something on the
+  coast, in every theme, by day and by night.
+
+## 5. Depth
+
+Menus feel like objects, without a 3D view per item (one live GL view per screen at most: the
+boat on the Fish tab, the fish on a species' page, the skins preview):
+
+| Effect | Where | Code |
+| --- | --- | --- |
+| Raised buttons that sink | Every `GameButton`, `RoundIconButton`, `TackleTile` | `drawRaised` |
+| Cards that lean under the finger, with a sheen | Dex cards, secrets, skins, shop tiles, battle tiles, social hub tiles | `Modifier.pressTilt()` |
+| The scene shifts as the phone tilts | The backdrop's layers (near ones more) | `rememberDeviceTilt`, `depth()` |
+| A chest that opens | The daily reward | `RewardChest` (a box model projected by hand) |
+| Coins burst out of a claim | Every `CLAIM` button | `RewardFx`, `RewardFxLayer` |
+
+All of it is looks only, costs nothing when idle (the tilt sensor stops in the background, the
+burst layer only draws while coins fly), and **stops with "Reduce motion"** (`LocalCalmMotion`):
+no tilt, no burst, the chest just opens, screens fade.
+
+## 6. What the most played games do (summary of the analysis)
 
 - One home scene, one hero, one big button (Brawl Stars' large yellow Play button; Royal Match's
   single Play button also drives its events).

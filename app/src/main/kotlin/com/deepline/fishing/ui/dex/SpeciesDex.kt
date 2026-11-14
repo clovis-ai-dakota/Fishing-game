@@ -37,6 +37,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.deepline.fishing.ui.kit.pressTilt
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.draw.clip
@@ -191,6 +192,8 @@ private fun FishCard(number: Int, species: FishSpecies, p: PlayerProgress, style
     }
     Card(
         onClick = onClick,
+        // A collector's card: it leans under the finger.
+        modifier = Modifier.pressTilt(),
         shape = RoundedCornerShape(14.dp),
         border = if (styled) BorderStroke(2.5.dp, cardFrame(style, species.zone, t)) else BorderStroke(if (state == DexState.CAUGHT) 2.dp else 1.dp, frame.copy(alpha = if (state == DexState.UNKNOWN) 0.35f else 0.9f)),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),

@@ -25,6 +25,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -97,12 +99,17 @@ fun GameButton(
     val isPressed by interaction.collectIsPressedAsState()
     val pressed by animateFloatAsState(if (isPressed && enabled) 1f else 0f, tween(PRESS_MS), label = "press")
     val feedback = LocalPressFeedback.current
+    // A claimed reward bursts out of its button.
+    val rewards = if (role == ActionRole.CLAIM) LocalRewardFx.current else null
+    val centre = remember { arrayOf(Offset.Unspecified) }
     Box(
         modifier
             .defaultMinSize(minWidth = size.height, minHeight = size.height + size.edge)
+            .let { m -> if (rewards != null) m.onGloballyPositioned { centre[0] = it.boundsInRoot().center } else m }
             .drawBehind { drawRaised(colors, size.radius.toPx(), size.edge.toPx(), pressed) }
             .clickable(interactionSource = interaction, indication = null, enabled = enabled, onClickLabel = onClickLabel, role = Role.Button) {
                 feedback(role)
+                if (rewards != null && centre[0] != Offset.Unspecified) rewards.burst(centre[0])
                 onClick()
             },
         contentAlignment = Alignment.Center,

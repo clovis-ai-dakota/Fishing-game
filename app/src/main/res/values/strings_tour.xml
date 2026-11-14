@@ -28,6 +28,10 @@
     <string name="tour_tabs_title">Four tabs</string>
     <!-- Fish, Dex, Shop and Battle are the tabs' names (shell_tab_*). -->
     <string name="tour_tabs_body">The bar at the bottom takes you everywhere: Fish is where you cast, the Dex collects every species you meet, the Shop has rope upgrades, tackle and looks for your boat, and Battle is for 1v1 matches.</string>
+    <!-- The redesigned menus (shown to returning players in "What's new"). -->
+    <string name="tour_look_title">A new look</string>
+    <!-- The colours are those of the buttons; "(i)" is the round information button, keep it as is. -->
+    <string name="tour_look_body">The menus now say less and show more. Colour tells you what a button does: amber is the main action, green is a free reward ready to claim, gold is a price in points and violet a price in euros. The (i) buttons hold the details.</string>
 
     <string name="tour_cast_title">Cast your line</string>
     <!-- "Cast line" is the button's label (home_cast_button). -->
@@ -99,13 +103,13 @@
 
     <string name="tour_boat_title">Customise your boat</string>
     <!-- "Customise boat" is the button's label in the Skins section. -->
-    <string name="tour_boat_body">Tap your boat at the top of the Fish tab to open the Skins section of the Dex. Customise boat lets you paint the hull, trim and cabin, and add a pattern, sails, a flag and an emblem. Basic colours are free; the rest unlock with points, or as you catch more species, reach new zones and claim milestones.</string>
+    <string name="tour_boat_body">Tap your boat on the Fish tab to open the Skins section of the Dex. Customise boat lets you paint the hull, trim and cabin, and add a pattern, sails, a flag and an emblem. Basic colours are free; the rest unlock with points, or as you catch more species, reach new zones and claim milestones.</string>
 
     <string name="tour_shop_style_title">Style</string>
     <string name="tour_shop_style_body">The Style page has premade boats, paints, emblems and sail prints (previewed on your own boat), and new hooks, lines and trails. Like every skin, they only change the look, never the game.</string>
 
     <string name="tour_aquarium_title">Your aquarium</string>
-    <string name="tour_aquarium_body">The fish you\'ve caught swim in your aquarium: open it with the Aquarium button in the Dex and pick who swims there. Decor and a bigger tank are on the Shop\'s Aquarium page.</string>
+    <string name="tour_aquarium_body">The fish you\'ve caught swim in your aquarium: open it with the tank button at the top of the Dex and pick who swims there. Decor and a bigger tank are on the Shop\'s Aquarium page.</string>
 
     <string name="tour_season_title">Seasons and weekend events</string>
     <!-- %1$s: how long a season lasts (e.g. "6 weeks"). -->
@@ -151,7 +155,7 @@
     <string name="tour_daily_title">Daily rewards</string>
     <!-- %1$s: the calendar's length (e.g. "7 days", used twice); %2$d: shields a new player starts
          with; %3$d: the most shields one can hold. -->
-    <string name="tour_daily_body">Claim a reward here once a day: points and tackle, and a bigger one every %1$s. Missing a day never sets the calendar back. Your streak counts the days in a row, and a streak shield covers a missed day by itself: you start with %2$d, and every %1$s bring another (up to %3$d).</string>
+    <string name="tour_daily_body">The flame opens your daily rewards. Claim one once a day: points and tackle, and a bigger one every %1$s. Missing a day never sets the calendar back. Your streak counts the days in a row, and a streak shield covers a missed day by itself: you start with %2$d, and every %1$s bring another (up to %3$d).</string>
 
     <string name="tour_daily_challenges_title">Daily challenges</string>
     <!-- %1$s: free swaps a day (tour_daily_swaps, e.g. "1 swap a day"). -->
@@ -163,7 +167,7 @@
 
     <string name="tour_migrations_title">Migrations</string>
     <!-- %1$s: how long a migration lasts (e.g. "2 days"). -->
-    <string name="tour_migrations_body">Every week, for %1$s, two less common species migrate: one near the surface and one in the deep, both far more common where they live. A banner shows them on the Fish tab and in the Dex. Migrations are for solo casts: battles never change.</string>
+    <string name="tour_migrations_body">Every week, for %1$s, two less common species migrate: one near the surface and one in the deep, both far more common where they live. A shoal button shows them on the Fish tab, and a card in the Dex. Migrations are for solo casts: battles never change.</string>
 
     <string name="tour_reminders_title">Reminders</string>
     <!-- %1$s and %2$s: times on the hour, start and end of the quiet hours (e.g. 21:00 and 09:00). -->

@@ -107,7 +107,7 @@ class DailyUiTest : DailyUiTestBase() {
         val before = vm.progress
         compose.onNodeWithTag("daily_button").performClick()
         assertEquals(Screen.DAILY, vm.screen)
-        compose.onNodeWithTag("daily_claim").performScrollTo().performClick()
+        compose.onNodeWithTag("daily_claim").performClick()
         assertEquals(1, vm.progress.dailyStreak)
         assertEquals(before.pointsBalance + DailyRewards.pointsFor(before, 0.2f), vm.progress.pointsBalance)
         // Claimed for today.
@@ -158,7 +158,7 @@ class ReminderOptInUiTest : DailyUiTestBase() {
         grantNotifications()
         val vm = launch(player())
         compose.onNodeWithTag("daily_button").performClick()
-        compose.onNodeWithTag("daily_claim").performScrollTo().performClick()
+        compose.onNodeWithTag("daily_claim").performClick()
         compose.onNodeWithTag("optin_yes").performClick()
         assertTrue(vm.daily.reminders.enabled)
         assertEquals(WorkInfo.State.ENQUEUED, reminderWork().single().state)

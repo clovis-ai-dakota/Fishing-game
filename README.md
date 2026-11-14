@@ -173,6 +173,23 @@ points, priced by how rich their scene is:
 
 Themes only change the menus: a cast's water always looks the same.
 
+### Menus
+
+The menus say little and show a lot (rules and kit: `docs/ui-design.md`):
+
+- **Names, numbers and pictograms** on the main screens; every explanation is behind an (i)
+  button or in the tour. The first view of a tab has a word budget, checked in three languages.
+- **Colour says what a button does**: amber for the one main action of a screen (Cast line, Start
+  the battle), green for a free reward ready to claim, gold for a price in points, violet for a
+  price in euros, the theme's colour for navigation, red when there is no way back.
+- **One world**: the Fish tab is the open sea, the Dex is the water under it, the Shop is the
+  port, battles are out at sea at sunset, and friends and rankings are by the lighthouse. The
+  scene's camera travels between them with parallax, screens move the same way in well under a
+  second, and casting dives into the water.
+- **Depth**: raised buttons that sink, cards that lean under the finger, a scene that shifts as
+  the phone tilts, a reward chest that opens, coins that burst out of a claim. "Reduce motion"
+  in Settings turns all of it into short fades.
+
 ### Shop
 
 Every item can be bought **with euros or with points**. A points price is fishing time: about

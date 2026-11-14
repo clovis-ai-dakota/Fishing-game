@@ -1,5 +1,10 @@
 package com.deepline.fishing.ui.shop
 
+import com.deepline.fishing.ui.kit.GameButton
+import com.deepline.fishing.ui.kit.ActionRole
+import com.deepline.fishing.ui.kit.ButtonSize
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
 import com.deepline.fishing.ui.i18n.label
 import com.deepline.fishing.ui.i18n.asString
 import android.app.Activity
@@ -74,14 +79,22 @@ fun GiftDialog(vm: GameViewModel) {
                         val points = vm.shopPointsPrice(item)
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             Text(item.label(), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
-                            Button(onClick = { vm.sendGiftWithMoney(item, activity) }, modifier = Modifier.testTag("gift_eur_${item.id}")) {
-                                Text(vm.billing.priceOf(AccountApi.giftProduct(item)) ?: formatEuros(item.euroCents))
-                            }
-                            OutlinedButton(
+                            // The two prices, as everywhere: violet for euros, gold for points.
+                            val pointsLabel = stringResource(R.string.common_points, compactPoints(points))
+                            GameButton(
+                                vm.billing.priceOf(AccountApi.giftProduct(item)) ?: formatEuros(item.euroCents),
+                                onClick = { vm.sendGiftWithMoney(item, activity) },
+                                modifier = Modifier.testTag("gift_eur_${item.id}"),
+                                role = ActionRole.PREMIUM,
+                                size = ButtonSize.SMALL,
+                            )
+                            GameButton(
                                 onClick = { vm.sendGiftWithPoints(item) },
                                 enabled = vm.progress.pointsBalance >= points,
-                                modifier = Modifier.testTag("gift_pts_${item.id}"),
-                            ) { PointsPriceLabel(compactPoints(points)) }
+                                modifier = Modifier.testTag("gift_pts_${item.id}").semantics { contentDescription = pointsLabel },
+                                role = ActionRole.POINTS,
+                                size = ButtonSize.SMALL,
+                            ) { CoinPrice(compactPoints(points)) }
                         }
                     }
                 }
@@ -127,9 +140,7 @@ fun AccountDialog(vm: GameViewModel, onClose: () -> Unit) {
                         },
                         style = MaterialTheme.typography.bodySmall,
                     )
-                    Button(onClick = { vm.backupNow() }, enabled = !vm.accountBusy, modifier = Modifier.testTag("backup_now")) {
-                        Text(stringResource(R.string.shop_account_backup_now))
-                    }
+                    GameButton(stringResource(R.string.shop_account_backup_now), onClick = { vm.backupNow() }, enabled = !vm.accountBusy, modifier = Modifier.testTag("backup_now"), size = ButtonSize.SMALL)
                 } else {
                     Text(stringResource(R.string.shop_account_club_perk), style = MaterialTheme.typography.bodySmall)
                 }
@@ -158,9 +169,7 @@ fun AccountDialog(vm: GameViewModel, onClose: () -> Unit) {
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.error,
                     )
-                    Button(onClick = { vm.restoreFromCode(code) }, enabled = !vm.accountBusy && code.isNotBlank()) {
-                        Text(stringResource(R.string.shop_account_restore))
-                    }
+                    GameButton(stringResource(R.string.shop_account_restore), onClick = { vm.restoreFromCode(code) }, enabled = !vm.accountBusy && code.isNotBlank(), size = ButtonSize.SMALL)
                 } else {
                     TextButton(onClick = { restoring = true }) { Text(stringResource(R.string.shop_account_restore_open)) }
                 }

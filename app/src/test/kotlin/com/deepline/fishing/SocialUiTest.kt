@@ -403,7 +403,7 @@ class SocialTournamentUiTest : SocialUiTestBase() {
         vm.toggleLantern(true)
         // The clock is held at first, so the cast only moves when this test moves it.
         compose.mainClock.autoAdvance = false
-        compose.onNodeWithTag("tournament_start").performScrollTo().performClick()
+        compose.onNodeWithTag("tournament_start").performClick()
         assertEquals(Screen.CAST, vm.screen)
         assertNotNull(vm.tournamentAttempt)
         assertEquals(Tournaments.specs, vm.session!!.specs)
@@ -436,7 +436,7 @@ class SocialTournamentUiTest : SocialUiTestBase() {
 
         // Quitting an attempt uses it (the clock is held so the cast can't end on its own).
         compose.mainClock.autoAdvance = false
-        compose.onNodeWithTag("tournament_start").performScrollTo().performClick()
+        compose.onNodeWithTag("tournament_start").performClick()
         assertEquals(Screen.CAST, vm.screen)
         vm.pause()
         compose.mainClock.advanceTimeBy(200)

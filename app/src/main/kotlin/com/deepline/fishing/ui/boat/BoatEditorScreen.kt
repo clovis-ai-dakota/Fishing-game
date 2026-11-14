@@ -124,11 +124,14 @@ fun BoatEditorScreen(vm: GameViewModel) {
                 .padding(16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            OutlinedButton(onClick = vm::onBack, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.common_cancel)) }
-            Button(
+            com.deepline.fishing.ui.kit.GameButton(stringResource(R.string.common_cancel), onClick = vm::onBack, modifier = Modifier.weight(1f))
+            com.deepline.fishing.ui.kit.GameButton(
+                stringResource(R.string.boat_editor_save),
                 onClick = { if (vm.saveBoatDesign(draft)) vm.openDex(DexSection.SKINS) },
                 modifier = Modifier.weight(1f),
-            ) { Text(stringResource(R.string.boat_editor_save)) }
+                role = com.deepline.fishing.ui.kit.ActionRole.PLAY,
+                icon = com.deepline.fishing.ui.kit.KitIcons.Check,
+            )
         }
     }
 

@@ -199,21 +199,16 @@ fun CastScreen(vm: GameViewModel) {
         )
         // All bumps used, or the line is full: offer to haul it straight up (thumb zone).
         if (hud.canFastReel && !vm.paused && vm.pendingResult == null) {
-            Button(
+            com.deepline.fishing.ui.kit.GameButton(
+                stringResource(if (hud.lineFull) R.string.cast_fast_reel_line_full else R.string.cast_fast_reel),
                 onClick = vm::fastReel,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .systemBarsPadding()
-                    .padding(bottom = 28.dp)
-                    .height(56.dp),
-                shape = RoundedCornerShape(28.dp),
-            ) {
-                Text(
-                    stringResource(if (hud.lineFull) R.string.cast_fast_reel_line_full else R.string.cast_fast_reel),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
+                    .padding(bottom = 28.dp),
+                role = com.deepline.fishing.ui.kit.ActionRole.PLAY,
+                size = com.deepline.fishing.ui.kit.ButtonSize.HERO,
+            )
         }
 
         if (vm.paused) {
@@ -550,7 +545,7 @@ private fun ResultsPanel(result: CastResult, collectLabel: String, onCollect: ()
                     color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.Bold,
                 )
-                Button(onClick = onCollect, modifier = Modifier.fillMaxWidth()) { Text(collectLabel) }
+                com.deepline.fishing.ui.kit.GameButton(collectLabel, onClick = onCollect, modifier = Modifier.fillMaxWidth(), role = com.deepline.fishing.ui.kit.ActionRole.PLAY, size = com.deepline.fishing.ui.kit.ButtonSize.HERO)
             }
         }
     }

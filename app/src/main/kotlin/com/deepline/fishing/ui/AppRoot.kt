@@ -53,7 +53,14 @@ fun AppRoot(vm: GameViewModel) {
             }
         }
     }
-    CompositionLocalProvider(LocalTourTargets provides tourTargets, com.deepline.fishing.ui.kit.LocalPressFeedback provides pressFeedback) {
+    val rewardFx = remember { com.deepline.fishing.ui.kit.RewardFx() }
+    val calmMotion = vm.feel.settings.reduceMotion
+    CompositionLocalProvider(
+        LocalTourTargets provides tourTargets,
+        com.deepline.fishing.ui.kit.LocalPressFeedback provides pressFeedback,
+        com.deepline.fishing.ui.kit.LocalCalmMotion provides calmMotion,
+        com.deepline.fishing.ui.kit.LocalRewardFx provides rewardFx.takeIf { !calmMotion },
+    ) {
         BackHandler(enabled = vm.screen != Screen.HOME) { vm.onBack() }
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             Box(Modifier.fillMaxSize()) {
@@ -66,6 +73,8 @@ fun AppRoot(vm: GameViewModel) {
                         Modifier.fillMaxSize(),
                         place = com.deepline.fishing.ui.theme.Place.of(vm.screen),
                         travelMs = if (calm) 0 else com.deepline.fishing.ui.theme.CAMERA_MS,
+                        // The scene's layers shift as the phone tilts: depth without a 3D view.
+                        tilt = com.deepline.fishing.ui.kit.rememberDeviceTilt(enabled = !calm),
                     )
                 }
                 // The four tabs are one layer (they move inside MainScaffold, under a tab bar that
@@ -99,6 +108,8 @@ fun AppRoot(vm: GameViewModel) {
                         Screen.CLUBS -> if (com.deepline.fishing.FeatureFlags.clubs) com.deepline.fishing.ui.social.ClubsScreen(vm) else com.deepline.fishing.ui.social.SocialHubScreen(vm)
                     }
                 }
+                // Coins burst out of claimed rewards, above the screens.
+                com.deepline.fishing.ui.kit.RewardFxLayer(rewardFx, Modifier.fillMaxSize())
                 vm.tour?.let { TourOverlay(it, onNext = vm::tourNext, onBack = vm::tourBack, onSkip = vm::skipTour) }
                 // What just happened in the shop (a purchase, a pending payment), above the tab bar.
                 val message = vm.shopMessage

@@ -71,10 +71,12 @@ fun NotificationSettingsSection(vm: GameViewModel) {
                     fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
-                OutlinedButton(
+                com.deepline.fishing.ui.kit.GameButton(
+                    stringResource(R.string.settings_notif_phone_settings),
                     onClick = { context.startActivity(appNotificationSettings(context.packageName)) },
                     modifier = Modifier.testTag("notif_phone_settings"),
-                ) { Text(stringResource(R.string.settings_notif_phone_settings)) }
+                    size = com.deepline.fishing.ui.kit.ButtonSize.SMALL,
+                )
             }
         }
     }

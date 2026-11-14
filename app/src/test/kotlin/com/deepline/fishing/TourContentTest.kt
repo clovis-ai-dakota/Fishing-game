@@ -157,7 +157,7 @@ class TourContentTest {
     fun soundAndFeelAreExplained() {
         // Version 11: sound, music and haptics settings, and Reduce motion, shown on the Settings screen.
         val step = Tour.steps.single { it.id == "sound" }
-        assertEquals(Tour.VERSION, step.sinceVersion)
+        assertEquals(11, step.sinceVersion)
         assertEquals(Screen.SETTINGS, step.screen)
         assertEquals(TourTarget.SETTINGS_SOUND, step.target)
         for (topic in listOf("volume", "music", "sound effects", "vibration", "Reduce motion", "screen shake", "slow motion", "flashes")) {
@@ -188,9 +188,20 @@ class TourContentTest {
     }
 
     @Test
+    fun theRedesignedMenusAreExplained() {
+        // Version 12: fewer words, colours that say what a button does, details behind (i).
+        val look = Tour.steps.single { it.id == "look" }
+        assertEquals(12, look.sinceVersion)
+        for (word in listOf("amber", "green", "gold", "violet", "(i)")) assertTrue("The new look step doesn't mention $word", word in look.body.shown)
+        // Steps that point at what the redesign moved say where it is now.
+        assertTrue("flame" in Tour.steps.single { it.id == "daily" }.body.shown)
+        assertTrue("tank button" in Tour.steps.single { it.id == "aquarium" }.body.shown)
+    }
+
+    @Test
     fun friendsLeaderboardsAndTheTournamentAreExplained() {
         // Version 11: friends, weekly leaderboards and the weekly tournament (from the Battle tab).
-        val v11 = Tour.steps.filter { it.sinceVersion == Tour.VERSION }.map { it.id }
+        val v11 = Tour.steps.filter { it.sinceVersion == 11 }.map { it.id }
         assertTrue(v11.containsAll(listOf("social", "friend_code", "friends", "leaderboards", "tournament")))
         val targets = Tour.steps.mapNotNull { it.target }.toSet()
         for (t in listOf(TourTarget.BATTLE_SOCIAL, TourTarget.SOCIAL_ID, TourTarget.FRIENDS_ADD, TourTarget.BOARD_KINDS, TourTarget.TOURNAMENT_ENTER)) {
@@ -255,7 +266,7 @@ class TourContentTest {
     fun theLanguageSettingIsExplained() {
         // Version 11: the game's language, chosen in Settings.
         val step = Tour.steps.single { it.id == "language" }
-        assertEquals(Tour.VERSION, step.sinceVersion)
+        assertEquals(11, step.sinceVersion)
         assertEquals(Screen.SETTINGS, step.screen)
         assertEquals(TourTarget.SETTINGS_LANGUAGE, step.target)
         for (language in listOf("English", "French", "Spanish", "German", "Brazilian Portuguese", "Turkish")) {

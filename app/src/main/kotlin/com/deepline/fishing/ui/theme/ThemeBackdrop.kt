@@ -17,6 +17,8 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.lerp
 import kotlin.math.PI
 import kotlin.math.abs
@@ -40,6 +42,8 @@ fun ThemeBackdrop(
     place: Place = Place.SEA,
     /** How long the camera takes to get there (0: at once, for reduced motion). */
     travelMs: Int = CAMERA_MS,
+    /** How the phone is tilted, -1..1 on each axis (see `rememberDeviceTilt`): near layers shift more. */
+    tilt: androidx.compose.runtime.State<Offset>? = null,
 ) {
     val camX = androidx.compose.animation.core.animateFloatAsState(place.x, tween(travelMs, easing = androidx.compose.animation.core.FastOutSlowInEasing), label = "camera x")
     val camY = androidx.compose.animation.core.animateFloatAsState(place.y, tween(travelMs, easing = androidx.compose.animation.core.FastOutSlowInEasing), label = "camera y")
@@ -50,7 +54,7 @@ fun ThemeBackdrop(
         animationSpec = infiniteRepeatable(tween(600_000, easing = LinearEasing)),
         label = "backdrop time",
     )
-    Canvas(modifier) { drawBackdrop(palette, if (animate) t.value else 12f, camX.value, camY.value) }
+    Canvas(modifier) { drawBackdrop(palette, if (animate) t.value else 12f, camX.value, camY.value, tilt?.value ?: Offset.Zero) }
 }
 
 /** How long the camera takes to travel between two places (a tab change), in milliseconds. */
@@ -63,7 +67,25 @@ private fun h(k: Int, salt: Int): Float {
     return ((x xor (x ushr 16)) and 0xFFFFFF) / 16777215f
 }
 
-fun DrawScope.drawBackdrop(p: MenuPalette, t: Float, camX: Float = 0f, camY: Float = 0f) {
+/** How far the nearest layer shifts at full tilt, as a share of the screen (see [depth]). */
+private const val TILT_SHIFT = 0.03f
+
+/**
+ * Draws a layer shifted by the phone's [tilt], [near] of the full shift (0 far, 1 near), slightly
+ * enlarged so its edges never show.
+ */
+private inline fun DrawScope.depth(tilt: Offset, near: Float, draw: DrawScope.() -> Unit) {
+    if (tilt == Offset.Zero) {
+        draw()
+        return
+    }
+    val grow = 1f + TILT_SHIFT * 2f * near
+    scale(grow, grow) {
+        translate(left = -tilt.x * TILT_SHIFT * near * size.width, top = tilt.y * TILT_SHIFT * near * size.width) { draw() }
+    }
+}
+
+fun DrawScope.drawBackdrop(p: MenuPalette, t: Float, camX: Float = 0f, camY: Float = 0f, tilt: Offset = Offset.Zero) {
     val w = size.width
     val hgt = size.height
     if (w <= 1f || hgt <= 1f) return
@@ -74,7 +96,7 @@ fun DrawScope.drawBackdrop(p: MenuPalette, t: Float, camX: Float = 0f, camY: Flo
     // Sky.
     drawRect(Brush.verticalGradient(p.sky, startY = 0f, endY = horizon), size = Size(w, horizon + 2f))
     // Far things move less than near ones as the camera travels along the coast.
-    if (horizon > 0f) parallax(camX, 0.25f) { drawSkyDetails(p, t, horizon, u) }
+    if (horizon > 0f) depth(tilt, 0.2f) { parallax(camX, 0.25f) { drawSkyDetails(p, t, horizon, u) } }
 
     // Sea, below a moving waterline.
     val line = Path().apply {
@@ -101,11 +123,11 @@ fun DrawScope.drawBackdrop(p: MenuPalette, t: Float, camX: Float = 0f, camY: Flo
     drawPath(foam, Color.White.copy(alpha = if (p.night) 0.18f else 0.55f), style = Stroke(width = 2f * u, cap = StrokeCap.Round))
 
     drawLight(p, t, horizon, u)
-    parallax(camX, 0.5f) { drawShoal(p, t, horizon, u) }
+    depth(tilt, 0.4f) { parallax(camX, 0.5f) { drawShoal(p, t, horizon, u) } }
     drawPlaceLight(p, horizon, camX, camY)
-    drawPlaces(p, t, horizon, u, camX)
-    parallax(camX, 1f) { drawDecor(p, t, horizon, u) }
-    parallax(camX, 0.75f) { drawParticles(p, t, horizon, u) }
+    depth(tilt, 0.55f) { drawPlaces(p, t, horizon, u, camX) }
+    depth(tilt, 1f) { parallax(camX, 1f) { drawDecor(p, t, horizon, u) } }
+    depth(tilt, 0.75f) { parallax(camX, 0.75f) { drawParticles(p, t, horizon, u) } }
 }
 
 private fun DrawScope.drawDecor(p: MenuPalette, t: Float, horizon: Float, u: Float) {

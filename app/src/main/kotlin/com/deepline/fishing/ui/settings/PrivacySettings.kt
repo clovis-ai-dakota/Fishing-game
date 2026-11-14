@@ -55,9 +55,12 @@ fun PrivacySettingsSection(vm: GameViewModel) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         } else if (choices.analytics) {
-            OutlinedButton(onClick = privacy::resetAnalyticsData, modifier = Modifier.testTag("privacy_reset_analytics")) {
-                Text(stringResource(R.string.privacy_reset_id))
-            }
+            com.deepline.fishing.ui.kit.GameButton(
+                stringResource(R.string.privacy_reset_id),
+                onClick = privacy::resetAnalyticsData,
+                modifier = Modifier.testTag("privacy_reset_analytics"),
+                size = com.deepline.fishing.ui.kit.ButtonSize.SMALL,
+            )
         }
         TextButton(
             onClick = { runCatching { uriHandler.openUri(BuildConfig.PRIVACY_POLICY_URL) } },
@@ -68,12 +71,15 @@ fun PrivacySettingsSection(vm: GameViewModel) {
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        OutlinedButton(
+        // Red: there is no way back.
+        com.deepline.fishing.ui.kit.GameButton(
+            stringResource(if (privacy.deleting) R.string.privacy_deleting else R.string.privacy_delete_account),
             onClick = privacy::askToDeleteAccount,
             enabled = !privacy.deleting,
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
             modifier = Modifier.testTag("privacy_delete_account"),
-        ) { Text(stringResource(if (privacy.deleting) R.string.privacy_deleting else R.string.privacy_delete_account)) }
+            role = com.deepline.fishing.ui.kit.ActionRole.ALERT,
+            size = com.deepline.fishing.ui.kit.ButtonSize.SMALL,
+        )
         privacy.message?.let { message ->
             Text(message.asString(), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.testTag("privacy_message"))
         }

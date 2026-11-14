@@ -1,5 +1,17 @@
 package com.deepline.fishing.ui.social
 
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import com.deepline.fishing.ui.GameIcons
+import com.deepline.fishing.ui.kit.ActionRole
+import com.deepline.fishing.ui.kit.ButtonSize
+import com.deepline.fishing.ui.kit.CoinAmount
+import com.deepline.fishing.ui.kit.GameButton
+import com.deepline.fishing.ui.kit.KitIcons
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -61,7 +73,11 @@ fun FriendsScreen(vm: GameViewModel) {
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             SocialStatus(vm) { social.refreshFriends() }
-            SocialCard(stringResource(R.string.social_friends_add_title), Modifier.tourTarget(TourTarget.FRIENDS_ADD)) {
+            SocialCard(
+                stringResource(R.string.social_friends_add_title),
+                Modifier.tourTarget(TourTarget.FRIENDS_ADD),
+                info = stringResource(R.string.social_friends_add_body, vm.playerIdentity.id),
+            ) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedTextField(
                         value = typed,
@@ -71,16 +87,17 @@ fun FriendsScreen(vm: GameViewModel) {
                         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters),
                         modifier = Modifier.weight(1f).testTag("friend_id"),
                     )
-                    Button(
+                    GameButton(
+                        stringResource(R.string.social_friends_send),
                         onClick = {
                             social.sendFriendRequest(typed)
                             typed = ""
                         },
                         enabled = typed.isNotBlank() && !social.busy,
                         modifier = Modifier.testTag("friend_send"),
-                    ) { Text(stringResource(R.string.social_friends_send)) }
+                        icon = KitIcons.Plus,
+                    )
                 }
-                Hint(stringResource(R.string.social_friends_add_body, vm.playerIdentity.id))
             }
 
             if (f != null && f.challenges.isNotEmpty()) {
@@ -94,9 +111,13 @@ fun FriendsScreen(vm: GameViewModel) {
                                     style = MaterialTheme.typography.bodySmall,
                                 )
                             }
-                            Button(onClick = { vm.acceptChallenge(c) }, modifier = Modifier.testTag("challenge_join_${c.code}")) {
-                                Text(stringResource(R.string.social_friends_join))
-                            }
+                            GameButton(
+                                stringResource(R.string.social_friends_join),
+                                onClick = { vm.acceptChallenge(c) },
+                                modifier = Modifier.testTag("challenge_join_${c.code}"),
+                                role = ActionRole.PLAY,
+                                icon = GameIcons.Battle,
+                            )
                         }
                     }
                 }
@@ -110,9 +131,14 @@ fun FriendsScreen(vm: GameViewModel) {
                             PlayerName(card.name, card.title, card.titleFrame)
                             Hint(stringResource(R.string.social_friends_request_in, card.id))
                             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Button(onClick = { social.accept(card) }, modifier = Modifier.testTag("friend_accept_${card.id}")) {
-                                    Text(stringResource(R.string.social_friends_accept))
-                                }
+                                GameButton(
+                                    stringResource(R.string.social_friends_accept),
+                                    onClick = { social.accept(card) },
+                                    modifier = Modifier.testTag("friend_accept_${card.id}"),
+                                    role = ActionRole.CLAIM,
+                                    size = ButtonSize.SMALL,
+                                    icon = KitIcons.Check,
+                                )
                                 TextButton(onClick = { social.decline(card) }, modifier = Modifier.testTag("friend_decline_${card.id}")) {
                                     Text(stringResource(R.string.social_friends_decline))
                                 }
@@ -195,26 +221,45 @@ private fun FriendRow(friend: FriendDto, onChallenge: () -> Unit, onRemove: () -
             PlayerName(friend.name, friend.title, friend.titleFrame, Modifier.weight(1f))
             OnlineLabel(friend.online)
         }
-        // "This week: best cast 1,200 pts, deepest catch 340 m." (a plain comma list after a colon).
+        // This week's bests as pictograms: best cast, deepest catch, tournament. The sentence is read aloud.
         val week = listOfNotNull(
             friend.weekBestCast?.let { stringResource(R.string.social_friends_week_best_cast, pointsLabel(it.toLong())) },
             friend.weekDeepestM?.let { stringResource(R.string.social_friends_week_deepest, stringResource(R.string.common_meters, formatPoints(it.toInt()))) },
             friend.weekTournament?.let { stringResource(R.string.social_friends_week_tournament, pointsLabel(it.toLong())) },
         )
-        Hint(
-            if (week.isEmpty()) {
-                stringResource(R.string.social_friends_week_none)
-            } else {
-                stringResource(R.string.social_friends_week, week.joinToString(", "))
-            },
-        )
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilledTonalButton(onClick = onChallenge, modifier = Modifier.testTag("friend_challenge_${friend.id}")) {
-                Text(stringResource(R.string.social_friends_challenge))
+        val sentence = if (week.isEmpty()) stringResource(R.string.social_friends_week_none) else stringResource(R.string.social_friends_week, week.joinToString(", "))
+        Row(
+            Modifier.semantics { contentDescription = sentence }.testTag("friend_week_${friend.id}"),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            val ink = MaterialTheme.colorScheme.onSurfaceVariant
+            ProvideTextStyle(MaterialTheme.typography.labelLarge) {
+                friend.weekBestCast?.let { CoinAmount(formatPoints(it), color = ink, iconSize = 14.dp) }
+                friend.weekDeepestM?.let { WeekFact(KitIcons.Depth, stringResource(R.string.common_meters, formatPoints(it.toInt()))) }
+                friend.weekTournament?.let { WeekFact(GameIcons.Trophy, formatPoints(it)) }
             }
-            OutlinedButton(onClick = onRemove, modifier = Modifier.testTag("friend_remove_${friend.id}")) {
+        }
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            GameButton(
+                stringResource(R.string.social_friends_challenge),
+                onClick = onChallenge,
+                modifier = Modifier.testTag("friend_challenge_${friend.id}"),
+                size = ButtonSize.SMALL,
+                icon = GameIcons.Battle,
+            )
+            TextButton(onClick = onRemove, modifier = Modifier.testTag("friend_remove_${friend.id}")) {
                 Text(stringResource(R.string.social_friends_remove))
             }
         }
+    }
+}
+
+/** A number with its pictogram, in a friend's row. */
+@Composable
+private fun WeekFact(icon: androidx.compose.ui.graphics.vector.ImageVector, text: String) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(14.dp))
+        Text(text, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold, maxLines = 1)
     }
 }
