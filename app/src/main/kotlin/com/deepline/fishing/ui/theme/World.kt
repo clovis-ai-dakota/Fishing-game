@@ -118,14 +118,16 @@ private fun DrawScope.drawPort(p: MenuPalette, t: Float, horizon: Float, u: Floa
     val woodDark = far(if (p.night) Color(0xFF2E2117) else Color(0xFF6B4826), p)
     // Just under the horizon, where a tab's first title ends and its first card starts.
     val deck = horizon + 7f * u
-    // The quay: a line of planks on short posts, mirrored in the water.
-    var x = 6f * u
+    // The quay: planks on short posts, mirrored in the water. It runs in from the right and stops
+    // past the middle, so it never strikes through a title on the left.
+    val quayStart = w * 0.54f
+    var x = quayStart + 6f * u
     while (x < w) {
         drawRect(woodDark, topLeft = Offset(x, deck), size = Size(4f * u, 12f * u))
         drawRect(woodDark.copy(alpha = 0.3f), topLeft = Offset(x + sin(t * 1.5f + x) * u, deck + 12f * u), size = Size(4f * u, 10f * u))
         x += 46f * u
     }
-    drawRect(wood, topLeft = Offset(0f, deck - 4f * u), size = Size(w, 5f * u))
+    drawRect(wood, topLeft = Offset(quayStart, deck - 4f * u), size = Size(w - quayStart, 5f * u))
     // The market stall: a counter under a striped awning, crates beside it, a string of lights.
     val sx = w * 0.6f
     val counter = far(if (p.night) Color(0xFF6A5A46) else Color(0xFFF1DFBE), p, 0.25f)
@@ -142,15 +144,9 @@ private fun DrawScope.drawPort(p: MenuPalette, t: Float, horizon: Float, u: Floa
         drawPath(stripe, Color.White.copy(alpha = if (p.night) 0.4f else 0.8f))
     }
     for (k in 0 until 3) {
-        val c = Offset(w * 0.3f + k * 15f * u, deck - 4f * u - 10f * u)
+        val c = Offset(w * 0.86f + k * 15f * u, deck - 4f * u - 10f * u)
         drawRoundRect(lerp(wood, Color.White, 0.12f * k), topLeft = c, size = Size(13f * u, 10f * u), cornerRadius = CornerRadius(1.5f * u))
         drawLine(woodDark, c + Offset(0f, 5f * u), c + Offset(13f * u, 5f * u), strokeWidth = 0.8f * u)
-    }
-    // A moored mast or two, far along the quay.
-    for (mx in listOf(0.1f, 0.17f, 0.9f)) {
-        val bob = sin(t * 0.9f + mx * 20f) * u
-        drawLine(woodDark, Offset(w * mx, deck - 4f * u + bob), Offset(w * mx, deck - 34f * u + bob), strokeWidth = 1.4f * u)
-        drawLine(woodDark, Offset(w * mx - 7f * u, deck - 8f * u + bob), Offset(w * mx + 7f * u, deck - 8f * u + bob), strokeWidth = 3f * u, cap = StrokeCap.Round)
     }
     for (k in 0..5) {
         val lx = sx - 8f * u + k * 12f * u
@@ -173,7 +169,7 @@ private fun DrawScope.drawArena(p: MenuPalette, t: Float, horizon: Float, u: Flo
         drawLine(glow.copy(alpha = 0.5f - k * 0.07f), Offset(sun.x - half, y), Offset(sun.x + half, y), strokeWidth = 3f * u, cap = StrokeCap.Round)
     }
     // The rival's boat, facing yours across the water.
-    val ink = far(lerp(p.silhouette, Color.Black, 0.55f), p, 0.3f)
+    val ink = far(lerp(p.silhouette, Color.Black, 0.55f), p, 0.5f)
     fun boat(cx: Float, flip: Float, flag: Color) {
         val bob = sin(t * 1.1f + cx) * 1.5f * u
         val y = horizon + bob
@@ -189,9 +185,10 @@ private fun DrawScope.drawArena(p: MenuPalette, t: Float, horizon: Float, u: Flo
         }
         drawPath(pennant, flag)
     }
-    scale(0.7f, 0.7f, pivot = Offset(w * 0.5f, horizon)) {
-        boat(w * 0.14f, 1f, Color(0xFF4FC3F7))
-        boat(w * 0.86f, -1f, Color(0xFFFF5A4A))
+    // Small and hazy on the horizon: a battle's rules are written just above it.
+    scale(0.55f, 0.55f, pivot = Offset(w * 0.5f, horizon)) {
+        boat(w * 0.08f, 1f, far(Color(0xFF4FC3F7), p, 0.35f))
+        boat(w * 0.92f, -1f, far(Color(0xFFFF5A4A), p, 0.35f))
     }
 }
 
