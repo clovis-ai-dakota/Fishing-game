@@ -99,12 +99,14 @@ class DailyUiTest : DailyUiTestBase() {
     @Test
     fun claimTheDailyRewardThenAChallengeAndSwapAnother() {
         val vm = launch(player())
-        compose.onNodeWithTag("daily_card").assertExists()
-        // A migration is under way: its banner is on the Fish tab.
+        // A migration is under way: its banner is on the Fish tab, next to the daily button.
         compose.onNodeWithTag("migration_banner").assertExists()
         compose.shot("90_daily_card")
 
+        // The Daily screen: the calendar, challenges and the migration.
         val before = vm.progress
+        compose.onNodeWithTag("daily_button").performClick()
+        assertEquals(Screen.DAILY, vm.screen)
         compose.onNodeWithTag("daily_claim").performScrollTo().performClick()
         assertEquals(1, vm.progress.dailyStreak)
         assertEquals(before.pointsBalance + DailyRewards.pointsFor(before, 0.2f), vm.progress.pointsBalance)
@@ -118,9 +120,6 @@ class DailyUiTest : DailyUiTestBase() {
         assertTrue(ReminderPrefs.asked(store))
         assertTrue(reminderWork().isEmpty())
 
-        // The Daily screen: the calendar, challenges and the migration.
-        compose.onNodeWithText("Daily").performClick()
-        assertEquals(Screen.DAILY, vm.screen)
         compose.shot("92_daily_screen")
         val detectors = vm.progress.detectors
         compose.onNodeWithTag("challenge_claim_easy").performScrollTo().performClick()
@@ -158,6 +157,7 @@ class ReminderOptInUiTest : DailyUiTestBase() {
     fun turningRemindersOnFromTheExplainer() {
         grantNotifications()
         val vm = launch(player())
+        compose.onNodeWithTag("daily_button").performClick()
         compose.onNodeWithTag("daily_claim").performScrollTo().performClick()
         compose.onNodeWithTag("optin_yes").performClick()
         assertTrue(vm.daily.reminders.enabled)

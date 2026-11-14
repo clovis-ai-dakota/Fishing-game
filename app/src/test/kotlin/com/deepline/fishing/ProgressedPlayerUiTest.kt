@@ -8,6 +8,7 @@ import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onFirst
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performScrollToNode
@@ -145,7 +146,7 @@ class ProgressedPlayerUiTest {
         compose.shot("06_shop_rope")
 
         compose.tab("fish")
-        compose.click("Milestones")
+        compose.onNodeWithContentDescription("Milestones").performClick()
         compose.shot("07_milestones")
         compose.click("‹ Back")
 

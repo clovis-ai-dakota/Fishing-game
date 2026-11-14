@@ -77,22 +77,22 @@ fun SeasonCard(vm: GameViewModel, modifier: Modifier = Modifier) {
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.Bold,
+                )                // How season XP is earned is behind the (i).
+                com.deepline.fishing.ui.kit.InfoButton(
+                    season.label(),
+                    stringResource(
+                        R.string.shop_season_xp,
+                        GameConfig.SEASON_XP_PER_CAST,
+                        GameConfig.SEASON_XP_PER_FISH,
+                        GameConfig.SEASON_XP_PER_SECRET,
+                        GameConfig.SEASON_XP_PER_TIER,
+                    ),
+                    tag = "season_info",
                 )
             }
             LinearProgressIndicator(
                 progress = { Seasons.xpIntoTier(p, now) / GameConfig.SEASON_XP_PER_TIER.toFloat() },
                 modifier = Modifier.fillMaxWidth(),
-            )
-            Text(
-                stringResource(
-                    R.string.shop_season_xp,
-                    GameConfig.SEASON_XP_PER_CAST,
-                    GameConfig.SEASON_XP_PER_FISH,
-                    GameConfig.SEASON_XP_PER_SECRET,
-                    GameConfig.SEASON_XP_PER_TIER,
-                ),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             val rewards = Seasons.rewards(season)
             val state = rememberLazyListState(initialFirstVisibleItemIndex = (tier - 1).coerceIn(0, GameConfig.SEASON_TIERS - 1))
@@ -113,9 +113,13 @@ fun SeasonCard(vm: GameViewModel, modifier: Modifier = Modifier) {
                     modifier = Modifier.weight(1f),
                 )
                 if (open.isNotEmpty()) {
-                    Button(onClick = vm::claimSeasonRewards, modifier = Modifier.testTag("claim_season")) {
-                        Text(stringResource(R.string.shop_season_claim, open.size))
-                    }
+                    com.deepline.fishing.ui.kit.GameButton(
+                        stringResource(R.string.shop_season_claim, open.size),
+                        onClick = vm::claimSeasonRewards,
+                        modifier = Modifier.testTag("claim_season"),
+                        role = com.deepline.fishing.ui.kit.ActionRole.CLAIM,
+                        icon = com.deepline.fishing.ui.kit.KitIcons.Gift,
+                    )
                 }
             }
         }

@@ -257,7 +257,7 @@ class AquariumUiTest : BoatUiTestBase() {
             midGamePlayer().copy(collection = caught.withIndex().associate { (i, s) -> s.id to com.deepline.fishing.core.CollectionEntry(1, 0, 20f, 100 + i) }),
         )
         compose.onNodeWithTag("tab_dex").performClick()
-        compose.onNodeWithText("Aquarium").performClick()
+        compose.onNodeWithContentDescription("Aquarium").performClick()
         assertEquals(Screen.AQUARIUM, vm.screen)
         compose.shot("70_aquarium")
         assertEquals(com.deepline.fishing.core.Showcase.TANK_SIZE, com.deepline.fishing.core.Showcase.tankFish(vm.progress).size)

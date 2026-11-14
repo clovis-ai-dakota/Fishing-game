@@ -10,6 +10,9 @@
     <string name="common_back">‹ Voltar</string>
     <string name="common_no_thanks">Não, obrigado</string>
     <string name="common_got_it">Entendi</string>
+    <string name="common_info_about">Saiba mais: %1$s</string>
+    <string name="common_fraction">%1$d\u00A0/\u00A0%2$d</string>
+    <string name="common_times">×%1$d</string>
 
     <!-- Unidades. -->
     <string name="common_meters">%1$s m</string>

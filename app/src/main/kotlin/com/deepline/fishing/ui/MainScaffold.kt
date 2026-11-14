@@ -26,6 +26,23 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.semantics.Role
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import com.deepline.fishing.GameViewModel
 import com.deepline.fishing.MainTab
 import com.deepline.fishing.Screen
@@ -56,44 +73,74 @@ private val MainTab.tourTarget: TourTarget?
  */
 @Composable
 fun MainScaffold(vm: GameViewModel) {
-    val current = MainTab.of(vm.screen) ?: MainTab.FISH
+    // While a pushed screen covers the tabs (and as it comes and goes), the tab it came from stays.
+    var last by rememberSaveable { mutableStateOf(MainTab.FISH) }
+    MainTab.of(vm.screen)?.let { last = it }
+    val current = last
     Column(Modifier.fillMaxSize()) {
-        Box(Modifier.weight(1f).fillMaxWidth()) {
-            when (current) {
+        // The content moves the way the camera travels between the two places (see ScreenMotion).
+        AnimatedContent(
+            targetState = current,
+            transitionSpec = { ScreenMotion.betweenTabs(initialState, targetState, vm.feel.settings.reduceMotion) },
+            label = "tab",
+            modifier = Modifier.weight(1f).fillMaxWidth(),
+        ) { tab ->
+            when (tab) {
                 MainTab.FISH -> HomeScreen(vm)
                 MainTab.DEX -> DexScreen(vm)
                 MainTab.SHOP -> com.deepline.fishing.ui.shop.ShopScreen(vm)
                 MainTab.BATTLE -> BattleSetupScreen(vm)
             }
         }
-        NavigationBar(
-            Modifier.tourTarget(TourTarget.NAV_BAR),
-            containerColor = com.deepline.fishing.ui.theme.LocalMenuPalette.current.bar,
-            tonalElevation = 0.dp,
-        ) {
-            for (tab in MainTab.entries) {
-                val target = tab.tourTarget
-                // A dot on the Shop tab when there's something for the player there (the Club's
-                // monthly pouch, or the starter pack offer while it's open).
-                val dot = tab == MainTab.SHOP && (vm.clubPouchReady || vm.starterOfferOpen || vm.seasonRewardsReady)
-                NavigationBarItem(
-                    selected = tab == current,
-                    onClick = { vm.selectTab(tab) },
-                    icon = {
-                        BadgedBox(badge = { if (dot) Badge() }) { Icon(tab.icon, contentDescription = null) }
-                    },
-                    label = { Text(stringResource(tab.labelRes), maxLines = 1) },
-                    alwaysShowLabel = true,
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = MaterialTheme.colorScheme.onPrimary,
-                        selectedTextColor = MaterialTheme.colorScheme.primary,
-                        indicatorColor = MaterialTheme.colorScheme.primary,
-                        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    ),
-                    modifier = Modifier
-                        .testTag("tab_${tab.name.lowercase()}")
-                        .then(if (target != null) Modifier.tourTarget(target) else Modifier),
+        TabBar(vm, current)
+    }
+}
+
+/**
+ * The tab bar, on the same deep water as the dock above it: the current tab is lit in the main
+ * action's amber and raised a little, the others are quiet. Always labelled, in the thumb zone.
+ */
+@Composable
+private fun TabBar(vm: GameViewModel, current: MainTab) {
+    val amber = com.deepline.fishing.ui.kit.GameColors.of(com.deepline.fishing.ui.kit.ActionRole.PLAY, com.deepline.fishing.ui.theme.LocalMenuPalette.current).top
+    val quiet = com.deepline.fishing.ui.kit.GameColors.OnDeepMuted
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .background(com.deepline.fishing.ui.kit.deepColor())
+            .navigationBarsPadding()
+            .height(64.dp)
+            .selectableGroup()
+            .tourTarget(TourTarget.NAV_BAR),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        for (tab in MainTab.entries) {
+            val target = tab.tourTarget
+            val selected = tab == current
+            // A dot on the Shop tab when there's something for the player there (the Club's
+            // monthly pouch, or the starter pack offer while it's open).
+            val dot = tab == MainTab.SHOP && (vm.clubPouchReady || vm.starterOfferOpen || vm.seasonRewardsReady)
+            val lift by animateDpAsState(if (selected) (-3).dp else 0.dp, tween(160), label = "tab")
+            Column(
+                Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .selectable(selected = selected, role = Role.Tab, onClick = { vm.selectTab(tab) })
+                    .testTag("tab_${tab.name.lowercase()}")
+                    .then(if (target != null) Modifier.tourTarget(target) else Modifier),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                Box(Modifier.offset(y = lift)) {
+                    Icon(tab.icon, contentDescription = null, tint = if (selected) amber else quiet, modifier = Modifier.size(if (selected) 28.dp else 24.dp))
+                    if (dot) Box(Modifier.align(Alignment.TopEnd).offset(x = 4.dp, y = (-2).dp).size(9.dp).background(com.deepline.fishing.ui.kit.GameColors.Badge, CircleShape))
+                }
+                Text(
+                    stringResource(tab.labelRes),
+                    maxLines = 1,
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+                    color = if (selected) amber else quiet,
                 )
             }
         }

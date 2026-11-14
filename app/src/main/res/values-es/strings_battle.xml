@@ -28,6 +28,8 @@
     <string name="battle_setup_computer">Máquina:</string>
     <string name="battle_setup_friend">Un amigo en este dispositivo (pasando el teléfono)</string>
     <string name="battle_setup_online">En línea (código de sala o partida rápida)</string>
+    <string name="battle_setup_friend_short">Mismo teléfono</string>
+    <string name="battle_setup_online_short">En línea</string>
     <!-- %1$d: the level of the standard tournament rope, in every rope stat. -->
     <string name="battle_setup_info_online">En línea, ambos jugadores pescan a la vez, cada uno en su teléfono, en exactamente la misma agua y con la misma cuerda de torneo estándar (nivel %1$d en cada estadística). Las capturas de los duelos no cuentan para tus puntos ni para tu registro de peces.</string>
     <string name="battle_setup_info_local">Ambos jugadores usan tu cuerda actual y pescan en exactamente la misma agua en cada lance, así que gana la habilidad. Las capturas de los duelos no cuentan para tus puntos ni para tu registro de peces.</string>

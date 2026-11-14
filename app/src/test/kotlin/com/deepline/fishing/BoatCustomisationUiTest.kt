@@ -135,10 +135,12 @@ class BoatCustomisationUiTest : BoatUiTestBase() {
         assertEquals(Screen.DEX, vm.screen)
         compose.onNodeWithText("Your boat").assertExists()
         compose.shot("54_skins_section")
-        val locked = hasText("Reach the ${DepthZone.ABYSS.displayName}", substring = true)
-        compose.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(locked)
+        // The locked atmosphere: a padlock, and how to unlock it behind its (i).
+        compose.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Atmosphere"))
+        compose.clickDescription("More about: Atmosphere")
         assertTrue(isShowing("Reach the ${DepthZone.ABYSS.displayName}", substring = true))
         compose.shot("54b_skins_atmosphere_locked")
+        compose.click("Got it")
         compose.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Customise boat"))
 
         compose.click("Customise boat")

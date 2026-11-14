@@ -60,6 +60,16 @@ import java.io.File
  * One class per language: each gets a fresh JVM (see `forkEvery`), so nothing leaks between them.
  * Run one: `./gradlew :app:testDebugUnitTest --tests '*LocaleLayoutDeTest'`.
  */
+/**
+ * The most words (with a letter; numbers don't count) a main screen may show at once, in any
+ * language: the first view of each tab and of each Shop page. Explanations belong behind (i)
+ * buttons and in the tour (docs/ui-design.md). Raise a budget only with a reason written here.
+ */
+val WORD_BUDGET: Map<String, Int> = mapOf(
+    "home" to 40,
+    "battle_setup" to 40,
+)
+
 abstract class LocaleLayoutTest(private val language: String) {
     @get:Rule
     val compose = createEmptyComposeRule()
@@ -71,6 +81,9 @@ abstract class LocaleLayoutTest(private val language: String) {
     private val dir by lazy { File("build/screenshots/locales/$language").apply { deleteRecursively(); mkdirs() } }
     private val problems = ArrayList<TextProblem>()
     private var count = 0
+
+    /** Words on each screen, by shot name (without its number). */
+    private val words = LinkedHashMap<String, Int>()
 
     /**
      * Truncations that are fine where they are (a name in a narrow card); each with its reason.
@@ -102,6 +115,7 @@ abstract class LocaleLayoutTest(private val language: String) {
         val file = "%03d_%s".format(++count, name)
         scenario!!.onActivity { captureWindows(it).savePng(File(dir, "$file.png")) }
         problems += TextAudit.check(compose, file, overlaps)
+        words[name] = TextAudit.words(compose)
     }
 
     /** The biggest list that scrolls down on the screen now, if any. */
@@ -153,6 +167,10 @@ abstract class LocaleLayoutTest(private val language: String) {
             else problems.joinToString("\n", "Text problems in $count screens (${left.size} not accepted):\n", "\n"),
         )
         assertTrue("Text problems in $language (see ${report.path}):\n" + left.joinToString("\n"), left.isEmpty())
+        // The word budget: a main screen shows names, numbers and pictograms, not paragraphs.
+        File(dir, "words.txt").writeText(words.entries.joinToString("\n", postfix = "\n") { "%4d  %s".format(it.value, it.key) })
+        val over = WORD_BUDGET.mapNotNull { (shot, budget) -> words[shot]?.takeIf { it > budget }?.let { "$shot: $it words, budget $budget" } }
+        assertTrue("Too much text in $language (docs/ui-design.md, word budget; see ${dir.path}/words.txt):\n" + over.joinToString("\n"), over.isEmpty())
     }
 
     /** The consent sheet (as in a build with Firebase), then every card of the tour. */

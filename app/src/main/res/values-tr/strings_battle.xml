@@ -28,6 +28,8 @@
     <string name="battle_setup_computer">Bilgisayar:</string>
     <string name="battle_setup_friend">Bu cihazdaki bir arkadaş (sırayla oyna)</string>
     <string name="battle_setup_online">Çevrim içi (oda kodu ya da hızlı eşleşme)</string>
+    <string name="battle_setup_friend_short">Aynı telefon</string>
+    <string name="battle_setup_online_short">Çevrimiçi</string>
     <!-- %1$d: the level of the standard tournament rope, in every rope stat. -->
     <string name="battle_setup_info_online">Çevrim içi düelloda iki oyuncu aynı anda kendi telefonunda, tıpatıp aynı suda ve aynı standart turnuva halatıyla (her özellikte seviye %1$d) balık tutar. Düello avları puanlarına ya da balık defterine sayılmaz.</string>
     <string name="battle_setup_info_local">İki oyuncu da senin şu anki halatını kullanır ve her atışta tıpatıp aynı suda balık tutar, yani kazananı beceri belirler. Düello avları puanlarına ya da balık defterine sayılmaz.</string>

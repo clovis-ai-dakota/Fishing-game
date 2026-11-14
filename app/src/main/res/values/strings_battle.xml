@@ -37,6 +37,10 @@
     <!-- Opponent chips. -->
     <string name="battle_setup_friend">Friend on this device (pass and play)</string>
     <string name="battle_setup_online">Online (room code or quick match)</string>
+    <!-- Opponent tile, under a phone pictogram: a friend on this same phone, taking turns. Two words at most. -->
+    <string name="battle_setup_friend_short">Same phone</string>
+    <!-- Opponent tile, under a globe pictogram: an online opponent. One word. -->
+    <string name="battle_setup_online_short">Online</string>
     <!-- Under the opponents. %1$d: the level of the standard tournament rope, in every rope stat. -->
     <string name="battle_setup_info_online">Online, both players fish at the same time on their own phones, on the very same water, with the same standard tournament rope (level %1$d in every stat). Battle catches don\'t count for your points or fish log.</string>
     <string name="battle_setup_info_local">Both players use your current rope and fish the very same water for each cast, so skill decides. Battle catches don\'t count for your points or fish log.</string>

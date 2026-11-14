@@ -102,7 +102,7 @@ private fun FishTurntable(species: FishSpecies, look: PortraitLook, sparkling: B
  * screens), or [fallback] where 3D isn't available.
  */
 @Composable
-fun SkinPreview3d(skins: Skins, modifier: Modifier = Modifier, fallback: @Composable androidx.compose.foundation.layout.BoxScope.() -> Unit) {
+fun SkinPreview3d(skins: Skins, modifier: Modifier = Modifier, cameraTop: Float = -6.5f, fallback: @Composable androidx.compose.foundation.layout.BoxScope.() -> Unit) {
     val context = LocalContext.current
     val supported = remember { Render3d.isSupported(context) } && !OffscreenGl.failed
     if (!supported) {
@@ -117,7 +117,7 @@ fun SkinPreview3d(skins: Skins, modifier: Modifier = Modifier, fallback: @Compos
             while (it.hookDepth < 5f) it.update(1f / 60f, 2f)
         }
         val builder = SceneBuilder()
-        FrameSource { w, h, t -> builder.build(session, 0.8f + t, w, h, current[0], cameraTop = -6.5f) }
+        FrameSource { w, h, t -> builder.build(session, 0.8f + t, w, h, current[0], cameraTop = cameraTop) }
     }
     Box(modifier) {
         LivePreview(source, transparent = false, modifier = Modifier.matchParentSize(), key = "skins")

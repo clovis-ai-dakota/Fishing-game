@@ -106,8 +106,11 @@ private fun badgeLook(frame: com.deepline.fishing.core.TitleFrame, t: Float): Ba
 @Composable
 fun SkinPreview(
     skins: Skins,
-    height: androidx.compose.ui.unit.Dp = 360.dp,
+    /** Null: the caller's [modifier] sizes it (the Fish tab's scene fills its place, edge to edge). */
+    height: androidx.compose.ui.unit.Dp? = 360.dp,
     modifier: Modifier = Modifier,
+    /** How far above the surface the view starts, in metres: more sky pushes the boat down. */
+    cameraTop: Float = -6.5f,
     /** When set, the preview is a button (the Fish tab's boat opens the Skins section). */
     onClick: (() -> Unit)? = null,
     clickLabel: String? = null,
@@ -128,18 +131,17 @@ fun SkinPreview(
     val description = clickLabel ?: androidx.compose.ui.res.stringResource(com.deepline.fishing.R.string.core_slot_boat)
     val box = modifier
         .fillMaxWidth()
-        .height(height)
-        .clip(RoundedCornerShape(12.dp))
+        .let { if (height != null) it.height(height).clip(RoundedCornerShape(12.dp)) else it }
         .let { m ->
             if (onClick == null) m
             else m.clickable(onClickLabel = clickLabel, role = Role.Button, onClick = onClick)
                 .semantics { contentDescription = description }
         }
     // 3D where the phone supports it, otherwise (and in tests) the 2D scene.
-    com.deepline.fishing.ui.render3d.gl.SkinPreview3d(skins, box) {
+    com.deepline.fishing.ui.render3d.gl.SkinPreview3d(skins, box, cameraTop) {
         Canvas(Modifier.matchParentSize()) {
             // Framed on the boat, the line and the hook, with room for the masts.
-            drawCastScene(session, 0.8f + time, measurer, skins = skins, cameraTop = -6.5f)
+            drawCastScene(session, 0.8f + time, measurer, skins = skins, cameraTop = cameraTop)
         }
     }
 }

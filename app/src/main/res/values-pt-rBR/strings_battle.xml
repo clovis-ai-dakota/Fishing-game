@@ -24,6 +24,8 @@
     <string name="battle_setup_computer">Computador:</string>
     <string name="battle_setup_friend">Amigo neste aparelho (passando o celular)</string>
     <string name="battle_setup_online">Online (código da sala ou partida rápida)</string>
+    <string name="battle_setup_friend_short">Mesmo celular</string>
+    <string name="battle_setup_online_short">Online</string>
     <string name="battle_setup_info_online">Online, os dois jogadores pescam ao mesmo tempo, cada um no seu celular, exatamente na mesma água, com a mesma corda padrão de torneio (nível %1$d em todos os atributos). O que se pesca nos duelos não conta para seus pontos nem para seu registro de peixes.</string>
     <string name="battle_setup_info_local">Os dois jogadores usam a sua corda atual e pescam exatamente na mesma água em cada lançamento, então quem decide é a habilidade. O que se pesca nos duelos não conta para seus pontos nem para seu registro de peixes.</string>
     <string name="battle_setup_tackle_title">Apetrechos para seus lançamentos</string>

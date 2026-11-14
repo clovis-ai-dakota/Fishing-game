@@ -125,7 +125,7 @@ class AppUiTest {
     @Test
     fun freshPlayerCastsAndCollects() {
         launch()
-        compose.onNodeWithText("Deep Line").assertExists()
+        compose.onNodeWithTag("cast_dock").assertExists()
         compose.shot("01_home")
 
         compose.click("Cast line")
@@ -138,6 +138,8 @@ class AppUiTest {
         compose.shot("03_cast_results")
 
         compose.click("Collect")
+        // Back on the Fish tab: the rope's (i) holds the numbers the screen no longer spells out.
+        compose.onNodeWithTag("rope_info").performClick()
         compose.onNodeWithText("Casts: 1", substring = true).assertExists()
     }
 
@@ -165,7 +167,7 @@ class AppUiTest {
     fun onlineLobby() {
         launch()
         compose.tab("battle")
-        compose.click("Online (room code or quick match)")
+        compose.onNodeWithTag("opponent_online").performScrollTo().performClick()
         compose.click("Go online")
         compose.onNodeWithText("Create room").assertExists()
         compose.shot("13_online_lobby")

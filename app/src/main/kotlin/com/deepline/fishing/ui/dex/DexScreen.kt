@@ -2,6 +2,7 @@ package com.deepline.fishing.ui.dex
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -30,19 +31,14 @@ fun DexScreen(vm: GameViewModel) {
     val section = vm.dexSection.takeIf { it in sections } ?: DexSection.FISH
     TabScreen(
         title = stringResource(R.string.shell_tab_dex),
-        subtitle = {
-            Text(
-                pluralStringResource(R.plurals.dex_subtitle, FishCatalog.all.size, FishCatalog.all.size),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        },
         actions = {
             // The aquarium shows off caught fish.
-            androidx.compose.material3.TextButton(
+            com.deepline.fishing.ui.kit.RoundIconButton(
+                com.deepline.fishing.ui.kit.KitIcons.Tank,
+                stringResource(R.string.dex_aquarium_button),
                 onClick = vm::openAquarium,
-                modifier = androidx.compose.ui.Modifier.tourTarget(com.deepline.fishing.ui.tour.TourTarget.DEX_AQUARIUM),
-            ) { Text(stringResource(R.string.dex_aquarium_button)) }
+                modifier = androidx.compose.ui.Modifier.padding(end = 8.dp).tourTarget(com.deepline.fishing.ui.tour.TourTarget.DEX_AQUARIUM),
+            )
         },
     ) {
         if (sections.size > 1) {
@@ -56,6 +52,17 @@ fun DexScreen(vm: GameViewModel) {
                         selected = s == section,
                         onClick = { vm.openDex(s) },
                         shape = SegmentedButtonDefaults.itemShape(i, sections.size),
+                        icon = {
+                            androidx.compose.material3.Icon(
+                                when (s) {
+                                    DexSection.FISH -> com.deepline.fishing.ui.GameIcons.Fish
+                                    DexSection.SECRETS -> com.deepline.fishing.ui.GameIcons.Sparkle
+                                    DexSection.SKINS -> com.deepline.fishing.ui.kit.KitIcons.Boat
+                                },
+                                contentDescription = null,
+                                modifier = androidx.compose.ui.Modifier.size(18.dp),
+                            )
+                        },
                     ) { Text(stringResource(s.labelRes), maxLines = 1) }
                 }
             }

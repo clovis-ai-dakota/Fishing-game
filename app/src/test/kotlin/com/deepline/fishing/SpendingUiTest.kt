@@ -1,5 +1,6 @@
 package com.deepline.fishing
 
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -40,7 +41,8 @@ class TackleShopUiTest : BoatUiTestBase() {
         assertEquals(1, vm.progress.luckyCharms)
 
         compose.onNodeWithTag("tab_fish").performClick()
-        compose.click("Lucky charm ×1")
+        compose.onNodeWithTag("tackle_charm").assertExists()
+        compose.onNodeWithContentDescription("Lucky charm ×1").performClick()
         assertTrue(vm.useCharm)
         compose.click("Cast line")
         val session = vm.session!!

@@ -27,6 +27,8 @@
     <string name="battle_setup_computer">Computer:</string>
     <string name="battle_setup_friend">Freund an diesem Gerät (Handy weitergeben)</string>
     <string name="battle_setup_online">Online (Raumcode oder schnelles Spiel)</string>
+    <string name="battle_setup_friend_short">Gleiches Handy</string>
+    <string name="battle_setup_online_short">Online</string>
     <string name="battle_setup_info_online">Online angeln beide gleichzeitig am eigenen Handy, im exakt gleichen Wasser und mit demselben Standard-Turnierseil (Stufe %1$d in allen Werten). Fänge in Duellen zählen nicht für deine Punkte oder dein Fangbuch.</string>
     <string name="battle_setup_info_local">Beide nutzen dein aktuelles Seil und angeln bei jedem Wurf im exakt gleichen Wasser, also entscheidet das Können. Fänge in Duellen zählen nicht für deine Punkte oder dein Fangbuch.</string>
     <string name="battle_setup_tackle_title">Zubehör für deine Würfe</string>

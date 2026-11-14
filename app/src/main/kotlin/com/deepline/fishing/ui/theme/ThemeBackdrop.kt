@@ -32,7 +32,17 @@ import kotlin.math.sin
  * never recompose for the animation. Looks only: nothing here is part of the game.
  */
 @Composable
-fun ThemeBackdrop(palette: MenuPalette, modifier: Modifier = Modifier, animate: Boolean = true) {
+fun ThemeBackdrop(
+    palette: MenuPalette,
+    modifier: Modifier = Modifier,
+    animate: Boolean = true,
+    /** Where the camera looks (see [Place]): it travels there when this changes. */
+    place: Place = Place.SEA,
+    /** How long the camera takes to get there (0: at once, for reduced motion). */
+    travelMs: Int = CAMERA_MS,
+) {
+    val camX = androidx.compose.animation.core.animateFloatAsState(place.x, tween(travelMs, easing = androidx.compose.animation.core.FastOutSlowInEasing), label = "camera x")
+    val camY = androidx.compose.animation.core.animateFloatAsState(place.y, tween(travelMs, easing = androidx.compose.animation.core.FastOutSlowInEasing), label = "camera y")
     val clock = rememberInfiniteTransition(label = "backdrop")
     val t = clock.animateFloat(
         initialValue = 0f,
@@ -40,8 +50,11 @@ fun ThemeBackdrop(palette: MenuPalette, modifier: Modifier = Modifier, animate: 
         animationSpec = infiniteRepeatable(tween(600_000, easing = LinearEasing)),
         label = "backdrop time",
     )
-    Canvas(modifier) { drawBackdrop(palette, if (animate) t.value else 12f) }
+    Canvas(modifier) { drawBackdrop(palette, if (animate) t.value else 12f, camX.value, camY.value) }
 }
+
+/** How long the camera takes to travel between two places (a tab change), in milliseconds. */
+const val CAMERA_MS = 340
 
 /** Deterministic noise in 0..1 for the scene's placements. */
 private fun h(k: Int, salt: Int): Float {
@@ -50,16 +63,18 @@ private fun h(k: Int, salt: Int): Float {
     return ((x xor (x ushr 16)) and 0xFFFFFF) / 16777215f
 }
 
-fun DrawScope.drawBackdrop(p: MenuPalette, t: Float) {
+fun DrawScope.drawBackdrop(p: MenuPalette, t: Float, camX: Float = 0f, camY: Float = 0f) {
     val w = size.width
     val hgt = size.height
     if (w <= 1f || hgt <= 1f) return
-    val horizon = hgt * 0.15f
+    // The camera sinks under the surface for the deep places: the waterline leaves by the top.
+    val horizon = hgt * (0.15f - camY)
     val u = min(w, hgt) / 400f // scene unit, about a dp on a phone
 
     // Sky.
     drawRect(Brush.verticalGradient(p.sky, startY = 0f, endY = horizon), size = Size(w, horizon + 2f))
-    drawSkyDetails(p, t, horizon, u)
+    // Far things move less than near ones as the camera travels along the coast.
+    if (horizon > 0f) parallax(camX, 0.25f) { drawSkyDetails(p, t, horizon, u) }
 
     // Sea, below a moving waterline.
     val line = Path().apply {
@@ -86,7 +101,14 @@ fun DrawScope.drawBackdrop(p: MenuPalette, t: Float) {
     drawPath(foam, Color.White.copy(alpha = if (p.night) 0.18f else 0.55f), style = Stroke(width = 2f * u, cap = StrokeCap.Round))
 
     drawLight(p, t, horizon, u)
-    drawShoal(p, t, horizon, u)
+    parallax(camX, 0.5f) { drawShoal(p, t, horizon, u) }
+    drawPlaceLight(p, horizon, camX, camY)
+    drawPlaces(p, t, horizon, u, camX)
+    parallax(camX, 1f) { drawDecor(p, t, horizon, u) }
+    parallax(camX, 0.75f) { drawParticles(p, t, horizon, u) }
+}
+
+private fun DrawScope.drawDecor(p: MenuPalette, t: Float, horizon: Float, u: Float) {
     when (p.decor) {
         SceneDecor.LAGOON -> drawSeabed(p, t, u, grass = true)
         SceneDecor.KELP -> drawKelp(p, t, horizon, u)
@@ -99,7 +121,6 @@ fun DrawScope.drawBackdrop(p: MenuPalette, t: Float) {
         SceneDecor.GLOW -> drawGlow(p, t, horizon, u)
         SceneDecor.AURORA -> drawSeabed(p, t, u, grass = false)
     }
-    drawParticles(p, t, horizon, u)
 }
 
 // ---- Sky -------------------------------------------------------------------------------------------

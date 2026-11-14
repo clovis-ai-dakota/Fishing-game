@@ -39,19 +39,18 @@ import com.deepline.fishing.ui.rewardTextColor
 import com.deepline.fishing.ui.tour.TourTarget
 import com.deepline.fishing.ui.tour.tourTarget
 
-/** On the Battle tab: the way to friends, the leaderboards, the tournament (and clubs). */
+/** The Battle tab's way into friends, leaderboards, the tournament (and clubs): a button with what's waiting. */
 @Composable
-fun SocialEntryCard(vm: GameViewModel) {
+fun SocialEntryButton(vm: GameViewModel, modifier: Modifier = Modifier) {
     val f = vm.social.friends
     val waiting = (f?.incoming?.size ?: 0) + (f?.challenges?.size ?: 0)
-    SocialCard(stringResource(R.string.social_hub_title), Modifier.tourTarget(TourTarget.BATTLE_SOCIAL)) {
-        Hint(stringResource(if (FeatureFlags.clubs) R.string.social_entry_body else R.string.social_entry_body_no_clubs))
-        BadgedBox(badge = { if (waiting > 0) Badge { Text(formatPoints(waiting)) } }) {
-            FilledTonalButton(onClick = { vm.openSocial() }, modifier = Modifier.testTag("battle_social")) {
-                Text(stringResource(R.string.social_entry_open))
-            }
-        }
-    }
+    com.deepline.fishing.ui.kit.RoundIconButton(
+        com.deepline.fishing.ui.kit.KitIcons.Friends,
+        stringResource(R.string.social_hub_title),
+        onClick = { vm.openSocial() },
+        modifier = modifier.tourTarget(TourTarget.BATTLE_SOCIAL).testTag("battle_social"),
+        badge = waiting,
+    )
 }
 
 /** The Friends card's summary: "You have 2 friends. 1 friend request is waiting for your answer." */

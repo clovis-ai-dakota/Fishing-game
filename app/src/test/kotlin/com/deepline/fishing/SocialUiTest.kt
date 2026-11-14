@@ -513,7 +513,7 @@ class SocialClubsOffUiTest : SocialUiTestBase() {
         FeatureFlags.clubs = false
         val (vm, fake) = launchSocial()
         compose.onNodeWithTag("tab_battle").performClick()
-        compose.onNodeWithText("Add friends, climb the weekly leaderboards and fish the weekly tournament.").assertExists()
+        assertTrue(exists("battle_social"))
         tap("battle_social")
         compose.waitUntil(5_000) { vm.social.tournament != null }
         assertFalse(exists("social_clubs"))

@@ -196,7 +196,7 @@ class OnlineUiTest {
 
         compose.onNodeWithTag("tab_battle").performClick()
         compose.click("Heavy Haul")
-        compose.click("Online (room code or quick match)")
+        compose.onNodeWithTag("opponent_online").performScrollTo().performClick()
         compose.click("Go online")
         compose.click("Create room")
         compose.waitFor(hasText("Share this room code"))

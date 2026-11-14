@@ -54,6 +54,19 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     must see exactly as much as in FAMILY.
   - The 2D boat (classic, skins and designs) is drawn by `drawBoat` in `BoatArt.kt`; every
     `HullPattern`, `SailStyle`, `FlagStyle` and `Emblem` must also be drawn in 3D.
+- **Menu design** (rules and kit: `docs/ui-design.md`; components in `ui/kit/`):
+  - **Few words**: a main screen shows names, numbers and pictograms. Explanations go behind an
+    (i) (`InfoButton`, `SectionTitle(info = ...)`) and in the tour, never as a permanent paragraph.
+    The first view of a tab has a word budget (`WORD_BUDGET` in `LocaleLayoutTest.kt`, checked in
+    French, German and Turkish).
+  - **Colour says what an action is** (`ActionRole`): amber `PLAY` for the one main action of a
+    screen, green `CLAIM` for something free and ready, the theme's colour `NAV` for navigation
+    and secondary actions, gold `POINTS` and violet `PREMIUM` for the two prices, red `ALERT`.
+    Use `GameButton` (raised, sinks when pressed) for anything that acts; Material buttons only
+    for dialogs' text buttons and chips. The main action sits in a dock on deep water
+    (`dockBackground()`), never in the scrolling content.
+  - **Pictograms are drawn in code** (`GameIcons`, `KitIcons`, `DailyIcons`), never system emoji;
+    a pictogram-only control keeps the sentence it replaced as its `contentDescription`.
 - **Navigation**: four bottom tabs (`MainTab`: Fish = `Screen.HOME`, Dex, Shop = `Screen.SHOP`,
   Battle = `Screen.BATTLE_SETUP`) in `MainScaffold`; the Shop's pages are `ShopPage` (tour steps
   pick one with `shopPage`); everything else is a full screen pushed on top (no

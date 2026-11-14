@@ -46,6 +46,8 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -68,6 +70,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.deepline.fishing.ui.kit.ActionRole
+import com.deepline.fishing.ui.kit.ButtonSize
+import com.deepline.fishing.ui.kit.GameButton
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Spacer
 import com.deepline.fishing.GameViewModel
 import com.deepline.fishing.R
 import com.deepline.fishing.ShopPage
@@ -121,15 +130,13 @@ fun ShopScreen(vm: GameViewModel) {
 
     TabScreen(
         title = stringResource(R.string.shell_tab_shop),
-        subtitle = {
-            Text(
-                stringResource(R.string.shop_balance, formatPoints(p.pointsBalance)),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.secondary,
-                fontWeight = FontWeight.Bold,
-            )
+        actions = {
+            if (vm.isClubMember) ClubChip()
+            val balance = stringResource(R.string.shop_balance, formatPoints(p.pointsBalance))
+            com.deepline.fishing.ui.kit.ScenePill(Modifier.padding(end = 8.dp).semantics { contentDescription = balance }.testTag("shop_balance")) {
+                com.deepline.fishing.ui.kit.CoinAmount(formatPoints(p.pointsBalance), iconSize = 18.dp)
+            }
         },
-        actions = { if (vm.isClubMember) ClubChip() },
     ) {
         Row(
             Modifier
@@ -143,6 +150,7 @@ fun ShopScreen(vm: GameViewModel) {
                     selected = pg == page,
                     onClick = { vm.selectShopPage(pg) },
                     label = { Text(stringResource(pg.labelRes)) },
+                    leadingIcon = { Icon(pg.icon, contentDescription = null, modifier = Modifier.size(18.dp)) },
                     modifier = Modifier.testTag("shop_page_${pg.name.lowercase()}"),
                 )
             }
@@ -216,13 +224,18 @@ private fun LazyGridScope.full(key: String, content: @Composable () -> Unit) =
     item(key = key, span = { GridItemSpan(maxLineSpan) }) { content() }
 
 private fun LazyGridScope.header(key: String, @StringRes title: Int, @StringRes note: Int? = null, modifier: Modifier = Modifier) = full(key) {
-    Column(modifier.padding(top = 6.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(stringResource(title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-        if (note != null) {
-            Text(stringResource(note), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-    }
+    // The note is behind the (i): a list starts with its title, not a paragraph.
+    com.deepline.fishing.ui.kit.SectionTitle(stringResource(title), note?.let { stringResource(it) }, modifier.fillMaxWidth().padding(top = 6.dp))
 }
+
+private val ShopPage.icon: androidx.compose.ui.graphics.vector.ImageVector
+    get() = when (this) {
+        ShopPage.ROPE -> com.deepline.fishing.ui.kit.KitIcons.Rope
+        ShopPage.TACKLE -> com.deepline.fishing.ui.GameIcons.Lantern
+        ShopPage.STYLE -> com.deepline.fishing.ui.GameIcons.Palette
+        ShopPage.PASSES -> com.deepline.fishing.ui.kit.KitIcons.Ticket
+        ShopPage.AQUARIUM -> com.deepline.fishing.ui.kit.KitIcons.Tank
+    }
 
 /** A bundle's saving as a badge ("-25%"). */
 @Composable
@@ -301,20 +314,47 @@ internal fun PriceButtons(item: ShopItem, actions: ShopActions, wide: Boolean = 
     val points = vm.shopPointsPrice(item)
     // Both buttons as tall as the taller one: a points price too long for one line ("1,1 Mio.
     // Punkte") shows its unit on a second line (PointsPriceLabel) instead of being cut off.
-    Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
-        Button(
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = modifier.fillMaxWidth()) {
+        GameButton(
             onClick = { actions.buyWithMoney(item) },
-            contentPadding = PaddingValues(horizontal = 8.dp),
-            modifier = Modifier.weight(1f).fillMaxHeight().testTag("buy_eur_${item.id}"),
-        ) { Text(vm.billing.priceOf(item) ?: formatEuros(item.euroCents), maxLines = 1, fontWeight = FontWeight.Bold) }
-        OutlinedButton(
+            modifier = Modifier.weight(1f).testTag("buy_eur_${item.id}"),
+            role = ActionRole.PREMIUM,
+            size = ButtonSize.SMALL,
+            contentPadding = PaddingValues(horizontal = 6.dp, vertical = 6.dp),
+        ) { Text(vm.billing.priceOf(item) ?: formatEuros(item.euroCents), maxLines = 1) }
+        val pointsLabel = stringResource(R.string.common_points, formatPoints(points))
+        GameButton(
             onClick = { actions.onPoints(item) },
+            modifier = Modifier.weight(1f).testTag("buy_pts_${item.id}").semantics { contentDescription = pointsLabel },
+            role = ActionRole.POINTS,
+            size = ButtonSize.SMALL,
             enabled = vm.progress.pointsBalance >= points,
-            contentPadding = PaddingValues(horizontal = 8.dp),
-            modifier = Modifier.weight(1f).fillMaxHeight().testTag("buy_pts_${item.id}"),
-        ) { PointsPriceLabel(if (wide) formatPoints(points) else compactPoints(points)) }
+            contentPadding = PaddingValues(horizontal = 6.dp, vertical = 6.dp),
+        ) { CoinPrice(if (wide) formatPoints(points) else compactPoints(points)) }
     }
 }
+
+/**
+ * A price in points on a gold button: the coin, then the number (the coin is the unit). In a
+ * narrow button a long number ("2,4 Mio.") is written smaller from the next frame on, never cut.
+ */
+@Composable
+internal fun RowScope.CoinPrice(number: String) {
+    var step by remember(number) { mutableStateOf(0) }
+    val scale = COIN_PRICE_SCALES[step]
+    val style = LocalTextStyle.current
+    Icon(com.deepline.fishing.ui.GameIcons.Coin, contentDescription = null, modifier = Modifier.size(if (step == 0) 16.dp else 13.dp))
+    Text(
+        number,
+        maxLines = 1,
+        softWrap = false,
+        style = style.copy(fontSize = style.fontSize * scale),
+        modifier = Modifier.weight(1f, fill = false),
+        onTextLayout = { if (it.didOverflowWidth && step < COIN_PRICE_SCALES.lastIndex) step++ },
+    )
+}
+
+private val COIN_PRICE_SCALES = floatArrayOf(1f, 0.86f, 0.74f)
 
 /**
  * A points price ([number] already formatted) inside a narrow button: "260k pts" on one line when
@@ -385,33 +425,69 @@ private fun RopeCard(vm: GameViewModel, stat: RopeStat, modifier: Modifier) {
     val p = vm.progress
     val level = p.level(stat)
     val cost = Progression.upgradeCost(p, stat)
+    val current = formatStat(stat, stat.valueAt(level))
     Card(Modifier.fillMaxWidth().then(modifier)) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(stat.label(), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-                Text(stringResource(R.string.shop_rope_level, level, stat.maxLevel), style = MaterialTheme.typography.labelLarge)
-            }
-            Text(stat.description(), style = MaterialTheme.typography.bodySmall)
-            LinearProgressIndicator(progress = { level.toFloat() / stat.maxLevel }, modifier = Modifier.fillMaxWidth())
-            val current = formatStat(stat, stat.valueAt(level))
-            Progression.downgradeRefund(p, stat)?.let { refund ->
-                TextButton(onClick = { vm.downgrade(stat) }) {
-                    Text(stringResource(R.string.shop_rope_downgrade, formatStat(stat, stat.valueAt(level - 1)), formatPoints(refund)))
+        Column(Modifier.padding(start = 14.dp, end = 8.dp, top = 10.dp, bottom = 14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Icon(stat.icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(28.dp))
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                    Text(stat.label(), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    val levelText = stringResource(R.string.shop_rope_level, level, stat.maxLevel)
+                    com.deepline.fishing.ui.kit.Pips(level, stat.maxLevel, Modifier.semantics { contentDescription = levelText })
                 }
+                com.deepline.fishing.ui.kit.InfoButton(stat.label(), stat.description())
             }
-            if (cost == null) {
-                Text(stringResource(R.string.shop_rope_maxed, current), fontWeight = FontWeight.SemiBold)
-            } else {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("$current → ${formatStat(stat, stat.valueAt(level + 1))}", fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
-                    Button(onClick = { vm.buyUpgrade(stat) }, enabled = p.pointsBalance >= cost) {
-                        Text(stringResource(R.string.common_points, formatPoints(cost)))
+            Row(Modifier.padding(end = 6.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (cost == null) {
+                    Text(stringResource(R.string.shop_rope_maxed, current), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                } else {
+                    Text("$current → ${formatStat(stat, stat.valueAt(level + 1))}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                }
+                // One level back, fully refunded: the arrow, where it goes back to and what comes back.
+                Progression.downgradeRefund(p, stat)?.let { refund ->
+                    val label = stringResource(R.string.shop_rope_downgrade, formatStat(stat, stat.valueAt(level - 1)), formatPoints(refund))
+                    Row(
+                        Modifier
+                            .clip(RoundedCornerShape(50))
+                            .clickable(role = androidx.compose.ui.semantics.Role.Button) { vm.downgrade(stat) }
+                            .semantics { contentDescription = label }
+                            .testTag("downgrade_${stat.name.lowercase()}")
+                            .padding(horizontal = 8.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        Icon(com.deepline.fishing.ui.kit.KitIcons.Undo, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
+                        com.deepline.fishing.ui.kit.CoinAmount("+" + compactPoints(refund.toLong()), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
+                }
+                if (cost != null) {
+                    val price = stringResource(R.string.common_points, formatPoints(cost))
+                    GameButton(
+                        onClick = { vm.buyUpgrade(stat) },
+                        modifier = Modifier.testTag("upgrade_${stat.name.lowercase()}").semantics { contentDescription = price },
+                        role = ActionRole.POINTS,
+                        enabled = p.pointsBalance >= cost,
+                    ) { CoinPrice(formatPoints(cost)) }
                 }
             }
         }
     }
 }
+
+private val RopeStat.icon: androidx.compose.ui.graphics.vector.ImageVector
+    get() = when (this) {
+        RopeStat.LENGTH -> com.deepline.fishing.ui.kit.KitIcons.Depth
+        RopeStat.STRENGTH -> com.deepline.fishing.ui.kit.KitIcons.Weight
+        RopeStat.AGILITY -> com.deepline.fishing.ui.kit.KitIcons.Speed
+    }
+
+internal val Tackle.icon: androidx.compose.ui.graphics.vector.ImageVector
+    get() = when (this) {
+        Tackle.LANTERN -> com.deepline.fishing.ui.GameIcons.Lantern
+        Tackle.DETECTOR -> com.deepline.fishing.ui.kit.KitIcons.Radar
+        Tackle.LUCKY_CHARM -> com.deepline.fishing.ui.kit.KitIcons.Clover
+        Tackle.SPARKLE_LURE -> com.deepline.fishing.ui.GameIcons.Sparkle
+    }
 
 // ---- Tackle --------------------------------------------------------------------------------------
 
@@ -434,25 +510,32 @@ private fun TackleCard(vm: GameViewModel, t: Tackle, actions: ShopActions, modif
     }
     Card(Modifier.fillMaxWidth().then(modifier)) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(t.label(), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Icon(t.icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(28.dp))
+                Text(t.label(), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                val owned = stringResource(R.string.shop_tackle_owned, Progression.tackleCount(p, t))
                 Text(
-                    stringResource(R.string.shop_tackle_owned, Progression.tackleCount(p, t)),
-                    style = MaterialTheme.typography.labelLarge,
+                    stringResource(R.string.common_times, Progression.tackleCount(p, t)),
+                    style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.secondary,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.semantics { contentDescription = owned },
+                )
+                com.deepline.fishing.ui.kit.InfoButton(
+                    t.label(),
+                    stringResource(if (t.usableInBattles) R.string.shop_tackle_desc_battles else R.string.shop_tackle_desc_solo, t.description()),
                 )
             }
-            Text(
-                stringResource(if (t.usableInBattles) R.string.shop_tackle_desc_battles else R.string.shop_tackle_desc_solo, t.description()),
-                style = MaterialTheme.typography.bodySmall,
-            )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(R.string.shop_tackle_single), style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
-                OutlinedButton(
+                val price = stringResource(R.string.common_points, formatPoints(single))
+                GameButton(
                     onClick = { vm.buyTackle(t) },
+                    modifier = Modifier.testTag("buy_one_${t.name.lowercase()}").semantics { contentDescription = price },
+                    role = ActionRole.POINTS,
+                    size = ButtonSize.SMALL,
                     enabled = p.pointsBalance >= single,
-                    modifier = Modifier.testTag("buy_one_${t.name.lowercase()}"),
-                ) { Text(stringResource(R.string.common_points, formatPoints(single))) }
+                ) { CoinPrice(formatPoints(single)) }
             }
             for (pack in packs) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -539,7 +622,6 @@ private fun BoatTile(vm: GameViewModel, item: ShopItem, actions: ShopActions, ti
     val presetId = (item.grants.first() as Grant.Preset).presetId
     val skin = PremiumSkins.byId(presetId) ?: return
     Tile(item.label(), item.badgeText()?.asString(), preview = { Canvas(Modifier.fillMaxSize()) { drawBoatTile(null, skin.design, time) } }) {
-        Text(skin.description(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, minLines = 2, maxLines = 2, overflow = TextOverflow.Ellipsis)
         when {
             vm.isWearingPreset(presetId) -> OwnedRow(stringResource(R.string.shop_worn))
             ShopCatalog.ownsPreset(vm.progress, presetId) -> OwnedRow { TextButton(onClick = { vm.wearPreset(presetId) }) { Text(stringResource(R.string.shop_wear)) } }
@@ -724,8 +806,8 @@ internal fun ItemCard(vm: GameViewModel, item: ShopItem, actions: ShopActions, m
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(item.label(), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                 badge?.let { Badge(it) }
+                com.deepline.fishing.ui.kit.InfoButton(item.label(), item.description(), tag = "info_${item.id}")
             }
-            Text(item.description(), style = MaterialTheme.typography.bodySmall)
             if (discount != null) {
                 Text(
                     stringResource(R.string.shop_item_worth, formatEuros(ShopCatalog.separateCents(item, p))),
@@ -767,24 +849,20 @@ internal fun ItemCard(vm: GameViewModel, item: ShopItem, actions: ShopActions, m
 
 private fun LazyGridScope.footer(vm: GameViewModel) = full("footer") {
     Column(Modifier.padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text(
-            stringResource(
-                R.string.shop_footer_rates,
-                ShopText.fishingTimeLabel(GameConfig.MINUTES_PER_EURO),
-                ShopText.fishingTimeLabel(GameConfig.LANTERN_MINUTES_PER_EURO),
-                ((GameConfig.tierBonus(499) - 1f) * 100).roundToInt(),
-                ((GameConfig.tierBonus(999) - 1f) * 100).roundToInt(),
-            ),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        val rates = stringResource(
+            R.string.shop_footer_rates,
+            ShopText.fishingTimeLabel(GameConfig.MINUTES_PER_EURO),
+            ShopText.fishingTimeLabel(GameConfig.LANTERN_MINUTES_PER_EURO),
+            ((GameConfig.tierBonus(499) - 1f) * 100).roundToInt(),
+            ((GameConfig.tierBonus(999) - 1f) * 100).roundToInt(),
         )
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                stringResource(R.string.shop_footer_payments, vm.billing.name.asString()),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.weight(1f),
+            com.deepline.fishing.ui.kit.InfoButton(
+                stringResource(R.string.shell_tab_shop),
+                rates + "\n\n" + stringResource(R.string.shop_footer_payments, vm.billing.name.asString()),
+                tag = "shop_rates_info",
             )
+            Spacer(Modifier.weight(1f))
             TextButton(onClick = vm::restorePurchases) { Text(stringResource(R.string.shop_footer_restore)) }
         }
         var account by remember { mutableStateOf(false) }

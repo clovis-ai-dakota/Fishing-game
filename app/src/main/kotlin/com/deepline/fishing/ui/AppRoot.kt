@@ -21,6 +21,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -43,38 +44,60 @@ import com.deepline.fishing.ui.tour.TourTargets
 @Composable
 fun AppRoot(vm: GameViewModel) {
     val tourTargets = remember { TourTargets() }
-    CompositionLocalProvider(LocalTourTargets provides tourTargets) {
+    // Kit buttons click: navigation and the main action play the tap; claims and purchases
+    // play their own sound when they succeed.
+    val pressFeedback = remember(vm) {
+        { role: com.deepline.fishing.ui.kit.ActionRole ->
+            if (role == com.deepline.fishing.ui.kit.ActionRole.NAV || role == com.deepline.fishing.ui.kit.ActionRole.PLAY) {
+                vm.feel.cue(com.deepline.fishing.feel.Cue.UI_TAP)
+            }
+        }
+    }
+    CompositionLocalProvider(LocalTourTargets provides tourTargets, com.deepline.fishing.ui.kit.LocalPressFeedback provides pressFeedback) {
         BackHandler(enabled = vm.screen != Screen.HOME) { vm.onBack() }
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             Box(Modifier.fillMaxSize()) {
-                // The theme's sea scene behind every menu (a cast draws its own water).
+                // The theme's sea scene behind every menu (a cast draws its own water): the camera
+                // travels to the menu's place in the world.
+                val calm = vm.feel.settings.reduceMotion
                 if (vm.screen != Screen.CAST) {
-                    com.deepline.fishing.ui.theme.ThemeBackdrop(com.deepline.fishing.ui.theme.LocalMenuPalette.current, Modifier.fillMaxSize())
+                    com.deepline.fishing.ui.theme.ThemeBackdrop(
+                        com.deepline.fishing.ui.theme.LocalMenuPalette.current,
+                        Modifier.fillMaxSize(),
+                        place = com.deepline.fishing.ui.theme.Place.of(vm.screen),
+                        travelMs = if (calm) 0 else com.deepline.fishing.ui.theme.CAMERA_MS,
+                    )
                 }
-                when (vm.screen) {
-                    // The four tabs share the bottom navigation bar.
-                    Screen.HOME, Screen.DEX, Screen.SHOP, Screen.BATTLE_SETUP -> MainScaffold(vm)
-                    // Full screens, without the bar.
-                    Screen.CAST -> CastScreen(vm)
-                    Screen.FISH_DETAIL -> FishDetailScreen(vm)
-                    Screen.MILESTONES -> MilestonesScreen(vm)
-                    Screen.BATTLE -> BattleScreen(vm)
-                    Screen.ONLINE_LOBBY -> OnlineLobbyScreen(vm)
-                    Screen.BOAT_EDITOR -> com.deepline.fishing.ui.boat.BoatEditorScreen(vm)
-                    Screen.AQUARIUM -> com.deepline.fishing.ui.shop.AquariumScreen(vm)
-                    Screen.THEMES -> com.deepline.fishing.ui.shop.ThemesScreen(vm)
-                    Screen.SETTINGS -> com.deepline.fishing.ui.settings.SettingsScreen(vm)
-                    // -- Daily loop screens below.
-                    Screen.DAILY -> com.deepline.fishing.ui.daily.DailyScreen(vm)
-
-                    // -- Social screens below.
-                    Screen.SOCIAL -> com.deepline.fishing.ui.social.SocialHubScreen(vm)
-                    Screen.FRIENDS -> com.deepline.fishing.ui.social.FriendsScreen(vm)
-                    Screen.LEADERBOARDS -> com.deepline.fishing.ui.social.LeaderboardsScreen(vm)
-                    Screen.TOURNAMENT -> com.deepline.fishing.ui.social.TournamentScreen(vm)
-                    // Clubs ship in a later update: without the flag there is no club screen at all.
-                    Screen.CLUBS -> if (com.deepline.fishing.FeatureFlags.clubs) com.deepline.fishing.ui.social.ClubsScreen(vm) else com.deepline.fishing.ui.social.SocialHubScreen(vm)
-
+                // The four tabs are one layer (they move inside MainScaffold, under a tab bar that
+                // stays put); every other screen is pushed on top of it.
+                val pushed: Screen? = vm.screen.takeIf { !isTabScreen(it) }
+                AnimatedContent(
+                    targetState = pushed,
+                    transitionSpec = { ScreenMotion.between(initialState, targetState, calm) },
+                    label = "screen",
+                    modifier = Modifier.fillMaxSize(),
+                ) { screen ->
+                    when (screen) {
+                        // The four tabs share the bottom navigation bar.
+                        null, Screen.HOME, Screen.DEX, Screen.SHOP, Screen.BATTLE_SETUP -> MainScaffold(vm)
+                        // Full screens, without the bar.
+                        Screen.CAST -> CastScreen(vm)
+                        Screen.FISH_DETAIL -> FishDetailScreen(vm)
+                        Screen.MILESTONES -> MilestonesScreen(vm)
+                        Screen.BATTLE -> BattleScreen(vm)
+                        Screen.ONLINE_LOBBY -> OnlineLobbyScreen(vm)
+                        Screen.BOAT_EDITOR -> com.deepline.fishing.ui.boat.BoatEditorScreen(vm)
+                        Screen.AQUARIUM -> com.deepline.fishing.ui.shop.AquariumScreen(vm)
+                        Screen.THEMES -> com.deepline.fishing.ui.shop.ThemesScreen(vm)
+                        Screen.SETTINGS -> com.deepline.fishing.ui.settings.SettingsScreen(vm)
+                        Screen.DAILY -> com.deepline.fishing.ui.daily.DailyScreen(vm)
+                        Screen.SOCIAL -> com.deepline.fishing.ui.social.SocialHubScreen(vm)
+                        Screen.FRIENDS -> com.deepline.fishing.ui.social.FriendsScreen(vm)
+                        Screen.LEADERBOARDS -> com.deepline.fishing.ui.social.LeaderboardsScreen(vm)
+                        Screen.TOURNAMENT -> com.deepline.fishing.ui.social.TournamentScreen(vm)
+                        // Clubs ship in a later update: without the flag there is no club screen at all.
+                        Screen.CLUBS -> if (com.deepline.fishing.FeatureFlags.clubs) com.deepline.fishing.ui.social.ClubsScreen(vm) else com.deepline.fishing.ui.social.SocialHubScreen(vm)
+                    }
                 }
                 vm.tour?.let { TourOverlay(it, onNext = vm::tourNext, onBack = vm::tourBack, onSkip = vm::skipTour) }
                 // What just happened in the shop (a purchase, a pending payment), above the tab bar.

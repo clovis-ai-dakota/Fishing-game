@@ -104,11 +104,18 @@ fun SkinDex(vm: GameViewModel) {
         item(key = "boat", span = { GridItemSpan(maxLineSpan) }) { YourBoatCard(vm, time) }
         item(key = "atmosphere", span = { GridItemSpan(maxLineSpan) }) { AtmosphereCard(vm) }
         item(key = "legendary", span = { GridItemSpan(maxLineSpan) }) {
-            Text(
+            com.deepline.fishing.ui.kit.SectionTitle(
                 stringResource(R.string.dex_skins_legendary_title),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
+                info = stringResource(R.string.dex_skins_note, unlocked.count { !it.fromShop }, Cosmetic.entries.count { !it.fromShop }),
                 modifier = Modifier.padding(top = 8.dp),
+                trailing = {
+                    Text(
+                        stringResource(R.string.common_fraction, unlocked.count { !it.fromShop }, Cosmetic.entries.count { !it.fromShop }),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.secondary,
+                        fontWeight = FontWeight.Bold,
+                    )
+                },
             )
         }
         item(key = "note", span = { GridItemSpan(maxLineSpan) }) {
@@ -119,11 +126,6 @@ fun SkinDex(vm: GameViewModel) {
                         TitleBadge(t)
                     }
                 }
-                Text(
-                    stringResource(R.string.dex_skins_note, unlocked.count { !it.fromShop }, Cosmetic.entries.count { !it.fromShop }),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
             }
         }
         for (set in sets) {
@@ -243,7 +245,7 @@ private fun YourBoatCard(vm: GameViewModel, time: Float) {
     val p = vm.progress
     Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) {
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(stringResource(R.string.dex_skins_boat_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            com.deepline.fishing.ui.kit.SectionTitle(stringResource(R.string.dex_skins_boat_title), info = stringResource(R.string.dex_skins_boat_body))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
                 val boatDescription = stringResource(R.string.dex_skins_boat_cd)
                 Canvas(
@@ -253,11 +255,6 @@ private fun YourBoatCard(vm: GameViewModel, time: Float) {
                         .semantics { contentDescription = boatDescription },
                 ) { drawBoatTile(null, p.boatDesign, time) }
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text(
-                        stringResource(R.string.dex_skins_boat_body),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
                     if (p.customBoatEquipped) {
                         TextButton(onClick = { vm.equipCustomBoat(false) }) { Text(stringResource(R.string.dex_skins_boat_worn)) }
                     } else {
@@ -266,12 +263,18 @@ private fun YourBoatCard(vm: GameViewModel, time: Float) {
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = vm::openBoatEditor, modifier = Modifier.weight(1f).tourTarget(TourTarget.SKINS_CUSTOMISE)) {
-                    Text(stringResource(R.string.dex_skins_boat_customise))
-                }
-                OutlinedButton(onClick = { vm.openShop(com.deepline.fishing.ShopPage.STYLE) }, modifier = Modifier.weight(1f)) {
-                    Text(stringResource(R.string.dex_skins_boat_shop))
-                }
+                com.deepline.fishing.ui.kit.GameButton(
+                    stringResource(R.string.dex_skins_boat_customise),
+                    onClick = vm::openBoatEditor,
+                    modifier = Modifier.weight(1f).tourTarget(TourTarget.SKINS_CUSTOMISE),
+                    icon = GameIcons.Palette,
+                )
+                com.deepline.fishing.ui.kit.GameButton(
+                    stringResource(R.string.dex_skins_boat_shop),
+                    onClick = { vm.openShop(com.deepline.fishing.ShopPage.STYLE) },
+                    modifier = Modifier.weight(1f),
+                    icon = GameIcons.Shop,
+                )
             }
         }
     }
@@ -308,23 +311,21 @@ private fun AtmosphereCard(vm: GameViewModel) {
     val p = vm.progress
     Card(Modifier.fillMaxWidth().tourTarget(TourTarget.SKINS_ATMOSPHERE), shape = RoundedCornerShape(14.dp)) {
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    stringResource(R.string.dex_skins_atmosphere_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f),
-                )
-                if (!p.atmosphereUnlocked) Icon(GameIcons.Lock, contentDescription = stringResource(R.string.dex_skins_locked), modifier = Modifier.size(18.dp))
-            }
-            if (!p.atmosphereUnlocked) {
-                Text(
-                    // The zone and the atmosphere are written into the sentence (they need articles and cases).
-                    stringResource(R.string.dex_skins_atmosphere_locked),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            } else {
+            com.deepline.fishing.ui.kit.SectionTitle(
+                stringResource(R.string.dex_skins_atmosphere_title),
+                // The zone and the atmosphere are written into the sentence (they need articles and cases).
+                info = stringResource(
+                    when {
+                        !p.atmosphereUnlocked -> R.string.dex_skins_atmosphere_locked
+                        p.atmosphere == Atmosphere.NIGHTMARE -> R.string.dex_skins_atmosphere_nightmare
+                        else -> R.string.dex_skins_atmosphere_family
+                    },
+                ),
+                trailing = {
+                    if (!p.atmosphereUnlocked) Icon(GameIcons.Lock, contentDescription = stringResource(R.string.dex_skins_locked), modifier = Modifier.size(18.dp))
+                },
+            )
+            if (p.atmosphereUnlocked) {
                 SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
                     Atmosphere.entries.forEachIndexed { i, a ->
                         SegmentedButton(
@@ -334,13 +335,6 @@ private fun AtmosphereCard(vm: GameViewModel) {
                         ) { Text(a.label()) }
                     }
                 }
-                Text(
-                    stringResource(
-                        if (p.atmosphere == Atmosphere.NIGHTMARE) R.string.dex_skins_atmosphere_nightmare else R.string.dex_skins_atmosphere_family,
-                    ),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
             }
         }
     }

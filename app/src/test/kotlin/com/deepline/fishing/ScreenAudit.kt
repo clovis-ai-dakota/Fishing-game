@@ -92,6 +92,24 @@ object TextAudit {
         return problems.distinct()
     }
 
+    /**
+     * How many words are on the screen now: every word with a letter, in every text at least
+     * partly visible (numbers and symbols don't count: they are read at a glance). The menus have
+     * a budget of them (see docs/ui-design.md).
+     */
+    fun words(rule: ComposeTestRule): Int {
+        val nodes = rule.onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsActions.GetTextLayoutResult), useUnmergedTree = true)
+            .fetchSemanticsNodes(atLeastOneRootRequired = false)
+        var words = 0
+        for (node in nodes) {
+            val clipped = node.boundsInRoot
+            if (clipped.width <= 0.5f || clipped.height <= 0.5f) continue
+            val text = layoutOf(node)?.layoutInput?.text?.text ?: continue
+            words += text.split(Regex("\\s+")).count { w -> w.any(Char::isLetter) }
+        }
+        return words
+    }
+
     private fun layoutOf(node: SemanticsNode): TextLayoutResult? {
         val results = ArrayList<TextLayoutResult>()
         return runCatching {
