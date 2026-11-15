@@ -192,7 +192,7 @@ class TourContentTest {
         // Version 12: fewer words, colours that say what a button does, details behind (i).
         val look = Tour.steps.single { it.id == "look" }
         assertEquals(12, look.sinceVersion)
-        for (word in listOf("amber", "green", "gold", "violet", "(i)")) assertTrue("The new look step doesn't mention $word", word in look.body.shown)
+        for (word in listOf("amber", "green", "coin", "violet", "(i)")) assertTrue("The new look step doesn't mention $word", word in look.body.shown)
         // Steps that point at what the redesign moved say where it is now.
         assertTrue("flame" in Tour.steps.single { it.id == "daily" }.body.shown)
         assertTrue("tank button" in Tour.steps.single { it.id == "aquarium" }.body.shown)

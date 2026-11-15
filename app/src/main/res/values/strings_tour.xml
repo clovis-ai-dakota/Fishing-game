@@ -31,7 +31,7 @@
     <!-- The redesigned menus (shown to returning players in "What's new"). -->
     <string name="tour_look_title">A new look</string>
     <!-- The colours are those of the buttons; "(i)" is the round information button, keep it as is. -->
-    <string name="tour_look_body">The menus now say less and show more. Colour tells you what a button does: amber is the main action, green is a free reward ready to claim, gold is a price in points and violet a price in euros. The (i) buttons hold the details.</string>
+    <string name="tour_look_body">The menus now say less and show more. Colour tells you what a button does: amber is the main action, green is a free reward ready to claim, the coin is a price in points and violet a price in euros. The (i) buttons hold the details.</string>
 
     <string name="tour_cast_title">Cast your line</string>
     <!-- "Cast line" is the button's label (home_cast_button). -->

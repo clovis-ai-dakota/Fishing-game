@@ -1,5 +1,17 @@
 package com.deepline.fishing.ui.daily
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import com.deepline.fishing.ui.kit.LocalCalmMotion
+import com.deepline.fishing.ui.kit.deepColor
+import kotlinx.coroutines.delay
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -138,11 +150,32 @@ private fun ReminderOptInDialog(vm: GameViewModel, turnOn: () -> Unit) {
     )
 }
 
-/** What the last daily action did, with a way to dismiss it. */
+/**
+ * What the last daily action did, with a way to dismiss it. After a claim, [got] is what was
+ * received: it is shown as big tiles popping in one after the other (the reward itself, before
+ * the sentence), the way the most played games reveal a chest's contents.
+ */
 @Composable
-private fun DailyMessage(vm: GameViewModel) {
+private fun DailyMessage(vm: GameViewModel, got: List<DailyGrant>? = null, onDismiss: () -> Unit = {}) {
     val message = vm.daily.message ?: return
     Surface(color = MaterialTheme.colorScheme.secondaryContainer, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
+        if (got != null) {
+            Column(Modifier.padding(start = 12.dp, end = 4.dp, top = 12.dp, bottom = 4.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(Modifier.testTag("daily_got"), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    got.forEachIndexed { i, g -> GotTile(g, vm.progress, i) }
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        message.asString(),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                        modifier = Modifier.weight(1f).testTag("daily_message"),
+                    )
+                    TextButton(onClick = { onDismiss(); vm.daily.dismissMessage() }) { Text(stringResource(R.string.common_ok)) }
+                }
+            }
+            return@Surface
+        }
         Row(Modifier.padding(start = 12.dp, end = 4.dp, top = 4.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(
                 message.asString(),
@@ -152,6 +185,37 @@ private fun DailyMessage(vm: GameViewModel) {
             )
             TextButton(onClick = vm.daily::dismissMessage) { Text(stringResource(R.string.common_ok)) }
         }
+    }
+}
+
+/** One thing just received: its pictogram, big, and how much, popping in after the one before. */
+@Composable
+private fun GotTile(g: DailyGrant, p: PlayerProgress, index: Int) {
+    val calm = LocalCalmMotion.current
+    val scale = remember { Animatable(if (calm) 1f else 0f) }
+    LaunchedEffect(Unit) {
+        if (!calm) {
+            delay(120L * index)
+            scale.animateTo(1f, spring(dampingRatio = 0.45f, stiffness = Spring.StiffnessMediumLow))
+        }
+    }
+    val description = DailyText.tile(g, p).asString()
+    Column(
+        Modifier
+            .graphicsLayer { scaleX = scale.value; scaleY = scale.value }
+            .size(width = 76.dp, height = 72.dp)
+            .background(deepColor(), RoundedCornerShape(14.dp))
+            .semantics { contentDescription = description },
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.CenterVertically),
+    ) {
+        val (icon, tint, amount) = when (g) {
+            is DailyGrant.Points -> Triple(GameIcons.Coin, SparkleGold, "+" + compactPoints(DailyRewards.pointsFor(p, g.casts)))
+            is DailyGrant.Tackle -> Triple(g.tackle.icon, Color(0xFF8FE3F5), stringResource(R.string.common_times, g.count))
+            DailyGrant.Shield -> Triple(DailyIcons.Shield, Color(0xFF8FE3F5), stringResource(R.string.common_times, 1))
+        }
+        Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(30.dp))
+        Text(amount, color = GameColors.OnDeep, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
     }
 }
 
@@ -288,7 +352,7 @@ private fun difficultyTag(d: ChallengeDifficulty) = d.name.lowercase()
  * pictograms and its action (claim in green, or swap).
  */
 @Composable
-private fun ChallengeRow(vm: GameViewModel, c: DailyChallenge) {
+private fun ChallengeRow(vm: GameViewModel, c: DailyChallenge, onClaimed: (List<DailyGrant>) -> Unit) {
     val p = vm.progress
     val scheme = MaterialTheme.colorScheme
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -310,7 +374,10 @@ private fun ChallengeRow(vm: GameViewModel, c: DailyChallenge) {
                 c.claimed -> Unit
                 c.claimable -> GameButton(
                     stringResource(R.string.daily_challenge_claim),
-                    onClick = { vm.daily.claimChallenge(c.difficulty) },
+                    onClick = {
+                        onClaimed(DailyRewards.challengeReward(c.difficulty))
+                        vm.daily.claimChallenge(c.difficulty)
+                    },
                     modifier = Modifier.testTag("challenge_claim_${difficultyTag(c.difficulty)}"),
                     role = ActionRole.CLAIM,
                     size = ButtonSize.SMALL,
@@ -318,7 +385,10 @@ private fun ChallengeRow(vm: GameViewModel, c: DailyChallenge) {
                 vm.daily.canReroll(c.difficulty) -> RoundIconButton(
                     DailyIcons.Swap,
                     stringResource(R.string.daily_challenge_swap),
-                    onClick = { vm.daily.reroll(c.difficulty) },
+                    onClick = {
+                        onClaimed(emptyList())
+                        vm.daily.reroll(c.difficulty)
+                    },
                     modifier = Modifier.testTag("challenge_reroll_${difficultyTag(c.difficulty)}"),
                     diameter = 34.dp,
                 )
@@ -401,6 +471,8 @@ fun DailyScreen(vm: GameViewModel) {
     val s = Daily.status(p, vm.daily.today)
     val turnOn = rememberReminderOptIn(vm, "explainer")
     val turnOnHere = rememberReminderOptIn(vm, "daily_screen")
+    // What the last claim gave, shown as tiles until dismissed (empty: a plain message).
+    var got by remember { mutableStateOf<List<DailyGrant>>(emptyList()) }
     SubScreen(stringResource(R.string.daily_title), onBack = vm::onBack) {
         Column(
             Modifier
@@ -409,7 +481,7 @@ fun DailyScreen(vm: GameViewModel) {
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            DailyMessage(vm)
+            DailyMessage(vm, got.takeIf { it.isNotEmpty() }, onDismiss = { got = emptyList() })
             Card(Modifier.fillMaxWidth().tourTarget(TourTarget.DAILY_CALENDAR)) {
                 Column(Modifier.padding(start = 16.dp, end = 8.dp, top = 10.dp, bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -458,7 +530,7 @@ fun DailyScreen(vm: GameViewModel) {
                         },
                     )
                     Column(Modifier.padding(end = 8.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                        for (c in vm.daily.challenges) ChallengeRow(vm, c)
+                        for (c in vm.daily.challenges) ChallengeRow(vm, c, onClaimed = { got = it })
                     }
                 }
             }
@@ -482,7 +554,10 @@ fun DailyScreen(vm: GameViewModel) {
             Box(Modifier.fillMaxWidth().dockBackground().navigationBarsPadding().padding(horizontal = 16.dp, vertical = 12.dp)) {
                 GameButton(
                     stringResource(R.string.daily_challenge_claim),
-                    onClick = vm.daily::claimReward,
+                    onClick = {
+                        got = Daily.nextReward(p)
+                        vm.daily.claimReward()
+                    },
                     modifier = Modifier.fillMaxWidth().testTag("daily_claim").semantics { contentDescription = sentence },
                     role = ActionRole.CLAIM,
                     size = ButtonSize.HERO,

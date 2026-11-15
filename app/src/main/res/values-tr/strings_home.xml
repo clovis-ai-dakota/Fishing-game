@@ -8,6 +8,8 @@
     <string name="home_cd_milestones">Kilometre taşları</string>
     <string name="home_cd_themes">Temalar</string>
     <string name="home_cd_settings">Ayarlar</string>
+    <string name="home_caption_season">Sezon</string>
+    <string name="home_caption_migration">Göç</string>
     <string name="home_boat_action">Tekneni özelleştir</string>
 
     <!-- The rope card. -->

@@ -1,5 +1,6 @@
 package com.deepline.fishing.ui.shop
 
+import com.deepline.fishing.ui.kit.rewardBalance
 import com.deepline.fishing.ui.shop.fishingTimeLabel
 import com.deepline.fishing.ui.shop.timeLeftLabel
 import com.deepline.fishing.ui.i18n.badgeText
@@ -134,7 +135,7 @@ fun ShopScreen(vm: GameViewModel) {
         actions = {
             if (vm.isClubMember) ClubChip()
             val balance = stringResource(R.string.shop_balance, formatPoints(p.pointsBalance))
-            com.deepline.fishing.ui.kit.ScenePill(Modifier.padding(end = 8.dp).semantics { contentDescription = balance }.testTag("shop_balance")) {
+            com.deepline.fishing.ui.kit.ScenePill(Modifier.padding(end = 8.dp).rewardBalance().semantics { contentDescription = balance }.testTag("shop_balance")) {
                 com.deepline.fishing.ui.kit.CoinAmount(formatPoints(p.pointsBalance), iconSize = 18.dp)
             }
         },

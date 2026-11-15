@@ -38,6 +38,8 @@ import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -118,32 +120,75 @@ private fun DrawScope.drawSheen(at: Float, strength: Float) {
     )
 }
 
-// ---- Rewards that burst out of what was tapped -----------------------------------------------------
+// ---- Points that fly to and from the balance ------------------------------------------------------
 
 /** How long a burst lasts, in milliseconds. */
 const val REWARD_BURST_MS = 800
 
 /**
- * The coins that jump out of a claimed reward. A [GameButton] with the `CLAIM` role starts one
- * from its own centre (see [LocalRewardFx]); [RewardFxLayer] draws them above everything.
+ * Coins in motion, so the player sees where points come from and where they go without a word
+ * (what Royal Match does for every resource): a claimed reward's coins fly from its button to
+ * the balance, points earned by a cast fly to it from the button that collected them, and points
+ * spent fly out of it to what was bought. Where no balance is on screen, a claim's coins just
+ * jump up and fall. [RewardFxLayer] draws them above everything.
  */
 @Stable
 class RewardFx {
-    internal class Burst(val origin: Offset, val seed: Int) {
+    internal class Burst(val from: Offset, val to: Offset?, val spending: Boolean, val seed: Int) {
         var startNanos = -1L
     }
 
     internal val bursts = mutableStateListOf<Burst>()
     private var count = 0
 
-    /** Coins fly out of [origin] (in the window's coordinates). */
-    fun burst(origin: Offset) {
-        if (bursts.size < 4) bursts += Burst(origin, count++)
+    /** Where the points balance is shown right now (see [rewardBalance]), and who said so. */
+    internal var balanceAt: Offset? = null
+    internal var balanceOwner: Any? = null
+
+    /** The last button pressed that pays or collects: where spent points go, where earned ones come from. */
+    internal var lastPressAt: Offset? = null
+
+    private fun add(from: Offset, to: Offset?, spending: Boolean) {
+        if (bursts.size < 4) bursts += Burst(from, to, spending, count++)
+    }
+
+    /** A reward was claimed at [origin] (in the root's coordinates): its coins go to the balance. */
+    fun burst(origin: Offset) = add(origin, balanceAt, spending = false)
+
+    /** The balance went up without a claim (a cast was collected): coins fly to it from the last press. */
+    fun earned() {
+        val to = balanceAt ?: return
+        val from = lastPressAt ?: return
+        if (bursts.isEmpty()) add(from, to, spending = false)
+    }
+
+    /** The balance went down: coins leave it for what was bought. */
+    fun spent() {
+        val from = balanceAt ?: return
+        add(from, lastPressAt ?: (from + Offset(0f, 300f)), spending = true)
     }
 }
 
-/** Null where rewards shouldn't burst (reduced motion, previews). */
+/** Null where coins shouldn't fly (reduced motion, previews). */
 val LocalRewardFx = compositionLocalOf<RewardFx?> { null }
+
+/** Marks where the points balance is shown: coins fly to it and out of it. */
+fun Modifier.rewardBalance(): Modifier = composed {
+    val fx = LocalRewardFx.current ?: return@composed this
+    val owner = remember { Any() }
+    DisposableEffect(fx) {
+        onDispose {
+            if (fx.balanceOwner === owner) {
+                fx.balanceOwner = null
+                fx.balanceAt = null
+            }
+        }
+    }
+    onGloballyPositioned {
+        fx.balanceOwner = owner
+        fx.balanceAt = it.boundsInRoot().center
+    }
+}
 
 /** Draws [fx]'s bursts: put it above the screens, filling the window. Runs only while one is flying. */
 @Composable
@@ -162,7 +207,12 @@ fun RewardFxLayer(fx: RewardFx, modifier: Modifier = Modifier) {
     Canvas(modifier) {
         for (b in fx.bursts) {
             if (b.startNanos < 0) continue
-            drawBurst(b.origin, b.seed, ((now - b.startNanos) / (REWARD_BURST_MS * 1e6f)).coerceIn(0f, 1f))
+            val p = ((now - b.startNanos) / (REWARD_BURST_MS * 1e6f)).coerceIn(0f, 1f)
+            when {
+                b.to == null -> drawFountain(b.from, b.seed, p)
+                b.spending -> drawFlight(b.from, b.to, b.seed, p, coins = 6, scatter = 0f)
+                else -> drawFlight(b.from, b.to, b.seed, p, coins = 10, scatter = 1f)
+            }
         }
     }
 }
@@ -173,28 +223,57 @@ private fun noise(k: Int, salt: Int): Float {
     return ((x xor (x ushr 16)) and 0xFFFF) / 65535f
 }
 
-/** Coins thrown up from [origin] in a fountain, spinning (their width breathes) and fading at the end. */
-private fun DrawScope.drawBurst(origin: Offset, seed: Int, p: Float) {
+private val CoinGold = Color(0xFFFFD54A)
+private val CoinEdge = Color(0xFFB98300)
+
+/** One coin at [center], [spin] 0..1 of a turn (its width breathes as it spins). */
+private fun DrawScope.drawCoin(center: Offset, r: Float, spin: Float, alpha: Float) {
     val u = 1.dp.toPx()
-    val gold = Color(0xFFFFD54A)
-    val edge = Color(0xFFB98300)
-    // A flash where the reward was.
+    val size = androidx.compose.ui.geometry.Size(r * 2f * (0.25f + 0.75f * abs(cos(spin * 2f * PI.toFloat()))), r * 2f)
+    val topLeft = Offset(center.x - size.width / 2f, center.y - r)
+    drawOval(CoinEdge.copy(alpha = alpha), topLeft = topLeft + Offset(0f, 1.5f * u), size = size)
+    drawOval(CoinGold.copy(alpha = alpha), topLeft = topLeft, size = size)
+    drawOval(Color.White.copy(alpha = 0.55f * alpha), topLeft = topLeft + Offset(size.width * 0.2f, r * 0.3f), size = size * 0.35f)
+}
+
+/**
+ * Coins from [from] to [to], one after the other: with [scatter], they first jump out around
+ * where they came from (a reward opening), then all rush to the same place.
+ */
+private fun DrawScope.drawFlight(from: Offset, to: Offset, seed: Int, p: Float, coins: Int, scatter: Float) {
+    val u = 1.dp.toPx()
+    if (scatter > 0f && p < 0.25f) drawCircle(Color.White.copy(alpha = 0.45f * (1f - p / 0.25f)), radius = (18f + 80f * p) * u, center = from)
+    for (k in 0 until coins) {
+        // Each coin leaves a little after the one before.
+        val q = ((p - k * 0.035f) / 0.65f).coerceIn(0f, 1f)
+        if (q <= 0f) continue
+        val angle = noise(k, seed) * 2f * PI.toFloat()
+        val out = from + Offset(cos(angle), sin(angle)) * ((30f + noise(k, seed + 7) * 50f) * u * scatter)
+        val pos = if (q < 0.3f) {
+            val e = 1f - (1f - q / 0.3f) * (1f - q / 0.3f)
+            from + (out - from) * e
+        } else {
+            val t = (q - 0.3f) / 0.7f
+            out + (to - out) * (t * t)
+        }
+        val arriving = ((q - 0.85f) / 0.15f).coerceIn(0f, 1f)
+        drawCoin(pos, (5f + noise(k, seed + 3) * 3f) * u * (1f - 0.4f * arriving), q * 2.5f + k * 0.3f, 1f - arriving)
+    }
+    // The balance (or what was bought) blinks as the coins land.
+    if (p > 0.6f) drawCircle(CoinGold.copy(alpha = 0.35f * (1f - abs(p - 0.8f) / 0.2f).coerceIn(0f, 1f)), radius = 22f * u, center = to)
+}
+
+/** Coins thrown up from [origin] in a fountain, spinning and fading at the end: a claim with no balance on screen. */
+private fun DrawScope.drawFountain(origin: Offset, seed: Int, p: Float) {
+    val u = 1.dp.toPx()
     if (p < 0.3f) drawCircle(Color.White.copy(alpha = 0.5f * (1f - p / 0.3f)), radius = (20f + 90f * p) * u, center = origin)
     for (k in 0 until 12) {
         val angle = (-PI / 2 + (noise(k, seed) - 0.5f) * 2.2f).toFloat()
         val speed = (150f + noise(k, seed + 7) * 150f) * u
         val t = p * 1.1f
-        val x = origin.x + cos(angle) * speed * t
         // Up, then pulled back down.
-        val y = origin.y + sin(angle) * speed * t + 330f * u * t * t
-        val alpha = if (p > 0.7f) (1f - p) / 0.3f else 1f
-        val r = (5f + noise(k, seed + 3) * 3f) * u
-        val spin = abs(cos(p * 9f + k))
-        val half = androidx.compose.ui.geometry.Size(r * 2f * (0.25f + 0.75f * spin), r * 2f)
-        val topLeft = Offset(x - half.width / 2f, y - r)
-        drawOval(edge.copy(alpha = alpha), topLeft = topLeft + Offset(0f, 1.5f * u), size = half)
-        drawOval(gold.copy(alpha = alpha), topLeft = topLeft, size = half)
-        drawOval(Color.White.copy(alpha = 0.55f * alpha), topLeft = topLeft + Offset(half.width * 0.2f, r * 0.3f), size = half * 0.35f)
+        val pos = Offset(origin.x + cos(angle) * speed * t, origin.y + sin(angle) * speed * t + 330f * u * t * t)
+        drawCoin(pos, (5f + noise(k, seed + 3) * 3f) * u, p * 1.4f + k * 0.16f, if (p > 0.7f) (1f - p) / 0.3f else 1f)
     }
 }
 

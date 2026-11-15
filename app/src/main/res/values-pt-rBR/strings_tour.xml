@@ -20,7 +20,7 @@
     <string name="tour_tabs_title">Quatro abas</string>
     <string name="tour_tabs_body">A barra de baixo leva você a todo lugar: Pescar é onde você lança a linha, o Dex reúne todas as espécies que você encontra, a Loja tem melhorias de corda, apetrechos e visuais para o seu barco, e Duelo é para partidas 1v1.</string>
     <string name="tour_look_title">Um novo visual</string>
-    <string name="tour_look_body">Os menus dizem menos e mostram mais. A cor indica o que um botão faz: âmbar para a ação principal, verde para uma recompensa grátis pronta para resgatar, dourado para um preço em pontos e violeta para um preço em euros. Os botões (i) guardam os detalhes.</string>
+    <string name="tour_look_body">Os menus dizem menos e mostram mais. A cor indica o que um botão faz: âmbar para a ação principal, verde para uma recompensa grátis pronta para resgatar, a moeda para um preço em pontos e violeta para um preço em euros. Os botões (i) guardam os detalhes.</string>
 
     <string name="tour_cast_title">Lance sua linha</string>
     <string name="tour_cast_body">O grande botão Lançar linha, embaixo na aba Pescar, solta o anzol do barco.</string>

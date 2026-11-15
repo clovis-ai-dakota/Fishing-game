@@ -22,7 +22,7 @@
     <string name="tour_tabs_title">Cuatro pestañas</string>
     <string name="tour_tabs_body">La barra inferior te lleva a todas partes: en Pescar lanzas el sedal, el Dex reúne todas las especies que encuentras, la Tienda tiene mejoras de cuerda, aparejos y aspectos para tu barco, y Duelo es para partidas 1 contra 1.</string>
     <string name="tour_look_title">Un nuevo aspecto</string>
-    <string name="tour_look_body">Los menús dicen menos y muestran más. El color indica qué hace un botón: ámbar para la acción principal, verde para una recompensa gratis lista para reclamar, dorado para un precio en puntos y violeta para un precio en euros. Los botones (i) guardan los detalles.</string>
+    <string name="tour_look_body">Los menús dicen menos y muestran más. El color indica qué hace un botón: ámbar para la acción principal, verde para una recompensa gratis lista para reclamar, la moneda para un precio en puntos y violeta para un precio en euros. Los botones (i) guardan los detalles.</string>
 
     <string name="tour_cast_title">Lanza el sedal</string>
     <string name="tour_cast_body">El gran botón Lanzar sedal, abajo en la pestaña Pescar, deja caer tu anzuelo desde el barco.</string>

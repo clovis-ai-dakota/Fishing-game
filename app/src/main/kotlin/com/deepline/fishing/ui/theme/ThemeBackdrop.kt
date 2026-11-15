@@ -58,7 +58,7 @@ fun ThemeBackdrop(
 }
 
 /** How long the camera takes to travel between two places (a tab change), in milliseconds. */
-const val CAMERA_MS = 340
+const val CAMERA_MS = 280
 
 /** Deterministic noise in 0..1 for the scene's placements. */
 private fun h(k: Int, salt: Int): Float {

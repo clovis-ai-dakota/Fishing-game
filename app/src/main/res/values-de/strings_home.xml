@@ -9,6 +9,8 @@
     <string name="home_cd_milestones">Meilensteine</string>
     <string name="home_cd_themes">Designs</string>
     <string name="home_cd_settings">Einstellungen</string>
+    <string name="home_caption_season">Saison</string>
+    <string name="home_caption_migration">Wanderung</string>
     <string name="home_boat_action">Dein Boot gestalten</string>
 
     <!-- Die Seil-Karte. -->

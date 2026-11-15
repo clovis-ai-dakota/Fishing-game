@@ -9,6 +9,8 @@
     <string name="home_cd_milestones">Hitos</string>
     <string name="home_cd_themes">Temas</string>
     <string name="home_cd_settings">Ajustes</string>
+    <string name="home_caption_season">Temporada</string>
+    <string name="home_caption_migration">Migración</string>
     <string name="home_boat_action">Personaliza tu barco</string>
 
     <!-- The rope card. -->

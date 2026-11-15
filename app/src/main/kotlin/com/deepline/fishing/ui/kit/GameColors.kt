@@ -15,7 +15,9 @@ import com.deepline.fishing.ui.theme.MenuPalette
  *   the opposite of the sea's blue. At most one per screen.
  * - [CLAIM]: something free and ready (daily reward, milestone, season tier, gift): green.
  * - [NAV]: open, choose, go back, and every secondary action: the theme's own colour.
- * - [POINTS]: a price in points, or a points reward: gold, with the coin.
+ * - [POINTS]: a price in points: an ivory price tag with a gold rim and the coin. Deliberately
+ *   not the amber of [PLAY]: a price must never look like the main action or a free reward. When
+ *   the player can't afford it, the number turns red.
  * - [PREMIUM]: euros, passes, the Captain's Club: violet.
  * - [ALERT]: no way back (delete), and notification badges: red.
  */
@@ -27,15 +29,19 @@ data class RoleColors(val top: Color, val bottom: Color, val edge: Color, val co
 object GameColors {
     private val play = RoleColors(Color(0xFFFFD54A), Color(0xFFFFAE00), Color(0xFFA86400), Color(0xFF3A2400))
     private val claim = RoleColors(Color(0xFF6BE391), Color(0xFF1FAE57), Color(0xFF0C6B31), Color(0xFF05311A))
-    private val points = RoleColors(Color(0xFFFFE27A), Color(0xFFF5B400), Color(0xFFA06500), Color(0xFF3A2400))
+    private val points = RoleColors(Color(0xFFFFFCEE), Color(0xFFFFEDB8), Color(0xFFC08F12), Color(0xFF5A3A00))
     private val premium = RoleColors(Color(0xFFB896FF), Color(0xFF7A4BE0), Color(0xFF482895), Color.White)
     private val alert = RoleColors(Color(0xFFFF8E7E), Color(0xFFE2412F), Color(0xFF96200F), Color.White)
     private val disabled = RoleColors(Color(0xFFB9C4CC), Color(0xFFA3B0BA), Color(0xFF7C8A95), Color(0xFF4B5964))
+
+    /** A price the player can't pay yet: the number in red, on the greyed button. */
+    val Unaffordable = Color(0xFF9E1B14)
 
     /** Notification badges and dots. */
     val Badge = Color(0xFFFF4B3E)
 
     fun of(role: ActionRole, palette: MenuPalette, enabled: Boolean = true): RoleColors = when {
+        !enabled && role == ActionRole.POINTS -> disabled.copy(content = Unaffordable)
         !enabled -> disabled
         role == ActionRole.PLAY -> play
         role == ActionRole.CLAIM -> claim

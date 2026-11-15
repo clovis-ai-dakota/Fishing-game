@@ -1,5 +1,6 @@
 package com.deepline.fishing.ui
 
+import com.deepline.fishing.ui.kit.rewardBalance
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -87,7 +88,7 @@ private fun TopBar(vm: GameViewModel, modifier: Modifier = Modifier) {
     Column(modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 12.dp, vertical = 10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                ScenePill(Modifier.tourTarget(TourTarget.HOME_POINTS)) {
+                ScenePill(Modifier.tourTarget(TourTarget.HOME_POINTS).rewardBalance()) {
                     Icon(GameIcons.Coin, contentDescription = null, tint = SparkleGold, modifier = Modifier.size(20.dp))
                     // From a million on, "1.2M": the exact balance is on the Shop tab.
                     Text(
@@ -113,9 +114,16 @@ private fun TopBar(vm: GameViewModel, modifier: Modifier = Modifier) {
                 modifier = Modifier.tourTarget(TourTarget.HOME_MILESTONES),
                 role = if (Progression.claimableCount(p) > 0) ActionRole.CLAIM else ActionRole.NAV,
                 badge = Progression.claimableCount(p),
+                caption = stringResource(R.string.home_cd_milestones),
             )
-            RoundIconButton(GameIcons.Palette, stringResource(R.string.home_cd_themes), onClick = vm::openThemes, modifier = Modifier.tourTarget(TourTarget.HOME_THEMES))
-            RoundIconButton(GameIcons.Settings, stringResource(R.string.home_cd_settings), onClick = vm::openSettings, modifier = Modifier.tourTarget(TourTarget.HOME_SETTINGS))
+            RoundIconButton(
+                GameIcons.Palette, stringResource(R.string.home_cd_themes), onClick = vm::openThemes,
+                modifier = Modifier.tourTarget(TourTarget.HOME_THEMES), caption = stringResource(R.string.home_cd_themes),
+            )
+            RoundIconButton(
+                GameIcons.Settings, stringResource(R.string.home_cd_settings), onClick = vm::openSettings,
+                modifier = Modifier.tourTarget(TourTarget.HOME_SETTINGS), caption = stringResource(R.string.home_cd_settings),
+            )
         }
         // Once per machine-translated language: the translation may be approximate.
         com.deepline.fishing.ui.i18n.MachineTranslationNotice()
@@ -137,7 +145,9 @@ private fun EventRail(vm: GameViewModel, modifier: Modifier = Modifier) {
             modifier = Modifier.tourTarget(TourTarget.HOME_DAILY).testTag("daily_button"),
             role = if (ready > 0) ActionRole.CLAIM else ActionRole.NAV,
             badge = ready,
+            // The streak, in days in a row.
             label = if (status.streak > 0) formatPoints(status.streak) else null,
+            caption = stringResource(R.string.daily_title),
         )
         val migration = vm.daily.migration
         if (migration != null) {
@@ -147,6 +157,7 @@ private fun EventRail(vm: GameViewModel, modifier: Modifier = Modifier) {
                 onClick = vm::openDaily,
                 modifier = Modifier.testTag("migration_banner"),
                 label = ShopText.timeLeft(migration.msLeft(now)).asString(),
+                caption = stringResource(R.string.home_caption_migration),
             )
         }
         val season = Seasons.at(now)
@@ -157,6 +168,7 @@ private fun EventRail(vm: GameViewModel, modifier: Modifier = Modifier) {
             modifier = Modifier.testTag("season_button"),
             role = if (vm.seasonRewardsReady) ActionRole.CLAIM else ActionRole.NAV,
             label = ShopText.timeLeft(season.msLeft(now)).asString(),
+            caption = stringResource(R.string.home_caption_season),
         )
     }
 }
@@ -171,6 +183,7 @@ private fun DexButton(vm: GameViewModel, modifier: Modifier = Modifier) {
         onClick = { vm.openDex() },
         modifier = modifier.testTag("dex_button"),
         label = stringResource(R.string.common_fraction, p.discoveredCount, FishCatalog.all.size),
+        caption = stringResource(R.string.home_dex_title),
     )
 }
 

@@ -77,8 +77,10 @@ fun CountBadge(count: Int, modifier: Modifier = Modifier) {
 
 /**
  * A round, raised pictogram button, for the top bar and the rails over a scene. [badge] is a
- * count in red; [label] is a short caption underneath (a countdown, a streak), drawn on a dark
- * pill so it reads on any scene. A [ActionRole.CLAIM] role says "something is ready here".
+ * count in red. Underneath, on a dark chip that reads on any scene: [caption], the one word that
+ * says what the button opens (the most played games label every icon button: a pictogram alone
+ * is a guess), and [label], a number that matters now (a countdown, a count). A
+ * [ActionRole.CLAIM] role says "something is ready here".
  */
 @Composable
 fun RoundIconButton(
@@ -90,6 +92,7 @@ fun RoundIconButton(
     badge: Int = 0,
     label: String? = null,
     diameter: Dp = 42.dp,
+    caption: String? = null,
 ) {
     val deep = deepColor()
     val colors = if (role == ActionRole.NAV) RoleColors(lerp(deep, Color.White, 0.14f), deep, lerp(deep, Color.Black, 0.5f), GameColors.OnDeep) else roleColors(role)
@@ -120,7 +123,24 @@ fun RoundIconButton(
             }
             CountBadge(badge, Modifier.align(Alignment.TopEnd).offset(x = 5.dp, y = (-5).dp))
         }
-        if (label != null) ScenePill { Text(label, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, maxLines = 1) }
+        if (caption != null || label != null) {
+            Column(
+                Modifier.clip(RoundedCornerShape(9.dp)).background(deep.copy(alpha = 0.82f)).padding(horizontal = 7.dp, vertical = 2.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                if (caption != null) Text(caption, color = GameColors.OnDeep, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
+                if (label != null) {
+                    Text(
+                        label,
+                        color = if (caption != null) GameColors.OnDeepMuted else GameColors.OnDeep,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        softWrap = false,
+                    )
+                }
+            }
+        }
     }
 }
 

@@ -62,12 +62,15 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     French, German and Turkish).
   - **Colour says what an action is** (`ActionRole`): amber `PLAY` for the one main action of a
     screen, green `CLAIM` for something free and ready, the theme's colour `NAV` for navigation
-    and secondary actions, gold `POINTS` and violet `PREMIUM` for the two prices, red `ALERT`.
+    and secondary actions, an ivory price tag with the coin for `POINTS` (never amber: a price must
+    not look like the main action; its number turns red when unaffordable) and violet `PREMIUM`
+    for the two prices, red `ALERT`.
     Use `GameButton` (raised, sinks when pressed) for anything that acts; Material buttons only
     for dialogs' text buttons and chips. The main action sits in a dock on deep water
     (`dockBackground()`), never in the scrolling content.
   - **Pictograms are drawn in code** (`GameIcons`, `KitIcons`, `DailyIcons`), never system emoji;
-    a pictogram-only control keeps the sentence it replaced as its `contentDescription`.
+    a pictogram-only control keeps the sentence it replaced as its `contentDescription`. A round
+    icon button over a scene gets a one-word `caption` under it (a pictogram alone is a guess).
   - **One world**: every menu has a place on the coast (`Place.of` in `ui/theme/World.kt`: sea,
     deep water, port, arena, lighthouse); `ThemeBackdrop` moves its camera there and `ScreenMotion`
     moves the screens the same way (under a second; casting dives, collecting surfaces). What
@@ -75,7 +78,10 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     tappable or hides text.
   - **Depth is looks only and stops with Reduce motion** (`LocalCalmMotion`): cards lean under
     the finger (`Modifier.pressTilt()`), the backdrop shifts with the phone's tilt, the daily
-    reward is a chest that opens (`RewardChest`), and `CLAIM` buttons burst coins (`RewardFx`).
+    reward is a chest that opens (`RewardChest`), and coins fly to the points pill when points
+    are won and out of it when they are spent (`RewardFx`, `Modifier.rewardBalance()`).
+    Transitions stay within NN/g's durations (`ScreenMotion`: 100 ms feedback, 200 to 300 ms a
+    screen change, 400 ms at most).
     At most one live GL view per screen.
 - **Navigation**: four bottom tabs (`MainTab`: Fish = `Screen.HOME`, Dex, Shop = `Screen.SHOP`,
   Battle = `Screen.BATTLE_SETUP`) in `MainScaffold`; the Shop's pages are `ShopPage` (tour steps

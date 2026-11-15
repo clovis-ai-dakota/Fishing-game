@@ -19,7 +19,7 @@
     <string name="tour_tabs_title">Vier Tabs</string>
     <string name="tour_tabs_body">Die Leiste unten bringt dich überallhin: Unter „Angeln“ wirfst du aus, der Dex sammelt jede Art, der du begegnest, im Shop gibt es Seilverbesserungen, Zubehör und Looks für dein Boot, und unter „Duell“ trittst du eins gegen eins an.</string>
     <string name="tour_look_title">Ein neuer Look</string>
-    <string name="tour_look_body">Die Menüs sagen weniger und zeigen mehr. Die Farbe verrät, was ein Button tut: Bernstein für die Hauptaktion, Grün für eine kostenlose Belohnung, die du abholen kannst, Gold für einen Preis in Punkten und Violett für einen Preis in Euro. Hinter den (i)-Buttons stehen die Details.</string>
+    <string name="tour_look_body">Die Menüs sagen weniger und zeigen mehr. Die Farbe verrät, was ein Button tut: Bernstein für die Hauptaktion, Grün für eine kostenlose Belohnung, die du abholen kannst, die Münze für einen Preis in Punkten und Violett für einen Preis in Euro. Hinter den (i)-Buttons stehen die Details.</string>
 
     <string name="tour_cast_title">Wirf deine Angel aus</string>
     <string name="tour_cast_body">Der große Button „Auswerfen“ unten im Tab „Angeln“ lässt deinen Haken vom Boot hinab.</string>

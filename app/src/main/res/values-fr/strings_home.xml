@@ -9,6 +9,8 @@
     <string name="home_cd_milestones">Paliers</string>
     <string name="home_cd_themes">Thèmes</string>
     <string name="home_cd_settings">Paramètres</string>
+    <string name="home_caption_season">Saison</string>
+    <string name="home_caption_migration">Migration</string>
     <string name="home_boat_action">Personnaliser votre bateau</string>
 
     <!-- The rope card. -->

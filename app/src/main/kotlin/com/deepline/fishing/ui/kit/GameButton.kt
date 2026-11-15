@@ -99,8 +99,9 @@ fun GameButton(
     val isPressed by interaction.collectIsPressedAsState()
     val pressed by animateFloatAsState(if (isPressed && enabled) 1f else 0f, tween(PRESS_MS), label = "press")
     val feedback = LocalPressFeedback.current
-    // A claimed reward bursts out of its button.
-    val rewards = if (role == ActionRole.CLAIM) LocalRewardFx.current else null
+    // Coins fly out of a claimed reward's button, to what a price button bought, and from the
+    // main action that collected a cast's points.
+    val rewards = if (role == ActionRole.CLAIM || role == ActionRole.POINTS || role == ActionRole.PLAY) LocalRewardFx.current else null
     val centre = remember { arrayOf(Offset.Unspecified) }
     Box(
         modifier
@@ -109,7 +110,9 @@ fun GameButton(
             .drawBehind { drawRaised(colors, size.radius.toPx(), size.edge.toPx(), pressed) }
             .clickable(interactionSource = interaction, indication = null, enabled = enabled, onClickLabel = onClickLabel, role = Role.Button) {
                 feedback(role)
-                if (rewards != null && centre[0] != Offset.Unspecified) rewards.burst(centre[0])
+                if (rewards != null && centre[0] != Offset.Unspecified) {
+                    if (role == ActionRole.CLAIM) rewards.burst(centre[0]) else rewards.lastPressAt = centre[0]
+                }
                 onClick()
             },
         contentAlignment = Alignment.Center,

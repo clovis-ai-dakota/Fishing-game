@@ -27,19 +27,34 @@ import com.deepline.fishing.ui.theme.Place
  * - casting dives: the menu leaves by the top as the water comes up from below; collecting the
  *   catch surfaces again.
  *
+ * Durations follow the usual guidance for interface motion (Nielsen Norman Group, "Executing UX
+ * animations: duration and motion characteristics"): about 100 ms for simple feedback, 200 to
+ * 300 ms for a screen change, 400 ms only for a big move, never 500 ms (it feels like a drag),
+ * and leaving a little faster than arriving.
+ *
  * With "Reduce motion" on ([calm]), every move is a short fade.
  */
 object ScreenMotion {
     const val PUSH_MS = 240
     const val POP_MS = 170
-    const val DIVE_MS = 600
-    const val SURFACE_MS = 450
+    const val DIVE_MS = 400
+    const val SURFACE_MS = 300
     const val CALM_MS = 120
+
+    /**
+     * No motion at all, for tests that drive the clock by hand: with the clock paused a move
+     * would stay half-way, both screens showing.
+     */
+    @Volatile
+    var instant = false
+
+    private val none: ContentTransform get() = androidx.compose.animation.EnterTransition.None togetherWith androidx.compose.animation.ExitTransition.None
 
     private val calmFade: ContentTransform get() = fadeIn(tween(CALM_MS)) togetherWith fadeOut(tween(CALM_MS))
 
     /** Between the tab layer (null) and pushed screens. */
     fun between(from: Screen?, to: Screen?, calm: Boolean): ContentTransform = when {
+        instant -> none
         calm -> calmFade
         to == Screen.CAST || to == Screen.BATTLE && from == Screen.CAST ->
             if (to == Screen.CAST) {
@@ -60,6 +75,7 @@ object ScreenMotion {
 
     /** Between two tabs: the way the camera goes from one place to the other. */
     fun betweenTabs(from: MainTab, to: MainTab, calm: Boolean): ContentTransform {
+        if (instant) return none
         if (calm) return calmFade
         val a = Place.of(from.screen)
         val b = Place.of(to.screen)

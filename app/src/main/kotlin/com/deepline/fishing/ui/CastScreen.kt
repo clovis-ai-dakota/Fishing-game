@@ -239,7 +239,11 @@ fun CastScreen(vm: GameViewModel) {
 
         vm.pendingResult?.let {
             val collect = if (turn != null || vm.tournamentAttempt != null) R.string.cast_results_continue else R.string.cast_results_collect
-            ResultsPanel(it, collectLabel = stringResource(collect), onCollect = vm::collectResult)
+            // A solo cast also moves the day's challenges, the season and the Dex: show how far.
+            val solo = turn == null && vm.tournamentAttempt == null
+            val before = vm.progress
+            val after = remember(it, before) { if (solo) com.deepline.fishing.core.Progression.applyCast(before, it) else null }
+            ResultsPanel(it, collectLabel = stringResource(collect), onCollect = vm::collectResult, progress = after?.let { a -> before to a })
         }
     }
 }
@@ -443,7 +447,12 @@ private fun oneDecimal(kg: Float): String = "%.1f".format(kg)
 internal fun castWeightText(kg: Float): UiText = UiText.res(R.string.common_kg, oneDecimal(kg))
 
 @Composable
-private fun ResultsPanel(result: CastResult, collectLabel: String, onCollect: () -> Unit) {
+private fun ResultsPanel(
+    result: CastResult,
+    collectLabel: String,
+    onCollect: () -> Unit,
+    progress: Pair<com.deepline.fishing.core.PlayerProgress, com.deepline.fishing.core.PlayerProgress>? = null,
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -545,6 +554,7 @@ private fun ResultsPanel(result: CastResult, collectLabel: String, onCollect: ()
                     color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.Bold,
                 )
+                if (progress != null) CastProgressStrip(progress.first, progress.second)
                 com.deepline.fishing.ui.kit.GameButton(collectLabel, onClick = onCollect, modifier = Modifier.fillMaxWidth(), role = com.deepline.fishing.ui.kit.ActionRole.PLAY, size = com.deepline.fishing.ui.kit.ButtonSize.HERO)
             }
         }

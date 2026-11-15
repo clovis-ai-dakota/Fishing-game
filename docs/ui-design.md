@@ -32,7 +32,7 @@ day and by night:
 | `PLAY` | amber | The **one** main action of a screen: Cast line, Start the battle, Collect. At most one per screen. |
 | `CLAIM` | green | Something free and ready: daily reward, milestone, season tier, gift. |
 | `NAV` | the theme's colour | Open, choose, go back, and every secondary action. |
-| `POINTS` | gold, with the coin | A price in points. |
+| `POINTS` | an ivory price tag with a gold rim and the coin | A price in points. Never the amber of `PLAY`: a price must not look like the main action or a free reward. The number turns red when the player can't afford it. |
 | `PREMIUM` | violet | A price in euros, passes, the Captain's Club. |
 | `ALERT` | red | No way back (delete). Notification badges use the same red (`GameColors.Badge`). |
 
@@ -72,13 +72,15 @@ The menus are places along one coast (`Place` in `ui/theme/World.kt`), in the ta
 | `ARENA` | Battle setup, battles, the online lobby | The setting sun and two rival boats. |
 | `LIGHTHOUSE` | Friends, leaderboards, the tournament, clubs | A lighthouse and its beam, evening blue. |
 
-- `ThemeBackdrop(place = ...)` moves a camera between places (`CAMERA_MS`, 340 ms) and the scene's
+- `ThemeBackdrop(place = ...)` moves a camera between places (`CAMERA_MS`, 280 ms) and the scene's
   layers slide by at different speeds (sky 0.25, shoal 0.5, particles 0.75, decor 1): parallax.
 - What stands on the coast is **far away**: small, washed towards the sky's colour (`far()`), and
   under the screens' titles. It must never look like something to tap, nor make text hard to read.
 - `ScreenMotion` decides every move, and none lasts a second: tabs slide the way the camera goes
   (sideways along the coast, down for the Dex); a pushed screen grows out of the menu (240 ms) and
-  shrinks back faster (170 ms); casting **dives** (600 ms) and collecting **surfaces** (450 ms).
+  shrinks back faster (170 ms); casting **dives** (400 ms) and collecting **surfaces** (300 ms).
+  The numbers follow NN/g's guidance: about 100 ms for feedback, 200 to 300 ms for a screen
+  change, 400 ms only for a big move, never 500 ms, and leaving faster than arriving.
 - A new menu gets a place (add it to `Place.of`); a new place gets a light and something on the
   coast, in every theme, by day and by night.
 
@@ -93,24 +95,45 @@ boat on the Fish tab, the fish on a species' page, the skins preview):
 | Cards that lean under the finger, with a sheen | Dex cards, secrets, skins, shop tiles, battle tiles, social hub tiles | `Modifier.pressTilt()` |
 | The scene shifts as the phone tilts | The backdrop's layers (near ones more) | `rememberDeviceTilt`, `depth()` |
 | A chest that opens | The daily reward | `RewardChest` (a box model projected by hand) |
-| Coins burst out of a claim | Every `CLAIM` button | `RewardFx`, `RewardFxLayer` |
+| Coins fly to and from the balance | A `CLAIM` button's coins fly to the points pill (`Modifier.rewardBalance()`), a collected cast's points fly to it, and points spent fly out of it to what was bought; a fountain where no balance is on screen | `RewardFx`, `RewardFxLayer` |
 
 All of it is looks only, costs nothing when idle (the tilt sensor stops in the background, the
 burst layer only draws while coins fly), and **stops with "Reduce motion"** (`LocalCalmMotion`):
 no tilt, no burst, the chest just opens, screens fade.
 
-## 6. What the most played games do (summary of the analysis)
+## 6. Patterns taken from the most played games
 
-- One home scene, one hero, one big button (Brawl Stars' large yellow Play button; Royal Match's
-  single Play button also drives its events).
-- Colour encodes function (Clash Royale keeps yellow for its most important actions, with an
-  animated shine); the accent is kept for the key action of a screen.
-- Animation replaces text (Royal Match shows where resources come from and go).
-- Short transitions that start from what was touched: 150 to 300 ms; a forced wait above about
-  250 ms feels like lag.
-- Drawn pictograms rather than text, and never emoji.
+Checked against real screens (Clash Royale, Brawl Stars and Clash of Clans on interfaceingame.com)
+and the articles below, read in full:
 
-Sources: Pratt IxD critique of Brawl Stars; The Rookies' breakdown of Clash Royale; Funovus on
-Royal Match; Game Juice on UI feedback; UX Planet's game UX guide; Transifex on localisation and
-UI; EmojiFYI on emoji rendering. Read through search summaries: the pages were not reachable from
-the development session.
+- **Every icon button has a word under it** (`RoundIconButton(caption = ...)`): Supercell labels
+  its home buttons (Shop, Brawlers, Friends...). A pictogram alone is a guess; a pictogram and one
+  word is learnt once. Numbers that matter now (a countdown, a count) go on the same chip.
+- **Yellow for the main action, green for free things, red for notifications, blue everywhere
+  else**, and never the main action's colour on a price: Clash Royale was criticised when a paid
+  item's button turned yellow, and again when it stopped showing unaffordable prices in red.
+  Hence the ivory `POINTS` tag and the red number.
+- **One cast feeds everything, and the game shows it**: Royal Match advances every event with its
+  single Play button and shows the progress after each level. `CastProgressStrip` does it on a
+  cast's results: the day's challenges, the season, new species, milestones ready.
+- **Resources travel**: coins fly from where they were won to where they are kept, and out of it
+  when spent (Royal Match does it for every resource), so no text is needed to say where points
+  come from or go.
+- **A reward is revealed as things, not as a sentence**: a claim's contents pop in as big tiles
+  (`GotTile` on the Daily screen), like a chest's "You got".
+- **A reward track is a road**: the milestones run along one progress line with a node each.
+- **One hand**: the main action and the tabs are in the lower half; back is the system gesture.
+- **Never more than one popup when the game opens**, and the same (i) everywhere for details.
+- **Undo**: a rope upgrade can be taken back for a full refund (the Brawl Stars critique asks
+  for exactly this).
+
+Not done, and why: swiping between tabs (Clash Royale allows it; ours would fight the horizontal
+lists of the Shop and the Dex), and half-height sheets instead of full screens for Daily or
+Milestones (Clash Royale keeps the previous screen visible behind its popups).
+
+Sources read in full: Pratt IxD, "Design Critique: Brawl Stars"; The Rookies, "Game Design UX
+Best Practices: Detailed Breakdown of Clash Royale"; Funovus, "Royal Match Dominates Match-3";
+UserWise, "5 Simple UX Lessons From Royal Match"; Nielsen Norman Group, "Executing UX Animations:
+Duration and Motion Characteristics". Known only through search summaries (their sites refuse
+automated readers): UX Planet's game UX guide and two Medium articles. The Game Juice article
+cited earlier is no longer online, so nothing here relies on it.

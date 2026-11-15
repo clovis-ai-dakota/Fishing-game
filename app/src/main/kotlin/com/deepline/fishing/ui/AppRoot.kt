@@ -55,6 +55,21 @@ fun AppRoot(vm: GameViewModel) {
     }
     val rewardFx = remember { com.deepline.fishing.ui.kit.RewardFx() }
     val calmMotion = vm.feel.settings.reduceMotion
+    // Points in motion: when the balance goes down coins leave it for what was bought, and when a
+    // cast's points arrive they fly to it (once the menu is back on screen).
+    val balance = vm.progress.pointsBalance
+    val seenBalance = remember { longArrayOf(balance) }
+    androidx.compose.runtime.LaunchedEffect(balance) {
+        val before = seenBalance[0]
+        seenBalance[0] = balance
+        if (calmMotion || balance == before) return@LaunchedEffect
+        if (balance < before) {
+            rewardFx.spent()
+        } else {
+            kotlinx.coroutines.delay(ScreenMotion.SURFACE_MS.toLong())
+            rewardFx.earned()
+        }
+    }
     CompositionLocalProvider(
         LocalTourTargets provides tourTargets,
         com.deepline.fishing.ui.kit.LocalPressFeedback provides pressFeedback,
@@ -72,7 +87,7 @@ fun AppRoot(vm: GameViewModel) {
                         com.deepline.fishing.ui.theme.LocalMenuPalette.current,
                         Modifier.fillMaxSize(),
                         place = com.deepline.fishing.ui.theme.Place.of(vm.screen),
-                        travelMs = if (calm) 0 else com.deepline.fishing.ui.theme.CAMERA_MS,
+                        travelMs = if (calm || ScreenMotion.instant) 0 else com.deepline.fishing.ui.theme.CAMERA_MS,
                         // The scene's layers shift as the phone tilts: depth without a 3D view.
                         tilt = com.deepline.fishing.ui.kit.rememberDeviceTilt(enabled = !calm),
                     )

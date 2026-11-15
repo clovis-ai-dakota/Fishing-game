@@ -95,9 +95,13 @@ abstract class LocaleLayoutTest(private val language: String) {
     fun tearDown() {
         scenario?.close()
         Telemetry.uninstall()
+        com.deepline.fishing.ui.ScreenMotion.instant = false
     }
 
     private fun launch() {
+        // Casts are played with the clock paused: a move between screens would freeze half-way,
+        // with the menu still showing through the cast.
+        com.deepline.fishing.ui.ScreenMotion.instant = true
         scenario?.close()
         scenario = ActivityScenario.launch(MainActivity::class.java)
         compose.waitForIdle()

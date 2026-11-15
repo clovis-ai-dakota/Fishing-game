@@ -20,7 +20,7 @@
     <string name="tour_tabs_title">Quatre onglets</string>
     <string name="tour_tabs_body">La barre du bas vous emmène partout : Pêche, c\'est là que vous lancez votre ligne ; le Dex rassemble toutes les espèces que vous rencontrez ; la Boutique propose des améliorations de corde, du matériel et des looks pour votre bateau ; et Duel sert aux matchs en 1 contre 1.</string>
     <string name="tour_look_title">Un nouveau look</string>
-    <string name="tour_look_body">Les menus en disent moins et en montrent plus. La couleur indique ce que fait un bouton : ambre pour l\'action principale, vert pour une récompense gratuite prête à être récupérée, or pour un prix en points et violet pour un prix en euros. Les boutons (i) donnent les détails.</string>
+    <string name="tour_look_body">Les menus en disent moins et en montrent plus. La couleur indique ce que fait un bouton : ambre pour l\'action principale, vert pour une récompense gratuite prête à être récupérée, la pièce pour un prix en points et violet pour un prix en euros. Les boutons (i) donnent les détails.</string>
 
     <string name="tour_cast_title">Lancez votre ligne</string>
     <string name="tour_cast_body">Le grand bouton Lancer la ligne, en bas de l\'onglet Pêche, fait descendre votre hameçon depuis le bateau.</string>

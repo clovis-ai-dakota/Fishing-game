@@ -19,7 +19,7 @@
     <string name="tour_tabs_title">Dört sekme</string>
     <string name="tour_tabs_body">Alttaki çubuk seni her yere götürür: Balık sekmesinde olta atarsın, Dex karşılaştığın her türü toplar, Mağaza sekmesinde halat geliştirmeleri, ekipman ve teknen için görünümler bulunur, Düello sekmesi ise 1v1 maçlar içindir.</string>
     <string name="tour_look_title">Yeni bir görünüm</string>
-    <string name="tour_look_body">Menüler artık daha az söyleyip daha çok gösteriyor. Renk, bir düğmenin ne yaptığını söyler: kehribar ana eylem, yeşil almaya hazır ücretsiz ödül, altın puan fiyatı, mor ise euro fiyatıdır. Ayrıntılar (i) düğmelerinde.</string>
+    <string name="tour_look_body">Menüler artık daha az söyleyip daha çok gösteriyor. Renk, bir düğmenin ne yaptığını söyler: kehribar ana eylem, yeşil almaya hazır ücretsiz ödül, madeni para puan fiyatı, mor ise euro fiyatıdır. Ayrıntılar (i) düğmelerinde.</string>
 
     <string name="tour_cast_title">Oltanı at</string>
     <string name="tour_cast_body">Balık sekmesinin altındaki büyük Oltayı at düğmesi, iğneni tekneden suya bırakır.</string>

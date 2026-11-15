@@ -8,6 +8,8 @@
     <string name="home_cd_milestones">Marcos</string>
     <string name="home_cd_themes">Temas</string>
     <string name="home_cd_settings">Configurações</string>
+    <string name="home_caption_season">Temporada</string>
+    <string name="home_caption_migration">Migração</string>
     <string name="home_boat_action">Personalize seu barco</string>
 
     <!-- O cartão da corda. -->
