@@ -174,7 +174,10 @@ class SceneBuilder {
         val bend = if (session.phase == CastPhase.ASCENDING) 0.25f + 0.6f * load else 0.1f
         val rodBase = Vec3(cx + 0.9f, 1.0f + boatBob, 0.8f)
         val rodTip = Vec3(cx + 1.9f + bend * 0.6f, 2.9f - bend + boatBob, 0.8f)
-        val nearSurface = -top < 8f
+        // The boat is in view whenever the surface is: however much sky the framing shows (a tall
+        // phone starts a cast with over 8 m of it, the Fish tab with more), and until the view's
+        // top is well under the keel. The same rule as the 2D renderer.
+        val nearSurface = boatInView(top)
         if (nearSurface) {
             items += boatItems(skins.boat, Vec3(cx, boatBob, 0f), timeSeconds, skins.customBoat)
             items += rodItem(rodBase, rodTip, timeSeconds)
@@ -724,6 +727,12 @@ class SceneBuilder {
     }
 
     companion object {
+        /** How far under the surface the view's top can be with the boat still (partly) in view, in metres. */
+        const val BOAT_IN_VIEW_BELOW_M = 6f
+
+        /** Whether the boat, the rod and the water around the hull are drawn for a view starting at [topDepth]. */
+        fun boatInView(topDepth: Float) = topDepth < BOAT_IN_VIEW_BELOW_M
+
         /** A slight three-quarter view, so fish show some of their face. */
         const val FACING_RIGHT = -0.32f
         val FACING_LEFT = -PI.toFloat() + 0.32f

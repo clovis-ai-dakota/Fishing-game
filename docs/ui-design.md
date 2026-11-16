@@ -50,15 +50,20 @@ day and by night:
 | Component | Use |
 | --- | --- |
 | `GameButton(role, size)` | Every button that does something. Raised, sinks when pressed (90 ms), plays the tap through `LocalPressFeedback`. Sizes: `HERO` (the main action, in the thumb zone), `MEDIUM`, `SMALL`. |
-| `RoundIconButton` | A pictogram button over a scene or in a top bar, with a red count (`badge`) and a caption (`label`: a countdown, a count). `CLAIM` role when something is ready. |
+| `RoundIconButton` | A pictogram button over a scene or in a top bar, with a red count (`badge`) and a caption (`label`: a countdown, a count). `CLAIM` role when something is ready. The circle and its caption are one tap target. |
 | `TackleTile` | One kind of tackle: pictogram, how many left, lit when in use; empty, it leads to the Shop. |
 | `ScenePill`, `StatPill`, `CoinAmount` | A number with its pictogram, readable on any scene. |
 | `SectionTitle`, `InfoButton` | A title with its (i). |
 | `Pips`, `RingProgress` | Levels and progress without words. |
 | `Modifier.dockBackground()` | The deep water under the action zone of a tab. |
+| `sceneChipColors()` | For chips placed straight on the scene (the Shop's pages, the Dex's filters): glass like a card, never see-through. |
 
 A tab's layout: the content (a scene or a list), then a **dock** on deep water holding the main
 action, then the tab bar. The main action never scrolls away.
+
+The phone's own navigation bar always stands on deep water too: the tab bar reaches under it, and
+a pushed screen (`SubScreen`) paints that strip, so the scene's seabed never shows under the
+system buttons.
 
 ## 4. One world, and moves that mean something
 
@@ -101,7 +106,33 @@ All of it is looks only, costs nothing when idle (the tilt sensor stops in the b
 burst layer only draws while coins fly), and **stops with "Reduce motion"** (`LocalCalmMotion`):
 no tilt, no burst, the chest just opens, screens fade.
 
-## 6. Patterns taken from the most played games
+## 6. Checked on a real phone
+
+The menus were run on a mid-range phone (Fairphone 4, Adreno 619, 1080 x 2340, 60 Hz) and measured
+with `adb shell dumpsys gfxinfo <package> framestats` (per-stage times of the last 120 frames) and
+`simpleperf` on the render thread. What it taught, and the rules that follow:
+
+- **The phone's GPU is the limit, not Kotlin.** A still menu already keeps the GPU about 70% busy
+  (the scene is redrawn on every frame), so there is little room left for a transition. Keep what
+  a frame draws cheap before adding anything to the scene.
+- **Never draw a big path that changes on every frame.** A path that isn't convex is rasterised on
+  the CPU at its full size and uploaded again each time it changes: the sea, as one path with a
+  wavy top, cost about 10 ms a frame in every menu. Anything "below a wavy line" goes through
+  `fillUnderWave` (a thin band for the wave, a rectangle for the rest). Small paths, convex shapes,
+  circles, rectangles and lines are fine.
+- **Tall screens show more sky.** The cast's 3D view starts with over 8 m of sky on a 19.5:9
+  phone and the Fish tab with more: nothing may depend on how much sky is in view
+  (`SceneBuilder.boatInView`, tested in `Render3dTest`).
+- **A question never covers a reward.** The reminder explainer waits for the chest to open and
+  the coins to land (`REVEAL_MS` in `DailyUi.kt`).
+- Tests and Robolectric have no navigation bar, no GPU and one screen size: after changing the
+  scene, a transition or a screen's frame, look at it on a phone.
+
+Not settled: screen changes still drop frames in debug builds (composing the next screen takes
+150 to 270 ms on the main thread there). Measure a release build (R8) before changing the
+transitions: debug builds overstate that cost several times over.
+
+## 7. Patterns taken from the most played games
 
 Checked against real screens (Clash Royale, Brawl Stars and Clash of Clans on interfaceingame.com)
 and the articles below, read in full:

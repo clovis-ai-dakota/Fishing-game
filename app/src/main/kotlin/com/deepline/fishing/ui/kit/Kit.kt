@@ -100,18 +100,23 @@ fun RoundIconButton(
     val isPressed by interaction.collectIsPressedAsState()
     val pressed by animateFloatAsState(if (isPressed) 1f else 0f, tween(PRESS_MS), label = "press")
     val feedback = LocalPressFeedback.current
-    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+    // The button and its caption are one target: the chip under the circle reads as part of it,
+    // and a tap there used to fall through to whatever was behind (on the Fish tab, the boat).
+    Column(
+        modifier
+            .clickable(interactionSource = interaction, indication = null, role = Role.Button) {
+                feedback(role)
+                onClick()
+            }
+            .semantics { this.contentDescription = contentDescription },
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
         Box {
             Box(
                 Modifier
                     .size(diameter, diameter + 3.dp)
-                    .drawBehind { drawRaised(colors, size.width / 2f, 3.dp.toPx(), pressed) }
-                    .clip(CircleShape)
-                    .clickable(interactionSource = interaction, indication = null, role = Role.Button) {
-                        feedback(role)
-                        onClick()
-                    }
-                    .semantics { this.contentDescription = contentDescription },
+                    .drawBehind { drawRaised(colors, size.width / 2f, 3.dp.toPx(), pressed) },
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
@@ -143,6 +148,14 @@ fun RoundIconButton(
         }
     }
 }
+
+/**
+ * Colours for chips that sit straight on the scene (the Shop's pages, the Dex's filters):
+ * unselected, they are glass like a card instead of see-through, so their label stays readable
+ * whatever the coast shows behind it (on a tall phone the port's stall stood behind "Style").
+ */
+@Composable
+fun sceneChipColors() = androidx.compose.material3.FilterChipDefaults.filterChipColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
 
 /** A dark pill for a number or a few words over a scene (white text in every theme). */
 @Composable

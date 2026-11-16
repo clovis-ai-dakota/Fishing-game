@@ -10,6 +10,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
+import androidx.compose.foundation.background
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Snackbar
@@ -192,6 +196,23 @@ private fun TestStoreDialog(item: com.deepline.fishing.core.ShopItem, onAnswer: 
 /** Shared layout for the secondary screens: a back button, a title, then the content. */
 @Composable
 fun SubScreen(title: String, onBack: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
+    Box(Modifier.fillMaxSize()) {
+        // The phone's navigation bar stands on the same deep water as the tab bar and a screen's
+        // dock: without it the scene's seabed shows under the system buttons, cut off by the
+        // content above it (seen on a phone with three-button navigation).
+        Box(
+            Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .windowInsetsBottomHeight(WindowInsets.navigationBars)
+                .background(com.deepline.fishing.ui.kit.deepColor()),
+        )
+        SubScreenContent(title, onBack, content)
+    }
+}
+
+@Composable
+private fun SubScreenContent(title: String, onBack: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()

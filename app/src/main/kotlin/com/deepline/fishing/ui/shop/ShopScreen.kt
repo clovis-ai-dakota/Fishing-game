@@ -153,6 +153,7 @@ fun ShopScreen(vm: GameViewModel) {
                     onClick = { vm.selectShopPage(pg) },
                     label = { Text(stringResource(pg.labelRes)) },
                     leadingIcon = { Icon(pg.icon, contentDescription = null, modifier = Modifier.size(18.dp)) },
+                    colors = com.deepline.fishing.ui.kit.sceneChipColors(),
                     modifier = Modifier.testTag("shop_page_${pg.name.lowercase()}"),
                 )
             }

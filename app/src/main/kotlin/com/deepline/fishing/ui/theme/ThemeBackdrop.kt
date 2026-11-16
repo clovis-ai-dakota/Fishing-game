@@ -98,25 +98,15 @@ fun DrawScope.drawBackdrop(p: MenuPalette, t: Float, camX: Float = 0f, camY: Flo
     // Far things move less than near ones as the camera travels along the coast.
     if (horizon > 0f) depth(tilt, 0.2f) { parallax(camX, 0.25f) { drawSkyDetails(p, t, horizon, u) } }
 
-    // Sea, below a moving waterline.
-    val line = Path().apply {
-        moveTo(0f, horizon)
-        var x = 0f
-        while (x <= w) {
-            lineTo(x, horizon + sin(x / (60f * u) + t * 0.8f) * 3f * u + sin(x / (23f * u) - t * 1.3f) * 1.5f * u)
-            x += 6f * u
-        }
-        lineTo(w, hgt)
-        lineTo(0f, hgt)
-        close()
-    }
-    drawPath(line, Brush.verticalGradient(p.sea, startY = horizon, endY = hgt))
+    // Sea, below a moving waterline (the same line as the foam).
+    val swell = 4.5f * u
+    fillUnderWave(Brush.verticalGradient(p.sea, startY = horizon, endY = hgt), hgt, trough = horizon + swell, step = 6f * u) { x -> waterline(x, horizon, t, u) }
     // The foam along the waterline.
     val foam = Path().apply {
         var x = 0f
         moveTo(0f, horizon)
         while (x <= w) {
-            lineTo(x, horizon + sin(x / (60f * u) + t * 0.8f) * 3f * u + sin(x / (23f * u) - t * 1.3f) * 1.5f * u)
+            lineTo(x, waterline(x, horizon, t, u))
             x += 6f * u
         }
     }
@@ -128,6 +118,38 @@ fun DrawScope.drawBackdrop(p: MenuPalette, t: Float, camX: Float = 0f, camY: Flo
     depth(tilt, 0.55f) { drawPlaces(p, t, horizon, u, camX) }
     depth(tilt, 1f) { parallax(camX, 1f) { drawDecor(p, t, horizon, u) } }
     depth(tilt, 0.75f) { parallax(camX, 0.75f) { drawParticles(p, t, horizon, u) } }
+}
+
+/** The waterline's height at [x]: two swells crossing, never more than 4.5 units from [horizon]. */
+private fun waterline(x: Float, horizon: Float, t: Float, u: Float) =
+    horizon + sin(x / (60f * u) + t * 0.8f) * 3f * u + sin(x / (23f * u) - t * 1.3f) * 1.5f * u
+
+/**
+ * Fills everything under a wavy line ([top], by x) down to [bottom]. Only the band the wave moves
+ * in is a path, down to [trough] (the lowest the line goes); the rest is a plain rectangle.
+ *
+ * A path that isn't convex is drawn by rasterising it on the CPU at its full size and uploading
+ * the result, again every time it changes: as one path, the whole sea cost about 10 ms a frame
+ * on a mid-range phone (measured on a Fairphone 4), in every menu, since its waterline moves on
+ * every frame. The band is a few pixels high, so it costs next to nothing.
+ */
+private inline fun DrawScope.fillUnderWave(brush: Brush, bottom: Float, trough: Float, step: Float, top: (Float) -> Float) {
+    val w = size.width
+    // On a whole pixel, and the band one pixel into the rectangle: no seam between the two.
+    val edge = kotlin.math.ceil(trough)
+    val band = Path().apply {
+        moveTo(0f, edge + 1f)
+        var x = 0f
+        while (x < w) {
+            lineTo(x, min(top(x), edge))
+            x += step
+        }
+        lineTo(w, min(top(w), edge))
+        lineTo(w, edge + 1f)
+        close()
+    }
+    drawPath(band, brush)
+    if (bottom > edge) drawRect(brush, topLeft = Offset(0f, edge), size = Size(w, bottom - edge))
 }
 
 private fun DrawScope.drawDecor(p: MenuPalette, t: Float, horizon: Float, u: Float) {
@@ -351,18 +373,10 @@ private fun DrawScope.drawSeabed(p: MenuPalette, t: Float, u: Float, grass: Bool
     val hgt = size.height
     val floor = hgt - 70f * u
     val sand = if (p.light) lerp(p.sea.last(), Color(0xFFF2DFB4), 0.55f) else lerp(p.sea.last(), p.silhouette, 0.35f)
-    val dunes = Path().apply {
-        moveTo(0f, hgt)
-        var x = 0f
-        lineTo(0f, floor)
-        while (x <= w) {
-            lineTo(x, floor + sin(x / (80f * u)) * 10f * u + sin(x / (31f * u)) * 4f * u)
-            x += 8f * u
-        }
-        lineTo(w, hgt)
-        close()
+    // Dunes: two swells of sand, at most 14 units above and below the floor.
+    fillUnderWave(androidx.compose.ui.graphics.SolidColor(sand), hgt, trough = floor + 14f * u, step = 8f * u) { x ->
+        floor + sin(x / (80f * u)) * 10f * u + sin(x / (31f * u)) * 4f * u
     }
-    drawPath(dunes, sand)
     if (grass) {
         for (k in 0 until 9) {
             val x = h(k, 51) * w

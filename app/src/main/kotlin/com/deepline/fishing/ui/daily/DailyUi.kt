@@ -1,6 +1,8 @@
 package com.deepline.fishing.ui.daily
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.runtime.LaunchedEffect
@@ -128,10 +130,31 @@ fun rememberReminderOptIn(vm: GameViewModel, source: String): () -> Unit {
     }
 }
 
-/** The explainer shown once, right after the first daily reward: why, how often, how to stop. */
+/** How long the chest's opening, the reward's tiles and the coins' flight take, in milliseconds. */
+private const val REVEAL_MS = 1600
+
+/** The same with "Reduce motion": nothing moves, the reward is just left on screen for a moment. */
+private const val REVEAL_CALM_MS = 700
+
+/**
+ * The explainer shown once, after the first daily reward: why, how often, how to stop. It waits
+ * for the reward to be revealed: asked at once, it covered the chest opening and the coins (seen
+ * on a phone), on the very first claim, the one moment made to delight.
+ */
 @Composable
 private fun ReminderOptInDialog(vm: GameViewModel, turnOn: () -> Unit) {
-    if (!vm.daily.askOptIn) return
+    val ask = vm.daily.askOptIn
+    val calm = LocalCalmMotion.current
+    var revealed by remember { mutableStateOf(false) }
+    LaunchedEffect(ask) {
+        revealed = false
+        if (ask) {
+            // Frame time, like the reveal itself (and like every animation, it follows a test's clock).
+            Animatable(0f).animateTo(1f, tween(if (calm) REVEAL_CALM_MS else REVEAL_MS, easing = LinearEasing))
+            revealed = true
+        }
+    }
+    if (!ask || !revealed) return
     AlertDialog(
         onDismissRequest = { vm.daily.answerOptIn(false) },
         icon = { Icon(DailyIcons.Bell, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },

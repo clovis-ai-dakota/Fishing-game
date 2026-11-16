@@ -129,6 +129,29 @@ class Render3dTest {
         }
     }
 
+    /**
+     * The boat is drawn whenever the surface is in view, whatever the framing: the Fish tab shows
+     * much more sky than a cast, and a tall phone starts a cast with more sky than a short one
+     * (seen on a 1080 x 2340 phone: no boat on the Fish tab, and it popped in a few metres down).
+     */
+    @Test
+    fun theBoatIsDrawnWhereverTheSurfaceShows() {
+        fun hasBoat(f: com.deepline.fishing.ui.render3d.Frame) = f.items.any { it.meshKey?.startsWith("boat") == true }
+        fun session() = CastSession(RopeSpecs(120f, 10f, 9f), false, com.deepline.fishing.core.World(emptyList(), emptyList()))
+        // The Fish tab's framing, and the Skins preview's.
+        for (cameraTop in listOf(-11.5f, -6.5f)) {
+            assertTrue("camera top $cameraTop", hasBoat(SceneBuilder().build(session(), 1f, 1080, 1636, cameraTop = cameraTop)))
+        }
+        // The start of a cast, on short and tall screens.
+        for ((w, h) in listOf(540 to 960, 1080 to 2340, 1080 to 2640)) {
+            assertTrue("${w}x$h", hasBoat(SceneBuilder().build(session(), 0f, w, h)))
+        }
+        // Deep down the surface is far above the view: no boat to draw.
+        assertTrue(!hasBoat(SceneBuilder().build(session(), 0f, 1080, 2340, cameraTop = 60f)))
+        // The 2D renderer's rule: the boat until the view's top is 6 m under the surface.
+        assertTrue(SceneBuilder.boatInView(5.9f) && !SceneBuilder.boatInView(6.1f))
+    }
+
     /** Builds a frame for every step of whole casts, with every skin set: nothing throws. */
     @Test
     fun wholeCastsBuildFramesWithEverySkin() {

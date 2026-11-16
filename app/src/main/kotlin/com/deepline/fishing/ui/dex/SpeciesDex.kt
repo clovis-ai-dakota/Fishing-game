@@ -92,19 +92,22 @@ fun SpeciesDex(vm: GameViewModel) {
                     .tourTarget(TourTarget.DEX_FILTERS),
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                FilterChip(selected = zone == null, onClick = { zoneName = null }, label = { Text(stringResource(R.string.dex_species_filter_all)) })
+                val chipColors = com.deepline.fishing.ui.kit.sceneChipColors()
+                FilterChip(selected = zone == null, onClick = { zoneName = null }, label = { Text(stringResource(R.string.dex_species_filter_all)) }, colors = chipColors)
                 for (z in DepthZone.entries) {
                     FilterChip(
                         selected = zone == z,
                         onClick = { zoneName = z.name },
                         label = { Text(z.label()) },
                         leadingIcon = { Box(Modifier.size(10.dp).clip(CircleShape).background(zoneColor(z))) },
+                        colors = chipColors,
                     )
                 }
                 FilterChip(
                     selected = caughtOnly,
                     onClick = { caughtOnly = !caughtOnly },
                     label = { Text(stringResource(R.string.dex_species_filter_caught)) },
+                    colors = chipColors,
                 )
             }
         }
