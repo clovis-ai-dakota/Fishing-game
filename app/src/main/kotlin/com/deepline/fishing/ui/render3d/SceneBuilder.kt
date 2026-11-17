@@ -213,14 +213,13 @@ class SceneBuilder {
         }
         val bumpFlash = (1f - (session.elapsedSeconds - session.lastTouchAtSeconds) / 0.5f).coerceIn(0f, 1f)
 
-        // Hook, bait and sinker.
+        // Hook and sinker.
         val hookAt = Mat4.translation(hookWorld.x, hookWorld.y, 0f)
         items += DrawItem(
             Program.TOON, "hook:${skins.hook?.name}",
             uniforms = model(hookAt) + mapOf("uMaterial" to f(1f), "uFlags" to f(0f, 0f, 0f, hookMode(skins.hook))),
             outlinePx = 1.6f, outlineColor = OUTLINE_INK,
         )
-        items += DrawItem(Program.TOON, "worm", uniforms = model(hookAt) + mapOf("uMaterial" to f(1f)), outlinePx = 1.6f, outlineColor = f(0.35f, 0.08f, 0.1f))
         val sinkerT = 0.9f
         val su = 1f - sinkerT
         val sinker = entry * (su * su) + control * (2f * su * sinkerT) + hookEye * (sinkerT * sinkerT)

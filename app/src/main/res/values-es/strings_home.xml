@@ -12,6 +12,8 @@
     <string name="home_caption_season">Temporada</string>
     <string name="home_caption_migration">Migración</string>
     <string name="home_boat_action">Personaliza tu barco</string>
+    <string name="home_line_action">Personaliza tu sedal</string>
+    <string name="home_hook_action">Personaliza tu anzuelo</string>
 
     <!-- The rope card. -->
     <string name="home_rope_title">Tu cuerda</string>

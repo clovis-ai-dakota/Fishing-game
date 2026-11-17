@@ -13,7 +13,7 @@ import kotlin.math.max
 import kotlin.math.sin
 
 /**
- * Procedural meshes for everything that isn't a fish: the hook and bait, obstacles, the boat and
+ * Procedural meshes for everything that isn't a fish: the hook, obstacles, the boat and
  * its skins, and background decor. Sizes are in meters unless noted.
  */
 object PropModels {
@@ -73,20 +73,6 @@ object PropModels {
             }
             else -> Unit
         }
-        b.build()
-    }
-
-    /** The worm threaded on the shank, with a tail the shader wriggles. */
-    fun worm(): MeshData = cached("worm") {
-        val b = MeshBuilder()
-        // A ringed body threaded on the shank (rings bulge slightly), rounded at the top.
-        val body = (0..18).map { i -> val u = i / 18f; Vec3(0.02f * s, (0.68f - 1.05f * u) * s, (0.06f + 0.02f * sin(u * PI.toFloat())) * s) }
-        b.tube(body, { u -> 0.16f * s * (1f + 0.07f * cos(u * 18f * 2f * PI.toFloat()) - 0.15f * smoothstep(0.85f, 1f, 1f - u)) }, 10, Part.WORM)
-        val tail = (0..16).map { i ->
-            val u = i / 16f
-            Vec3(0.05f * s + 0.25f * s * u, -0.45f * s - 1.0f * s * u, 0.05f * s)
-        }
-        b.tube(tail, { u -> 0.13f * s * (1f - 0.55f * u) * (1f + 0.06f * cos(u * 14f * 2f * PI.toFloat())) }, 8, Part.WORM_TAIL)
         b.build()
     }
 

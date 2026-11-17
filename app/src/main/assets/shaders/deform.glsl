@@ -13,8 +13,7 @@ vec3 deform(vec3 p, float part, vec2 uv) {
             p.y += sin(uTime * 5.0 + p.x * 25.0 + p.y * 40.0 + uSwim.z) * 0.03 * t;
         }
     } else if (uMaterial < 1.5) {
-        // The worm's tail wriggles.
-        if (isPart(part, 12.0)) p.x += sin(uTime * 6.0 + uv.x * 6.0) * 0.096 * uv.x;
+        // The hook doesn't move.
     } else if (uMaterial < 2.5) {
         if (isPart(part, 23.0)) {
             p.x += sin(uTime * 2.5 + uv.x * 5.0 + uSwim.z) * 0.16 * uv.x;

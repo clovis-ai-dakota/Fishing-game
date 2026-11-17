@@ -3,6 +3,14 @@ package com.deepline.fishing.ui
 import com.deepline.fishing.ui.kit.rewardBalance
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.offset
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -81,18 +89,74 @@ fun HomeScreen(vm: GameViewModel) {
             SkinPreview(
                 vm.skins,
                 height = null,
-                modifier = Modifier.fillMaxSize().tourTarget(TourTarget.HOME_BOAT),
-                cameraTop = -11.5f,
-                onClick = { vm.openDex(DexSection.SKINS) },
-                clickLabel = stringResource(R.string.home_boat_action),
+                modifier = Modifier.fillMaxSize(),
+                cameraTop = SCENE_CAMERA_TOP,
                 onPainted = { painted = it },
             )
+            // The boat, the line and the hook each open their own skins; the sea does nothing.
+            SceneTaps(vm, Modifier.fillMaxSize())
             TopBar(vm, Modifier.align(Alignment.TopCenter))
             EventRail(vm, Modifier.align(Alignment.CenterStart).padding(start = 12.dp))
             DexButton(vm, Modifier.align(Alignment.CenterEnd).padding(end = 12.dp))
             RopeStrip(vm, Modifier.align(Alignment.BottomCenter).padding(bottom = 10.dp))
         }
         CastDock(vm)
+    }
+}
+
+/** How far above the surface the Fish menu's scene starts, in metres (more sky than a cast). */
+private const val SCENE_CAMERA_TOP = -11.5f
+
+/**
+ * Taps on the scene: the boat opens the boat's customisation, the line the line skins and the hook
+ * the hook skins ([FishMenuHitAreas]: the same places as both renderers draw them). Each is also an
+ * invisible button for screen readers and tests, over the thing it opens.
+ */
+@Composable
+private fun SceneTaps(vm: GameViewModel, modifier: Modifier = Modifier) {
+    val density = androidx.compose.ui.platform.LocalDensity.current
+    var size by remember { mutableStateOf(androidx.compose.ui.unit.IntSize.Zero) }
+    val minTouch = with(density) { 48.dp.toPx() }
+    val areas = remember(size, minTouch) {
+        if (size.width == 0 || size.height == 0) null
+        else FishMenuHitAreas.of(size.width.toFloat(), size.height.toFloat(), SCENE_CAMERA_TOP, minTouch)
+    }
+    fun open(target: FishMenuTarget) = vm.openSkins(
+        when (target) {
+            FishMenuTarget.BOAT -> com.deepline.fishing.core.CosmeticSlot.BOAT
+            FishMenuTarget.LINE -> com.deepline.fishing.core.CosmeticSlot.LINE
+            FishMenuTarget.HOOK -> com.deepline.fishing.core.CosmeticSlot.HOOK
+        },
+    )
+    Box(
+        modifier
+            .onSizeChanged { size = it }
+            .pointerInput(areas) { detectTapGestures { p -> areas?.targetAt(p.x, p.y)?.let(::open) } },
+    ) {
+        if (areas == null) return@Box
+        val line = areas.lineMiddle
+        val lineSpot = HitRect(line.first, line.second, line.first, line.second).atLeast(minTouch)
+        for ((target, rect) in listOf(FishMenuTarget.BOAT to areas.boat, FishMenuTarget.LINE to lineSpot, FishMenuTarget.HOOK to areas.hook)) {
+            val label = stringResource(
+                when (target) {
+                    FishMenuTarget.BOAT -> R.string.home_boat_action
+                    FishMenuTarget.LINE -> R.string.home_line_action
+                    FishMenuTarget.HOOK -> R.string.home_hook_action
+                },
+            )
+            Box(
+                Modifier
+                    .offset { androidx.compose.ui.unit.IntOffset(rect.left.toInt(), rect.top.toInt()) }
+                    .size(with(density) { rect.width.toDp() }, with(density) { rect.height.toDp() })
+                    .then(if (target == FishMenuTarget.BOAT) Modifier.tourTarget(TourTarget.HOME_BOAT) else Modifier)
+                    .testTag("scene_${target.name.lowercase()}")
+                    .semantics {
+                        contentDescription = label
+                        role = androidx.compose.ui.semantics.Role.Button
+                        onClick(label) { open(target); true }
+                    },
+            )
+        }
     }
 }
 

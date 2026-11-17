@@ -76,7 +76,7 @@ class Render3dTest {
     @Test
     fun everyMeshIsClosedTheRightWayRound() {
         for (sp in FishCatalog.all) assertWindingMatchesNormals(sp.id, FishModels.mesh(sp))
-        val props = listOf("hook:null", "worm", "sinker", "rock:0", "rock:5", "wood:1", "jelly", "boat:null", "kelp:2", "decor:1", "coral:3") +
+        val props = listOf("hook:null", "sinker", "rock:0", "rock:5", "wood:1", "jelly", "boat:null", "kelp:2", "decor:1", "coral:3") +
             Cosmetic.entries.filter { it.slot == CosmeticSlot.HOOK || it.slot == CosmeticSlot.BOAT }.map { (if (it.slot == CosmeticSlot.HOOK) "hook:" else "boat:") + it.name }
         for (key in props) assertWindingMatchesNormals(key, Meshes.get(key))
         // Every hand-made boat combination.

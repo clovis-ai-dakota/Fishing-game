@@ -12,6 +12,8 @@
     <string name="home_caption_season">Saison</string>
     <string name="home_caption_migration">Migration</string>
     <string name="home_boat_action">Personnaliser votre bateau</string>
+    <string name="home_line_action">Personnaliser votre ligne</string>
+    <string name="home_hook_action">Personnaliser votre hameçon</string>
 
     <!-- The rope card. -->
     <string name="home_rope_title">Votre corde</string>

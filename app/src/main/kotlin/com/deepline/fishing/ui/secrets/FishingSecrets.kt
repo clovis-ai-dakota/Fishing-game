@@ -291,7 +291,7 @@ private fun DrawScope.drawLastBumpArt() {
     val hook = Offset(size.width / 2f, size.height * 0.42f)
     drawLine(Color.White.copy(alpha = 0.85f), Offset(hook.x, 0f), Offset(hook.x, hook.y - 22.dp.toPx()), strokeWidth = 2f)
     val s = 15.dp.toPx()
-    drawHook(hook, s, 0.3f, withBait = false)
+    drawHook(hook, s, 0.3f)
     drawObstacleIcon(ObstacleKind.ROCK, Offset(hook.x, hook.y + s * 2.2f), 20.dp.toPx())
     burst(Offset(hook.x, hook.y + s), s * 2.6f, s * 3.4f)
 }
@@ -307,7 +307,7 @@ private fun DrawScope.drawFishRow(ids: List<String>, hook: Boolean = false, top:
     if (hook) {
         val h = Offset(size.width * 0.5f, size.height * 0.2f)
         drawLine(Color.White.copy(alpha = 0.8f), Offset(h.x, 0f), Offset(h.x, h.y - 10.dp.toPx()), strokeWidth = 2f)
-        drawHook(h, 8.dp.toPx(), 0.2f, withBait = false)
+        drawHook(h, 8.dp.toPx(), 0.2f)
     }
 }
 
@@ -326,7 +326,7 @@ private fun DrawScope.drawCornerArt() {
     val sp = FishCatalog.byId("dusk_snapper")!!
     drawFish(sp, Offset(size.width * 0.78f, size.height * 0.55f), size.width * 0.25f, -1, false, 0.2f)
     val h = Offset(size.width * 0.62f, size.height * 0.5f)
-    drawHook(h, 9.dp.toPx(), 0f, withBait = false)
+    drawHook(h, 9.dp.toPx(), 0f)
     burst(h, 14.dp.toPx(), 20.dp.toPx())
 }
 
@@ -339,7 +339,7 @@ private fun DrawScope.drawMoonlitArt(dark: Boolean = false) {
         drawFishGlow(sp, c, size.width * 0.3f, 1, 1f)
     }
     drawLine(Color.White.copy(alpha = 0.5f), Offset(size.width * 0.3f, 0f), Offset(size.width * 0.3f, size.height * 0.8f), strokeWidth = 1.5f)
-    drawHook(Offset(size.width * 0.3f, size.height * 0.85f), 8.dp.toPx(), 0f, withBait = false)
+    drawHook(Offset(size.width * 0.3f, size.height * 0.85f), 8.dp.toPx(), 0f)
 }
 
 private fun DrawScope.drawSovereignArt() {
@@ -428,7 +428,7 @@ private fun DrawScope.drawGoliathArt() {
     drawFish(leviathan, c, size.width * 0.75f, -1, false, 0.6f)
     val hook = Offset(c.x - size.width * 0.33f, c.y - 6.dp.toPx())
     drawLine(Color.White.copy(alpha = 0.6f), Offset(hook.x, 0f), Offset(hook.x, hook.y - 14.dp.toPx()), strokeWidth = 1.5f)
-    drawHook(hook, 10.dp.toPx(), 0f, withBait = false)
+    drawHook(hook, 10.dp.toPx(), 0f)
     burst(hook, 16.dp.toPx(), 24.dp.toPx())
 }
 

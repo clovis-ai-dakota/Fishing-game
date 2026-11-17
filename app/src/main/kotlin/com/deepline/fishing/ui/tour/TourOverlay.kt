@@ -285,8 +285,8 @@ private fun DrawScope.drawHeads() {
     drawFish(sp, left, len, 1, sparkling = false, timeSeconds = 0.2f)
     drawFish(sp, right, len, 1, sparkling = false, timeSeconds = 0.9f)
     val s = 11.dp.toPx()
-    drawHook(left + Offset(len * 0.42f, -s * 0.2f), s, 0.1f, withBait = false)
-    drawHook(right + Offset(-len * 0.45f, -s * 0.2f), s, 0.1f, withBait = false)
+    drawHook(left + Offset(len * 0.42f, -s * 0.2f), s, 0.1f)
+    drawHook(right + Offset(-len * 0.45f, -s * 0.2f), s, 0.1f)
     check(Offset(left.x, size.height * 0.16f), 12.dp.toPx())
     cross(Offset(right.x, size.height * 0.16f), 10.dp.toPx())
 }
@@ -295,7 +295,7 @@ private fun DrawScope.drawWeight() {
     drawRect(ArtWater)
     val hook = Offset(size.width * 0.35f, size.height * 0.22f)
     drawLine(Color.White.copy(alpha = 0.85f), Offset(hook.x, 0f), Offset(hook.x, hook.y - 18.dp.toPx()), strokeWidth = 2f)
-    drawHook(hook, 12.dp.toPx(), 0f, withBait = false)
+    drawHook(hook, 12.dp.toPx(), 0f)
     val fish = listOf("sun_bream", "reed_perch", "coral_darter")
     fish.forEachIndexed { i, id ->
         val sp = FishCatalog.byId(id)!!

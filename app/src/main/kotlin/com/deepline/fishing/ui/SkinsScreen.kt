@@ -40,11 +40,8 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.GameViewModel
 import com.deepline.fishing.Screen
-import com.deepline.fishing.core.CastSession
 import com.deepline.fishing.core.Cosmetic
 import com.deepline.fishing.core.CosmeticSlot
-import com.deepline.fishing.core.RopeSpecs
-import com.deepline.fishing.core.World
 
 /**
  * A title (won with a legendary secret, or bought), shown under the player's name, in its
@@ -118,11 +115,7 @@ fun SkinPreview(
     onPainted: ((Boolean) -> Unit)? = null,
 ) {
     val measurer = rememberTextMeasurer()
-    val session = remember {
-        CastSession(RopeSpecs(120f, 10f, 9f), false, World(emptyList(), emptyList())).also {
-            while (it.hookDepth < 5f) it.update(1f / 60f, null)
-        }
-    }
+    val session = remember { boatPreviewSession() }
     // Skins are animated: the preview plays them (tests run with animations paused).
     val time by rememberInfiniteTransition(label = "skins").animateFloat(
         initialValue = 0f,

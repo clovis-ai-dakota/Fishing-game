@@ -56,7 +56,6 @@ object Meshes {
                 FishModels.mesh(FishCatalog.byId(id) ?: error("Unknown species $id"), atmosphere)
             }
             "hook" -> PropModels.hook(cosmetic())
-            "worm" -> PropModels.worm()
             "sinker" -> PropModels.sinker()
             "rock" -> PropModels.rock(arg.toInt())
             "wood" -> PropModels.driftwood(arg.toInt())

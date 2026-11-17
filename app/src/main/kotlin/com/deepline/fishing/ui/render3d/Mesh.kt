@@ -47,8 +47,6 @@ object Part {
     const val TENTACLE = 6f
     const val TAIL = 7f
     const val METAL = 10f
-    const val WORM = 11f
-    const val WORM_TAIL = 12f
     const val RUNE = 13f
     const val WOOD = 20f
     const val ROCK = 21f

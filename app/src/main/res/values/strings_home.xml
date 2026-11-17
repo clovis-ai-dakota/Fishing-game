@@ -14,8 +14,11 @@
     <string name="home_caption_season">Season</string>
     <!-- One word under the migration button on the Fish tab (keep it very short). -->
     <string name="home_caption_migration">Migration</string>
-    <!-- Screen reader action for tapping the boat (opens the Skins section). -->
+    <!-- Screen reader actions for tapping the boat, the line and the hook in the Fish menu's
+         scene (each opens the Skins section on its own slot). -->
     <string name="home_boat_action">Customise your boat</string>
+    <string name="home_line_action">Customise your line</string>
+    <string name="home_hook_action">Customise your hook</string>
 
     <!-- The rope card: how deep the rope reaches. -->
     <string name="home_rope_title">Your rope</string>

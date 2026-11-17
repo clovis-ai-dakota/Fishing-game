@@ -15,6 +15,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.ui.platform.testTag
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -77,6 +80,33 @@ import com.deepline.fishing.ui.tour.TourTarget
 import com.deepline.fishing.ui.tour.tourTarget
 import kotlin.math.min
 
+/** All slots, or one: the chips at the top of the Skins section. */
+@Composable
+private fun SlotFilters(filter: CosmeticSlot?, onPick: (CosmeticSlot?) -> Unit) {
+    val colors = com.deepline.fishing.ui.kit.sceneChipColors()
+    Row(
+        Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        androidx.compose.material3.FilterChip(
+            selected = filter == null,
+            onClick = { onPick(null) },
+            label = { Text(stringResource(R.string.dex_species_filter_all)) },
+            colors = colors,
+            modifier = Modifier.testTag("skins_filter_all"),
+        )
+        for (slot in CosmeticSlot.entries) {
+            androidx.compose.material3.FilterChip(
+                selected = filter == slot,
+                onClick = { onPick(slot) },
+                label = { Text(slot.label()) },
+                colors = colors,
+                modifier = Modifier.testTag("skins_filter_${slot.name.lowercase()}"),
+            )
+        }
+    }
+}
+
 /**
  * The Skins section: a live preview of what you wear, then every legendary set as a row of slot
  * tiles. Tap a tile to wear it, tap it again to go back to the classic look. Locked tiles only
@@ -89,6 +119,8 @@ fun SkinDex(vm: GameViewModel) {
     // Legendary sets (earned with secrets); shop pieces have their own group below.
     val sets = Cosmetic.entries.filterNot { it.fromShop }.map { it.setName }.distinct() // i18n-ignore: set ids (names shown with skinSetLabel)
     val shopGear = Cosmetic.entries.filter { it.fromShop && it in unlocked && it.slot != CosmeticSlot.TITLE }
+    val filter = vm.skinsFilter
+    fun shows(slot: CosmeticSlot) = filter == null || filter == slot
     val time by rememberInfiniteTransition(label = "skin tiles").animateFloat(
         initialValue = 0f,
         targetValue = 60f,
@@ -102,9 +134,12 @@ fun SkinDex(vm: GameViewModel) {
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         item(key = "preview", span = { GridItemSpan(maxLineSpan) }) { SkinPreview(vm.skins, height = 240.dp) }
-        item(key = "boat", span = { GridItemSpan(maxLineSpan) }) { YourBoatCard(vm, time) }
-        item(key = "atmosphere", span = { GridItemSpan(maxLineSpan) }) { AtmosphereCard(vm) }
-        item(key = "legendary", span = { GridItemSpan(maxLineSpan) }) {
+        // One slot at a time (the Fish menu's boat, line and hook open it on theirs). A slot says
+        // nothing about a secret: locked tiles already show only their slot.
+        item(key = "filters", span = { GridItemSpan(maxLineSpan) }) { SlotFilters(filter, vm::filterSkins) }
+        if (shows(CosmeticSlot.BOAT)) item(key = "boat", span = { GridItemSpan(maxLineSpan) }) { YourBoatCard(vm, time) }
+        if (filter == null) item(key = "atmosphere", span = { GridItemSpan(maxLineSpan) }) { AtmosphereCard(vm) }
+        if (filter != CosmeticSlot.BOAT) item(key = "legendary", span = { GridItemSpan(maxLineSpan) }) {
             com.deepline.fishing.ui.kit.SectionTitle(
                 stringResource(R.string.dex_skins_legendary_title),
                 info = stringResource(R.string.dex_skins_note, unlocked.count { !it.fromShop }, Cosmetic.entries.count { !it.fromShop }),
@@ -130,8 +165,10 @@ fun SkinDex(vm: GameViewModel) {
             }
         }
         for (set in sets) {
-            val items = Cosmetic.entries.filter { it.setName == set && !it.fromShop }.sortedBy { it.slot.ordinal } // i18n-ignore: set id
-            val open = items.any { it in unlocked }
+            val whole = Cosmetic.entries.filter { it.setName == set && !it.fromShop }.sortedBy { it.slot.ordinal } // i18n-ignore: set id
+            val open = whole.any { it in unlocked }
+            val items = whole.filter { shows(it.slot) }
+            if (items.isEmpty()) continue
             item(key = "set-$set", span = { GridItemSpan(maxLineSpan) }) {
                 Text(
                     if (open) stringResource(R.string.dex_skins_set, skinSetLabel(set)) else stringResource(R.string.dex_skins_set_locked),
@@ -162,11 +199,11 @@ fun SkinDex(vm: GameViewModel) {
                 }
             }
         }
-        items(shopGear, key = { it.name }) { c ->
+        items(shopGear.filter { shows(it.slot) }, key = { it.name }) { c ->
             val equipped = p.equippedSkins[c.slot] == c
             SkinTile(c, true, equipped, time) { vm.equipSkin(c.slot, if (equipped) null else c) }
         }
-        item(key = "badge", span = { GridItemSpan(maxLineSpan) }) { ShowOffCard(vm) }
+        if (shows(CosmeticSlot.TITLE)) item(key = "badge", span = { GridItemSpan(maxLineSpan) }) { ShowOffCard(vm) }
     }
 }
 
@@ -360,7 +397,7 @@ internal fun DrawScope.drawSlotArt(slot: CosmeticSlot, c: Cosmetic?, time: Float
             val s = min(w, h) * 0.2f
             val bend = Offset(w / 2f - 0.2f * s, h / 2f + 0.6f * s)
             drawHookAura(bend, s, time, c)
-            drawHook(bend, s, time, withBait = false, skin = c)
+            drawHook(bend, s, time, skin = c)
         }
         CosmeticSlot.LINE -> {
             val a = Offset(w * 0.15f, h * 0.1f)
@@ -382,7 +419,7 @@ internal fun DrawScope.drawSlotArt(slot: CosmeticSlot, c: Cosmetic?, time: Float
             val s = min(w, h) * 0.12f
             val bend = Offset(w / 2f, h * 0.86f)
             drawHookTrail(bend.x, bend.y - 1.4f * s, scale, time, c)
-            drawHook(bend, s, time, withBait = false)
+            drawHook(bend, s, time)
         }
         CosmeticSlot.TITLE -> Unit
     }

@@ -585,10 +585,10 @@ private fun DrawScope.drawBoatAndRod(
 }
 
 /**
- * A barbed J-hook with a wriggling worm. [bend] is the bottom of the hook (where it catches
- * fish) and [s] its size in pixels; the line ties on at the eye, 1.4 s above the bend.
+ * A barbed J-hook, bare (no bait). [bend] is the bottom of the hook (where it catches fish) and
+ * [s] its size in pixels; the line ties on at the eye, 1.4 s above the bend.
  */
-fun DrawScope.drawHook(bend: Offset, s: Float, timeSeconds: Float, withBait: Boolean = true, skin: Cosmetic? = null) {
+fun DrawScope.drawHook(bend: Offset, s: Float, timeSeconds: Float, skin: Cosmetic? = null) {
     val w = max(2.2f, s * 0.16f)
     val metal = hookMetal(skin, bend, s, timeSeconds)
     val pointTip = Offset(bend.x + 0.85f * s, bend.y - 0.10f * s)
@@ -596,30 +596,6 @@ fun DrawScope.drawHook(bend: Offset, s: Float, timeSeconds: Float, withBait: Boo
         moveTo(bend.x, bend.y - 1.23f * s)
         lineTo(bend.x, bend.y + 0.15f * s)
         cubicTo(bend.x, bend.y + 0.95f * s, bend.x + 0.95f * s, bend.y + 0.95f * s, pointTip.x, pointTip.y)
-    }
-    if (withBait) {
-        // Worm threaded on the shank, with its tail dangling below the bend: a darker back,
-        // segment rings, the saddle band and a wet highlight (as in 3D).
-        val pink = Color(0xFFE57373)
-        val dark = Color(0xFFB4485A)
-        val tail = Path()
-        for (i in 0..8) {
-            val u = i / 8f
-            val x = bend.x + 0.30f * s + sin(timeSeconds * 6f + u * 6f) * 0.16f * s * u
-            val y = bend.y + (0.55f + u * 1.0f) * s
-            if (i == 0) tail.moveTo(bend.x + 0.05f * s, bend.y + 0.45f * s)
-            tail.lineTo(x, y)
-        }
-        drawPath(tail, dark, style = Stroke(width = s * 0.3f, cap = StrokeCap.Round))
-        drawPath(tail, pink, style = Stroke(width = s * 0.2f, cap = StrokeCap.Round))
-        drawLine(dark, Offset(bend.x, bend.y - 0.65f * s), Offset(bend.x, bend.y + 0.35f * s), strokeWidth = s * 0.36f, cap = StrokeCap.Round)
-        drawLine(pink, Offset(bend.x - s * 0.03f, bend.y - 0.65f * s), Offset(bend.x - s * 0.03f, bend.y + 0.35f * s), strokeWidth = s * 0.26f, cap = StrokeCap.Round)
-        drawRoundRect(Color(0xFFD9707E), topLeft = Offset(bend.x - s * 0.19f, bend.y - 0.42f * s), size = Size(s * 0.38f, s * 0.2f), cornerRadius = CornerRadius(s * 0.08f))
-        for (k in 0 until 6) {
-            val y = bend.y + (-0.55f + k * 0.17f) * s
-            drawLine(Color(0xFF8E2A3C).copy(alpha = 0.45f), Offset(bend.x - s * 0.15f, y), Offset(bend.x + s * 0.15f, y), strokeWidth = max(1f, s * 0.035f))
-        }
-        drawLine(Color.White.copy(alpha = 0.55f), Offset(bend.x - s * 0.09f, bend.y - 0.58f * s), Offset(bend.x - s * 0.09f, bend.y + 0.2f * s), strokeWidth = max(1f, s * 0.05f), cap = StrokeCap.Round)
     }
     drawCircle(metal, radius = s * 0.17f, center = Offset(bend.x, bend.y - 1.4f * s), style = Stroke(width = w * 0.8f))
     drawPath(shankAndBend, metal, style = Stroke(width = w, cap = StrokeCap.Round))

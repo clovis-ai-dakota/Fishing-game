@@ -23,10 +23,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import com.deepline.fishing.core.CastSession
 import com.deepline.fishing.core.FishSpecies
-import com.deepline.fishing.core.RopeSpecs
-import com.deepline.fishing.core.World
 import com.deepline.fishing.ui.Skins
 import com.deepline.fishing.ui.render3d.PortraitLook
 import com.deepline.fishing.ui.render3d.PortraitScene
@@ -122,9 +119,9 @@ fun SkinPreview3d(
     val current = remember { arrayOf(skins) }
     current[0] = skins
     val source = remember {
-        val session = CastSession(RopeSpecs(120f, 10f, 9f), false, World(emptyList(), emptyList())).also {
-            while (it.hookDepth < 5f) it.update(1f / 60f, 2f)
-        }
+        // The same still scene as the 2D preview: the hook hangs at the same place in both
+        // renderers, so the Fish menu's tap areas (FishMenuHitAreas) fit either.
+        val session = com.deepline.fishing.ui.boatPreviewSession()
         val builder = SceneBuilder()
         FrameSource { w, h, t -> builder.build(session, 0.8f + t, w, h, current[0], cameraTop = cameraTop) }
     }

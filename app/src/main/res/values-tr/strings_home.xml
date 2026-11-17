@@ -11,6 +11,8 @@
     <string name="home_caption_season">Sezon</string>
     <string name="home_caption_migration">Göç</string>
     <string name="home_boat_action">Tekneni özelleştir</string>
+    <string name="home_line_action">Misinanı özelleştir</string>
+    <string name="home_hook_action">İğneni özelleştir</string>
 
     <!-- The rope card. -->
     <string name="home_rope_title">Halatın</string>

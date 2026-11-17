@@ -331,7 +331,23 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /** Opens the Dex on [section] (falls back to Species if that section isn't unlocked yet). */
+    /** The slot the Skins section shows (null: every slot). */
+    var skinsFilter by mutableStateOf<com.deepline.fishing.core.CosmeticSlot?>(null)
+        private set
+
+    /** Opens the Skins section on one slot's skins (the Fish menu's boat, line and hook lead here). */
+    fun openSkins(slot: com.deepline.fishing.core.CosmeticSlot?) {
+        openDex(DexSection.SKINS)
+        skinsFilter = slot
+    }
+
+    fun filterSkins(slot: com.deepline.fishing.core.CosmeticSlot?) {
+        skinsFilter = slot
+    }
+
     fun openDex(section: DexSection = dexSection) {
+        // Every other way into the Skins section shows all of it.
+        skinsFilter = null
         dexSection = if (section in availableDexSections) section else DexSection.FISH
         screen = Screen.DEX
     }

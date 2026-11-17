@@ -13,6 +13,7 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
@@ -130,11 +131,15 @@ class BoatCustomisationUiTest : BoatUiTestBase() {
         val stripeCost = (BoatParts.requirement(stripe) as PartRequirement.Points).cost
         val vm = launch(PlayerProgress(pointsBalance = 5_000, pointsEarned = 5_000))
 
-        // The boat at the top of the Fish tab opens the Dex's Skins section.
+        // The boat at the top of the Fish tab opens the Dex's Skins section, on the boat's skins.
         compose.clickDescription("Customise your boat")
         assertEquals(Screen.DEX, vm.screen)
+        assertEquals(com.deepline.fishing.core.CosmeticSlot.BOAT, vm.skinsFilter)
         compose.onNodeWithText("Your boat").assertExists()
         compose.shot("54_skins_section")
+        // Everything else is one chip away.
+        compose.onNodeWithTag("skins_filter_all").performClick()
+        assertEquals(null, vm.skinsFilter)
         // The locked atmosphere: a padlock, and how to unlock it behind its (i).
         compose.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Atmosphere"))
         compose.clickDescription("More about: Atmosphere")

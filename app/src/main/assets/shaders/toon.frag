@@ -171,23 +171,10 @@ Surface fishSurface() {
     return s;
 }
 
-// ---- Hook and bait -------------------------------------------------------------------------
+// ---- Hook ------------------------------------------------------------------------------
 
 Surface hookSurface() {
     float mode = uFlags.w; // 0 classic steel, 1 bone, 2 prism, 3 gold, 4 coral, 5 neon, 6 obsidian
-    if (isPart(vPart, 11.0) || isPart(vPart, 12.0)) {
-        // A juicy worm: darker along its back, ringed, with a pale band (the clitellum) and a
-        // wet highlight.
-        vec3 n = normalize(vNormal);
-        vec3 pink = mix(vec3(0.72, 0.30, 0.34), vec3(0.96, 0.55, 0.52), smoothstep(-0.6, 0.8, n.z));
-        pink *= 0.86 + 0.14 * smoothstep(0.2, 0.5, abs(fract(vUv.x * (isPart(vPart, 11.0) ? 18.0 : 14.0)) - 0.5));
-        if (isPart(vPart, 11.0)) pink = mix(pink, vec3(1.0, 0.74, 0.66), smoothstep(0.02, 0.0, abs(vUv.x - 0.28) - 0.07));
-        Surface s = surface(pink);
-        s.spec = 0.8;
-        s.rim = 0.6;
-        s.rimColor = vec3(1.0, 0.85, 0.85);
-        return s;
-    }
     if (isPart(vPart, 13.0)) {
         Surface s;
         if (mode > 0.5 && mode < 1.5) {

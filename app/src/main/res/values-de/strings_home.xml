@@ -12,6 +12,8 @@
     <string name="home_caption_season">Saison</string>
     <string name="home_caption_migration">Wanderung</string>
     <string name="home_boat_action">Dein Boot gestalten</string>
+    <string name="home_line_action">Deine Schnur gestalten</string>
+    <string name="home_hook_action">Deinen Haken gestalten</string>
 
     <!-- Die Seil-Karte. -->
     <string name="home_rope_title">Dein Seil</string>
