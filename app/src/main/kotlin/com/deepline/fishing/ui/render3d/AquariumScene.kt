@@ -23,9 +23,12 @@ class AquariumScene {
      */
     class Camera {
         @Volatile var zoom = 1f
-        /** The view's centre, in metres from the middle of the tank's back wall. */
+        /**
+         * The view's centre, in metres from the middle of the tank's back wall; it starts down at
+         * the sand (clamped to the lowest view), where the decor and most fish are.
+         */
         @Volatile var panX = 0f
-        @Volatile var panY = 0f
+        @Volatile var panY = -HEIGHT
         /** Metres of back wall per screen pixel at the last frame: how far a finger moves the view. */
         @Volatile var metersPerPx = 0f
 
@@ -42,7 +45,7 @@ class AquariumScene {
         fun reset() {
             zoom = 1f
             panX = 0f
-            panY = 0f
+            panY = -HEIGHT
         }
 
         companion object {
@@ -71,7 +74,10 @@ class AquariumScene {
         val seenHalfH = toBack * halfTan
         val seenHalfW = seenHalfH * aspect
         val panX = (camera?.panX ?: 0f).coerceIn(-max(0f, tw / 2f - seenHalfW), max(0f, tw / 2f - seenHalfW))
-        val panY = (camera?.panY ?: 0f).coerceIn(-max(0f, HEIGHT / 2f - seenHalfH), max(0f, HEIGHT / 2f - seenHalfH))
+        // A little lower than the back wall's foot too: the sand in front of the decor is nearer the
+        // lens and shows below it.
+        val roomY = max(0f, HEIGHT / 2f - seenHalfH)
+        val panY = (camera?.panY ?: 0f).coerceIn(-roomY - FLOOR_ROOM, roomY)
         if (camera != null) {
             camera.panX = panX
             camera.panY = panY
@@ -155,6 +161,8 @@ class AquariumScene {
     companion object {
         const val HEIGHT = 4.5f
         const val DEPTH = 3f
+        /** How much lower than the back wall's foot the full-screen view can look (m). */
+        private const val FLOOR_ROOM = 0.6f
 
         /** The tank's own meshes: `aquarium:tank`, `aquarium:tank:big` and one per piece of decor. */
         fun mesh(key: String): MeshData = AquariumModels.mesh(key)

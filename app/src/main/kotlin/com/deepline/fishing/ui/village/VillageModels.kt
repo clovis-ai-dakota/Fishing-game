@@ -1291,7 +1291,6 @@ object VillageModels {
         val rope = VillageLayout.spots.getValue(Building.ROPE).center
         // Across the square, from the market's front corner to the workshop's.
         b.flagString(Vec3(shop.x + 5.2f, fShop + 4.2f, shop.z + 3.4f), Vec3(rope.x - 6.1f, fRope + 3.7f, rope.z + 3.2f), 1.1f)
-        b.flagString(Vec3(shop.x + 5.2f, fShop + 4.2f, shop.z + 3.4f), Vec3(VillageLayout.square.x + 1f, fShop + 3.4f, VillageLayout.square.z + 5.5f), 0.6f)
         // Along the pier, on three tall poles.
         val a = VillageLayout.pierFrom
         val e = VillageLayout.pierTo

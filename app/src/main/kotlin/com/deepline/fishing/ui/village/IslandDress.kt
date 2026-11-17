@@ -47,7 +47,7 @@ data class IslandDress(
          * flag, trim). Then the shop gear's colours (flag, trim).
          */
         private val LEGENDS = mapOf(
-            Secrets.DAVID_AND_GOLIATH to ("leviathan" to Triple(0xFF2F6F7EL, 0xFF59E3F2L, 0xFFEDE6D2L)),
+            Secrets.DAVID_AND_GOLIATH to ("leviathan" to Triple(0xFF2F6F7EL, 0xFF59E3F2L, 0xFF1FA2B8L)),
             Secrets.PERFECT_CAST to ("prism" to Triple(0xFF7E6CF2L, 0xFFFF6FB5L, 0xFF63E0C6L)),
             Secrets.MASTER_ANGLER to ("crown" to Triple(0xFF6A3FA0L, 0xFFF2C14EL, 0xFFF2C14EL)),
         )
