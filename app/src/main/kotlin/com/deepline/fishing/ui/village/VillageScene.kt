@@ -21,13 +21,15 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 /**
- * Builds the village's 3D frames (on the preview's render thread): the ground, the town, your
- * boat at the pier wearing your skins, the fish of your aquarium behind its glass, the sea and a
- * few gulls. Lit by the sun by day and the moon at night ([MenuPalette.night]), with the lamps
+ * Builds the village's 3D frames (on the preview's render thread): the island and its six
+ * places, your boat at the pier wearing your skins, the fish of your aquarium behind its glass,
+ * the sea and a few gulls. Lit by the sun by day and the moon at night ([MenuPalette.night]), with the lamps
  * and windows lit. One instance per view (it keeps the boat's scene builder).
  */
 class VillageScene {
     private val boats = SceneBuilder()
+    private val aquariumFloor = VillageModels.floorOf(Building.AQUARIUM) + 1.3f
+    private val lighthouseLamp = VillageModels.lighthouseLamp
 
     /** What the scene shows besides the village itself (read on the render thread). */
     class Looks(val palette: MenuPalette, val skins: Skins, val tankFish: List<FishSpecies>)
@@ -48,10 +50,11 @@ class VillageScene {
             "uTime" to floatArrayOf(t),
             "uResolution" to floatArrayOf(w, h),
             "uCamPos" to floatArrayOf(eye.x, eye.y, eye.z),
-            // The sun high on the left (the moon by night), so fronts facing the sea are lit.
-            "uLightDir" to if (night) floatArrayOf(0.35f, 1f, 0.6f) else floatArrayOf(-0.55f, 1f, 0.6f),
-            "uLightColor" to if (night) floatArrayOf(0.42f, 0.5f, 0.72f) else floatArrayOf(1.04f, 1f, 0.92f),
-            "uAmbient" to if (night) floatArrayOf(0.3f, 0.36f, 0.6f) else floatArrayOf(0.7f, 0.78f, 0.9f),
+            // The sun high in the west (the moon by night, from the same side: the shadows are
+            // baked for that direction, see VillageModels.SUN). Warm light, cool sky.
+            "uLightDir" to floatArrayOf(VillageModels.SUN.x, VillageModels.SUN.y, VillageModels.SUN.z),
+            "uLightColor" to if (night) floatArrayOf(0.46f, 0.54f, 0.78f) else floatArrayOf(1.06f, 1f, 0.9f),
+            "uAmbient" to if (night) floatArrayOf(0.32f, 0.38f, 0.62f) else floatArrayOf(0.72f, 0.8f, 0.95f),
             // Far hills fade into the sky's haze.
             "uFogColor" to sky,
             "uFogNear" to floatArrayOf(camera.distance * 1.5f),
@@ -61,23 +64,26 @@ class VillageScene {
         )
         val items = ArrayList<DrawItem>()
         val painted = mapOf("uModel" to Mat4.identity(), "uNormalMatrix" to Mat4.normalMatrix(Mat4.identity()), "uMaterial" to floatArrayOf(5f), "uGlow" to floatArrayOf(glow))
-        // The big occluders first (the town, the boat, then the sea), the ground last: the depth
-        // test then skips what's hidden (the ground under the buildings, the sea bed) before it's shaded.
+        // The big occluders first (the town, the boat, the island, then the sea): the depth test
+        // then skips what's hidden (the ground under the buildings, the water under the island).
         items += DrawItem(Program.TOON, "village:town", uniforms = painted, cullBack = false)
         // Your boat moored along the pier, bow out to sea, in your skins.
         items += boats.boatItems(looks.skins.boat, VillageLayout.boatAt, t, looks.skins.customBoat, rotY = PI.toFloat() / 2f)
         // The aquarium's fish swimming circles under the dome.
         val c = VillageLayout.spots.getValue(Building.AQUARIUM).center
+        val tankFloor = aquariumFloor
         for ((i, s) in looks.tankFish.take(5).withIndex()) {
             val speed = 0.35f + 0.08f * i
             val a = t * speed + i * 1.3f
             val r = 1.6f + 0.55f * i
-            val at = Vec3(c.x + cos(a) * r, 2.4f + 0.45f * i + 0.2f * sin(t * 0.7f + i), c.z + sin(a) * r)
+            val at = Vec3(c.x + cos(a) * r, tankFloor + 1.9f + 0.4f * i + 0.2f * sin(t * 0.7f + i), c.z + sin(a) * r)
             // Facing along the circle.
             val yaw = atan2(cos(a), sin(a))
             items += SceneBuilder.fishItem(s, at, yaw, 0f, t * 5f + i, 1f, false, i.toFloat(), len = 0.9f)
         }
-        // The sea, then the glass (see-through, after what's behind it).
+        // The island before the sea (the water under it is then never shaded; its sea bed was
+        // left out of the mesh), then the glass (see-through, after what's behind it).
+        items += DrawItem(Program.TOON, "village:terrain", uniforms = painted)
         // A real turquoise over the sand and blue further out, nudged towards the theme's sea.
         val deep = rgb(lerp(Color(0xFF1677A8), p.sea.last(), if (night) 0.6f else 0.25f))
         val shallow = rgb(lerp(Color(0xFF34C3CF), p.sea.first(), if (night) 0.5f else 0.15f))
@@ -88,12 +94,21 @@ class VillageScene {
                 "uBase" to deep, "uAccent" to shallow, "uExtra" to sky, "uGlow" to floatArrayOf(glow),
             ),
         )
-        items += DrawItem(Program.TOON, "village:terrain", uniforms = painted)
         items += DrawItem(
             Program.TOON, "village:glass",
             uniforms = painted + mapOf("uOpacity" to floatArrayOf(if (night) 0.55f else 0.34f)),
             blend = Blend.ALPHA, depthWrite = false,
         )
+        // At night the lighthouse's beam sweeps over the water.
+        if (night) {
+            val lamp = lighthouseLamp
+            val model = Mat4.multiply(Mat4.translation(lamp.x, lamp.y, lamp.z), Mat4.rotationY(t * 0.7f))
+            items += DrawItem(
+                Program.TOON, "village:beam",
+                uniforms = mapOf("uModel" to model, "uNormalMatrix" to Mat4.normalMatrix(model), "uMaterial" to floatArrayOf(5f), "uGlow" to floatArrayOf(1f), "uOpacity" to floatArrayOf(0.14f)),
+                blend = Blend.ALPHA, depthWrite = false, cullBack = false,
+            )
+        }
         items += gulls(t, night)
         return Frame(widthPx, heightPx, globals, items, clearColor = sky)
     }

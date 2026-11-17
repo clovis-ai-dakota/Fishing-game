@@ -37,20 +37,28 @@ class VillageSceneTest {
     }
 
     @Test
-    fun theSeaCoversTheBeachesEdgeAndTheGroundRisesInland() {
-        // The ground dips under the sea a little way past the shore, and the buildings stand on dry land.
-        for (x in listOf(-20f, 0f, 20f)) {
-            assertTrue(VillageModels.height(x, VillageModels.shoreZ(x) + 6f) < 0f)
-            assertTrue(VillageModels.height(x, VillageModels.shoreZ(x) - 3f) > 0f)
+    fun theVillageIsAnIslandWithItsPlacesOnLandOrOverTheWater() {
+        // All round the island: dry a few metres inland, under water a few metres out.
+        for (k in 0 until 36) {
+            val a = k / 36f * 2f * Math.PI.toFloat()
+            val r = VillageLayout.islandRadius(a)
+            fun at(d: Float) = VillageModels.height(VillageLayout.ISLAND_X + kotlin.math.cos(a) * d, VillageLayout.ISLAND_Z + kotlin.math.sin(a) * d)
+            assertTrue("inland at angle $a", at(r - 3f) > 0f)
+            assertTrue("out at sea at angle $a", at(r + 6f) < 0f)
         }
+        // Sea everywhere around it.
+        for ((x, z) in listOf(-45f to -18f, 45f to -18f, 0f to -60f, 0f to 40f)) assertTrue(VillageModels.height(x, z) < 0f)
+        // The lighthouse, the halls and the pavilion stand on land.
         for (b in listOf(Building.DEX, Building.SHOP, Building.ROPE, Building.AQUARIUM)) {
             val c = VillageLayout.spots.getValue(b).center
             assertTrue("$b stands in the sea", VillageModels.height(c.x, c.z) > 0f)
         }
-        // The pier and the duelling platform reach out over the water.
+        // The pier and the duelling platform reach out over the water; their feet are on the beach.
         assertTrue(VillageModels.height(VillageLayout.pierTo.x, VillageLayout.pierTo.z) < 0f)
         val duel = VillageLayout.spots.getValue(Building.DUEL).center
         assertTrue(VillageModels.height(duel.x, duel.z) < 0f)
+        assertTrue(VillageLayout.shoreDistance(VillageLayout.pierFrom.x, VillageLayout.pierFrom.z) > 0f)
+        assertTrue(VillageLayout.shoreDistance(VillageLayout.jettyFrom.x, VillageLayout.jettyFrom.z) > 0f)
     }
 
     @Test

@@ -5,19 +5,23 @@ import com.deepline.fishing.ui.render3d.Mat4
 import com.deepline.fishing.ui.render3d.Vec3
 import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sin
+import kotlin.math.sqrt
 import kotlin.math.tan
 
 /**
- * Where everything stands in the village, in metres: x to the east, z towards the viewer (the sea
- * is to the south, at the bottom of the screen), y up, the sea's surface at y = 0. One source for
- * the 3D scene, the 2D map (the fallback, and what the UI tests see) and the tests.
+ * Where everything stands in the village, in metres: x to the east, z towards the viewer (south,
+ * the bottom of the screen), y up, the sea's surface at y = 0. One source for the 3D scene, the 2D
+ * map (the fallback, and what the UI tests see) and the tests.
  *
- * Laid out for a phone held upright: the buildings climb from the shore to the hill rather than
- * spreading along the coast, so the six of them fit across the screen's width.
+ * The village is a small island with only the six places that open a menu: the lighthouse (Dex)
+ * on its rocks to the north, the market hall (Shop) and the rope workshop (Rope) either side of
+ * the square, the glass pavilion (Aquarium) by the south-west beach, and out on the water the pier
+ * with your boat (Fish) and the duelling platform (Battle). Laid out for a phone held upright.
  */
 object VillageLayout {
     /** A building's place: its footprint's centre, its half sizes, and where its name plate floats. */
@@ -30,37 +34,58 @@ object VillageLayout {
             }
     }
 
-    /** Where the land meets the beach (z), and the beach meets the sea. */
-    const val SHORE_Z = 4f
-    const val BEACH_Z = 7.5f
+    /** The island: its middle and its half sizes east-west and north-south (before the shore's wobble). */
+    const val ISLAND_X = 0f
+    const val ISLAND_Z = -18f
+    const val ISLAND_RX = 25f
+    const val ISLAND_RZ = 24f
 
-    /** How far the camera may wander: the village's own grounds. */
+    /** How far the camera may wander: the island and the water around it. */
     const val MIN_X = -18f
     const val MAX_X = 18f
     const val MIN_Z = -38f
     const val MAX_Z = 24f
 
+    /** The shore's distance from the island's middle in the direction [angle] (radians, atan2(dz, dx)). */
+    fun islandRadius(angle: Float): Float {
+        val c = cos(angle)
+        val s = sin(angle)
+        val ellipse = 1f / sqrt(c * c / (ISLAND_RX * ISLAND_RX) + s * s / (ISLAND_RZ * ISLAND_RZ))
+        // A few gentle coves and points, so the coast isn't a perfect oval.
+        return ellipse * (1f + 0.05f * sin(3f * angle + 0.6f) + 0.035f * sin(5f * angle + 1.9f) + 0.02f * sin(9f * angle))
+    }
+
+    /** How far inland ([x], [z]) is from the shore, in metres: negative out at sea. */
+    fun shoreDistance(x: Float, z: Float): Float {
+        val dx = x - ISLAND_X
+        val dz = z - ISLAND_Z
+        return islandRadius(atan2(dz, dx)) - sqrt(dx * dx + dz * dz)
+    }
+
     val spots: Map<Building, Spot> = mapOf(
-        // The species hall on the hill, the tallest roof in the village.
-        Building.DEX to Spot(Vec3(0f, 6.5f, -32f), Vec3(7f, 6.5f, 5f), Vec3(0f, 15.5f, -32f)),
-        // The market hall and the rope workshop, either side of the high street.
-        Building.SHOP to Spot(Vec3(-12f, 4f, -15f), Vec3(5.5f, 4f, 4f), Vec3(-12f, 10f, -15f)),
-        Building.ROPE to Spot(Vec3(12f, 3.5f, -15f), Vec3(6.5f, 3.5f, 4f), Vec3(12f, 9f, -15f)),
-        // The glass pavilion by the beach.
-        Building.AQUARIUM to Spot(Vec3(-11f, 4f, -1f), Vec3(5.5f, 4f, 5.5f), Vec3(-11f, 10f, -1f)),
+        // The lighthouse on its rocks at the island's northern point: the tallest thing in sight.
+        Building.DEX to Spot(Vec3(-3f, 9f, -35f), Vec3(4f, 9f, 4f), Vec3(-3f, 21f, -35f)),
+        // The market hall and the rope workshop, either side of the square.
+        Building.SHOP to Spot(Vec3(-11f, 4f, -18f), Vec3(5.5f, 4f, 4f), Vec3(-11f, 10.5f, -18f)),
+        Building.ROPE to Spot(Vec3(11f, 3.5f, -17f), Vec3(6.5f, 3.5f, 4f), Vec3(11f, 9.5f, -17f)),
+        // The glass pavilion by the south-west beach.
+        Building.AQUARIUM to Spot(Vec3(-10f, 4f, -4.5f), Vec3(5.5f, 4f, 5.5f), Vec3(-10f, 10.5f, -4.5f)),
         // The pier and your boat moored at its end.
         Building.FISHING to Spot(Vec3(7f, 2.5f, 15f), Vec3(4.5f, 3.5f, 10f), Vec3(9f, 8.5f, 20f)),
         // The round duelling platform out on the water.
         Building.DUEL to Spot(Vec3(-8f, 2.5f, 19f), Vec3(7f, 3f, 7f), Vec3(-8f, 9.5f, 19f)),
     )
 
+    /** The square in the middle of the island, where the paths meet. */
+    val square = Vec3(0f, 0f, -14f)
+
     /** The pier, from the beach out to sea (x, z of its two ends), and where the boat lies. */
-    val pierFrom = Vec3(6f, 0.9f, SHORE_Z)
+    val pierFrom = Vec3(6f, 0.9f, 2.5f)
     val pierTo = Vec3(6f, 0.9f, 24f)
     val boatAt = Vec3(9.2f, 0f, 20f)
 
     /** The duelling platform's jetty from the beach. */
-    val jettyFrom = Vec3(-8.5f, 0.9f, SHORE_Z)
+    val jettyFrom = Vec3(-8.5f, 0.9f, 2.5f)
     val jettyTo = Vec3(-8.5f, 0.9f, 12.5f)
 }
 

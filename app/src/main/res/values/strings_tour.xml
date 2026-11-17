@@ -27,7 +27,7 @@
 
     <string name="tour_village_title">Your village</string>
     <!-- Fish, Dex, Shop, Battle, Rope and Aquarium are the buildings' names (shell_tab_*, shell_shop_page_rope, shell_shop_page_aquarium). -->
-    <string name="tour_village_body">The village is your home port. Each building opens a menu: Fish (the pier, where you cast), Dex (every species you meet), Shop (tackle and looks), Battle (1v1 matches), Rope (its upgrades) and Aquarium (your catches on show). Drag to move around, pinch to zoom.</string>
+    <string name="tour_village_body">The village is your home port, on its own island. Each building opens a menu: Fish (the pier, where you cast), Dex (the lighthouse: every species you meet), Shop (tackle and looks), Battle (1v1 matches), Rope (its upgrades) and Aquarium (your catches on show). Drag to move around, pinch to zoom.</string>
     <!-- The redesigned menus (shown to returning players in "What's new"). -->
     <string name="tour_look_title">A new look</string>
     <!-- The colours are those of the buttons; "(i)" is the round information button, keep it as is. -->

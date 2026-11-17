@@ -17,7 +17,7 @@
     <string name="tour_welcome_body">Derinlerdeki her balığı yakala. Bu kısa tanıtım, nasıl oynanacağını ve her şeyin ne işe yaradığını gösterir. İleri düğmesine dokun ya da yolunu zaten biliyorsan Tanıtımı geç düğmesine bas.</string>
 
     <string name="tour_village_title">Köyün</string>
-    <string name="tour_village_body">Köy senin limanın. Her bina bir menü açar: Balık (olta attığın iskele), Dex (karşılaştığın her tür), Mağaza (ekipman ve görünümler), Düello (1v1 maçlar), Halat (geliştirmeleri) ve Akvaryum (sergilenen avların). Gezinmek için kaydır, yakınlaştırmak için iki parmakla sıkıştır.</string>
+    <string name="tour_village_body">Köy, kendi adasındaki limanın. Her bina bir menü açar: Balık (olta attığın iskele), Dex (deniz feneri: karşılaştığın her tür), Mağaza (ekipman ve görünümler), Düello (1v1 maçlar), Halat (geliştirmeleri) ve Akvaryum (sergilenen avların). Gezinmek için kaydır, yakınlaştırmak için iki parmakla sıkıştır.</string>
     <string name="tour_look_title">Yeni bir görünüm</string>
     <string name="tour_look_body">Menüler artık daha az söyleyip daha çok gösteriyor. Renk, bir düğmenin ne yaptığını söyler: kehribar ana eylem, yeşil almaya hazır ücretsiz ödül, madeni para puan fiyatı, mor ise euro fiyatıdır. Ayrıntılar (i) düğmelerinde.</string>
 

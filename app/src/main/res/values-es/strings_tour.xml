@@ -20,7 +20,7 @@
     <string name="tour_welcome_body">Pesca todos los peces de las profundidades. Esta breve guía te enseña cómo se juega y para qué sirve cada cosa. Toca Siguiente, o Saltar guía si ya te manejas bien.</string>
 
     <string name="tour_village_title">Tu pueblo</string>
-    <string name="tour_village_body">El pueblo es tu puerto base. Cada edificio abre un menú: Pescar (el muelle, desde donde lanzas), Dex (todas las especies que encuentras), Tienda (aparejos y aspectos), Duelo (partidas 1 contra 1), Cuerda (sus mejoras) y Acuario (tus capturas a la vista). Arrastra para moverte y pellizca para hacer zoom.</string>
+    <string name="tour_village_body">El pueblo es tu puerto base, en su propia isla. Cada edificio abre un menú: Pescar (el muelle, desde donde lanzas), Dex (el faro: todas las especies que encuentras), Tienda (aparejos y aspectos), Duelo (partidas 1 contra 1), Cuerda (sus mejoras) y Acuario (tus capturas a la vista). Arrastra para moverte y pellizca para hacer zoom.</string>
     <string name="tour_look_title">Un nuevo aspecto</string>
     <string name="tour_look_body">Los menús dicen menos y muestran más. El color indica qué hace un botón: ámbar para la acción principal, verde para una recompensa gratis lista para reclamar, la moneda para un precio en puntos y violeta para un precio en euros. Los botones (i) guardan los detalles.</string>
 

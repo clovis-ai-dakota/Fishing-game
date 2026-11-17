@@ -504,9 +504,12 @@ Surface paintedSurface() {
     return s;
 }
 
-// The sea: deep water (uBase) far out, shallow water (uAccent) over the sand, the sky (uExtra)
-// mirrored at grazing angles, moving wave bands and foam where it meets the beach. vColor.r is
-// the depth (0 at the shore, 1 deep), vColor.g the foam.
+// The sea, in the stylised way of mobile island games: flat bands of colour by depth (uAccent
+// over the sand, uBase out deep), thin foam lines that run out from the beach and fade, a collar
+// of foam around whatever stands in the water, the sky (uExtra) mirrored at grazing angles and
+// stepped sun glints on the swell. Everything comes from the vertex colours (see
+// VillageModels.sea): r the depth (0..1), g the closeness to the shore, b the closeness to things
+// in the water, a the sunlight (the decks' shadows). No texture, two noise lookups.
 bool gSea = false;
 vec3 gSeaNormal = vec3(0.0, 1.0, 0.0);
 
@@ -515,29 +518,41 @@ Surface seaSurface() {
     vec2 q = vWorld.xz;
     float w1 = sin(q.x * 0.35 + q.y * 0.22 + uTime * 0.9);
     float w2 = sin(q.x * -0.21 + q.y * 0.41 - uTime * 1.2);
-    float w3 = 0.5 + 0.25 * sin(q.x * 0.13 + uTime * 0.4) + 0.25 * sin(q.y * 0.17 - uTime * 0.3);
-    gSeaNormal = normalize(vec3(0.10 * (w1 + 0.6 * w2) + 0.08 * (w3 - 0.5), 1.0, 0.10 * (w2 - 0.4 * w1)));
+    gSeaNormal = normalize(vec3(0.07 * (w1 + 0.6 * w2), 1.0, 0.07 * (w2 - 0.4 * w1)));
     float depth = vColor.r;
-    vec3 water = mix(uAccent, uBase, smoothstep(0.0, 1.0, depth));
-    // Bands of light on the swell, and caustic sparkle in the shallows.
-    // (Softer at night: under the moon, bright specks read as noise.)
-    float sparkle = 1.0 - 0.75 * uGlow;
-    float bands = smoothstep(0.82, 0.98, sin(q.y * 0.55 + w1 * 1.4 + uTime * 0.6));
-    water += vec3(0.9, 0.97, 1.0) * bands * 0.08 * (1.0 - 0.5 * depth) * sparkle;
-    float c = noise2(q * 1.4 + uTime * 0.35) * (0.6 + 0.4 * sin(q.x * 1.9 - uTime * 0.8 + q.y));
-    water += vec3(0.9, 1.0, 1.0) * smoothstep(0.42, 0.56, c) * 0.12 * (1.0 - depth) * sparkle;
-    // Foam where the waves meet the sand, coming and going.
-    float lap = 0.5 + 0.5 * sin(uTime * 1.3 + q.x * 0.25 + w3 * 3.0);
-    float foam = smoothstep(0.35, 0.75, vColor.g * (0.75 + 0.35 * lap) + 0.25 * fract(sin(dot(floor(q * 2.5), vec2(12.9, 78.2))) * 43758.5));
-    water = mix(water, vec3(0.97, 0.99, 1.0), foam * 0.85);
+    // Three bands with soft steps: shallow turquoise, a middle blue, the deep.
+    float wob = 0.05 * sin(q.x * 0.5 + uTime * 0.5) * sin(q.y * 0.45 - uTime * 0.4);
+    float d = depth + wob;
+    vec3 mid = mix(uAccent, uBase, 0.55);
+    vec3 water = mix(uAccent, mid, smoothstep(0.18, 0.26, d));
+    water = mix(water, uBase, smoothstep(0.55, 0.65, d));
+    // A few soft light patches on the shallows (caustics), gently moving.
+    float n = noise2(q * 0.9 + vec2(uTime * 0.18, -uTime * 0.12));
+    float c = n;
+    float sparkle = 1.0 - 0.7 * uGlow;
+    water += vec3(0.85, 1.0, 1.0) * smoothstep(0.62, 0.78, c) * 0.07 * (1.0 - depth) * sparkle;
+    // Foam: right at the beach, then two thin lines running out to sea and fading.
+    float shore = vColor.g;
+    float edge = 1.0 - shore;
+    float foam = smoothstep(0.92, 0.96, shore + 0.04 * n + 0.025 * sin(uTime * 1.4 + q.x * 0.4));
+    for (int k = 0; k < 2; k++) {
+        float life = fract(uTime * 0.11 + float(k) * 0.5);
+        float at = life * 0.5;
+        float line = 1.0 - smoothstep(0.0, 0.014 + 0.008 * n, abs(edge - at - 0.03 * (n - 0.5)));
+        foam = max(foam, line * (1.0 - life) * smoothstep(0.0, 0.08, life) * 0.85);
+    }
+    // Collars of foam around the pilings, the arena, the boat and the rocks.
+    float collar = vColor.b;
+    foam = max(foam, smoothstep(0.68, 0.8, collar + 0.14 * (n - 0.5) + 0.05 * sin(uTime * 2.0 + q.x + q.y)) * 0.9);
+    water = mix(water, vec3(0.97, 0.99, 1.0), foam * (1.0 - 0.45 * uGlow));
     // The sky in the water at a grazing angle.
     vec3 v = normalize(uCamPos - vWorld);
     float fres = pow(1.0 - max(dot(gSeaNormal, v), 0.0), 3.0);
-    water = mix(water, uExtra, clamp(fres * 0.6, 0.0, 0.5));
+    water = mix(water, uExtra, clamp(fres * 0.6, 0.0, 0.45));
     Surface s = surface(water);
-    s.spec = 1.0;
+    s.spec = 0.8 * (1.0 - foam);
     s.rim = 0.0;
-    s.shadowCool = 0.0;
+    s.shadowCool = 0.6;
     return s;
 }
 
@@ -559,6 +574,8 @@ void main() {
 
     // Cel shading: three flat tones with soft edges, cool-tinted shadows.
     float ndl = dot(n, l);
+    // The village bakes its cast shadows into the vertex colours' alpha (1 in the sun).
+    if (uMaterial > 4.5) ndl = min(ndl, mix(-0.25, 1.0, vColor.a));
     float t1 = smoothstep(-0.10, -0.02, ndl);
     float t2 = smoothstep(0.42, 0.50, ndl);
     vec3 shadowCol = s.albedo * mix(vec3(1.0), vec3(0.60, 0.66, 0.92), s.shadowCool) * 0.62;
@@ -607,7 +624,20 @@ void main() {
         else col = vec3(0.03, 0.008, 0.012) + vec3(0.25, 0.02, 0.03) * smoothstep(0.6, 0.8, fres);
     }
 
+    // The village's grade: a touch more colour, warm lights and cool shadows.
+    if (uMaterial > 4.5) {
+        float lum = dot(col, vec3(0.2126, 0.7152, 0.0722));
+        col = mix(vec3(lum), col, 1.12);
+        col *= mix(vec3(0.95, 0.98, 1.05), vec3(1.04, 1.0, 0.95), smoothstep(0.2, 0.7, lum));
+    }
+
     float fog = fogAmount(length(uCamPos - vWorld));
     col = mix(col, uFogColor, fog);
+    // The village's vignette: frames the island and keeps the HUD readable at the edges.
+    if (uMaterial > 4.5) {
+        vec2 sc = gl_FragCoord.xy / uResolution - 0.5;
+        sc.y *= uResolution.y / uResolution.x * 0.55;
+        col = mix(col, vec3(0.02, 0.13, 0.18), 0.3 * smoothstep(0.32, 0.72, length(sc)));
+    }
     fragColor = vec4(col, s.alpha * uOpacity);
 }

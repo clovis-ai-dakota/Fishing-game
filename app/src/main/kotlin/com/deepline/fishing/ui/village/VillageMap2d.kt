@@ -17,8 +17,8 @@ import kotlin.math.sin
 
 /**
  * The village as a flat drawing through the same camera as the 3D view: the fallback where 3D
- * isn't available, and what the UI tests see. Ground and sea, the high street, then each
- * building as a painted box (roof, front and side), far ones first.
+ * isn't available, and what the UI tests see. The sea, the island and its paths, then each
+ * place (the lighthouse, halls as painted boxes, the pier and the arena), far ones first.
  */
 fun DrawScope.drawVillageMap(camera: VillageCamera, p: MenuPalette, t: Float) {
     val w = size.width
@@ -40,8 +40,8 @@ fun DrawScope.drawVillageMap(camera: VillageCamera, p: MenuPalette, t: Float) {
     val sea = p.sea
     drawRect(Brush.verticalGradient(listOf(sea.last(), sea[1], sea.first())))
     // Gentle swell lines on the water.
-    for (k in 0 until 14) {
-        val z = VillageLayout.BEACH_Z + 4f + k * 5f
+    for (k in 0 until 24) {
+        val z = -70f + k * 5f
         val path = Path()
         var started = false
         var x = -70f
@@ -52,38 +52,40 @@ fun DrawScope.drawVillageMap(camera: VillageCamera, p: MenuPalette, t: Float) {
         }
         drawPath(path, Color.White.copy(alpha = if (night) 0.07f else 0.16f), style = Stroke(width = 1.5f))
     }
-    // The land: a beach along a gently curving shore, grass behind it, a darker hill at the back.
-    fun shore(x: Float, extra: Float) = VillageLayout.SHORE_Z + extra + 1.6f * sin(x / 9f) + 0.8f * sin(x / 3.7f)
-    val xs = (-80..80 step 4).map { it.toFloat() }
-    val sand = if (night) Color(0xFF8C7B5E) else Color(0xFFEAD7A4)
-    val grass = if (night) Color(0xFF2E4A3A) else Color(0xFF7FBF6A)
-    val hill = if (night) Color(0xFF233A2E) else Color(0xFF5E9E55)
-    poly(xs.map { Vec3(it, 0f, shore(it, 3.5f)) } + listOf(Vec3(80f, 0f, -120f), Vec3(-80f, 0f, -120f)))?.let { drawPath(it, sand) }
-    poly(xs.map { Vec3(it, 0.3f, shore(it, 0f)) } + listOf(Vec3(80f, 0.3f, -120f), Vec3(-80f, 0.3f, -120f)))?.let { drawPath(it, grass) }
-    poly((-80..80 step 4).map { Vec3(it.toFloat(), 2f, -42f + 4f * sin(it / 11f)) } + listOf(Vec3(80f, 2f, -120f), Vec3(-80f, 2f, -120f)))?.let { drawPath(it, hill) }
-    // Foam where the waves meet the sand.
-    run {
-        val path = Path()
-        var started = false
-        for (x in xs) {
-            val s = at(x, 0f, shore(x, 3.5f) + 0.4f * sin(t * 1.4f + x)) ?: continue
-            if (!started) { path.moveTo(s.x, s.y); started = true } else path.lineTo(s.x, s.y)
-        }
-        drawPath(path, Color.White.copy(alpha = if (night) 0.35f else 0.8f), style = Stroke(width = 3f, cap = StrokeCap.Round))
+    // The island: shallows, a beach all round, the grass, and the lighthouse's rocks.
+    fun ring(inset: Float, y: Float, wobble: Float = 0f): List<Vec3> = (0 until 72).map { k ->
+        val a = k / 72f * 2f * PI.toFloat()
+        val r = VillageLayout.islandRadius(a) - inset + wobble * sin(t * 1.4f + k)
+        Vec3(VillageLayout.ISLAND_X + cos(a) * r, y, VillageLayout.ISLAND_Z + sin(a) * r)
     }
-    // The high street: from the pier up to the hall, with a branch to each side.
-    val road = if (night) Color(0xFF6E6352) else Color(0xFFD8C49A)
+    val shallows = if (night) Color(0xFF1F5E73) else Color(0xFF5ED3D8)
+    val sand = if (night) Color(0xFF8C7B5E) else Color(0xFFF1DEAD)
+    val grass = if (night) Color(0xFF2E4A3A) else Color(0xFF86C862)
+    poly(ring(-6f, 0f))?.let { drawPath(it, shallows.copy(alpha = 0.8f)) }
+    poly(ring(-0.4f, 0f, 0.3f))?.let { drawPath(it, Color.White.copy(alpha = if (night) 0.35f else 0.85f)) }
+    poly(ring(0f, 0.2f))?.let { drawPath(it, sand) }
+    poly(ring(3.5f, 0.6f))?.let { drawPath(it, grass) }
+    val dex = VillageLayout.spots.getValue(Building.DEX).center
+    poly((0 until 16).map { k -> val a = k / 16f * 2f * PI.toFloat(); Vec3(dex.x + cos(a) * 6f, 1.5f, dex.z + sin(a) * 6f) })
+        ?.let { drawPath(it, if (night) Color(0xFF4F4A44) else Color(0xFFA9A196)) }
+    // The paths from the square to each place.
+    val road = if (night) Color(0xFF6E6352) else Color(0xFFE6D3A8)
     fun street(a: Vec3, b: Vec3, width: Float) {
         val dx = b.x - a.x
         val dz = b.z - a.z
         val len = kotlin.math.sqrt(dx * dx + dz * dz).coerceAtLeast(0.01f)
         val nx = -dz / len * width / 2f
         val nz = dx / len * width / 2f
-        poly(listOf(Vec3(a.x + nx, 0.35f, a.z + nz), Vec3(b.x + nx, 0.35f, b.z + nz), Vec3(b.x - nx, 0.35f, b.z - nz), Vec3(a.x - nx, 0.35f, a.z - nz)))?.let { drawPath(it, road) }
+        poly(listOf(Vec3(a.x + nx, 0.8f, a.z + nz), Vec3(b.x + nx, 0.8f, b.z + nz), Vec3(b.x - nx, 0.8f, b.z - nz), Vec3(a.x - nx, 0.8f, a.z - nz)))?.let { drawPath(it, road) }
     }
-    street(Vec3(6f, 0f, VillageLayout.SHORE_Z + 1f), Vec3(0f, 0f, -26f), 4f)
-    street(Vec3(-12f, 0f, -10f), Vec3(12f, 0f, -10f), 3.5f)
-    street(Vec3(-11f, 0f, 4f), Vec3(-2f, 0f, -6f), 3f)
+    val sq = VillageLayout.square
+    poly((0 until 24).map { k -> val a = k / 24f * 2f * PI.toFloat(); Vec3(sq.x + cos(a) * 4.2f, 0.8f, sq.z + sin(a) * 4.2f) })?.let { drawPath(it, road) }
+    street(sq, Vec3(dex.x, 0f, dex.z + 3.2f), 2.2f)
+    street(sq, Vec3(-11f, 0f, -13.6f), 2.4f)
+    street(sq, Vec3(11f, 0f, -12.6f), 2.4f)
+    street(sq, Vec3(-6.2f, 0f, -1.4f), 2.2f)
+    street(sq, Vec3(VillageLayout.pierFrom.x, 0f, VillageLayout.pierFrom.z + 0.5f), 2.6f)
+    street(Vec3(-4f, 0f, -6.5f), Vec3(VillageLayout.jettyFrom.x, 0f, VillageLayout.jettyFrom.z + 0.5f), 2f)
 
     // The pier and the duelling platform's jetty, out over the water.
     val wood = if (night) Color(0xFF5D4632) else Color(0xFFA77B4F)
@@ -101,19 +103,18 @@ fun DrawScope.drawVillageMap(camera: VillageCamera, p: MenuPalette, t: Float) {
         when (b) {
             Building.FISHING -> drawBoat2d(::at, night, t)
             Building.DUEL -> drawArena2d(::at, night, t)
+            Building.DEX -> drawLighthouse2d(::at, night, t)
             else -> drawHouse2d(b, ::at, night)
         }
     }
 }
 
 private val roofs = mapOf(
-    Building.DEX to Color(0xFF2F6E8E),
     Building.SHOP to Color(0xFFD9573B),
     Building.ROPE to Color(0xFF8A5A3B),
     Building.AQUARIUM to Color(0xFFBFE9F2),
 )
 private val walls = mapOf(
-    Building.DEX to Color(0xFFF1E6CF),
     Building.SHOP to Color(0xFFF6EBD3),
     Building.ROPE to Color(0xFFCFB28A),
     Building.AQUARIUM to Color(0xFF9ED8E6),
@@ -170,12 +171,6 @@ private fun DrawScope.drawHouse2d(b: Building, at: (Float, Float, Float) -> Offs
     quad(Triple(c.x - hx - o, wallTop, c.z - hz - o), Triple(c.x + hx + o, wallTop, c.z - hz - o), Triple(c.x + hx + o, ridge, c.z), Triple(c.x - hx - o, ridge, c.z))?.let { drawPath(it, lerp(roof, Color.Black, 0.25f)) }
     // What makes each one recognisable.
     when (b) {
-        Building.DEX -> at(c.x, ridge + 1.5f, c.z + 0.5f)?.let { f ->
-            // The big fish sign over the hall.
-            val r = (at(c.x + 3f, ridge + 1.5f, c.z)?.x ?: (f.x + 30f)) - f.x
-            drawOval(Color(0xFFFFB74D), topLeft = Offset(f.x - r, f.y - r * 0.4f), size = androidx.compose.ui.geometry.Size(2f * r, 0.8f * r))
-            drawCircle(Color(0xFF263238), radius = r * 0.12f, center = Offset(f.x + r * 0.55f, f.y - r * 0.05f))
-        }
         Building.SHOP -> {
             // A striped awning over the stalls.
             for (k in 0 until 6) {
@@ -240,4 +235,32 @@ private fun DrawScope.drawArena2d(at: (Float, Float, Float) -> Offset?, night: B
         val low = at(x, 5.6f, c.z) ?: continue
         drawPath(Path().apply { moveTo(top.x, top.y); lineTo(tip.x, tip.y + wave); lineTo(low.x, low.y); close() }, flag)
     }
+}
+
+/** The lighthouse (the Dex): a tapering tower in red and white bands, the gallery, the lantern and its dome. */
+private fun DrawScope.drawLighthouse2d(at: (Float, Float, Float) -> Offset?, night: Boolean, t: Float) {
+    val c = VillageLayout.spots.getValue(Building.DEX).center
+    val base = 3.6f
+    val top = base + 12f
+    fun r(y: Float) = 2.15f - 0.6f * (y - base) / 12f
+    val bands = 5
+    for (k in 0 until bands) {
+        val lo = base + k * 12f / bands
+        val hi = lo + 12f / bands
+        val a = at(c.x - r(lo), lo, c.z) ?: return
+        val b = at(c.x + r(lo), lo, c.z) ?: return
+        val e = at(c.x + r(hi), hi, c.z) ?: return
+        val d = at(c.x - r(hi), hi, c.z) ?: return
+        val col = if (k % 2 == 0) Color(0xFFFFF9EE) else Color(0xFFD8473A)
+        drawPath(Path().apply { moveTo(a.x, a.y); lineTo(b.x, b.y); lineTo(e.x, e.y); lineTo(d.x, d.y); close() }, lerp(col, Color(0xFF1B2733), if (night) 0.4f else 0f))
+    }
+    val gl = at(c.x - 2.75f, top, c.z) ?: return
+    val gr = at(c.x + 2.75f, top, c.z) ?: return
+    drawLine(Color(0xFF2F3E46), gl, gr, strokeWidth = 6f)
+    val lamp = at(c.x, top + 1.6f, c.z) ?: return
+    val lr = (gr.x - gl.x) * 0.22f
+    drawCircle(if (night) Color(0xFFFFE9A0) else Color(0xFFFFF1B0), radius = lr, center = lamp)
+    if (night) drawCircle(Color(0xFFFFE9A0).copy(alpha = 0.25f + 0.1f * sin(t * 2f)), radius = lr * 2.6f, center = lamp)
+    val dome = at(c.x, top + 3.6f, c.z) ?: return
+    drawPath(Path().apply { moveTo(lamp.x - lr * 1.3f, lamp.y - lr); quadraticTo(lamp.x, dome.y - lr, lamp.x + lr * 1.3f, lamp.y - lr); close() }, Color(0xFFD8473A))
 }

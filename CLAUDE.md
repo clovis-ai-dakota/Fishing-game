@@ -85,9 +85,9 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     Transitions stay within NN/g's durations (`ScreenMotion`: 100 ms feedback, 200 to 300 ms a
     screen change, 400 ms at most).
     At most one live GL view per screen.
-- **Navigation**: home is the village (`Screen.VILLAGE`, `ui/village/`): a 3D cove (drag, pinch)
+- **Navigation**: home is the village (`Screen.VILLAGE`, `ui/village/`): a 3D island (drag, pinch)
   whose buildings (`Building`) open the menus: the pier = Fish menu (`Screen.HOME`, where you
-  cast), the species hall = Dex, the market hall = Shop, the duelling platform = Battle setup, the
+  cast), the lighthouse = Dex, the market hall = Shop, the duelling platform = Battle setup, the
   rope workshop = `Screen.ROPE`, the glass pavilion = Aquarium. Each building has a name plate
   (pictogram + menu name, tagged `village_<building>`); the HUD around the map (points,
   milestones, themes, settings, daily, migration, season) replaced the Fish tab's. There is no tab
@@ -136,6 +136,12 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     `GLASS` and `BULB` that light up with `uGlow` at night, fluttering `CLOTH`) and the village's
     sea its own (`uMaterial` 6). Still parts are merged into a few big meshes (a triangle budget
     is tested in `VillageSceneTest`); the 2D map and the 2D tank stay the fallbacks.
+  - The village is an island with only the six places that open a menu (research:
+    `docs/research/village-visuals.md`): no decor building. Its light is baked once into the
+    vertex colours, as mobile games do: cast shadows from `VillageModels.SUN` (soft, several
+    rays) in the alpha (the painted and sea materials read it), ambient occlusion in the colour.
+    Edges are bevelled (`bevelBox`). A new occluder (anything tall) goes in `occluders`, and
+    anything standing in the water in `waterObjectDistance` (its foam collar).
 - **Colours** come from `ui/ColorScript.kt`, shared by the 3D renderer, the 2D fallback and the
   Dex: the water, light and specks by depth (bright and warm in the shallows, then cooler, darker
   and less saturated, near-black with sparse red/cyan glows in the abyss), and `FishLooks` for

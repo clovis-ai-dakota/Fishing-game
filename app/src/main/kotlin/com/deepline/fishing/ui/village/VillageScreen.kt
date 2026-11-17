@@ -191,8 +191,10 @@ private fun VillageMap(
                 modifier = Modifier.fillMaxSize(),
                 key = "village",
                 onPainted = onPainted,
-                // Sharp enough with 4x MSAA, and a third fewer pixels to shade than 720.
-                maxRenderWidth = 600,
+                // Sharp enough with 4x MSAA (the plates and HUD are drawn at full size over it),
+                // and 40% fewer pixels to shade than 720: the island's baked light and water
+                // cost their share.
+                maxRenderWidth = 560,
                 pace = pace,
             )
         }

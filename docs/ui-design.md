@@ -65,11 +65,12 @@ The phone's own navigation bar always stands on deep water too: the Fish menu's 
 it, and every other screen (`SubScreen`) paints that strip, so the scene's seabed never shows
 under the system buttons.
 
-**The village is home** (`ui/village/`): a 3D cove whose buildings are the menus. Each building
-must say what it opens at a glance: a name plate floats over it (the menu's pictogram and name,
-the red dot when something waits there), and its shape says it too (the pier with your boat, the
-hall with a golden fish, the market's striped awning, the rope workshop's giant spool, the glass
-pavilion, the duelling platform with two pennants). The plate and the building are both tap
+**The village is home** (`ui/village/`): a 3D island whose buildings are the menus, and nothing
+else stands on it (trees, rocks and paths only: a building that opens nothing is noise). Each
+building must say what it opens at a glance: a name plate floats over it (the menu's pictogram
+and name, the red dot when something waits there), and its shape says it too (the pier with your
+boat, the lighthouse with its golden fish for the Dex, the market's striped awning, the rope
+workshop's giant spool, the glass pavilion, the duelling platform with two pennants). The plate and the building are both tap
 targets; the HUD keeps clear of the plates (`VillageCamera.fit` frames the six inside it). A new
 menu that deserves a building gets one in `VillageLayout` and `VillageModels`, and a plate.
 
@@ -79,7 +80,7 @@ The menus are places along one coast (`Place` in `ui/theme/World.kt`), in the ta
 
 | Place | Menus | What shows it |
 | --- | --- | --- |
-| `SEA` | The Fish menu and what opens from the village's HUD (Daily, Milestones, Themes, Settings) | The boat's scene (the village draws its own 3D cove). |
+| `SEA` | The Fish menu and what opens from the village's HUD (Daily, Milestones, Themes, Settings) | The boat's scene (the village draws its own 3D island). |
 | `DEEP` | Dex, a species' page, the aquarium | The camera sinks: the waterline leaves by the top, the water darkens. |
 | `PORT` | Shop | A quay, a market stall, moored masts, warm morning light. |
 | `ARENA` | Battle setup, battles, the online lobby | The setting sun and two rival boats. |

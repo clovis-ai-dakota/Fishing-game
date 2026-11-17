@@ -165,6 +165,21 @@ class MeshBuilder {
         }
     }
 
+    /**
+     * Lets [f] change the colour (r, g, b, a, in place) of vertices [from] until the end, knowing
+     * each one's position, normal and part: lighting baked into the colours (the village's
+     * shadows and ambient occlusion are computed once, not every frame).
+     */
+    fun bakeColors(from: Int = 0, f: (p: Vec3, n: Vec3, part: Float, rgba: FloatArray) -> Unit) {
+        hasColors = true
+        val c = FloatArray(4)
+        for (i in from until vCount) {
+            for (k in 0..3) c[k] = col[i * 4 + k]
+            f(p(i), Vec3(nor[i * 3], nor[i * 3 + 1], nor[i * 3 + 2]), part[i], c)
+            for (k in 0..3) col[i * 4 + k] = c[k]
+        }
+    }
+
     /** Replaces the normals of vertices [from] until the end by smooth normals from the faces. */
     fun smoothNormals(from: Int = 0, triangleFrom: Int = 0) {
         val n = FloatArray((vertexCount - from) * 3)

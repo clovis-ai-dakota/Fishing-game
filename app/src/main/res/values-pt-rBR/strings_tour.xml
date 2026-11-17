@@ -18,7 +18,7 @@
     <string name="tour_welcome_body">Pesque todos os peixes das profundezas. Este tour rápido mostra como jogar e para que serve cada coisa. Toque em Próximo, ou em Pular tour se você já conhece o caminho.</string>
 
     <string name="tour_village_title">Sua vila</string>
-    <string name="tour_village_body">A vila é o seu porto. Cada construção abre um menu: Pescar (o píer, de onde você lança), Dex (todas as espécies que você encontra), Loja (apetrechos e visuais), Duelo (partidas 1v1), Corda (suas melhorias) e Aquário (suas capturas em exposição). Arraste para se mover e faça pinça para dar zoom.</string>
+    <string name="tour_village_body">A vila é o seu porto, na sua própria ilha. Cada construção abre um menu: Pescar (o píer, de onde você lança), Dex (o farol: todas as espécies que você encontra), Loja (apetrechos e visuais), Duelo (partidas 1v1), Corda (suas melhorias) e Aquário (suas capturas em exposição). Arraste para se mover e faça pinça para dar zoom.</string>
     <string name="tour_look_title">Um novo visual</string>
     <string name="tour_look_body">Os menus dizem menos e mostram mais. A cor indica o que um botão faz: âmbar para a ação principal, verde para uma recompensa grátis pronta para resgatar, a moeda para um preço em pontos e violeta para um preço em euros. Os botões (i) guardam os detalhes.</string>
 

@@ -10,7 +10,9 @@ import com.deepline.fishing.ui.render3d.Vec3
 import com.deepline.fishing.ui.render3d.hash01
 import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.math.atan2
 import kotlin.math.cos
+import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sin
@@ -18,9 +20,14 @@ import kotlin.math.sqrt
 
 /**
  * The village's meshes, built in code like the rest of the game's models and painted per vertex
- * (the painted material): the ground, the sea, the buildings and everything around them. The
- * still parts are merged into a few big meshes so a frame is a handful of draws. Keys:
- * `village:terrain`, `village:sea`, `village:town`, `village:glass` (see [mesh]).
+ * (the painted material): the island, the sea around it and the six places that open a menu.
+ *
+ * The look follows what stylised mobile games do on a phone's budget: the light is baked into the
+ * vertex colours once (cast shadows from the sun in the alpha channel, ambient occlusion and a
+ * gentle darkening towards the ground in the colour), edges are bevelled so they catch the light,
+ * shapes are few, chunky and readable, and the still parts are merged into a few big meshes so a
+ * frame is a handful of draws. Keys: `village:terrain`, `village:sea`, `village:town`,
+ * `village:glass` and `village:beam` (see [mesh]).
  */
 object VillageModels {
     private val cache = HashMap<String, MeshData>()
@@ -33,29 +40,64 @@ object VillageModels {
                 "village:sea" -> sea()
                 "village:town" -> town()
                 "village:glass" -> glass()
+                "village:beam" -> beam()
                 else -> error("Unknown village mesh $key")
             }
         }
     }
 
-    // ---- Ground and sea --------------------------------------------------------------------------
+    /**
+     * Towards the sun: high, from the west and a little from the front, so the fronts facing the
+     * player are lit and the shadows fall to the east, where they show. The moon shines from the
+     * same side, so the baked shadows hold at night.
+     */
+    val SUN: Vec3 = Vec3(-0.65f, 0.9f, 0.22f).normalized()
 
-    /** Where the shore is at [x]: the same wavy line as the 2D map. */
-    fun shoreZ(x: Float) = VillageLayout.SHORE_Z + 1.6f * sin(x / 9f) + 0.8f * sin(x / 3.7f)
+    // ---- The island -------------------------------------------------------------------------------
 
-    /** The ground's height (m) at [x], [z]: the beach dipping under the sea, the village's gentle slope, the hill and the headlands. */
+    private val lighthouseAt get() = VillageLayout.spots.getValue(Building.DEX).center
+
+    /**
+     * The ground's height (m) at [x], [z]: a gentle green island with a sandy beach all round,
+     * shelving into the sea, and a rocky knoll under the lighthouse.
+     */
     fun height(x: Float, z: Float): Float {
-        val d = shoreZ(x) - z // inland distance
-        val base = when {
-            d < -3.5f -> -0.6f - 0.25f * (-d - 3.5f)
-            d < 0f -> 0.5f + (d / 3.5f) * 1.1f
-            else -> 0.5f + 0.025f * d
+        val s = VillageLayout.shoreDistance(x, z)
+        val ground = when {
+            s < 0f -> max(0.2f + s * 0.55f, -7f)
+            s < 4f -> 0.2f + s * 0.18f
+            else -> 0.92f + 1.5f * smooth(4f, 20f, s) + 0.7f * (noise(x * 0.09f, z * 0.09f) - 0.5f) * smooth(6f, 12f, s) * (1f - plotMask(x, z))
         }
-        val hill = 12f * smooth(36f, 90f, d) * (0.8f + 0.2f * sin(x / 13f)) + 10f * smooth(90f, 180f, d)
-        // Gentle headlands either side of the cove (no walls: a long, soft rise).
-        val headland = 5f * smooth(26f, 70f, abs(x)) * smooth(-20f, 10f, d)
-        val bumps = 0.5f * (noise(x * 0.11f, z * 0.11f) - 0.5f) * smooth(2f, 8f, d)
-        return max(base + hill + headland + bumps, -6f)
+        val l = lighthouseAt
+        val dl = sqrt((x - l.x) * (x - l.x) + (z - l.z) * (z - l.z))
+        return ground + 2.6f * (1f - smooth(3.5f, 10f, dl))
+    }
+
+    /** 1 on and right around a building's plot on land, 0 elsewhere (the ground is levelled there). */
+    private fun plotMask(x: Float, z: Float): Float {
+        var m = 0f
+        for (b in listOf(Building.SHOP, Building.ROPE, Building.AQUARIUM)) {
+            val s = VillageLayout.spots.getValue(b)
+            m = max(m, 1f - smooth(0f, 3f, outside(x, z, s)))
+        }
+        return m
+    }
+
+    /** How far ([x], [z]) is outside [s]'s footprint (0 inside). */
+    private fun outside(x: Float, z: Float, s: VillageLayout.Spot): Float {
+        val dx = max(abs(x - s.center.x) - s.half.x, 0f)
+        val dz = max(abs(z - s.center.z) - s.half.z, 0f)
+        return sqrt(dx * dx + dz * dz)
+    }
+
+    /** The floor of a building on land: its stone plinth's top, just above the highest ground under it. */
+    fun floorOf(b: Building): Float {
+        val s = VillageLayout.spots.getValue(b)
+        var top = -10f
+        for (sx in listOf(-1f, 0f, 1f)) for (sz in listOf(-1f, 0f, 1f)) {
+            top = max(top, height(s.center.x + sx * s.half.x * 0.8f, s.center.z + sz * s.half.z * 0.8f))
+        }
+        return top + 0.3f
     }
 
     private fun smooth(a: Float, b: Float, x: Float): Float {
@@ -64,8 +106,8 @@ object VillageModels {
     }
 
     private fun noise(x: Float, z: Float): Float {
-        val ix = kotlin.math.floor(x).toInt()
-        val iz = kotlin.math.floor(z).toInt()
+        val ix = floor(x).toInt()
+        val iz = floor(z).toInt()
         val fx = x - ix
         val fz = z - iz
         fun h(a: Int, b: Int) = hash01(a, b, 97)
@@ -73,14 +115,6 @@ object VillageModels {
         val uz = fz * fz * (3f - 2f * fz)
         return (h(ix, iz) * (1 - ux) + h(ix + 1, iz) * ux) * (1 - uz) + (h(ix, iz + 1) * (1 - ux) + h(ix + 1, iz + 1) * ux) * uz
     }
-
-    /** The streets, as (from, to, width), shared with the ground's colour. */
-    private val streets = listOf(
-        Triple(Vec3(6f, 0f, 3f), Vec3(0f, 0f, -27f), 4f),
-        Triple(Vec3(-12f, 0f, -9.5f), Vec3(12f, 0f, -9.5f), 3.2f),
-        Triple(Vec3(-11f, 0f, 4f), Vec3(-1.5f, 0f, -6f), 2.6f),
-        Triple(Vec3(-8.5f, 0f, 3f), Vec3(-8.5f, 0f, -2f), 2.2f),
-    )
 
     private fun distanceToSegment(x: Float, z: Float, a: Vec3, b: Vec3): Float {
         val dx = b.x - a.x
@@ -91,72 +125,305 @@ object VillageModels {
         return sqrt(px * px + pz * pz)
     }
 
-    /** How shaded the ground is at [x], [z] by the buildings standing next to it (fake contact shadow). */
-    private fun groundShade(x: Float, z: Float): Float {
-        var s = 0f
-        for (spot in VillageLayout.spots.values) {
-            val dx = max(abs(x - spot.center.x) - spot.half.x, 0f)
-            val dz = max(abs(z - spot.center.z) - spot.half.z, 0f)
-            val d = sqrt(dx * dx + dz * dz)
-            s = max(s, 1f - smooth(0f, 2.2f, d))
-        }
-        for (h in houses) {
-            val dx = max(abs(x - h.x) - h.w / 2f, 0f)
-            val dz = max(abs(z - h.z) - h.d / 2f, 0f)
-            s = max(s, 1f - smooth(0f, 1.6f, sqrt(dx * dx + dz * dz)))
-        }
-        return s
+    /** The paths, from the square to each place's door (from, to, width). */
+    private val paths: List<Triple<Vec3, Vec3, Float>> by lazy {
+        val sq = VillageLayout.square
+        listOf(
+            Triple(sq, Vec3(lighthouseAt.x, 0f, lighthouseAt.z + 3.2f), 2.2f),
+            Triple(sq, Vec3(-11f, 0f, -13.6f), 2.4f),
+            Triple(sq, Vec3(11f, 0f, -12.6f), 2.4f),
+            Triple(sq, Vec3(-6.2f, 0f, -1.4f), 2.2f),
+            Triple(sq, Vec3(VillageLayout.pierFrom.x, 0f, VillageLayout.pierFrom.z + 0.5f), 2.6f),
+            Triple(Vec3(-4f, 0f, -6.5f), Vec3(VillageLayout.jettyFrom.x, 0f, VillageLayout.jettyFrom.z + 0.5f), 2f),
+        )
     }
+
+    private fun pathDistance(x: Float, z: Float): Float {
+        val sq = VillageLayout.square
+        val plaza = sqrt((x - sq.x) * (x - sq.x) + (z - sq.z) * (z - sq.z)) - 4.2f
+        return min(plaza, paths.minOf { (a, e, w) -> distanceToSegment(x, z, a, e) - w / 2f })
+    }
+
+    // ---- Baked light -----------------------------------------------------------------------------
+
+    /** Simple shapes standing in for what casts a shadow (tested against a ray towards the sun). */
+    private sealed interface Occluder {
+        fun hit(o: Vec3, d: Vec3): Boolean
+        /** How far ([x], [z]) is from its foot on the ground (for contact shadows), or a large number. */
+        fun footDistance(x: Float, z: Float): Float = 99f
+    }
+
+    private class BoxOcc(val min: Vec3, val max: Vec3) : Occluder {
+        override fun hit(o: Vec3, d: Vec3): Boolean {
+            var t0 = 0.02f
+            var t1 = 1e6f
+            for (k in 0..2) {
+                val oo = when (k) { 0 -> o.x; 1 -> o.y; else -> o.z }
+                val dd = when (k) { 0 -> d.x; 1 -> d.y; else -> d.z }
+                val lo = when (k) { 0 -> min.x; 1 -> min.y; else -> min.z }
+                val hi = when (k) { 0 -> max.x; 1 -> max.y; else -> max.z }
+                if (abs(dd) < 1e-6f) {
+                    if (oo < lo || oo > hi) return false
+                } else {
+                    var a = (lo - oo) / dd
+                    var b = (hi - oo) / dd
+                    if (a > b) { val s = a; a = b; b = s }
+                    t0 = max(t0, a)
+                    t1 = min(t1, b)
+                    if (t0 > t1) return false
+                }
+            }
+            return true
+        }
+
+        override fun footDistance(x: Float, z: Float): Float {
+            if (min.y > 1.5f) return 99f
+            val dx = max(max(min.x - x, x - max.x), 0f)
+            val dz = max(max(min.z - z, z - max.z), 0f)
+            return sqrt(dx * dx + dz * dz)
+        }
+    }
+
+    private class CylOcc(val x: Float, val z: Float, val r: Float, val y0: Float, val y1: Float) : Occluder {
+        override fun hit(o: Vec3, d: Vec3): Boolean {
+            val ox = o.x - x
+            val oz = o.z - z
+            val a = d.x * d.x + d.z * d.z
+            val b = 2f * (ox * d.x + oz * d.z)
+            val c = ox * ox + oz * oz - r * r
+            if (c <= 0f) return o.y <= y1 && o.y >= y0 - 0.01f
+            val disc = b * b - 4f * a * c
+            if (disc < 0f || a < 1e-8f) return false
+            val t = (-b - sqrt(disc)) / (2f * a)
+            if (t < 0.02f) return false
+            val y = o.y + d.y * t
+            return y in y0..y1
+        }
+
+        override fun footDistance(x: Float, z: Float): Float {
+            if (y0 > 1.5f) return 99f
+            return max(sqrt((x - this.x) * (x - this.x) + (z - this.z) * (z - this.z)) - r, 0f)
+        }
+    }
+
+    private class SphereOcc(val c: Vec3, val r: Float) : Occluder {
+        override fun hit(o: Vec3, d: Vec3): Boolean {
+            val oc = o - c
+            val b = oc dot d
+            val cc = (oc dot oc) - r * r
+            if (cc <= 0f) return true
+            val disc = b * b - cc
+            return disc >= 0f && -b - sqrt(disc) > 0.02f
+        }
+    }
+
+    /** What casts shadows on the ground and the water: the buildings, the decks, the trees. */
+    private val occluders: List<Occluder> by lazy {
+        val out = ArrayList<Occluder>()
+        val l = lighthouseAt
+        val lg = height(l.x, l.z)
+        out += CylOcc(l.x, l.z, 3f, lg - 1f, lg + 1f)
+        out += CylOcc(l.x, l.z, 2.1f, lg, lg + 12f)
+        out += CylOcc(l.x, l.z, 2.7f, lg + 12f, lg + 12.4f)
+        out += CylOcc(l.x, l.z, 1.4f, lg + 12.4f, lg + 15.8f)
+        // The halls: their walls, then their pitched roofs as two narrowing steps.
+        for ((b, walls) in listOf(Building.SHOP to 4.6f, Building.ROPE to 4f)) {
+            val s = VillageLayout.spots.getValue(b)
+            val f = floorOf(b)
+            val x0 = s.center.x - s.half.x
+            val x1 = s.center.x + s.half.x
+            val z0 = s.center.z - s.half.z
+            val z1 = s.center.z + s.half.z - 0.3f
+            val ridge = if (b == Building.SHOP) 2.7f else 2.4f
+            out += BoxOcc(Vec3(x0, f - 1.5f, z0), Vec3(x1, f + walls + ridge * 0.35f, z1))
+            val inset = (z1 - z0) * 0.3f
+            out += BoxOcc(Vec3(x0, f + walls, z0 + inset), Vec3(x1, f + walls + ridge * 0.75f, z1 - inset))
+            out += BoxOcc(Vec3(x0, f + walls, s.center.z - 0.5f), Vec3(x1, f + walls + ridge, s.center.z + 0.5f))
+        }
+        val aq = VillageLayout.spots.getValue(Building.AQUARIUM).center
+        val af = floorOf(Building.AQUARIUM)
+        out += CylOcc(aq.x, aq.z, AQ_R + 0.4f, af - 1.5f, af + 1.3f)
+        out += SphereOcc(Vec3(aq.x, af + 1.3f, aq.z), AQ_R)
+        val p0 = VillageLayout.pierFrom
+        val p1 = VillageLayout.pierTo
+        out += BoxOcc(Vec3(p0.x - 1.75f, 0.55f, p0.z), Vec3(p0.x + 1.75f, 0.95f, p1.z))
+        val j0 = VillageLayout.jettyFrom
+        val j1 = VillageLayout.jettyTo
+        out += BoxOcc(Vec3(j0.x - 1.25f, 0.55f, j0.z), Vec3(j0.x + 1.25f, 0.95f, j1.z))
+        val duel = VillageLayout.spots.getValue(Building.DUEL).center
+        out += CylOcc(duel.x, duel.z, ARENA_R, -0.3f, 0.95f)
+        // The boat at the pier (its usual size: the skins keep the same hull).
+        val boat = VillageLayout.boatAt
+        out += BoxOcc(Vec3(boat.x - 1.1f, 0f, boat.z - 2.6f), Vec3(boat.x + 1.1f, 2.2f, boat.z + 2.6f))
+        for (t in trees) {
+            out += SphereOcc(Vec3(t.at.x, t.at.y + t.crownY, t.at.z), t.crownR)
+            out += CylOcc(t.at.x, t.at.z, 0.25f * t.scale, t.at.y - 0.5f, t.at.y + t.crownY)
+        }
+        out
+    }
+
+    /**
+     * Rays towards the sun's disc: the middle and four around it, so a shadow's edge goes soft
+     * the further it falls from what casts it (a penumbra), as in the stylised games' baked light.
+     */
+    private val sunRays: List<Vec3> by lazy {
+        val side = (SUN cross Vec3.UP).normalized()
+        val up = (side cross SUN).normalized()
+        val spread = 0.06f
+        listOf(SUN) + listOf(side, -side, up, -up).map { (SUN + it * spread).normalized() }
+    }
+
+    /** How much of the sun ([p]) sees: 1 in the light, 0 deep in a cast shadow. */
+    private fun sunlight(p: Vec3): Float {
+        val o = p + Vec3(0f, 0.05f, 0f)
+        var lit = 0
+        for (d in sunRays) if (occluders.none { it.hit(o, d) }) lit++
+        return lit / sunRays.size.toFloat()
+    }
+
+    /** Softens a grid of values (row-major, [w] wide) with a 3x3 average: no stair steps between vertices. */
+    private fun blur(v: FloatArray, w: Int): FloatArray {
+        val h = v.size / w
+        val out = FloatArray(v.size)
+        for (j in 0 until h) for (i in 0 until w) {
+            var sum = 0f
+            var n = 0
+            for (dj in -1..1) for (di in -1..1) {
+                val ii = i + di
+                val jj = j + dj
+                if (ii !in 0 until w || jj !in 0 until h) continue
+                sum += v[jj * w + ii]
+                n++
+            }
+            out[j * w + i] = sum / n
+        }
+        return out
+    }
+
+    /** Darkening of the ground at the foot of what stands on it (0 none, 1 right against it). */
+    private fun contactShade(x: Float, z: Float): Float {
+        var d = 99f
+        for (o in occluders) d = min(d, o.footDistance(x, z))
+        return 1f - smooth(0f, 1.8f, d)
+    }
+
+    // ---- Ground and sea --------------------------------------------------------------------------
 
     private fun terrain(): MeshData {
         val b = MeshBuilder()
-        val xs = (-60..60).map { it * 2f }
-        // Fine where the village is, coarser up the hill to the horizon.
-        val zs = (-14..-1).map { -120f + it * 10f } + (-60..17).map { it * 2f }
+        val step = 0.5f
+        val xs = (0..132).map { -33f + it * step }
+        val zs = (0..120).map { -50f + it * step }
         val stride = xs.size
-        val sand = rgb(0xFFE8D3A0)
-        val wetSand = rgb(0xFFC9B07A)
-        val grass = rgb(0xFF86C46C)
-        val grassDark = rgb(0xFF5E9E55)
-        val rock = rgb(0xFF8E9AA0)
-        val path = rgb(0xFFD9C08F)
-        for (z in zs) for (x in xs) {
+        val sand = rgb(0xFFF3E1AF)
+        val wetSand = rgb(0xFFD8BD85)
+        val grass = rgb(0xFF8ACB62)
+        val grassDeep = rgb(0xFF62AE55)
+        val grassSun = rgb(0xFFB0D86A)
+        val rock = rgb(0xFFA9A196)
+        val rockDark = rgb(0xFF8A847C)
+        val path = rgb(0xFFE6D3A8)
+        val cobble = rgb(0xFFD2BE94)
+        val flowers = listOf(rgb(0xFFFF8FA3), rgb(0xFFFFE066), rgb(0xFFFFFFFF), rgb(0xFFB39DDB))
+        val l = lighthouseAt
+        val land = BooleanArray(xs.size * zs.size)
+        val light = FloatArray(xs.size * zs.size)
+        for ((j, z) in zs.withIndex()) for ((i, x) in xs.withIndex()) {
+            light[j * stride + i] = if (VillageLayout.shoreDistance(x, z) > -2f) sunlight(Vec3(x, height(x, z), z)) else 1f
+        }
+        val sun = blur(light, stride)
+        for ((j, z) in zs.withIndex()) for ((i, x) in xs.withIndex()) {
+            val s = VillageLayout.shoreDistance(x, z)
+            land[j * stride + i] = s > -1.5f
             val y = height(x, z)
-            val d = shoreZ(x) - z
-            val slope = abs(height(x + 1f, z) - height(x - 1f, z)) + abs(height(x, z + 1f) - height(x, z - 1f))
             var c = when {
-                d < -1.4f -> wetSand
-                d < 2.5f -> mix(wetSand, sand, smooth(-1.4f, 0.5f, d))
-                else -> mix(sand, mix(grass, grassDark, noise(x * 0.07f, z * 0.07f) * 0.8f + smooth(20f, 60f, d) * 0.4f), smooth(2.5f, 5f, d))
+                s < 0.9f -> wetSand
+                s < 3.2f -> mix(wetSand, sand, smooth(0.9f, 1.8f, s))
+                else -> {
+                    val g = mix(grass, grassDeep, noise(x * 0.12f, z * 0.12f) * 0.9f)
+                    mix(sand, mix(g, grassSun, smooth(1.4f, 2.6f, y) * 0.45f), smooth(3.2f, 4.6f, s))
+                }
             }
-            // Rocky cliffs where the ground is steep, and on the headlands.
-            c = mix(c, rock, smooth(1.6f, 3.2f, slope) * 0.9f)
-            // The streets, worn into the grass.
-            val street = streets.minOf { (a, e, w) -> distanceToSegment(x, z, a, e) - w / 2f }
-            if (d > 1f) c = mix(c, path, 1f - smooth(-0.3f, 0.7f, street))
-            val shade = groundShade(x, z)
-            c = floatArrayOf(c[0] * (1f - 0.35f * shade), c[1] * (1f - 0.35f * shade), c[2] * (1f - 0.3f * shade), 1f)
+            // The lighthouse's knoll: bare rock.
+            val dl = sqrt((x - l.x) * (x - l.x) + (z - l.z) * (z - l.z))
+            val rocky = 1f - smooth(5f, 8.5f, dl)
+            c = mix(c, mix(rock, rockDark, noise(x * 0.6f, z * 0.6f)), rocky * 0.9f)
+            // Paths and the paved square, with a cobble pattern.
+            val pd = pathDistance(x, z)
+            if (s > 1.2f && pd < 0.6f) {
+                // Lighter in the middle where it's worn, a darker edge of stones.
+                val paved = mix(path, cobble, smooth(-0.9f, 0.1f, pd))
+                c = mix(c, paved, 1f - smooth(-0.1f, 0.5f, pd))
+            }
+            // A few wildflowers in the grass.
+            if (s > 6f && pd > 1.2f && rocky < 0.1f) {
+                val f = hash01(i, j, 59)
+                if (f > 0.985f) c = flowers[(f * 1000f).toInt() % flowers.size]
+            }
+            // Contact shadow at the foot of the buildings, decks and trees.
+            val ao = 1f - 0.32f * contactShade(x, z)
+            c = floatArrayOf(c[0] * ao, c[1] * ao, c[2] * ao, sun[j * stride + i])
             b.vertex(Vec3(x, y, z), Vec3.UP, x / 40f, z / 40f, Part.PAINTED, c)
         }
         for (j in 0 until zs.size - 1) for (i in 0 until stride - 1) {
             val a = j * stride + i
+            // Only the island and its edge: the sea bed is hidden under the water.
+            if (!land[a] && !land[a + 1] && !land[a + stride] && !land[a + stride + 1]) continue
             b.quad(a, a + stride, a + stride + 1, a + 1)
         }
         b.smoothNormals()
         return b.build()
     }
 
+    /** How far ([x], [z]) is from something standing in the water (pilings, the arena, the boat, rocks). */
+    private fun waterObjectDistance(x: Float, z: Float): Float {
+        var d = 99f
+        val p0 = VillageLayout.pierFrom
+        val p1 = VillageLayout.pierTo
+        for (side in listOf(-1.55f, 1.55f)) d = min(d, distanceToSegment(x, z, Vec3(p0.x + side, 0f, p0.z), Vec3(p1.x + side, 0f, p1.z)) - 0.2f)
+        d = min(d, sqrt((x - p1.x) * (x - p1.x) + (z - p1.z) * (z - p1.z)) - 1.6f)
+        val j0 = VillageLayout.jettyFrom
+        val j1 = VillageLayout.jettyTo
+        for (side in listOf(-1.1f, 1.1f)) d = min(d, distanceToSegment(x, z, Vec3(j0.x + side, 0f, j0.z), Vec3(j1.x + side, 0f, j1.z)) - 0.18f)
+        val duel = VillageLayout.spots.getValue(Building.DUEL).center
+        d = min(d, abs(sqrt((x - duel.x) * (x - duel.x) + (z - duel.z) * (z - duel.z)) - ARENA_R))
+        for (bu in buoys) d = min(d, sqrt((x - bu.x) * (x - bu.x) + (z - bu.z) * (z - bu.z)) - 0.45f)
+        val boat = VillageLayout.boatAt
+        d = min(d, distanceToSegment(x, z, Vec3(boat.x, 0f, boat.z - 2.2f), Vec3(boat.x, 0f, boat.z + 2.4f)) - 1.0f)
+        for (r in seaRocks) d = min(d, sqrt((x - r.x) * (x - r.x) + (z - r.z) * (z - r.z)) - r.y)
+        return max(d, 0f)
+    }
+
+    /**
+     * The sea, one big plane: fine around the island, coarse out to the horizon. Its colours are
+     * data for the sea material: r the depth (0 shallow to 1 deep), g the closeness to the shore
+     * (1 at the beach, 0 seven metres out: the foam lines), b the closeness to things standing in
+     * the water (foam collars), a the sunlight (the decks' shadows).
+     */
     private fun sea(): MeshData {
         val b = MeshBuilder()
-        val xs = (-40..40).map { it * 3f }
-        // Fine near the shore, where the foam is, coarser out at sea.
-        val zs = (-5..30).map { it * 1.5f } + (1..14).map { 45f + it * 18f }
+        val coarse = listOf(-240f, -170f, -120f, -85f, -60f, -46f)
+        val xs = coarse + (-38..38).map { it.toFloat() } + coarse.reversed().map { -it }
+        val zs = coarse + (-54..36).map { it.toFloat() } + coarse.reversed().map { -it }
         val stride = xs.size
-        for (z in zs) for (x in xs) {
+        val light = FloatArray(xs.size * zs.size)
+        for ((j, z) in zs.withIndex()) for ((i, x) in xs.withIndex()) {
+            val fine = x in -38f..38f && z in -54f..36f
+            light[j * stride + i] = if (fine) sunlight(Vec3(x, 0f, z)) else 1f
+        }
+        val sun = blur(light, stride)
+        for ((j, z) in zs.withIndex()) for ((i, x) in xs.withIndex()) {
+            val fine = x in -38f..38f && z in -54f..36f
+            if (!fine) {
+                b.vertex(Vec3(x, 0f, z), Vec3.UP, x / 30f, z / 30f, Part.PAINTED, floatArrayOf(1f, 0f, 0f, 1f))
+                continue
+            }
+            val s = VillageLayout.shoreDistance(x, z)
             val depth = max(0f, -height(x, z))
-            val deep = smooth(0f, 5f, depth)
-            val foam = 1f - smooth(0f, 0.7f, depth)
-            b.vertex(Vec3(x, 0f, z), Vec3.UP, x / 30f, z / 30f, Part.PAINTED, floatArrayOf(deep, foam, 0f, 1f))
+            val deep = smooth(0.2f, 6.5f, depth)
+            val shore = if (s >= 0f) 1f else 1f - smooth(0f, 7f, -s)
+            val collar = 1f - smooth(0f, 1.1f, waterObjectDistance(x, z))
+            b.vertex(Vec3(x, 0f, z), Vec3.UP, x / 30f, z / 30f, Part.PAINTED, floatArrayOf(deep, shore, collar, sun[j * stride + i]))
         }
         for (j in 0 until zs.size - 1) for (i in 0 until stride - 1) {
             val a = j * stride + i
@@ -173,6 +440,9 @@ object VillageModels {
 
     private fun shade(c: FloatArray, k: Float) = floatArrayOf(c[0] * k, c[1] * k, c[2] * k, c[3])
 
+    /** [c] a little lighter or darker by [k] (-1..1) from a hash: planks and stones that aren't all alike. */
+    private fun vary(c: FloatArray, i: Int, salt: Int, k: Float = 0.08f) = shade(c, 1f + k * (hash01(i, salt, 23) * 2f - 1f))
+
     /** Builds with [block], then paints what it added in [color]. */
     private inline fun MeshBuilder.paint(color: FloatArray, block: MeshBuilder.() -> Unit) {
         val from = vertexCount
@@ -180,367 +450,666 @@ object VillageModels {
         recolor(from, color)
     }
 
-    private fun MeshBuilder.cube(center: Vec3, size: Vec3, color: FloatArray, part: Float = Part.PAINTED) = paint(color) { box(center, size, part) }
+    /**
+     * A box with bevelled (chamfered) edges, [size] centred on the origin of [m]: the bevels catch
+     * the light and the rim, which reads as crafted rather than as a cardboard cube.
+     */
+    private fun MeshBuilder.bevelBox(m: FloatArray, size: Vec3, color: FloatArray, bevel: Float = 0.08f, part: Float = Part.PAINTED) {
+        val h = floatArrayOf(size.x / 2f, size.y / 2f, size.z / 2f)
+        // Seen from the village's camera a pixel is about 8 cm: a smaller bevel wouldn't show,
+        // so small boxes stay plain (12 triangles instead of 44).
+        val b = if (bevel < 0.06f) 0f else min(bevel, min(h[0], min(h[1], h[2])) * 0.45f)
+        val nm = Mat4.normalMatrix(m)
+        fun tn(n: Vec3) = Vec3(
+            nm[0] * n.x + nm[3] * n.y + nm[6] * n.z,
+            nm[1] * n.x + nm[4] * n.y + nm[7] * n.z,
+            nm[2] * n.x + nm[5] * n.y + nm[8] * n.z,
+        ).normalized()
+        fun axis(k: Int, s: Float) = when (k) { 0 -> Vec3(s, 0f, 0f); 1 -> Vec3(0f, s, 0f); else -> Vec3(0f, 0f, s) }
+        // The corner of face (axis a, side s) towards the signs [sg] on the other two axes.
+        fun facePoint(a: Int, s: Float, sg: FloatArray): Vec3 {
+            val q = FloatArray(3) { k -> if (k == a) s * h[k] else sg[k] * (h[k] - b) }
+            return Vec3(q[0], q[1], q[2])
+        }
+        fun poly(points: List<Vec3>, n: Vec3) {
+            val wn = tn(n)
+            val ids = points.map { vertex(Mat4.transformPoint(m, it), wn, 0f, 0f, part, color) }
+            val flip = (((points[1] - points[0]) cross (points[2] - points[0])) dot n) < 0f
+            for (k in 1 until ids.size - 1) if (flip) triangle(ids[0], ids[k + 1], ids[k]) else triangle(ids[0], ids[k], ids[k + 1])
+        }
+        val signs = listOf(-1f, 1f)
+        for (a in 0..2) for (s in signs) {
+            val u = (a + 1) % 3
+            val v = (a + 2) % 3
+            val pts = listOf(-1f to -1f, 1f to -1f, 1f to 1f, -1f to 1f).map { (su, sv) ->
+                facePoint(a, s, FloatArray(3).also { it[u] = su; it[v] = sv })
+            }
+            poly(pts, axis(a, s))
+        }
+        if (b <= 1e-4f) return
+        for (a1 in 0..2) for (a2 in a1 + 1..2) for (s1 in signs) for (s2 in signs) {
+            val a3 = 3 - a1 - a2
+            fun on1(s3: Float) = facePoint(a1, s1, FloatArray(3).also { it[a2] = s2; it[a3] = s3 })
+            fun on2(s3: Float) = facePoint(a2, s2, FloatArray(3).also { it[a1] = s1; it[a3] = s3 })
+            poly(listOf(on1(-1f), on1(1f), on2(1f), on2(-1f)), (axis(a1, s1) + axis(a2, s2)).normalized())
+        }
+        for (sx in signs) for (sy in signs) for (sz in signs) {
+            poly(
+                listOf(
+                    facePoint(0, sx, floatArrayOf(0f, sy, sz)),
+                    facePoint(1, sy, floatArrayOf(sx, 0f, sz)),
+                    facePoint(2, sz, floatArrayOf(sx, sy, 0f)),
+                ),
+                Vec3(sx, sy, sz).normalized(),
+            )
+        }
+    }
+
+    private fun MeshBuilder.box(c: Vec3, size: Vec3, color: FloatArray, bevel: Float = 0.08f, part: Float = Part.PAINTED) =
+        bevelBox(Mat4.translation(c.x, c.y, c.z), size, color, bevel, part)
+
+    private fun MeshBuilder.boxR(c: Vec3, size: Vec3, color: FloatArray, rotX: Float = 0f, rotY: Float = 0f, rotZ: Float = 0f, bevel: Float = 0.08f, part: Float = Part.PAINTED) =
+        bevelBox(Mat4.trs(c, rotX = rotX, rotY = rotY, rotZ = rotZ), size, color, bevel, part)
 
     /** A post, pole or piling from [a] to [b]. */
-    private fun MeshBuilder.pole(a: Vec3, b: Vec3, r: Float, color: FloatArray, sides: Int = 6) = paint(color) { tube(listOf(a, b), { r }, sides, Part.PAINTED, cap = false) }
+    private fun MeshBuilder.pole(a: Vec3, b: Vec3, r: Float, color: FloatArray, sides: Int = 8, cap: Boolean = false) =
+        paint(color) { tube(listOf(a, b), { r }, sides, Part.PAINTED, cap = cap) }
+
+    /** A flat disc of radius [r] at [y], facing up. */
+    private fun MeshBuilder.disc(at: Vec3, r: Float, color: FloatArray, sides: Int, part: Float = Part.PAINTED) =
+        paint(color) { lathe(listOf(0.01f to at.y, r to at.y), sides, part, Vec3(at.x, 0f, at.z)) }
+
+    /** A ring of rope or iron through [points] (closed). */
+    private fun MeshBuilder.loop(points: List<Vec3>, r: Float, color: FloatArray, sides: Int = 5) =
+        paint(color) { tube(points + points.first(), { r }, sides, Part.PAINTED, cap = false) }
+
+    private fun circle(c: Vec3, r: Float, n: Int, y: Float = c.y) = (0 until n).map { k ->
+        val a = k / n.toFloat() * 2f * PI.toFloat()
+        Vec3(c.x + cos(a) * r, y, c.z + sin(a) * r)
+    }
 
     /**
-     * A pitched roof over a [w] x [d] box whose walls end at [top]: the ridge runs along x at
-     * [h] above the eaves, overhanging by [o], with a darker fascia under the edge.
+     * A pitched roof over a [w] x [d] building whose walls end at [top]: the ridge runs along x at
+     * [h] above the eaves, overhanging by [o]. Thick slabs with rows of tiles, a ridge cap and the
+     * gable ends filled with the [wall] colour.
      */
     private fun MeshBuilder.gableRoof(cx: Float, cz: Float, w: Float, d: Float, top: Float, h: Float, o: Float, color: FloatArray, wall: FloatArray) {
-        val x0 = cx - w / 2f - o
-        val x1 = cx + w / 2f + o
-        val zf = cz + d / 2f + o
-        val zb = cz - d / 2f - o
-        val ridge = top + h
-        fun slope(a: Vec3, b: Vec3, c: Vec3, e: Vec3, col: FloatArray) {
-            val n = ((b - a) cross (e - a)).normalized()
-            val i0 = vertex(a, n, 0f, 0f, Part.PAINTED, col)
-            val i1 = vertex(b, n, 1f, 0f, Part.PAINTED, col)
-            val i2 = vertex(c, n, 1f, 1f, Part.PAINTED, col)
-            val i3 = vertex(e, n, 0f, 1f, Part.PAINTED, col)
-            quad(i0, i1, i2, i3)
-        }
-        // Front and back slopes (counter-clockwise seen from outside).
-        slope(Vec3(x0, top, zf), Vec3(x1, top, zf), Vec3(x1, ridge, cz), Vec3(x0, ridge, cz), color)
-        slope(Vec3(x1, top, zb), Vec3(x0, top, zb), Vec3(x0, ridge, cz), Vec3(x1, ridge, cz), shade(color, 0.92f))
-        // Gable ends: the wall up to the ridge.
-        for ((x, sign) in listOf(cx - w / 2f to -1f, cx + w / 2f to 1f)) {
-            val n = Vec3(sign, 0f, 0f)
-            val a = vertex(Vec3(x, top, cz - d / 2f), n, 0f, 0f, Part.PAINTED, wall)
-            val c = vertex(Vec3(x, top, cz + d / 2f), n, 1f, 0f, Part.PAINTED, wall)
-            val r = vertex(Vec3(x, ridge - h * (o / (d / 2f + o)), cz), n, 0.5f, 1f, Part.PAINTED, wall)
-            if (sign > 0f) triangle(a, r, c) else triangle(a, c, r)
-        }
-        // The fascia: a thin dark band along both eaves.
-        val fascia = shade(color, 0.6f)
-        cube(Vec3(cx, top - 0.12f, zf), Vec3(w + 2f * o, 0.24f, 0.12f), fascia)
-        cube(Vec3(cx, top - 0.12f, zb), Vec3(w + 2f * o, 0.24f, 0.12f), fascia)
-    }
-
-    /** A window on the wall facing +z at ([x], [y], [z]): a white frame and glass (lit at night). */
-    private fun MeshBuilder.window(x: Float, y: Float, z: Float, w: Float = 1.1f, h: Float = 1.3f, frame: FloatArray = rgb(0xFFFFFBF2)) {
-        cube(Vec3(x, y, z + 0.04f), Vec3(w + 0.24f, h + 0.24f, 0.1f), frame)
-        cube(Vec3(x, y, z + 0.1f), Vec3(w, h, 0.06f), rgb(0xFF9FC6D8), Part.GLASS)
-        cube(Vec3(x, y, z + 0.14f), Vec3(0.08f, h, 0.04f), frame)
-    }
-
-    private fun MeshBuilder.door(x: Float, z: Float, w: Float = 1.3f, h: Float = 2.2f, color: FloatArray = rgb(0xFF6D4C35)) {
-        cube(Vec3(x, h / 2f, z + 0.05f), Vec3(w + 0.3f, h + 0.15f, 0.1f), rgb(0xFFF5EBD8))
-        cube(Vec3(x, h / 2f, z + 0.1f), Vec3(w, h, 0.08f), color)
-    }
-
-    /** A plain house: walls, a pitched roof, windows, a door and a chimney. */
-    private fun MeshBuilder.house(h: House) {
-        val wallH = h.storeys * 2.8f
-        cube(Vec3(h.x, wallH / 2f - 0.5f, h.z), Vec3(h.w, wallH + 1f, h.d), h.wall)
-        gableRoof(h.x, h.z, h.w, h.d, wallH, h.w * 0.32f + 0.6f, 0.45f, h.roof, h.wall)
-        val front = h.z + h.d / 2f
-        door(h.x - h.w * 0.22f, front)
-        window(h.x + h.w * 0.22f, 1.5f, front)
-        if (h.storeys > 1) {
-            window(h.x - h.w * 0.22f, 4.3f, front)
-            window(h.x + h.w * 0.22f, 4.3f, front)
-        }
-        cube(Vec3(h.x + h.w * 0.28f, wallH + h.w * 0.32f, h.z - h.d * 0.15f), Vec3(0.7f, 1.6f, 0.7f), rgb(0xFF9E5B45))
-        // A flower box under the ground-floor window.
-        cube(Vec3(h.x + h.w * 0.22f, 0.75f, front + 0.25f), Vec3(1.3f, 0.3f, 0.35f), rgb(0xFF8D5A3B))
-        cube(Vec3(h.x + h.w * 0.22f, 0.98f, front + 0.25f), Vec3(1.2f, 0.2f, 0.3f), if (hash01(h.x.toInt(), h.z.toInt(), 3) > 0.5f) rgb(0xFFE57373) else rgb(0xFFFFD54F))
-    }
-
-    class House(val x: Float, val z: Float, val w: Float, val d: Float, val storeys: Int, val wall: FloatArray, val roof: FloatArray)
-
-    private val walls = listOf(0xFFF7F1E3, 0xFFFFF4D6, 0xFFE9F1F2, 0xFFF6E3D3, 0xFFDDEBE1, 0xFFFBE7E1)
-    private val roofs = listOf(0xFFC8553D, 0xFFE07A3F, 0xFF3B7EA1, 0xFF2E8C88, 0xFFB5463A, 0xFF5A6F8C)
-
-    /** The fishermen's houses: along the street, up the hill and by the shore. */
-    val houses: List<House> by lazy {
-        val spots = listOf(
-            Triple(-3.5f, -21f, 1), Triple(4.5f, -22f, 2), Triple(-21f, -27f, 2), Triple(21f, -26f, 1),
-            Triple(-24f, -9f, 1), Triple(24f, -7f, 2), Triple(-5f, -44f, 2), Triple(8f, -45f, 1),
-            Triple(-15f, -38f, 1), Triple(17f, -39f, 2), Triple(23f, 2f, 1), Triple(-25f, 3f, 1),
-            Triple(-30f, -18f, 2), Triple(31f, -17f, 1), Triple(0f, -56f, 1), Triple(-12f, -52f, 1),
-            Triple(12f, -55f, 2), Triple(-24f, -45f, 1), Triple(27f, -48f, 1), Triple(-6f, -68f, 2),
-            Triple(9f, -70f, 1), Triple(-18f, -64f, 1), Triple(21f, -63f, 2), Triple(-33f, -32f, 1),
-            Triple(34f, -30f, 2), Triple(2f, -82f, 1), Triple(-28f, -76f, 1), Triple(26f, -80f, 1),
-        )
-        spots.mapIndexed { i, (x, z, storeys) ->
-            val w = 4.6f + 1.8f * hash01(i, 1, 5)
-            val d = 4.2f + 1.4f * hash01(i, 2, 5)
-            House(x, z, w, d, storeys, rgb(walls[i % walls.size]), rgb(roofs[(i * 5 + 2) % roofs.size]))
-        }
-    }
-
-    /** Trees on the hill and the headlands, never on a building or a street. */
-    private val trees: List<Vec3> by lazy {
-        val out = ArrayList<Vec3>()
-        var k = 0
-        while (out.size < 170 && k < 5000) {
-            val x = -100f + 200f * hash01(k, 11, 7)
-            val z = -150f + 152f * hash01(k, 12, 7)
-            k++
-            val d = shoreZ(x) - z
-            if (d < 6f) continue
-            if (VillageLayout.spots.values.any { abs(x - it.center.x) < it.half.x + 3f && abs(z - it.center.z) < it.half.z + 3f }) continue
-            if (houses.any { abs(x - it.x) < it.w / 2f + 2.5f && abs(z - it.z) < it.d / 2f + 2.5f }) continue
-            if (streets.any { (a, e, w) -> distanceToSegment(x, z, a, e) < w / 2f + 1.5f }) continue
-            // Fewer trees down in the village, a wood on the hill behind it.
-            if (d < 40f && abs(x) < 26f && hash01(k, 13, 7) > 0.25f) continue
-            out += Vec3(x, height(x, z), z)
-        }
-        out
-    }
-
-    private fun MeshBuilder.pine(at: Vec3, scale: Float, variant: Int) {
-        pole(at + Vec3(0f, -0.5f, 0f), at + Vec3(0f, 1.4f * scale, 0f), 0.22f * scale, rgb(0xFF7A5536))
-        val greens = listOf(rgb(0xFF2F7D4F), rgb(0xFF3C8D57), rgb(0xFF2A6E4A))
-        for (tier in 0 until 3) {
-            val y0 = at.y + (1.1f + tier * 1.25f) * scale
-            val r = (2.1f - tier * 0.55f) * scale
-            paint(greens[(tier + variant) % 3]) {
-                lathe(listOf(0.02f to 2.2f * scale, r to 0f, r * 0.75f to -0.1f), 7, Part.PAINTED, Vec3(at.x, y0, at.z))
+        val run = d / 2f + o
+        val slope = atan2(h, run)
+        val len = sqrt(run * run + h * h)
+        val thick = 0.32f
+        val width = w + 2f * o
+        for (side in listOf(1f, -1f)) {
+            val rot = side * slope
+            // The slab, centred halfway down the slope and sunk by half its thickness.
+            val mid = Vec3(cx, top + h / 2f + thick * 0.5f * cos(slope), cz + side * run / 2f + side * thick * 0.5f * sin(slope))
+            val m = Mat4.trs(mid, rotX = rot)
+            bevelBox(m, Vec3(width, thick, len), shade(color, if (side > 0f) 1f else 0.9f), 0.1f)
+            // Rows of tiles: thin ribs across the slope, each a touch darker at its lower edge.
+            val rows = (len / 0.62f).toInt()
+            for (k in 1 until rows) {
+                val along = -len / 2f + k * (len / rows)
+                val local = Mat4.multiply(m, Mat4.translation(0f, thick / 2f + 0.03f, along * side))
+                bevelBox(local, Vec3(width - 0.1f, 0.08f, 0.16f), shade(color, 0.86f), 0.03f)
             }
         }
-    }
-
-    private fun MeshBuilder.roundTree(at: Vec3, scale: Float, variant: Int) {
-        pole(at + Vec3(0f, -0.5f, 0f), at + Vec3(0f, 2f * scale, 0f), 0.25f * scale, rgb(0xFF7A5536))
-        val greens = listOf(rgb(0xFF6DB15A), rgb(0xFF5AA052), rgb(0xFF7CBF5E))
-        paint(greens[variant % 3]) {
-            sphere(at + Vec3(0f, 3.2f * scale, 0f), 1.9f * scale, Part.PAINTED, 5, 8)
-            sphere(at + Vec3(1.1f * scale, 2.7f * scale, 0.4f * scale), 1.3f * scale, Part.PAINTED, 4, 7)
-            sphere(at + Vec3(-1.0f * scale, 2.8f * scale, -0.3f * scale), 1.2f * scale, Part.PAINTED, 4, 7)
+        // The ridge cap.
+        box(Vec3(cx, top + h + thick * 0.6f, cz), Vec3(width + 0.1f, 0.34f, 0.5f), shade(color, 0.78f), 0.1f)
+        // Gable ends: the wall up under the roof, to the ridge.
+        val atWall = top + h * o / run
+        for ((x, sign) in listOf(cx - w / 2f to -1f, cx + w / 2f to 1f)) {
+            facet(
+                listOf(Vec3(x, top - 0.05f, cz - d / 2f), Vec3(x, top - 0.05f, cz + d / 2f), Vec3(x, atWall, cz + d / 2f), Vec3(x, top + h, cz), Vec3(x, atWall, cz - d / 2f)),
+                Vec3(sign, 0f, 0f), wall,
+            )
         }
     }
 
-    private fun MeshBuilder.rockAt(at: Vec3, size: Float, variant: Int, color: FloatArray = rgb(0xFF9AA4A8)) {
-        paint(color) { append(PropModels.rock(variant), Mat4.trs(at, rotY = variant * 1.3f, scale = Vec3(size, size * 0.7f, size))) }
+    /** A flat convex polygon facing [n] (wound to match it). */
+    private fun MeshBuilder.facet(points: List<Vec3>, n: Vec3, color: FloatArray) {
+        val ids = points.map { vertex(it, n, 0f, 0f, Part.PAINTED, color) }
+        val flip = (((points[1] - points[0]) cross (points[2] - points[0])) dot n) < 0f
+        for (k in 1 until ids.size - 1) if (flip) triangle(ids[0], ids[k + 1], ids[k]) else triangle(ids[0], ids[k], ids[k + 1])
     }
 
-    private fun MeshBuilder.barrel(at: Vec3, color: FloatArray = rgb(0xFF9C6B43)) {
-        paint(color) { lathe(listOf(0.42f to 1.1f, 0.5f to 0.55f, 0.42f to 0f), 9, Part.PAINTED, at) }
-        cube(at + Vec3(0f, 1.12f, 0f), Vec3(0.75f, 0.06f, 0.75f), shade(color, 0.75f))
+    /** A window on a wall facing +z at ([x], [y], [z]): a frame, a sill, a cross of glazing bars, glass that's lit at night. */
+    private fun MeshBuilder.window(x: Float, y: Float, z: Float, w: Float = 1.1f, h: Float = 1.3f, frame: FloatArray = rgb(0xFFFFFBF2), shutters: FloatArray? = null) {
+        box(Vec3(x, y, z + 0.06f), Vec3(w + 0.3f, h + 0.3f, 0.14f), frame, 0.05f)
+        box(Vec3(x, y, z + 0.1f), Vec3(w, h, 0.08f), rgb(0xFF8DBBD2), 0.02f, Part.GLASS)
+        box(Vec3(x, y, z + 0.16f), Vec3(0.09f, h, 0.05f), frame, 0.02f)
+        box(Vec3(x, y + h * 0.12f, z + 0.16f), Vec3(w, 0.09f, 0.05f), frame, 0.02f)
+        box(Vec3(x, y - h / 2f - 0.2f, z + 0.18f), Vec3(w + 0.5f, 0.14f, 0.32f), shade(frame, 0.92f), 0.04f)
+        if (shutters != null) for (s in listOf(-1f, 1f)) box(Vec3(x + s * (w / 2f + 0.42f), y, z + 0.08f), Vec3(0.5f, h + 0.1f, 0.1f), shutters, 0.04f)
     }
 
-    private fun MeshBuilder.crate(at: Vec3, s: Float = 0.9f, fill: FloatArray? = null) {
-        cube(at + Vec3(0f, s / 2f, 0f), Vec3(s, s, s), rgb(0xFFB9874F))
-        cube(at + Vec3(0f, s / 2f, s / 2f + 0.02f), Vec3(s * 0.95f, 0.12f, 0.04f), rgb(0xFF8C6239))
-        if (fill != null) cube(at + Vec3(0f, s + 0.08f, 0f), Vec3(s * 0.85f, 0.16f, s * 0.85f), fill)
+    /** A door on a wall facing +z: frame, planks and a brass knob. */
+    private fun MeshBuilder.door(x: Float, floor: Float, z: Float, w: Float = 1.3f, h: Float = 2.2f, color: FloatArray = rgb(0xFF7A4E33), frame: FloatArray = rgb(0xFFF5EBD8)) {
+        box(Vec3(x, floor + h / 2f + 0.05f, z + 0.05f), Vec3(w + 0.36f, h + 0.2f, 0.12f), frame, 0.05f)
+        for (k in 0 until 3) box(Vec3(x - w / 3f + k * w / 3f, floor + h / 2f, z + 0.1f), Vec3(w / 3f - 0.03f, h, 0.08f), vary(color, k, 7), 0.02f)
+        box(Vec3(x + w * 0.32f, floor + h * 0.48f, z + 0.17f), Vec3(0.1f, 0.1f, 0.08f), rgb(0xFFF2B33D), 0.03f)
+    }
+
+    /** The ground under ([x], [z]). */
+    private fun ground(x: Float, z: Float) = Vec3(x, height(x, z), z)
+
+    private fun MeshBuilder.rockAt(at: Vec3, size: Float, variant: Int, color: FloatArray = rgb(0xFFA9A196)) {
+        paint(vary(color, variant, 5, 0.1f)) { append(PropModels.rock(variant), Mat4.trs(at, rotY = variant * 1.3f, scale = Vec3(size, size * 0.72f, size))) }
+    }
+
+    private fun MeshBuilder.barrel(at: Vec3, color: FloatArray = rgb(0xFFA0703F)) {
+        paint(color) { lathe(listOf(0.4f to 1.1f, 0.48f to 0.82f, 0.5f to 0.55f, 0.48f to 0.28f, 0.4f to 0f), 12, Part.PAINTED, at) }
+        disc(at + Vec3(0f, 1.1f, 0f), 0.4f, shade(color, 0.8f), 12)
+        for (y in listOf(0.22f, 0.88f)) loop(circle(at + Vec3(0f, y, 0f), 0.47f, 14), 0.035f, rgb(0xFF5B5F63), 4)
+    }
+
+    private fun MeshBuilder.crate(at: Vec3, s: Float = 0.9f, fill: FloatArray? = null, turn: Float = 0f) {
+        val wood = rgb(0xFFC8955A)
+        boxR(at + Vec3(0f, s / 2f, 0f), Vec3(s, s, s), wood, rotY = turn, bevel = 0.06f)
+        // Slats on the sides facing the player.
+        for (k in 0 until 2) {
+            val m = Mat4.multiply(Mat4.trs(at + Vec3(0f, s / 2f, 0f), rotY = turn), Mat4.translation(0f, -s / 4f + k * s / 2f, s / 2f + 0.02f))
+            bevelBox(m, Vec3(s * 0.96f, s * 0.16f, 0.05f), shade(wood, 0.8f), 0.02f)
+        }
+        if (fill != null) boxR(at + Vec3(0f, s + 0.06f, 0f), Vec3(s * 0.86f, 0.14f, s * 0.86f), fill, rotY = turn, bevel = 0.05f)
     }
 
     private fun MeshBuilder.lamp(at: Vec3, height: Float = 3.2f) {
-        pole(at, at + Vec3(0f, height, 0f), 0.08f, rgb(0xFF37474F), 5)
-        cube(at + Vec3(0f, height + 0.2f, 0f), Vec3(0.45f, 0.5f, 0.45f), rgb(0xFFFFE08A), Part.BULB)
-        cube(at + Vec3(0f, height + 0.5f, 0f), Vec3(0.6f, 0.12f, 0.6f), rgb(0xFF37474F))
+        val iron = rgb(0xFF37474F)
+        box(at + Vec3(0f, 0.12f, 0f), Vec3(0.5f, 0.24f, 0.5f), iron, 0.06f)
+        pole(at, at + Vec3(0f, height, 0f), 0.08f, iron, 6)
+        box(at + Vec3(0f, height + 0.25f, 0f), Vec3(0.44f, 0.5f, 0.44f), rgb(0xFFFFE08A), 0.04f, Part.BULB)
+        paint(iron) { lathe(listOf(0.02f to height + 0.85f, 0.38f to height + 0.5f), 4, Part.PAINTED, at) }
     }
 
     /** A pennant on its pole: the cloth flutters (u along it). */
     private fun MeshBuilder.pennant(foot: Vec3, height: Float, length: Float, dir: Float, color: FloatArray) {
-        pole(foot, foot + Vec3(0f, height, 0f), 0.09f, rgb(0xFF5D4037), 5)
-        val top = foot + Vec3(0f, height - 0.1f, 0f)
+        pole(foot, foot + Vec3(0f, height, 0f), 0.09f, rgb(0xFF5D4037), 6)
+        paint(rgb(0xFFF2B33D)) { sphere(foot + Vec3(0f, height + 0.1f, 0f), 0.16f, Part.PAINTED, 4, 6) }
+        val top = foot + Vec3(0f, height - 0.15f, 0f)
         val n = Vec3(0f, 0f, 1f)
-        val from = vertexCount
         val a = vertex(top, n, 0f, 0f, Part.CLOTH, color)
-        val b = vertex(top + Vec3(0f, -1.4f, 0f), n, 0f, 1f, Part.CLOTH, color)
-        val c = vertex(top + Vec3(dir * length, -0.7f, 0f), n, 1f, 0.5f, Part.CLOTH, color)
+        val b = vertex(top + Vec3(0f, -1.5f, 0f), n, 0f, 1f, Part.CLOTH, color)
+        val c = vertex(top + Vec3(dir * length, -0.75f, 0f), n, 1f, 0.5f, Part.CLOTH, color)
         if (dir > 0f) triangle(a, b, c) else triangle(a, c, b)
-        recolor(from, color)
     }
 
-    // ---- The town: buildings and everything else that stands still ------------------------------
+    // ---- Trees -----------------------------------------------------------------------------------
+
+    private class Tree(val at: Vec3, val scale: Float, val palm: Boolean, val variant: Int) {
+        val crownY get() = if (palm) 5.2f * scale else 3.3f * scale
+        val crownR get() = if (palm) 1.8f * scale else 2.0f * scale
+    }
+
+    /** A few palms along the beach and round trees inland, never on a path or a building. */
+    private val trees: List<Tree> by lazy {
+        fun free(x: Float, z: Float): Boolean =
+            pathDistance(x, z) > 1.6f &&
+                VillageLayout.spots.values.none { outside(x, z, it) < 2.4f } &&
+                sqrt((x - lighthouseAt.x).let { it * it } + (z - lighthouseAt.z).let { it * it }) > 7f
+        val out = ArrayList<Tree>()
+        // Palms on the beach (angle around the island, inland distance).
+        for ((k, a) in listOf(0.05f, 0.5f, 0.95f, 2.75f, 3.35f, -0.6f, -2.45f, 1.6f).withIndex()) {
+            val r = VillageLayout.islandRadius(a) - 2.4f - 0.8f * hash01(k, 1, 31)
+            val x = VillageLayout.ISLAND_X + cos(a) * r
+            val z = VillageLayout.ISLAND_Z + sin(a) * r
+            if (free(x, z)) out += Tree(Vec3(x, height(x, z), z), 0.9f + 0.25f * hash01(k, 2, 31), true, k)
+        }
+        // Round trees in small groups between the places.
+        val inland = listOf(
+            -1.5f to -26f, 3f to -27.5f, 17f to -26f, 19.5f to -23f, -18f to -26f, -19.5f to -12f,
+            17.5f to -7f, 19f to -10.5f, 1.5f to -3.5f, -2f to -5f, -15f to -30f, 9f to -31f,
+        )
+        for ((k, p) in inland.withIndex()) {
+            val (x, z) = p
+            if (free(x, z) && VillageLayout.shoreDistance(x, z) > 4.5f) out += Tree(Vec3(x, height(x, z), z), 0.8f + 0.35f * hash01(k, 3, 31), false, k)
+        }
+        out
+    }
+
+    private fun MeshBuilder.palm(t: Tree) {
+        val s = t.scale
+        val lean = Vec3(0.5f + 0.4f * hash01(t.variant, 4, 3), 0f, 0.3f - 0.6f * hash01(t.variant, 5, 3)).normalized()
+        val trunk = (0..6).map { k ->
+            val u = k / 6f
+            t.at + Vec3(0f, -0.4f + u * 5.4f * s, 0f) + lean * (u * u * 1.4f * s)
+        }
+        paint(rgb(0xFFA07B52)) { tube(trunk, { u -> (0.3f - 0.12f * u) * s }, 7, Part.PAINTED, cap = false) }
+        // Rings on the trunk.
+        for (k in 1..5) {
+            val c = trunk[k]
+            loop(circle(c, (0.3f - 0.12f * k / 6f) * s + 0.02f, 8), 0.05f * s, rgb(0xFF7E5E3E), 3)
+        }
+        val top = trunk.last()
+        val greens = listOf(rgb(0xFF4FA84C), rgb(0xFF66BF57), rgb(0xFF3F9447))
+        for (k in 0 until 8) {
+            val a = k / 8f * 2f * PI.toFloat() + t.variant
+            val dir = Vec3(cos(a), 0f, sin(a))
+            val side = Vec3(-dir.z, 0f, dir.x)
+            val col = greens[(k + t.variant) % 3]
+            val segs = 6
+            var prevL = -1
+            var prevR = -1
+            for (i in 0..segs) {
+                val u = i / segs.toFloat()
+                val reach = u * 3.1f * s
+                val p = top + dir * reach + Vec3(0f, (0.5f * u - 1.9f * u * u) * s, 0f)
+                val wHalf = (0.55f * sin(u * PI.toFloat()) + 0.05f) * s
+                val n = Vec3(0f, 1f, 0f)
+                val l = vertex(p + side * wHalf + Vec3(0f, -0.12f * s * u, 0f), n, 0f, u, Part.PAINTED, col)
+                val r = vertex(p - side * wHalf + Vec3(0f, -0.12f * s * u, 0f), n, 1f, u, Part.PAINTED, col)
+                if (prevL >= 0) quad(prevL, l, r, prevR)
+                prevL = l
+                prevR = r
+            }
+        }
+        paint(rgb(0xFF6B4A2E)) {
+            for (k in 0 until 3) sphere(top + Vec3(0.25f * cos(k * 2.1f), -0.3f, 0.25f * sin(k * 2.1f)) * s, 0.2f * s, Part.PAINTED, 4, 6)
+        }
+    }
+
+    private fun MeshBuilder.roundTree(t: Tree) {
+        val s = t.scale
+        pole(t.at + Vec3(0f, -0.5f, 0f), t.at + Vec3(0f, 2.2f * s, 0f), 0.26f * s, rgb(0xFF85603F), 7)
+        val greens = listOf(rgb(0xFF6DB85A), rgb(0xFF5AA94E), rgb(0xFF7FC463))
+        val c = t.at + Vec3(0f, t.crownY, 0f)
+        paint(greens[t.variant % 3]) {
+            // Lumps of leaves, coarse enough to stay cheap (the cel shading hides the facets).
+            sphere(c, 1.75f * s, Part.PAINTED, 6, 9)
+            sphere(c + Vec3(1.1f * s, -0.45f * s, 0.35f * s), 1.2f * s, Part.PAINTED, 5, 7)
+            sphere(c + Vec3(-1.0f * s, -0.35f * s, -0.3f * s), 1.15f * s, Part.PAINTED, 5, 7)
+            sphere(c + Vec3(0.2f * s, 0.95f * s, -0.2f * s), 1.0f * s, Part.PAINTED, 5, 7)
+        }
+    }
+
+    /** Rocks along the coast, half in the water (each with its foam collar): (x, z) and size in y. */
+    private val seaRocks: List<Vec3> by lazy {
+        listOf(-2.15f, -1.75f, -1.25f, -0.35f, 0.2f, 2.45f, 3.0f).mapIndexed { k, a ->
+            val r = VillageLayout.islandRadius(a) + 0.6f + 1.4f * hash01(k, 1, 17)
+            Vec3(VillageLayout.ISLAND_X + cos(a) * r, 0.9f + 0.9f * hash01(k, 2, 17), VillageLayout.ISLAND_Z + sin(a) * r)
+        }
+    }
+
+    /** The buoys around the duelling platform. */
+    private val buoys: List<Vec3> by lazy {
+        val c = VillageLayout.spots.getValue(Building.DUEL).center
+        (0 until 6).map { k ->
+            val a = k / 6f * 2f * PI.toFloat() + 0.3f
+            Vec3(c.x + cos(a) * (ARENA_R + 2.4f), 0.1f, c.z + sin(a) * (ARENA_R + 2.4f))
+        }
+    }
+
+    // ---- The town: the six places and what grows around them --------------------------------------
+
+    private const val AQ_R = 5f
+    private const val ARENA_R = 6.6f
 
     private fun town(): MeshData {
         val b = MeshBuilder()
-        for (h in houses) b.house(h)
-        for ((i, t) in trees.withIndex()) {
-            val s = 0.8f + 0.5f * hash01(i, 3, 9)
-            if (t.y > 6f || hash01(i, 4, 9) > 0.35f) b.pine(t, s, i) else b.roundTree(t, s, i)
-        }
-        b.dexHall()
+        b.lighthouse()
         b.market()
         b.ropeWorkshop()
         b.aquariumPavilion()
         b.pier()
         b.arena()
-        b.lighthouse()
-        b.shoreProps()
+        for (t in trees) if (t.palm) b.palm(t) else b.roundTree(t)
+        for ((k, r) in seaRocks.withIndex()) b.rockAt(Vec3(r.x, -0.5f, r.z), 1.2f + r.y * 0.6f, k + 2)
+        // Bushes by the buildings' plinths.
+        for ((k, p) in listOf(-17.2f to -14.6f, -4.6f to -14.4f, 4.7f to -13.6f, 17.6f to -13.4f, -15.6f to -1.2f, -3.2f to -31.5f, 0.6f to -33.5f).withIndex()) {
+            val (x, z) = p
+            val y = height(x, z)
+            b.paint(listOf(rgb(0xFF5FAE52), rgb(0xFF79BF5C), rgb(0xFF4F9C4D))[k % 3]) {
+                sphere(Vec3(x, y + 0.35f, z), 0.75f, Part.PAINTED, 5, 8)
+                sphere(Vec3(x + 0.6f, y + 0.2f, z + 0.2f), 0.55f, Part.PAINTED, 5, 8)
+            }
+            if (k % 2 == 0) b.paint(rgb(0xFFFF8FA3)) { sphere(Vec3(x - 0.2f, y + 1.0f, z + 0.45f), 0.12f, Part.PAINTED, 3, 5) }
+        }
+        // The light baked into the colours: ambient occlusion towards the ground (and the water),
+        // so everything sits on the island instead of floating over it.
+        b.bakeColors { p, n, part, c ->
+            if (part == Part.GLASS || part == Part.BULB || part == Part.CLOTH) return@bakeColors
+            val ground = max(height(p.x, p.z), 0f)
+            val ao = 0.7f + 0.3f * smooth(0f, 2.4f, p.y - ground)
+            // Faces looking down (under eaves and decks) get a little less sky.
+            val under = if (n.y < -0.3f) 0.85f else 1f
+            for (k in 0..2) c[k] *= ao * under
+        }
         return b.build()
     }
 
-    /** The species hall: stone steps, tall walls, a big pitched roof, a fish weathervane, a bell turret. */
-    private fun MeshBuilder.dexHall() {
-        val s = VillageLayout.spots.getValue(Building.DEX)
-        val c = s.center
-        val w = 12f
-        val d = 8.5f
-        val wallTop = 6.5f
-        val stone = rgb(0xFFCFC6B4)
-        val wall = rgb(0xFFF4EBD6)
-        val roof = rgb(0xFF2F6E8E)
-        cube(Vec3(c.x, 0.2f, c.z), Vec3(w + 1.6f, 1.6f, d + 1.6f), stone)
-        cube(Vec3(c.x, wallTop / 2f, c.z), Vec3(w, wallTop, d), wall)
-        gableRoof(c.x, c.z, w, d, wallTop, 4.6f, 0.6f, roof, wall)
-        val front = c.z + d / 2f
-        // A columned porch over the big doors, with its own small roof.
-        for (x in listOf(-2.6f, 2.6f)) pole(Vec3(c.x + x, 1f, front + 1.6f), Vec3(c.x + x, 4.6f, front + 1.6f), 0.32f, rgb(0xFFF8F3E8), 8)
-        cube(Vec3(c.x, 4.8f, front + 1.0f), Vec3(6.8f, 0.4f, 2.6f), rgb(0xFFF8F3E8))
-        gableRoof(c.x, front + 1.0f, 6.4f, 2.4f, 5f, 1.4f, 0.25f, roof, rgb(0xFFF8F3E8))
-        door(c.x, front, 2.4f, 3.4f, rgb(0xFF2F5E73))
-        for (x in listOf(-4.6f, -3.2f, 3.2f, 4.6f)) window(c.x + x, 3.2f, front, 0.9f, 2.2f)
-        for (x in listOf(-3.6f, 0f, 3.6f)) window(c.x + x, 8.1f, front - 0.05f + 0f, 0.8f, 0.8f)
-        // Steps up to the porch.
-        for (k in 0 until 3) cube(Vec3(c.x, 0.15f + k * 0.3f, front + 2.6f - k * 0.45f), Vec3(5.2f, 0.3f, 0.9f), stone)
-        // The bell turret on the ridge, and the big golden fish turning over it.
-        cube(Vec3(c.x, wallTop + 5.3f, c.z), Vec3(1.8f, 1.6f, 1.8f), wall)
-        gableRoof(c.x, c.z, 1.8f, 1.8f, wallTop + 6.1f, 1.2f, 0.25f, roof, wall)
-        pole(Vec3(c.x, wallTop + 7.2f, c.z), Vec3(c.x, wallTop + 9.2f, c.z), 0.08f, rgb(0xFF37474F), 5)
+    /**
+     * The lighthouse (the Dex): on its rocky knoll, an octagonal stone plinth, a tapering tower in
+     * red and white bands with windows up the front, the gallery and its railing, the glass lantern
+     * room (lit at night, with a turning beam drawn by the scene), a red dome and a golden fish
+     * weathervane on top.
+     */
+    private fun MeshBuilder.lighthouse() {
+        val c = lighthouseAt
+        val g = height(c.x, c.z)
+        val at = Vec3(c.x, 0f, c.z)
+        val stone = rgb(0xFFD9D0C1)
+        val red = rgb(0xFFD8473A)
+        val white = rgb(0xFFFFF9EE)
+        val iron = rgb(0xFF2F3E46)
+        // Rocks around the knoll.
+        for (k in 0 until 10) {
+            val a = k / 10f * 2f * PI.toFloat() + 0.4f * hash01(k, 1, 13)
+            val r = 3.6f + 2.2f * hash01(k, 2, 13)
+            val x = c.x + cos(a) * r
+            val z = c.z + sin(a) * r
+            rockAt(Vec3(x, height(x, z) - 0.25f, z), 0.8f + 0.9f * hash01(k, 3, 13), k)
+        }
+        // The plinth, with steps up to the door.
+        paint(stone) { lathe(listOf(3.05f to g + 1.0f, 3.05f to g - 1.6f), 8, Part.PAINTED, at) }
+        disc(Vec3(c.x, g + 1.0f, c.z), 3.05f, shade(stone, 1.05f), 8)
+        paint(shade(stone, 0.85f)) { lathe(listOf(3.25f to g + 0.15f, 3.25f to g - 1.6f), 8, Part.PAINTED, at) }
+        for (k in 0 until 3) box(Vec3(c.x, g + 0.17f + k * 0.28f, c.z + 3.75f - k * 0.38f), Vec3(2.2f, 0.28f, 0.6f), vary(stone, k, 3), 0.05f)
+        // The tower in bands.
+        val y0 = g + 1f
+        val tall = 11f
+        fun r(y: Float) = 2.15f - 0.6f * (y - y0) / tall
+        val bands = 5
+        for (k in 0 until bands) {
+            val lo = y0 + k * tall / bands
+            val hi = lo + tall / bands
+            paint(if (k % 2 == 0) white else red) { lathe(listOf(r(hi) to hi, r(lo) to lo), 28, Part.PAINTED, at) }
+        }
+        // A trim ring between each band.
+        for (k in 1 until bands) {
+            val y = y0 + k * tall / bands
+            loop(circle(Vec3(c.x, y, c.z), r(y) + 0.02f, 28), 0.07f, shade(white, 0.88f), 4)
+        }
+        // Windows up the front, facing out.
+        fun onTower(y: Float, angle: Float, size: Vec3, color: FloatArray, part: Float = Part.PAINTED, out: Float = 0f) {
+            val rr = r(y) + out
+            val p = Vec3(c.x + cos(angle) * rr, y, c.z + sin(angle) * rr)
+            bevelBox(Mat4.trs(p, rotY = atan2(cos(angle), sin(angle))), size, color, 0.04f, part)
+        }
+        for ((k, a) in listOf(1.75f, 1.35f, 1.65f).withIndex()) {
+            val y = y0 + 3.2f + k * 2.6f
+            onTower(y, a, Vec3(0.8f, 1.05f, 0.16f), white, out = 0.02f)
+            onTower(y, a, Vec3(0.56f, 0.8f, 0.12f), rgb(0xFF8DBBD2), Part.GLASS, out = 0.08f)
+            onTower(y - 0.6f, a, Vec3(0.95f, 0.12f, 0.3f), white, out = 0.08f)
+        }
+        // The door, under a little roof.
+        onTower(y0 + 1.15f, PI.toFloat() / 2f, Vec3(1.5f, 2.3f, 0.2f), white, out = 0.02f)
+        onTower(y0 + 1.1f, PI.toFloat() / 2f, Vec3(1.1f, 2.1f, 0.14f), rgb(0xFF2F6E8E), out = 0.1f)
+        onTower(y0 + 2.45f, PI.toFloat() / 2f, Vec3(1.8f, 0.16f, 0.8f), red, out = 0.4f)
+        // The gallery: a deck on brackets, posts and a rail.
+        val gy = y0 + tall
+        paint(iron) { lathe(listOf(2.75f to gy + 0.32f, 2.75f to gy), 28, Part.PAINTED, at) }
+        disc(Vec3(c.x, gy + 0.32f, c.z), 2.75f, shade(iron, 1.25f), 28)
+        paint(iron) { lathe(listOf(2.75f to gy + 0.01f, r(gy) to gy - 0.7f), 28, Part.PAINTED, at) }
+        for (p in circle(Vec3(c.x, gy, c.z), 2.6f, 18)) pole(Vec3(p.x, gy + 0.3f, p.z), Vec3(p.x, gy + 1.25f, p.z), 0.045f, iron, 4)
+        loop(circle(Vec3(c.x, gy + 1.25f, c.z), 2.6f, 36), 0.07f, iron, 5)
+        loop(circle(Vec3(c.x, gy + 0.8f, c.z), 2.6f, 36), 0.04f, iron, 4)
+        // The lantern room: a stone collar, glass, mullions and the lamp.
+        paint(white) { lathe(listOf(1.45f to gy + 0.85f, 1.45f to gy + 0.3f), 20, Part.PAINTED, at) }
+        paint(rgb(0xFFFFF1B0)) { lathe(listOf(1.2f to gy + 2.55f, 1.2f to gy + 0.85f), 16, Part.GLASS, at) }
+        paint(rgb(0xFFFFE9A0)) { sphere(Vec3(c.x, gy + 1.7f, c.z), 0.62f, Part.BULB, 6, 10) }
+        for (p in circle(Vec3(c.x, 0f, c.z), 1.24f, 8)) pole(Vec3(p.x, gy + 0.85f, p.z), Vec3(p.x, gy + 2.6f, p.z), 0.06f, iron, 4)
+        // The dome, the finial and the fish weathervane.
+        paint(red) {
+            lathe(listOf(0.05f to gy + 3.75f, 0.6f to gy + 3.55f, 1.05f to gy + 3.15f, 1.38f to gy + 2.7f, 1.5f to gy + 2.55f), 20, Part.PAINTED, at)
+        }
+        loop(circle(Vec3(c.x, gy + 2.56f, c.z), 1.5f, 24), 0.08f, iron, 4)
+        pole(Vec3(c.x, gy + 3.7f, c.z), Vec3(c.x, gy + 5.2f, c.z), 0.06f, iron, 5)
+        paint(rgb(0xFFF2B33D)) { sphere(Vec3(c.x, gy + 3.95f, c.z), 0.22f, Part.PAINTED, 5, 8) }
         val fish = listOf(
-            -1.6f to 0f, -1.1f to 0.55f, 0f to 0.85f, 1.1f to 0.5f, 1.6f to 0.05f, 2.3f to 0.5f, 2.3f to -0.5f, 1.6f to -0.05f,
-            1.1f to -0.5f, 0f to -0.8f, -1.1f to -0.5f,
+            -1.0f to 0f, -0.7f to 0.34f, 0f to 0.5f, 0.7f to 0.3f, 1.0f to 0.04f, 1.45f to 0.32f, 1.45f to -0.32f, 1.0f to -0.04f,
+            0.7f to -0.3f, 0f to -0.48f, -0.7f to -0.32f,
         )
         paint(rgb(0xFFF2B33D)) {
-            append(MeshBuilder().apply { extrude(fish, 0.25f, Part.PAINTED) }.build(), Mat4.trs(Vec3(c.x, wallTop + 10.1f, c.z), rotY = 0.35f, scale = Vec3(1.1f, 1.1f, 1.1f)))
+            append(MeshBuilder().apply { extrude(fish, 0.16f, Part.PAINTED) }.build(), Mat4.trs(Vec3(c.x, gy + 5.0f, c.z), rotY = 0.5f))
         }
-        cube(Vec3(c.x - 1.15f, wallTop + 10.25f, c.z + 0.18f), Vec3(0.3f, 0.3f, 0.12f), rgb(0xFF263238))
-        // Banners either side of the porch, in the Dex's colours.
-        for (x in listOf(-6.3f, 6.3f)) cube(Vec3(c.x + x, 4f, front + 0.12f), Vec3(1.1f, 3f, 0.08f), rgb(0xFF2F6E8E))
     }
 
-    /** The market hall: an open front under a striped awning, stalls of fish and fruit, lanterns. */
+    /** The lamp at the top of the lighthouse (the beam turns around it at night). */
+    val lighthouseLamp: Vec3 get() = Vec3(lighthouseAt.x, height(lighthouseAt.x, lighthouseAt.z) + 1f + 11f + 1.7f, lighthouseAt.z)
+
+    /**
+     * The market hall (the Shop): a half-timbered hall open at the front, under a terracotta roof,
+     * a red and white striped awning over two stalls (fish on ice, fruit), crates and barrels, a
+     * string of lanterns, and a big gold coin over the entrance.
+     */
     private fun MeshBuilder.market() {
         val s = VillageLayout.spots.getValue(Building.SHOP)
         val c = s.center
+        val f = floorOf(Building.SHOP)
         val w = 10f
-        val d = 6.5f
-        val wall = rgb(0xFFF6E7C8)
-        val roof = rgb(0xFFD9573B)
-        cube(Vec3(c.x, 2.2f, c.z - d / 2f + 0.3f), Vec3(w, 5.4f, 0.6f), wall)
-        for (x in listOf(-w / 2f + 0.3f, w / 2f - 0.3f)) cube(Vec3(c.x + x, 2.2f, c.z), Vec3(0.6f, 5.4f, d), wall)
-        for (x in listOf(-3.2f, 0f, 3.2f)) pole(Vec3(c.x + x, 0f, c.z + d / 2f - 0.3f), Vec3(c.x + x, 4.9f, c.z + d / 2f - 0.3f), 0.2f, rgb(0xFF8D6E63), 6)
-        gableRoof(c.x, c.z, w, d, 4.9f, 2.6f, 0.5f, roof, wall)
-        // The striped awning sloping out over the stalls.
-        val stripes = 9
+        val d = 6.6f
+        val plaster = rgb(0xFFF7EAD0)
+        val timber = rgb(0xFF6E4A33)
+        val roof = rgb(0xFFD2553A)
+        val stone = rgb(0xFFD3C9B8)
+        box(Vec3(c.x, f - 0.9f, c.z), Vec3(w + 1.2f, 1.8f, d + 1.4f), stone, 0.14f)
+        val wallH = 4.6f
+        val front = c.z + d / 2f
+        val back = c.z - d / 2f
+        // Back and side walls, with their timber frames.
+        box(Vec3(c.x, f + wallH / 2f, back + 0.3f), Vec3(w, wallH, 0.6f), plaster, 0.06f)
+        for (sx in listOf(-1f, 1f)) {
+            val x = c.x + sx * (w / 2f - 0.3f)
+            box(Vec3(x, f + wallH / 2f, c.z - 0.4f), Vec3(0.6f, wallH, d - 0.8f), plaster, 0.06f)
+            for (zz in listOf(back + 0.2f, c.z - 0.4f, front - 0.9f)) box(Vec3(x + sx * 0.32f, f + wallH / 2f, zz), Vec3(0.12f, wallH, 0.32f), timber, 0.04f)
+            for (yy in listOf(f + 0.2f, f + wallH * 0.55f, f + wallH - 0.1f)) box(Vec3(x + sx * 0.32f, yy, c.z - 0.4f), Vec3(0.12f, 0.3f, d - 0.6f), timber, 0.04f)
+            // A brace in each panel.
+            boxR(Vec3(x + sx * 0.32f, f + wallH * 0.3f, c.z - 1.6f), Vec3(0.1f, 0.24f, 2.6f), timber, rotX = 0.55f, bevel = 0.03f)
+        }
+        // The open front: posts and a beam.
+        for (x in listOf(-4.7f, -1.6f, 1.6f, 4.7f)) box(Vec3(c.x + x, f + wallH / 2f, front - 0.2f), Vec3(0.38f, wallH, 0.38f), timber, 0.06f)
+        box(Vec3(c.x, f + wallH - 0.2f, front - 0.2f), Vec3(w + 0.3f, 0.45f, 0.45f), timber, 0.08f)
+        gableRoof(c.x, c.z, w, d, f + wallH, 2.7f, 0.55f, roof, plaster)
+        // The striped awning sloping out over the stalls, with a scalloped edge.
+        val stripes = 10
+        val sw = (w + 0.4f) / stripes
         for (k in 0 until stripes) {
-            val x0 = c.x - w / 2f + (k + 0.5f) * (w / stripes)
-            paint(if (k % 2 == 0) rgb(0xFFE53935) else rgb(0xFFFFFBF2)) {
-                append(MeshBuilder().apply { box(Vec3.ZERO, Vec3(w / stripes, 0.1f, 2.4f), Part.PAINTED) }.build(), Mat4.trs(Vec3(x0, 3.7f, c.z + d / 2f + 1.0f), rotX = 0.38f))
+            val x = c.x - (w + 0.4f) / 2f + (k + 0.5f) * sw
+            val col = if (k % 2 == 0) rgb(0xFFE5483C) else rgb(0xFFFFFBF2)
+            boxR(Vec3(x, f + wallH - 0.95f, front + 1.0f), Vec3(sw, 0.1f, 2.5f), col, rotX = 0.42f, bevel = 0.03f)
+            boxR(Vec3(x, f + wallH - 1.62f, front + 2.12f), Vec3(sw * 0.9f, 0.42f, 0.06f), col, bevel = 0.03f)
+        }
+        // Stalls: fish on ice, and fruit.
+        val stall = rgb(0xFFB98652)
+        for ((k, x) in listOf(-2.6f, 2.6f).withIndex()) {
+            box(Vec3(c.x + x, f + 0.5f, front - 0.9f), Vec3(3.4f, 1.0f, 1.1f), stall, 0.06f)
+            for (p in 0 until 4) box(Vec3(c.x + x - 1.25f + p * 0.83f, f + 0.5f, front - 0.33f), Vec3(0.76f, 0.9f, 0.06f), vary(stall, p + k * 4, 9), 0.02f)
+            box(Vec3(c.x + x, f + 1.06f, front - 0.9f), Vec3(3.5f, 0.12f, 1.2f), shade(stall, 0.8f), 0.04f)
+        }
+        box(Vec3(c.x - 2.6f, f + 1.18f, front - 0.9f), Vec3(3.1f, 0.14f, 0.95f), rgb(0xFFE8F4FA), 0.04f)
+        for (k in 0 until 5) {
+            val col = rgb(listOf(0xFF9FB4C0, 0xFFFFA45C, 0xFF5CC1E8, 0xFFF07FA0, 0xFFB7C7A0)[k])
+            paint(col) { sphere(Vec3(c.x - 3.8f + k * 0.6f, f + 1.32f, front - 0.9f + (k % 2) * 0.12f), 0.22f, Part.PAINTED, 4, 8, Vec3(1.4f, 0.5f, 0.7f)) }
+        }
+        for (k in 0 until 9) {
+            val row = if (k < 5) 0 else 1
+            val i = if (k < 5) k else k - 5
+            paint(rgb(listOf(0xFFFF7043, 0xFFFFCA28, 0xFF9CCC65)[k % 3])) {
+                sphere(Vec3(c.x + 1.55f + i * 0.5f + row * 0.25f, f + 1.32f + row * 0.3f, front - 0.9f - row * 0.1f), 0.22f, Part.PAINTED, 4, 7)
             }
         }
-        // Counters with fish on ice, fruit, and crates.
-        cube(Vec3(c.x - 2.5f, 0.55f, c.z + d / 2f - 1.0f), Vec3(3.2f, 1.1f, 1.1f), rgb(0xFFB9874F))
-        cube(Vec3(c.x - 2.5f, 1.15f, c.z + d / 2f - 1.0f), Vec3(3f, 0.12f, 0.9f), rgb(0xFFE3F2FD))
-        for (k in 0 until 4) cube(Vec3(c.x - 3.6f + k * 0.75f, 1.3f, c.z + d / 2f - 1.0f), Vec3(0.55f, 0.16f, 0.22f), rgb(listOf(0xFF90A4AE, 0xFFFFB74D, 0xFF4FC3F7, 0xFFF06292)[k]))
-        cube(Vec3(c.x + 2.5f, 0.55f, c.z + d / 2f - 1.0f), Vec3(3.2f, 1.1f, 1.1f), rgb(0xFFB9874F))
-        for (k in 0 until 6) paint(rgb(listOf(0xFFFF7043, 0xFFFFCA28, 0xFF9CCC65)[k % 3])) {
-            sphere(Vec3(c.x + 1.3f + k * 0.45f, 1.3f, c.z + d / 2f - 1.0f + (k % 2) * 0.25f), 0.22f, Part.PAINTED, 3, 6)
+        crate(ground(c.x + w / 2f + 1.3f, c.z + 1.6f), 0.95f, rgb(0xFF64B5F6), 0.2f)
+        val stack = ground(c.x + w / 2f + 1.4f, c.z + 0.3f)
+        crate(stack, 0.85f, null, -0.1f)
+        crate(stack + Vec3(0f, 0.85f, 0f), 0.7f, rgb(0xFFFFB74D), 0.3f)
+        barrel(ground(c.x - w / 2f - 1.3f, c.z + 1.8f))
+        barrel(ground(c.x - w / 2f - 1.5f, c.z + 0.6f), rgb(0xFF8E6440))
+        // A string of lanterns along the awning's edge.
+        val string = (0..12).map { k ->
+            val x = c.x - w / 2f - 0.2f + k * ((w + 0.4f) / 12f)
+            Vec3(x, f + wallH - 1.75f - sin(k / 12f * PI.toFloat()) * 0.35f, front + 2.25f)
         }
-        crate(Vec3(c.x + w / 2f + 0.9f, 0f, c.z + 1.2f), 1f, rgb(0xFF64B5F6))
-        crate(Vec3(c.x + w / 2f + 1.0f, 0f, c.z - 0.2f), 0.85f)
-        crate(Vec3(c.x + w / 2f + 1.0f, 0.85f, c.z - 0.2f), 0.7f, rgb(0xFFFFB74D))
-        barrel(Vec3(c.x - w / 2f - 1f, 0f, c.z + 1.6f))
-        // A string of lanterns from the awning's corners.
-        for (k in 0..6) {
-            val x = c.x - w / 2f + k * (w / 6f)
-            val sag = sin(k / 6f * PI.toFloat()) * 0.5f
-            cube(Vec3(x, 4.2f - sag, c.z + d / 2f + 2.2f), Vec3(0.3f, 0.36f, 0.3f), rgb(listOf(0xFFFFD54F, 0xFFFF8A65, 0xFF81D4FA)[k % 3]), Part.BULB)
+        paint(rgb(0xFF4E3B30)) { tube(string, { 0.025f }, 3, Part.PAINTED, cap = false) }
+        for ((k, p) in string.withIndex()) if (k % 2 == 1) {
+            box(p + Vec3(0f, -0.25f, 0f), Vec3(0.28f, 0.34f, 0.28f), rgb(listOf(0xFFFFD54F, 0xFFFF8A65, 0xFF81D4FA)[k % 3]), 0.06f, Part.BULB)
         }
-        // The sign: a coin over the entrance.
-        paint(rgb(0xFFF2B33D)) { append(MeshBuilder().apply { tube(listOf(Vec3(0f, 0f, -0.1f), Vec3(0f, 0f, 0.1f)), { 0.9f }, 16, Part.PAINTED) }.build(), Mat4.translation(c.x, 6.4f, c.z + d / 2f + 0.3f)) }
+        // The sign: a gold coin over the entrance, on a bracket under the ridge.
+        val coinAt = Vec3(c.x, f + wallH + 1.25f, front + 0.75f)
+        paint(rgb(0xFFF2B33D)) { append(MeshBuilder().apply { tube(listOf(Vec3(0f, 0f, -0.12f), Vec3(0f, 0f, 0.12f)), { 0.85f }, 24, Part.PAINTED, cap = false) }.build(), Mat4.translation(coinAt.x, coinAt.y, coinAt.z)) }
+        paint(rgb(0xFFF7C95A)) { append(MeshBuilder().apply { lathe(listOf(0.01f to 0.13f, 0.85f to 0.12f), 24, Part.PAINTED) }.build(), Mat4.trs(coinAt, rotX = PI.toFloat() / 2f)) }
+        loop((0 until 24).map { k -> val a = k / 24f * 2f * PI.toFloat(); coinAt + Vec3(cos(a) * 0.6f, sin(a) * 0.6f, 0.15f) }, 0.05f, rgb(0xFFC98A1E), 4)
+        box(coinAt + Vec3(0f, 0f, 0.16f), Vec3(0.18f, 0.72f, 0.06f), rgb(0xFFC98A1E), 0.02f)
     }
 
-    /** The rope workshop: a long timber shed, a giant spool of rope and a winch in front of it. */
+    /**
+     * The rope workshop (Rope): a long shed of lapped timber boards under a slate roof, its big
+     * doors open on a dark workshop, a giant spool wound with rope in front, a winch, coils on the
+     * ground and a rope hung out to dry between two posts.
+     */
     private fun MeshBuilder.ropeWorkshop() {
         val s = VillageLayout.spots.getValue(Building.ROPE)
         val c = s.center
+        val f = floorOf(Building.ROPE)
         val w = 12f
-        val d = 6f
-        val timber = rgb(0xFFB98A5E)
-        val roof = rgb(0xFF5D6B7A)
-        cube(Vec3(c.x, 1.8f, c.z), Vec3(w, 4.6f, d), timber)
-        // Plank lines across the front.
-        for (k in 1 until 6) cube(Vec3(c.x, 0.1f + k * 0.75f, c.z + d / 2f + 0.03f), Vec3(w, 0.06f, 0.06f), shade(timber, 0.75f))
-        gableRoof(c.x, c.z, w, d, 4.1f, 2.4f, 0.5f, roof, timber)
-        // A wide barn door, open, and two windows.
-        cube(Vec3(c.x - 2f, 1.6f, c.z + d / 2f + 0.05f), Vec3(3.2f, 3.2f, 0.1f), rgb(0xFF3E2C23))
-        cube(Vec3(c.x - 4.1f, 1.6f, c.z + d / 2f + 0.5f), Vec3(1.6f, 3.1f, 0.12f), rgb(0xFF8D6040))
-        window(c.x + 2.2f, 2.2f, c.z + d / 2f)
-        window(c.x + 4.4f, 2.2f, c.z + d / 2f)
-        // The giant spool on its side, wound with rope.
-        val spool = Vec3(c.x + 3.4f, 1.9f, c.z + d / 2f + 3.2f)
-        for (side in listOf(-0.95f, 0.95f)) {
-            paint(rgb(0xFF8D6E63)) { append(MeshBuilder().apply { tube(listOf(Vec3(0f, 0f, -0.15f), Vec3(0f, 0f, 0.15f)), { 1.9f }, 18, Part.PAINTED) }.build(), Mat4.translation(spool.x + side, spool.y, spool.z).let { Mat4.multiply(it, Mat4.rotationY(PI.toFloat() / 2f)) }) }
-        }
-        paint(rgb(0xFFE3C99A)) {
-            append(MeshBuilder().apply { tube(listOf(Vec3(0f, 0f, -0.85f), Vec3(0f, 0f, 0.85f)), { 1.45f }, 18, Part.PAINTED, cap = false) }.build(), Mat4.multiply(Mat4.translation(spool.x, spool.y, spool.z), Mat4.rotationY(PI.toFloat() / 2f)))
-        }
-        for (k in 0 until 5) {
-            val x = spool.x - 0.7f + k * 0.35f
-            paint(rgb(0xFFC9AE7E)) {
-                append(MeshBuilder().apply { tube((0..16).map { j -> val a = j / 16f * 2f * PI.toFloat(); Vec3(0f, cos(a) * 1.47f, sin(a) * 1.47f) }, { 0.06f }, 4, Part.PAINTED, cap = false) }.build(), Mat4.translation(x, spool.y, spool.z))
+        val d = 6.2f
+        val board = rgb(0xFFBF8B5A)
+        val dark = rgb(0xFF4A3426)
+        val roof = rgb(0xFF51708C)
+        val stone = rgb(0xFFCFC6B6)
+        box(Vec3(c.x, f - 0.9f, c.z), Vec3(w + 1.0f, 1.8f, d + 1.0f), stone, 0.14f)
+        val wallH = 4f
+        val front = c.z + d / 2f
+        box(Vec3(c.x, f + wallH / 2f, c.z), Vec3(w - 0.2f, wallH, d - 0.2f), dark, 0.04f)
+        // Lapped boards on the front (around the door) and the sides.
+        val rows = 7
+        val doorX = c.x - 2f
+        val doorW = 3.4f
+        for (k in 0 until rows) {
+            val y = f + 0.3f + k * (wallH - 0.3f) / rows
+            val col = vary(board, k, 11, 0.06f)
+            val left = c.x - w / 2f
+            val right = c.x + w / 2f
+            val y1 = y + 0.28f
+            if (y1 < f + 3.4f) {
+                box(Vec3((left + doorX - doorW / 2f) / 2f, y1, front + 0.04f), Vec3(doorX - doorW / 2f - left, 0.56f, 0.12f), col, 0.05f)
+                box(Vec3((doorX + doorW / 2f + right) / 2f, y1, front + 0.04f), Vec3(right - doorX - doorW / 2f, 0.56f, 0.12f), col, 0.05f)
+            } else {
+                box(Vec3(c.x, y1, front + 0.04f), Vec3(w, 0.56f, 0.12f), col, 0.05f)
             }
+            for (sx in listOf(-1f, 1f)) box(Vec3(c.x + sx * (w / 2f + 0.04f), y1, c.z), Vec3(0.12f, 0.56f, d), col, 0.05f)
         }
-        // The winch: an A-frame with a drum, and coils of rope on the ground.
-        val wx = c.x - 3.8f
-        val wz = c.z + d / 2f + 3f
+        // Corner posts.
+        for (sx in listOf(-1f, 1f)) box(Vec3(c.x + sx * w / 2f, f + wallH / 2f, front), Vec3(0.34f, wallH, 0.34f), dark, 0.06f)
+        gableRoof(c.x, c.z, w, d, f + wallH, 2.4f, 0.55f, roof, board)
+        // The big doors, open, with X braces.
+        box(Vec3(doorX, f + 1.7f, front + 0.1f), Vec3(doorW + 0.4f, 0.3f, 0.2f), dark, 0.05f)
+        for (side in listOf(-1f, 1f)) {
+            val hinge = Vec3(doorX + side * doorW / 2f, f + 1.6f, front + 0.12f)
+            val turn = side * 1.15f
+            val m = Mat4.multiply(Mat4.trs(hinge, rotY = turn), Mat4.translation(-side * doorW / 4f, 0f, 0f))
+            bevelBox(m, Vec3(doorW / 2f, 3.1f, 0.12f), shade(board, 0.9f), 0.04f)
+            for (diag in listOf(0.82f, -0.82f)) bevelBox(Mat4.multiply(m, Mat4.multiply(Mat4.translation(0f, 0f, 0.08f), Mat4.rotationZ(diag))), Vec3(0.16f, 3.3f, 0.06f), dark, 0.02f)
+        }
+        // A sign board with a coil of rope over the door.
+        box(Vec3(doorX, f + 3.75f, front + 0.2f), Vec3(2.4f, 0.7f, 0.14f), rgb(0xFFF3E3C2), 0.06f)
+        loop(circle(Vec3(doorX, 0f, front + 0.32f), 0.25f, 12).map { Vec3(it.x, f + 3.75f + (it.z - front - 0.32f), front + 0.32f) }, 0.07f, rgb(0xFFC9A26B), 4)
+        // The giant spool on its side, in a wooden cradle.
+        val spool = ground(c.x + 3.3f, front + 3.2f) + Vec3(0f, 1.7f, 0f)
+        val spoolM = Mat4.multiply(Mat4.translation(spool.x, spool.y, spool.z), Mat4.rotationZ(PI.toFloat() / 2f))
+        val wound = MeshBuilder().apply {
+            paint(rgb(0xFF9C6E47)) {
+                for (y in listOf(-1.05f, 0.85f)) {
+                    lathe(listOf(1.75f to y + 0.2f, 1.75f to y), 28, Part.PAINTED)
+                    lathe(listOf(0.01f to y + 0.2f, 1.75f to y + 0.2f), 28, Part.PAINTED)
+                    lathe(listOf(1.75f to y, 0.01f to y), 28, Part.PAINTED)
+                }
+            }
+            paint(rgb(0xFFE0C08C)) { lathe((0..24).map { k -> val y = 0.85f - k * 1.7f / 24f; (1.32f + 0.07f * abs(sin(k * PI.toFloat() / 3f))) to y }, 28, Part.PAINTED) }
+        }.build()
+        append(wound, spoolM)
+        for (sx in listOf(-1.15f, 1.15f)) box(Vec3(spool.x + sx, spool.y - 1.62f, spool.z), Vec3(0.3f, 0.3f, 2.4f), dark, 0.06f)
+        // The winch: an A-frame and a drum with rope.
+        val wx = c.x - 4.2f
+        val wz = front + 2.6f
+        val wy = height(wx, wz)
         for (side in listOf(-0.9f, 0.9f)) {
-            pole(Vec3(wx + side, 0f, wz - 0.6f), Vec3(wx + side, 2.6f, wz), 0.12f, rgb(0xFF6D4C35))
-            pole(Vec3(wx + side, 0f, wz + 0.6f), Vec3(wx + side, 2.6f, wz), 0.12f, rgb(0xFF6D4C35))
+            pole(Vec3(wx + side, wy - 0.2f, wz - 0.7f), Vec3(wx + side, wy + 2.4f, wz), 0.12f, dark, 6)
+            pole(Vec3(wx + side, wy - 0.2f, wz + 0.7f), Vec3(wx + side, wy + 2.4f, wz), 0.12f, dark, 6)
         }
-        pole(Vec3(wx - 1.1f, 2.1f, wz), Vec3(wx + 1.1f, 2.1f, wz), 0.3f, rgb(0xFFE3C99A), 10)
-        for ((k, at) in listOf(Vec3(c.x - 1f, 0.2f, c.z + d / 2f + 2.2f), Vec3(c.x + 0.4f, 0.2f, c.z + d / 2f + 3.6f)).withIndex()) {
-            for (ring in 0 until 3) paint(rgb(0xFFD8BC8C)) {
-                tube((0..14).map { j -> val a = j / 14f * 2f * PI.toFloat(); at + Vec3(cos(a) * (0.75f - ring * 0.18f), ring * 0.14f, sin(a) * (0.75f - ring * 0.18f)) }, { 0.09f }, 4, Part.PAINTED, cap = false)
-            }
-            if (k == 0) barrel(at + Vec3(-1.6f, -0.2f, 0f), rgb(0xFF8D6E63))
+        pole(Vec3(wx - 1.1f, wy + 2.0f, wz), Vec3(wx + 1.1f, wy + 2.0f, wz), 0.32f, rgb(0xFFE0C08C), 12)
+        // Coils of rope on the ground.
+        for (at in listOf(ground(c.x - 0.6f, front + 1.8f), ground(c.x + 0.6f, front + 3.4f))) {
+            for (ring in 0 until 4) loop(circle(at + Vec3(0f, 0.08f + ring * 0.13f, 0f), 0.72f - ring * 0.13f, 16), 0.09f, rgb(0xFFD8B985), 5)
         }
+        barrel(ground(c.x - 7.0f, front - 0.6f), rgb(0xFF8E6440))
+        // A rope hung between two posts.
+        val p0 = ground(c.x + 7.2f, c.z + 2.4f) + Vec3(0f, -0.3f, 0f)
+        val p1 = ground(c.x + 7.2f, c.z - 2.4f) + Vec3(0f, -0.3f, 0f)
+        pole(p0, p0 + Vec3(0f, 2.8f, 0f), 0.1f, dark, 6)
+        pole(p1, p1 + Vec3(0f, 2.8f, 0f), 0.1f, dark, 6)
+        paint(rgb(0xFFD8B985)) { tube((0..10).map { k -> val u = k / 10f; Vec3(p0.x + 0.05f, p0.y + (p1.y - p0.y) * u + 2.4f - sin(u * PI.toFloat()) * 0.7f, p0.z + (p1.z - p0.z) * u) }, { 0.07f }, 4, Part.PAINTED, cap = false) }
     }
 
-    /** The aquarium: a round stone base, a glass dome on iron ribs (the glass is its own mesh), a golden finial. */
+    /**
+     * The aquarium (the glass pavilion): a round stone base with a band of blue tiles, the water
+     * inside, a glass dome on teal iron ribs (the glass is its own see-through mesh), a gold
+     * finial, an arched entrance between lamps and planters of flowers.
+     */
     private fun MeshBuilder.aquariumPavilion() {
         val c = VillageLayout.spots.getValue(Building.AQUARIUM).center
-        val r = 5f
+        val f = floorOf(Building.AQUARIUM)
+        val at = Vec3(c.x, 0f, c.z)
+        val r = AQ_R
         val stone = rgb(0xFFF1ECE2)
-        paint(stone) { lathe(listOf(r + 0.4f to 1.6f, r + 0.4f to -0.6f), 20, Part.PAINTED, Vec3(c.x, 0f, c.z)) }
-        paint(shade(stone, 0.9f)) { lathe(listOf(0.01f to 1.62f, r + 0.4f to 1.6f), 20, Part.PAINTED, Vec3(c.x, 0f, c.z)) }
+        val iron = rgb(0xFF2E6B70)
+        val top = f + 1.3f
+        paint(stone) { lathe(listOf(r + 0.4f to top, r + 0.4f to f - 1.6f), 36, Part.PAINTED, at) }
+        paint(rgb(0xFF4A9BC4)) { lathe(listOf(r + 0.43f to top - 0.45f, r + 0.43f to top - 0.85f), 36, Part.PAINTED, at) }
+        paint(shade(stone, 0.95f)) { lathe(listOf(r - 0.1f to top + 0.12f, r + 0.6f to top + 0.12f, r + 0.6f to top - 0.1f), 36, Part.PAINTED, at) }
         // The water inside, seen through the glass.
-        paint(rgb(0xFF2BB3C8)) { lathe(listOf(0.01f to 4.4f, r - 0.4f to 4.4f, r - 0.4f to 1.6f), 20, Part.PAINTED, Vec3(c.x, 0f, c.z)) }
-        // Iron ribs over the dome, and a ring at its foot.
-        val ribs = 8
+        disc(Vec3(c.x, top + 2.6f, c.z), r - 0.3f, rgb(0xFF2BB3C8), 32)
+        paint(rgb(0xFF1E9BB5)) { lathe(listOf(r - 0.3f to top + 2.6f, r - 0.3f to top), 32, Part.PAINTED, at) }
+        // Iron ribs over the dome, a ring at its foot and at its crown.
+        val ribs = 12
         for (k in 0 until ribs) {
             val a = k / ribs.toFloat() * 2f * PI.toFloat()
-            val path = (0..10).map { j ->
-                val t = j / 10f * PI.toFloat() / 2f
-                Vec3(c.x + cos(a) * r * cos(t), 1.6f + r * 0.95f * sin(t), c.z + sin(a) * r * cos(t))
+            val path = (0..12).map { j ->
+                val t = j / 12f * PI.toFloat() / 2f * 0.94f
+                Vec3(c.x + cos(a) * (r + 0.05f) * cos(t), top + (r + 0.05f) * 0.95f * sin(t), c.z + sin(a) * (r + 0.05f) * cos(t))
             }
-            paint(rgb(0xFF2E5E62)) { tube(path, { 0.12f }, 4, Part.PAINTED, cap = false) }
+            paint(iron) { tube(path, { 0.11f }, 5, Part.PAINTED, cap = false) }
         }
-        paint(rgb(0xFF2E5E62)) {
-            tube((0..24).map { j -> val a = j / 24f * 2f * PI.toFloat(); Vec3(c.x + cos(a) * r, 1.65f, c.z + sin(a) * r) }, { 0.16f }, 4, Part.PAINTED, cap = false)
+        loop(circle(Vec3(c.x, top + 0.08f, c.z), r + 0.05f, 40), 0.16f, iron, 6)
+        loop(circle(Vec3(c.x, top + r * 0.95f * sin(PI.toFloat() / 2f * 0.94f), c.z), (r + 0.05f) * cos(PI.toFloat() / 2f * 0.94f), 12), 0.12f, iron, 5)
+        paint(rgb(0xFFF2B33D)) {
+            sphere(Vec3(c.x, top + r * 0.95f + 0.35f, c.z), 0.42f, Part.PAINTED, 6, 10)
+            lathe(listOf(0.02f to top + r * 0.95f + 1.4f, 0.14f to top + r * 0.95f + 0.7f), 6, Part.PAINTED, at)
         }
-        paint(rgb(0xFFF2B33D)) { sphere(Vec3(c.x, 1.6f + r * 0.95f + 0.35f, c.z), 0.45f, Part.PAINTED, 5, 8) }
-        // An arched entrance on the street side.
-        cube(Vec3(c.x + 1.8f, 1.2f, c.z + r - 0.2f), Vec3(1.8f, 2.4f, 0.8f), rgb(0xFF2E5E62))
-        lamp(Vec3(c.x + 3.4f, 0f, c.z + r + 1.2f), 2.8f)
+        // The arched entrance, facing the square (south-east).
+        val a = 0.75f
+        val ex = c.x + cos(a) * (r + 0.4f)
+        val ez = c.z + sin(a) * (r + 0.4f)
+        val turn = atan2(cos(a), sin(a))
+        val m = Mat4.trs(Vec3(ex, f, ez), rotY = turn)
+        for (side in listOf(-1f, 1f)) bevelBox(Mat4.multiply(m, Mat4.translation(side * 1.05f, 1.5f, 0.2f)), Vec3(0.45f, 3.0f, 0.7f), stone, 0.06f)
+        bevelBox(Mat4.multiply(m, Mat4.translation(0f, 3.2f, 0.2f)), Vec3(2.8f, 0.5f, 0.75f), stone, 0.08f)
+        bevelBox(Mat4.multiply(m, Mat4.translation(0f, 1.25f, 0.05f)), Vec3(1.65f, 2.5f, 0.4f), rgb(0xFF1F4E5A), 0.04f)
+        bevelBox(Mat4.multiply(m, Mat4.translation(0f, 3.55f, 0.25f)), Vec3(1.1f, 0.3f, 0.6f), rgb(0xFF4A9BC4), 0.05f)
+        for (side in listOf(-1f, 1f)) {
+            val p = Mat4.transformPoint(m, Vec3(side * 2.2f, 0f, 1.0f))
+            lamp(ground(p.x, p.z), 2.6f)
+            val q = ground(Mat4.transformPoint(m, Vec3(side * 1.6f, 0f, 1.7f)).x, Mat4.transformPoint(m, Vec3(side * 1.6f, 0f, 1.7f)).z)
+            box(q + Vec3(0f, 0.3f, 0f), Vec3(0.8f, 0.7f, 0.8f), rgb(0xFFC77D55), 0.06f)
+            paint(rgb(0xFF5FAE52)) { sphere(q + Vec3(0f, 0.85f, 0f), 0.45f, Part.PAINTED, 4, 7) }
+            paint(rgb(if (side > 0f) 0xFFFF8FA3 else 0xFFFFE066)) { sphere(q + Vec3(0.1f, 1.2f, 0.15f), 0.13f, Part.PAINTED, 3, 5) }
+        }
     }
 
     /** The aquarium's glass dome, drawn see-through after the fish inside it. */
     private fun glass(): MeshData {
         val b = MeshBuilder()
         val c = VillageLayout.spots.getValue(Building.AQUARIUM).center
-        val r = 5f
+        val top = floorOf(Building.AQUARIUM) + 1.3f
+        val r = AQ_R
         b.paint(rgb(0xFFBFE9F2)) {
-            // A half sphere (the top half of a squashed sphere), glass all round.
-            val lat = 7
-            val lon = 20
+            val lat = 10
+            val lon = 32
             val first = vertexCount
             for (i in 0..lat) {
                 val th = i / lat.toFloat() * PI.toFloat() / 2f
                 for (j in 0..lon) {
                     val ph = j / lon.toFloat() * 2f * PI.toFloat()
                     val n = Vec3(cos(th) * cos(ph), sin(th), cos(th) * sin(ph))
-                    vertex(Vec3(c.x + n.x * r, 1.6f + n.y * r * 0.95f, c.z + n.z * r), n, j / lon.toFloat(), 1f - i / lat.toFloat(), Part.GLASS)
+                    vertex(Vec3(c.x + n.x * r, top + n.y * r * 0.95f, c.z + n.z * r), n, j / lon.toFloat(), 1f - i / lat.toFloat(), Part.GLASS)
                 }
             }
             val stride = lon + 1
@@ -552,141 +1121,124 @@ object VillageModels {
         return b.build()
     }
 
-    /** The pier: a long deck on pilings, a harbour master's hut at its foot, lamps, bollards and rope. */
+    /** The lighthouse's beam: two long, soft wedges of light around the lamp (turned by the scene). */
+    private fun beam(): MeshData {
+        val b = MeshBuilder()
+        val col = rgb(0xFFFFF4C8)
+        for (dir in listOf(1f, -1f)) {
+            val n = Vec3.UP
+            val o = b.vertex(Vec3(0f, 0f, 0f), n, 0f, 0f, Part.BULB, col)
+            val l = b.vertex(Vec3(dir * 38f, -6f, -4f), n, 1f, 0f, Part.BULB, col)
+            val r = b.vertex(Vec3(dir * 38f, -6f, 4f), n, 1f, 1f, Part.BULB, col)
+            b.triangle(o, l, r)
+        }
+        return b.build()
+    }
+
+    /**
+     * The pier (Fish): a deck of planks on stringers and pilings from the beach out to your boat,
+     * bollards with the mooring lines, lamps, a life ring, crates of the day's catch and a coil
+     * of rope.
+     */
     private fun MeshBuilder.pier() {
         val a = VillageLayout.pierFrom
         val e = VillageLayout.pierTo
-        val wood = rgb(0xFFB98A57)
+        val wood = rgb(0xFFC28E58)
+        val dark = rgb(0xFF5E4330)
         val len = e.z - a.z
-        cube(Vec3(a.x, a.y - 0.15f, (a.z + e.z) / 2f), Vec3(3.2f, 0.3f, len), wood)
-        var z = a.z + 0.6f
+        for (side in listOf(-1.25f, 1.25f)) box(Vec3(a.x + side, a.y - 0.3f, (a.z + e.z) / 2f), Vec3(0.26f, 0.3f, len), dark, 0.05f)
+        var z = a.z + 0.25f
         var k = 0
         while (z < e.z) {
-            cube(Vec3(a.x, a.y + 0.02f, z), Vec3(3.3f, 0.05f, 0.1f), shade(wood, 0.72f))
-            if (k % 3 == 0) for (side in listOf(-1.5f, 1.5f)) pole(Vec3(a.x + side, -2.5f, z), Vec3(a.x + side, a.y + 0.6f, z), 0.2f, rgb(0xFF6D4C35), 6)
-            z += 1.1f
+            box(Vec3(a.x + (hash01(k, 1, 19) - 0.5f) * 0.08f, a.y - 0.08f, z), Vec3(3.4f, 0.16f, 0.46f), vary(wood, k, 21), 0.04f)
+            z += 0.53f
             k++
         }
-        // Bollards with the boat's mooring lines, and lamps along the edge.
-        for (zz in listOf(e.z - 6f, e.z - 1.2f)) paint(rgb(0xFF455A64)) { lathe(listOf(0.22f to 0.7f, 0.3f to 0.55f, 0.2f to 0f), 8, Part.PAINTED, Vec3(a.x + 1.3f, a.y, zz)) }
-        for (zz in listOf(a.z + 5f, a.z + 13f, e.z - 0.5f)) lamp(Vec3(a.x - 1.4f, a.y, zz), 2.6f)
-        // The harbour master's hut at the foot of the pier.
-        val hut = House(a.x + 4.2f, a.z - 3.2f, 3.6f, 3.2f, 1, rgb(0xFFE9F1F2), rgb(0xFF3B7EA1))
-        house(hut)
-        // A life ring on the hut's wall, and crates of the day's catch.
-        paint(rgb(0xFFE53935)) {
-            tube((0..14).map { j -> val t = j / 14f * 2f * PI.toFloat(); Vec3(hut.x - 0.6f + cos(t) * 0.45f, 1.9f + sin(t) * 0.45f, hut.z + hut.d / 2f + 0.15f) }, { 0.12f }, 5, Part.PAINTED, cap = false)
+        z = a.z + 2f
+        while (z < e.z + 0.1f) {
+            for (side in listOf(-1.55f, 1.55f)) {
+                paint(dark) { tube(listOf(Vec3(a.x + side, -2.6f, z), Vec3(a.x + side, a.y + 0.45f, z)), { 0.2f }, 8, Part.PAINTED, cap = true) }
+            }
+            z += 2.6f
         }
-        crate(Vec3(a.x - 0.8f, a.y, e.z - 3f), 0.8f, rgb(0xFF90A4AE))
+        // Bollards with the boat's mooring lines, lamps on the left edge.
+        val boat = VillageLayout.boatAt
+        for (zz in listOf(boat.z - 3.6f, boat.z + 2.8f)) {
+            val bp = Vec3(a.x + 1.3f, a.y, zz)
+            paint(rgb(0xFF3E4A52)) { lathe(listOf(0.24f to 0.72f, 0.32f to 0.6f, 0.2f to 0.45f, 0.24f to 0f), 10, Part.PAINTED, bp) }
+            val tie = Vec3(boat.x - 0.8f, 0.9f, zz + if (zz < boat.z) 1.4f else -1.4f)
+            paint(rgb(0xFFD8B985)) { tube((0..6).map { j -> val u = j / 6f; Vec3.lerp(bp + Vec3(0f, 0.55f, 0f), tie, u) + Vec3(0f, -sin(u * PI.toFloat()) * 0.3f, 0f) }, { 0.045f }, 4, Part.PAINTED, cap = false) }
+        }
+        for (zz in listOf(a.z + 5f, a.z + 12f, e.z - 0.8f)) lamp(Vec3(a.x - 1.45f, a.y, zz), 2.6f)
+        // A life ring on a post at the end.
+        val ringAt = Vec3(a.x - 1.1f, a.y + 1.1f, e.z + 0.05f)
+        pole(Vec3(ringAt.x, a.y, e.z - 0.1f), Vec3(ringAt.x, a.y + 1.8f, e.z - 0.1f), 0.09f, dark, 6)
+        loop((0 until 18).map { j -> val t = j / 18f * 2f * PI.toFloat(); ringAt + Vec3(cos(t) * 0.48f, sin(t) * 0.48f, 0.1f) }, 0.14f, rgb(0xFFE53935), 6)
+        for (q in 0 until 4) {
+            val t = q / 4f * 2f * PI.toFloat() + 0.4f
+            box(ringAt + Vec3(cos(t) * 0.48f, sin(t) * 0.48f, 0.12f), Vec3(0.2f, 0.2f, 0.3f), rgb(0xFFFFFBF2), 0.05f)
+        }
+        // Crates of the catch and a coil of rope.
+        crate(Vec3(a.x - 0.7f, a.y, e.z - 3.6f), 0.8f, rgb(0xFF90A4AE), 0.15f)
+        crate(Vec3(a.x - 0.75f, a.y, e.z - 4.5f), 0.7f, rgb(0xFF5CC1E8), -0.2f)
+        for (ring in 0 until 3) loop(circle(Vec3(a.x + 0.5f, a.y + 0.08f + ring * 0.11f, a.z + 8f), 0.5f - ring * 0.1f, 14), 0.07f, rgb(0xFFD8B985), 4)
         barrel(Vec3(a.x + 0.9f, a.y, a.z + 3f))
     }
 
-    /** The duelling platform: a round deck on the water, a rope rail, the rivals' pennants and buoys. */
+    /**
+     * The duelling platform (Battle): a round deck of planks on the water inside a dark rim, the
+     * white starting circle, posts and a rope rail, the rivals' pennants (blue and red) facing each
+     * other, red and white buoys around it and a jetty from the beach.
+     */
     private fun MeshBuilder.arena() {
-        val s = VillageLayout.spots.getValue(Building.DUEL)
-        val c = s.center
-        val r = 6.6f
+        val c = VillageLayout.spots.getValue(Building.DUEL).center
+        val r = ARENA_R
         val deckY = 0.9f
-        paint(rgb(0xFFB98A57)) { lathe(listOf(0.01f to deckY, r to deckY, r to -0.4f), 28, Part.PAINTED, Vec3(c.x, 0f, c.z)) }
-        // Planks across, and the white starting circle in the middle.
-        for (k in -5..5) cube(Vec3(c.x, deckY + 0.01f, c.z + k * 1.2f), Vec3(2f * sqrt(max(0f, r * r - (k * 1.2f) * (k * 1.2f))), 0.03f, 0.08f), rgb(0xFF8C6239))
-        paint(rgb(0xFFFFFBF2)) {
-            tube((0..28).map { j -> val a = j / 28f * 2f * PI.toFloat(); Vec3(c.x + cos(a) * 2.2f, deckY + 0.05f, c.z + sin(a) * 2.2f) }, { 0.12f }, 4, Part.PAINTED, cap = false)
+        val wood = rgb(0xFFC28E58)
+        val dark = rgb(0xFF5E4330)
+        val at = Vec3(c.x, 0f, c.z)
+        paint(dark) { lathe(listOf(r + 0.25f to deckY + 0.1f, r + 0.25f to -0.5f), 40, Part.PAINTED, at) }
+        loop(circle(Vec3(c.x, deckY + 0.1f, c.z), r + 0.12f, 48), 0.18f, shade(dark, 1.2f), 5)
+        var k = 0
+        var z = -r + 0.3f
+        while (z < r - 0.2f) {
+            val half = sqrt(max(0f, r * r - z * z)) - 0.05f
+            box(Vec3(c.x, deckY - 0.02f, c.z + z), Vec3(2f * half, 0.16f, 0.48f), vary(wood, k, 27), 0.04f)
+            z += 0.53f
+            k++
         }
+        loop(circle(Vec3(c.x, deckY + 0.07f, c.z), 2.2f, 40), 0.1f, rgb(0xFFFFFBF2), 4)
         // Posts and a rope rail around the edge (open towards the jetty).
-        val posts = 14
-        for (k in 0 until posts) {
-            val a = k / posts.toFloat() * 2f * PI.toFloat()
-            if (abs(a - 3f * PI.toFloat() / 2f) < 0.4f) continue
-            pole(Vec3(c.x + cos(a) * (r - 0.3f), -1.5f, c.z + sin(a) * (r - 0.3f)), Vec3(c.x + cos(a) * (r - 0.3f), deckY + 1.3f, c.z + sin(a) * (r - 0.3f)), 0.13f, rgb(0xFF6D4C35), 5)
+        val posts = 16
+        val gap = 3f * PI.toFloat() / 2f
+        for (i in 0 until posts) {
+            val ang = i / posts.toFloat() * 2f * PI.toFloat()
+            if (abs(ang - gap) < 0.35f) continue
+            val p = Vec3(c.x + cos(ang) * (r - 0.25f), 0f, c.z + sin(ang) * (r - 0.25f))
+            paint(dark) { tube(listOf(Vec3(p.x, -1.6f, p.z), Vec3(p.x, deckY + 1.3f, p.z)), { 0.14f }, 6, Part.PAINTED, cap = true) }
         }
         paint(rgb(0xFFE3C99A)) {
-            tube((0..40).map { j -> val a = -PI.toFloat() / 2f + 0.4f + j / 40f * (2f * PI.toFloat() - 0.8f); Vec3(c.x + cos(a) * (r - 0.3f), deckY + 1.15f - 0.12f * sin(j * 0.8f), c.z + sin(a) * (r - 0.3f)) }, { 0.07f }, 4, Part.PAINTED, cap = false)
+            tube((0..44).map { j -> val ang = gap + 0.35f + j / 44f * (2f * PI.toFloat() - 0.7f); Vec3(c.x + cos(ang) * (r - 0.25f), deckY + 1.12f - 0.14f * abs(sin(j * PI.toFloat() / 2.75f)), c.z + sin(ang) * (r - 0.25f)) }, { 0.07f }, 4, Part.PAINTED, cap = false)
         }
-        // The rivals' pennants, blue and red, facing each other.
-        pennant(Vec3(c.x - r * 0.6f, deckY, c.z), 6.2f, 2.8f, 1f, rgb(0xFF4FC3F7))
-        pennant(Vec3(c.x + r * 0.6f, deckY, c.z), 6.2f, 2.8f, -1f, rgb(0xFFFF5A4A))
-        // Buoys around it.
-        for (k in 0 until 6) {
-            val a = k / 6f * 2f * PI.toFloat() + 0.3f
-            val at = Vec3(c.x + cos(a) * (r + 2.5f), 0.1f, c.z + sin(a) * (r + 2.5f))
-            paint(if (k % 2 == 0) rgb(0xFFE53935) else rgb(0xFFFFFBF2)) { sphere(at, 0.45f, Part.PAINTED, 4, 8) }
+        pennant(Vec3(c.x - r * 0.62f, deckY, c.z), 6.2f, 2.8f, 1f, rgb(0xFF3FA9F5))
+        pennant(Vec3(c.x + r * 0.62f, deckY, c.z), 6.2f, 2.8f, -1f, rgb(0xFFFF5A4A))
+        for ((i, at2) in buoys.withIndex()) {
+            paint(if (i % 2 == 0) rgb(0xFFE53935) else rgb(0xFFFFFBF2)) { sphere(at2, 0.45f, Part.PAINTED, 6, 10) }
+            pole(at2 + Vec3(0f, 0.3f, 0f), at2 + Vec3(0f, 1.0f, 0f), 0.05f, rgb(0xFF37474F), 4)
         }
         // The jetty from the beach.
         val ja = VillageLayout.jettyFrom
         val je = VillageLayout.jettyTo
-        cube(Vec3(ja.x, ja.y - 0.15f, (ja.z + je.z) / 2f), Vec3(2.4f, 0.3f, je.z - ja.z), rgb(0xFFB98A57))
-        var z = ja.z + 0.5f
+        for (side in listOf(-0.9f, 0.9f)) box(Vec3(ja.x + side, ja.y - 0.3f, (ja.z + je.z) / 2f), Vec3(0.22f, 0.26f, je.z - ja.z), dark, 0.05f)
+        z = ja.z + 0.25f
+        k = 0
         while (z < je.z) {
-            cube(Vec3(ja.x, ja.y + 0.02f, z), Vec3(2.5f, 0.05f, 0.1f), rgb(0xFF8C6239))
-            z += 1.1f
+            box(Vec3(ja.x, ja.y - 0.08f, z), Vec3(2.5f, 0.14f, 0.44f), vary(wood, k, 29), 0.04f)
+            z += 0.5f
+            k++
         }
-        for (zz in listOf(ja.z + 3f, ja.z + 6.5f)) for (side in listOf(-1.1f, 1.1f)) pole(Vec3(ja.x + side, -2f, zz), Vec3(ja.x + side, ja.y, zz), 0.16f, rgb(0xFF6D4C35), 5)
+        for (zz in listOf(ja.z + 3f, ja.z + 6.5f, je.z - 0.3f)) for (side in listOf(-1.1f, 1.1f)) {
+            paint(dark) { tube(listOf(Vec3(ja.x + side, -2f, zz), Vec3(ja.x + side, ja.y + 0.3f, zz)), { 0.17f }, 7, Part.PAINTED, cap = true) }
+        }
     }
-
-    /** The lighthouse on its rock, out beyond the arena: decor (its light turns at night). */
-    private fun MeshBuilder.lighthouse() {
-        val at = Vec3(18f, 0f, 36f)
-        rockAt(at + Vec3(0f, -0.5f, 0f), 6f, 3)
-        rockAt(at + Vec3(4f, -0.8f, 2f), 3f, 5)
-        val base = 3.2f
-        val bands = listOf(rgb(0xFFFFFBF2), rgb(0xFFD84B3B), rgb(0xFFFFFBF2), rgb(0xFFD84B3B), rgb(0xFFFFFBF2))
-        for ((k, col) in bands.withIndex()) {
-            val y0 = base + k * 2.2f
-            val r0 = 1.6f - k * 0.16f
-            paint(col) { lathe(listOf(r0 - 0.16f to y0 + 2.2f, r0 to y0), 12, Part.PAINTED, Vec3(at.x, 0f, at.z)) }
-        }
-        val top = base + bands.size * 2.2f
-        cube(Vec3(at.x, top + 0.15f, at.z), Vec3(2.4f, 0.3f, 2.4f), rgb(0xFF37474F))
-        paint(rgb(0xFFFFF1B0)) { lathe(listOf(0.7f to top + 1.5f, 0.7f to top + 0.3f), 10, Part.BULB, Vec3(at.x, 0f, at.z)) }
-        paint(rgb(0xFFD84B3B)) { lathe(listOf(0.02f to top + 2.6f, 1.1f to top + 1.5f), 10, Part.PAINTED, Vec3(at.x, 0f, at.z)) }
-    }
-
-    /** By the shore: rowboats pulled up on the sand, nets drying on poles, rocks, a bench. */
-    private fun MeshBuilder.shoreProps() {
-        for ((k, at) in listOf(Vec3(-17f, 0f, 5.5f), Vec3(-2.5f, 0f, 6.5f), Vec3(14f, 0f, 6f)).withIndex()) {
-            val y = height(at.x, at.z) + 0.25f
-            val hull = listOf(-1.6f to 0.5f, -1.3f to -0.15f, 1.3f to -0.15f, 1.8f to 0.5f)
-            val col = rgb(listOf(0xFF3B7EA1, 0xFFE07A3F, 0xFF2E8C88)[k])
-            paint(col) { append(MeshBuilder().apply { extrude(hull, 1.2f, Part.PAINTED) }.build(), Mat4.trs(Vec3(at.x, y, at.z), rotY = 0.6f + k * 0.9f)) }
-            paint(rgb(0xFFF5EBD8)) { append(MeshBuilder().apply { box(Vec3(0f, 0.42f, 0f), Vec3(2.9f, 0.08f, 1.0f), Part.PAINTED) }.build(), Mat4.trs(Vec3(at.x, y, at.z), rotY = 0.6f + k * 0.9f)) }
-        }
-        // Sailing boats moored in the bay, on their buoys.
-        for ((k, at) in listOf(Vec3(-20f, 0f, 22f), Vec3(22f, 0f, 16f), Vec3(-2f, 0f, 34f), Vec3(30f, 0f, 30f)).withIndex()) {
-            val hull = listOf(-1.8f to 0.7f, -1.4f to -0.3f, 1.6f to -0.3f, 2.2f to 0.7f)
-            val col = rgb(listOf(0xFFFFFBF2, 0xFF3B7EA1, 0xFFE07A3F, 0xFF2E8C88)[k])
-            val turn = 0.4f + k * 1.3f
-            paint(col) { append(MeshBuilder().apply { extrude(hull, 1.4f, Part.PAINTED) }.build(), Mat4.trs(at, rotY = turn)) }
-            paint(rgb(0xFF6D4C35)) { append(MeshBuilder().apply { box(Vec3(0f, 0.72f, 0f), Vec3(3.4f, 0.08f, 1.2f), Part.PAINTED) }.build(), Mat4.trs(at, rotY = turn)) }
-            pole(at + Vec3(0f, 0.7f, 0f), at + Vec3(0f, 5.5f, 0f), 0.08f, rgb(0xFF5D4037), 5)
-            paint(rgb(0xFFFFF8EC)) {
-                val n = Vec3(0f, 0f, 1f)
-                val base = vertexCount
-                val a = vertex(at + Vec3(0.05f, 5.3f, 0f), n, 0f, 1f, Part.CLOTH)
-                val b = vertex(at + Vec3(0.05f, 1.1f, 0f), n, 0f, 0f, Part.CLOTH)
-                val c = vertex(at + Vec3(2.2f * cos(turn), 1.1f, -2.2f * sin(turn)), n, 1f, 0f, Part.CLOTH)
-                triangle(a, b, c)
-                triangle(a, c, b)
-                if (base < 0) Unit
-            }
-        }
-        // Nets drying between poles.
-        for (x in listOf(-22f, 18f)) {
-            val z = shoreZ(x) - 3f
-            val y = height(x, z)
-            for (dx in listOf(-2f, 2f)) pole(Vec3(x + dx, y - 0.3f, z), Vec3(x + dx, y + 2.2f, z), 0.1f, rgb(0xFF6D4C35), 5)
-            cube(Vec3(x, y + 1.4f, z), Vec3(4f, 1.4f, 0.05f), rgb(0xFF7D8F86))
-        }
-        // Rocks along the shore and on the headlands.
-        for (k in 0 until 14) {
-            val x = if (k % 2 == 0) -26f - 18f * hash01(k, 1, 13) else 26f + 18f * hash01(k, 1, 13)
-            val z = shoreZ(x) + 2f + 8f * hash01(k, 2, 13)
-            rockAt(Vec3(x, height(x, z) - 0.3f, z), 1.4f + 2f * hash01(k, 3, 13), k % 8)
-        }
-        // Benches and lamps along the street.
-        for (z in listOf(-4f, -12f, -20f)) lamp(Vec3(3.6f + (z + 4f) * -0.2f, height(3.6f, z), z), 3f)
-    }
-
-    /** The lights that glow at night (for gulls and sparkles, see VillageScene): bulb positions. */
-    val lighthouseLamp = Vec3(18f, 15.4f, 36f)
 }

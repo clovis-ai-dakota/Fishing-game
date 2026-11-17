@@ -18,7 +18,7 @@
     <string name="tour_welcome_body">Pêchez tous les poissons des profondeurs. Cette courte visite montre comment jouer et à quoi sert chaque chose. Touchez Suivant, ou Passer la visite si vous connaissez déjà le jeu.</string>
 
     <string name="tour_village_title">Votre village</string>
-    <string name="tour_village_body">Le village est votre port d\'attache. Chaque bâtiment ouvre un menu : Pêche (le ponton, d\'où vous lancez), Dex (toutes les espèces rencontrées), Boutique (matériel et looks), Duel (matchs en 1 contre 1), Corde (ses améliorations) et Aquarium (vos prises exposées). Faites glisser pour vous déplacer, pincez pour zoomer.</string>
+    <string name="tour_village_body">Le village est votre port d\'attache, sur son île. Chaque bâtiment ouvre un menu : Pêche (le ponton, d\'où vous lancez), Dex (le phare : toutes les espèces rencontrées), Boutique (matériel et looks), Duel (matchs en 1 contre 1), Corde (ses améliorations) et Aquarium (vos prises exposées). Faites glisser pour vous déplacer, pincez pour zoomer.</string>
     <string name="tour_look_title">Un nouveau look</string>
     <string name="tour_look_body">Les menus en disent moins et en montrent plus. La couleur indique ce que fait un bouton : ambre pour l\'action principale, vert pour une récompense gratuite prête à être récupérée, la pièce pour un prix en points et violet pour un prix en euros. Les boutons (i) donnent les détails.</string>
 

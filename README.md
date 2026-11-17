@@ -37,13 +37,13 @@ monofilament line; the 2D fallback draws the same boat.
 
 ### Navigation
 
-Home is a **village**: a little fishing cove in 3D, seen from above. Drag to move around, pinch
+Home is a **village**: a little fishing island in 3D, seen from above. Drag to move around, pinch
 to zoom; every building opens a menu, with a name plate over it (its pictogram and name):
 
 - **Fish** (the pier, your boat moored at its end): one dominant **Cast line** button at the
   bottom with the tackle next to it, and your rope's three numbers (they open the rope workshop).
   Tap the boat, its line or its hook to customise each.
-- **Dex** (the species hall): the collection (see below).
+- **Dex** (the lighthouse): the collection (see below).
 - **Shop** (the market hall): tackle, style and passes, each with a euro price and a points price
   (see below). A dot on its plate means something is waiting there (a Club gift, season
   rewards, the starter pack offer).
