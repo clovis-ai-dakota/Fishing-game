@@ -80,6 +80,8 @@ enum class Screen {
     SETTINGS,
     /** The rope workshop: the rope's upgrades, bought with points (from the Fish menu's rope numbers). */
     ROPE,
+    /** The aquarium full screen, the phone held sideways (from the aquarium's button). */
+    AQUARIUM_FULL,
     // -- Daily loop screens below.
     /** The daily reward calendar, today's challenges and migrations (from the Fish tab's daily card). */
     DAILY,
@@ -1156,6 +1158,10 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         com.deepline.fishing.core.Showcase.toggleDecor(progress, decor)?.let(::update)
     }
 
+    fun openAquariumFull() {
+        screen = Screen.AQUARIUM_FULL
+    }
+
     fun openRope() {
         screen = Screen.ROPE
     }
@@ -1393,6 +1399,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             Screen.FISH_DETAIL -> screen = Screen.DEX
             Screen.BOAT_EDITOR -> openDex(DexSection.SKINS)
             Screen.THEMES, Screen.SETTINGS, Screen.ROPE, Screen.AQUARIUM -> screen = Screen.VILLAGE
+            Screen.AQUARIUM_FULL -> screen = Screen.AQUARIUM
             // -- Daily loop screens' back below.
             Screen.DAILY -> screen = Screen.VILLAGE
 

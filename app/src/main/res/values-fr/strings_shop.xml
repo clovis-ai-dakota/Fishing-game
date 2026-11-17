@@ -220,6 +220,7 @@
     <string name="shop_aquarium_count">Dans le bac : %1$d / %2$d. Touchez une espèce pour l\'ajouter ou la retirer.</string>
     <string name="shop_aquarium_decor">Décor</string>
     <string name="shop_aquarium_for_sale">Décor à acheter</string>
+    <string name="shop_aquarium_fullscreen">Plein écran</string>
     <string name="shop_aquarium_catches">Vos prises</string>
     <plurals name="shop_aquarium_cd_tank">
         <item quantity="one">Aquarium avec %d poisson</item>

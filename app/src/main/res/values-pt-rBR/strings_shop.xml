@@ -220,6 +220,7 @@
     <string name="shop_aquarium_count">No tanque: %1$d / %2$d. Toque numa espécie para colocá-la ou tirá-la.</string>
     <string name="shop_aquarium_decor">Decoração</string>
     <string name="shop_aquarium_for_sale">Decoração à venda</string>
+    <string name="shop_aquarium_fullscreen">Tela cheia</string>
     <string name="shop_aquarium_catches">Suas capturas</string>
     <plurals name="shop_aquarium_cd_tank">
         <item quantity="one">Aquário com %d peixe</item>

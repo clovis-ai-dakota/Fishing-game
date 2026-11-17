@@ -245,6 +245,7 @@
     <string name="shop_aquarium_count">Tankta: %1$d / %2$d. Eklemek ya da çıkarmak için bir türe dokun.</string>
     <string name="shop_aquarium_decor">Dekor</string>
     <string name="shop_aquarium_for_sale">Satılık dekorlar</string>
+    <string name="shop_aquarium_fullscreen">Tam ekran</string>
     <string name="shop_aquarium_catches">Avların</string>
     <plurals name="shop_aquarium_cd_tank">
         <item quantity="one">%d balıklı akvaryum</item>

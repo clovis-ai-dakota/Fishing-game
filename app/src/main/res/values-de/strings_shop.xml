@@ -213,6 +213,7 @@
     <string name="shop_aquarium_count">Im Becken: %1$d / %2$d. Tippe auf eine Art, um sie hinzuzufügen oder herauszunehmen.</string>
     <string name="shop_aquarium_decor">Deko</string>
     <string name="shop_aquarium_for_sale">Deko zu kaufen</string>
+    <string name="shop_aquarium_fullscreen">Vollbild</string>
     <string name="shop_aquarium_catches">Deine Fänge</string>
     <plurals name="shop_aquarium_cd_tank">
         <item quantity="one">Aquarium mit %d Fisch</item>

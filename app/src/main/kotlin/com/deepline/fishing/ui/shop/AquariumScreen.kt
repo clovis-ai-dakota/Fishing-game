@@ -10,6 +10,8 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -90,7 +92,19 @@ fun AquariumScreen(vm: GameViewModel) {
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.testTag("aquarium_list"),
         ) {
-            item(span = { GridItemSpan(maxLineSpan) }) { AquariumTank(p, height = 260.dp, modifier = Modifier.tourTarget(TourTarget.AQUARIUM_TANK)) }
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                // The live tank (3D where available), with a button to watch it full screen.
+                androidx.compose.foundation.layout.Box(Modifier.fillMaxWidth().height(260.dp).tourTarget(TourTarget.AQUARIUM_TANK)) {
+                    AquariumView(p, Modifier.fillMaxWidth().height(260.dp).clip(RoundedCornerShape(16.dp)))
+                    com.deepline.fishing.ui.kit.RoundIconButton(
+                        com.deepline.fishing.ui.kit.KitIcons.FullScreen,
+                        stringResource(R.string.shop_aquarium_fullscreen),
+                        onClick = vm::openAquariumFull,
+                        modifier = Modifier.align(androidx.compose.ui.Alignment.BottomEnd).padding(10.dp).testTag("aquarium_fullscreen"),
+                        diameter = 38.dp,
+                    )
+                }
+            }
             item(span = { GridItemSpan(maxLineSpan) }) {
                 Text(
                     stringResource(
@@ -150,7 +164,69 @@ fun AquariumScreen(vm: GameViewModel) {
     confirm?.let { item -> PointsConfirmDialog(vm, item, onDone = { confirm = null }) }
 }
 
-/** The tank itself, animated (2D): the aquarium screen's tank and the decor previews. */
+/**
+ * The tank as it lives: in 3D where the phone can draw it ([com.deepline.fishing.ui.render3d.AquariumScene]),
+ * otherwise the 2D [AquariumTank]. Fills [modifier]'s size, whatever its shape.
+ */
+@Composable
+fun AquariumView(p: PlayerProgress, modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    val supported = remember { com.deepline.fishing.ui.render3d.gl.Render3d.isSupported(context) } && !com.deepline.fishing.ui.render3d.gl.OffscreenGl.failed
+    val fish = Showcase.tankFish(p)
+    val description = pluralStringResource(R.plurals.shop_aquarium_cd_tank, fish.size, fish.size)
+    if (!supported) {
+        androidx.compose.foundation.layout.BoxWithConstraints(modifier) { AquariumTank(p, height = maxHeight) }
+        return
+    }
+    // What the render thread draws: the latest fish and decor.
+    val looks = remember { arrayOfNulls<Triple<List<FishSpecies>, List<Decor>, Boolean>>(1) }
+    looks[0] = Triple(fish, Showcase.shownDecor(p), Showcase.hasBigTank(p))
+    val source = remember {
+        val scene = com.deepline.fishing.ui.render3d.AquariumScene()
+        com.deepline.fishing.ui.render3d.gl.FrameSource { w, h, t -> looks[0]!!.let { (f, d, big) -> scene.build(w, h, t, f, d, big) } }
+    }
+    androidx.compose.foundation.layout.Box(modifier.semantics { contentDescription = description }) {
+        com.deepline.fishing.ui.render3d.gl.LivePreview(
+            source,
+            transparent = false,
+            modifier = Modifier.matchParentSize(),
+            key = "aquarium",
+            maxRenderWidth = 720,
+        )
+    }
+}
+
+/**
+ * The aquarium full screen: the phone turns sideways and the system bars hide while it shows, and
+ * both come back when it closes (back, or the button in the corner).
+ */
+@Composable
+fun AquariumFullScreen(vm: GameViewModel) {
+    val activity = LocalContext.current.findActivity()
+    androidx.compose.runtime.DisposableEffect(activity) {
+        val window = activity?.window
+        val insets = window?.let { androidx.core.view.WindowCompat.getInsetsController(it, it.decorView) }
+        activity?.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+        insets?.systemBarsBehavior = androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        insets?.hide(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+        onDispose {
+            insets?.show(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+            activity?.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
+    }
+    androidx.compose.foundation.layout.Box(Modifier.fillMaxSize().background(Color.Black).testTag("aquarium_full")) {
+        AquariumView(vm.progress, Modifier.fillMaxSize())
+        com.deepline.fishing.ui.kit.RoundIconButton(
+            com.deepline.fishing.ui.kit.KitIcons.Close,
+            stringResource(R.string.common_back),
+            onClick = vm::onBack,
+            modifier = Modifier.padding(16.dp).testTag("aquarium_full_close"),
+            diameter = 40.dp,
+        )
+    }
+}
+
+/** The tank itself, animated (2D): the fallback for [AquariumView] and the decor previews. */
 @Composable
 fun AquariumTank(p: PlayerProgress, height: Dp, modifier: Modifier = Modifier, extraDecor: Decor? = null, big: Boolean = Showcase.hasBigTank(p)) {
     val t by rememberInfiniteTransition(label = "tank").animateFloat(

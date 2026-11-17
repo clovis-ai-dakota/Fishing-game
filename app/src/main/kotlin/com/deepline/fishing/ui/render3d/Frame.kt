@@ -74,6 +74,7 @@ object Meshes {
             "kelp" -> PropModels.kelp(arg.toInt())
             "decor" -> PropModels.decorRock(arg.toInt())
             "coral" -> PropModels.coral(arg.toInt())
+            "aquarium" -> AquariumModels.mesh(key)
             "village" -> com.deepline.fishing.ui.village.VillageModels.mesh(key)
             "fullscreen" -> PropModels.fullscreenTriangle()
             else -> error("Unknown mesh $key")

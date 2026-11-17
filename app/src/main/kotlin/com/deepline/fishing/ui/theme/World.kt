@@ -36,7 +36,7 @@ enum class Place(val x: Float, val y: Float) {
 
     companion object {
         fun of(screen: Screen): Place = when (screen) {
-            Screen.DEX, Screen.FISH_DETAIL, Screen.AQUARIUM -> DEEP
+            Screen.DEX, Screen.FISH_DETAIL, Screen.AQUARIUM, Screen.AQUARIUM_FULL -> DEEP
             Screen.SHOP -> PORT
             Screen.BATTLE_SETUP, Screen.BATTLE, Screen.ONLINE_LOBBY -> ARENA
             Screen.SOCIAL, Screen.FRIENDS, Screen.LEADERBOARDS, Screen.TOURNAMENT, Screen.CLUBS -> LIGHTHOUSE

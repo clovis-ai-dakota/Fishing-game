@@ -37,7 +37,8 @@ class TourContentTest {
         // explained from the screens that lead to them. A species' page (FISH_DETAIL) is
         // explained from the Dex, which opens it. The boat editor is explained from the Fish tab's
         // boat, which leads to it.
-        val explainedElsewhere = setOf(Screen.CAST, Screen.BATTLE, Screen.ONLINE_LOBBY, Screen.FISH_DETAIL, Screen.BOAT_EDITOR) +
+        // The full-screen aquarium is explained by the aquarium's step (its button opens it).
+        val explainedElsewhere = setOf(Screen.CAST, Screen.BATTLE, Screen.ONLINE_LOBBY, Screen.FISH_DETAIL, Screen.BOAT_EDITOR, Screen.AQUARIUM_FULL) +
             // Clubs ship later: with the flag off there is no club screen to explain.
             (if (FeatureFlags.clubs) emptySet() else setOf(Screen.CLUBS))
         val visited = Tour.steps.map { it.screen }.toSet()

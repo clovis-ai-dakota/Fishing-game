@@ -271,6 +271,7 @@
     <string name="shop_aquarium_count">En la pecera: %1$d / %2$d. Toca una especie para añadirla o sacarla.</string>
     <string name="shop_aquarium_decor">Decoración</string>
     <string name="shop_aquarium_for_sale">Decoración a la venta</string>
+    <string name="shop_aquarium_fullscreen">Pantalla completa</string>
     <string name="shop_aquarium_catches">Tus capturas</string>
     <plurals name="shop_aquarium_cd_tank">
         <item quantity="one">Acuario con %d pez</item>

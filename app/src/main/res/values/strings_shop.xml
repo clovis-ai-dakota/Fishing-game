@@ -305,6 +305,8 @@
     <!-- Heading over the decor chips (plants, a treasure chest...). -->
     <string name="shop_aquarium_decor">Decor</string>
     <string name="shop_aquarium_for_sale">Decor for sale</string>
+    <!-- The aquarium's button that shows the tank full screen, the phone sideways. -->
+    <string name="shop_aquarium_fullscreen">Full screen</string>
     <!-- Heading over the species the player caught (chips to put them in the tank). -->
     <string name="shop_aquarium_catches">Your catches</string>
     <plurals name="shop_aquarium_cd_tank">

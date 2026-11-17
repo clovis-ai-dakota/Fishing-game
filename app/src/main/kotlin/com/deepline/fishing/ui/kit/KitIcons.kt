@@ -188,6 +188,21 @@ object KitIcons {
         stroked(1.8f) { moveTo(2f, 21f); quadTo(5f, 19.5f, 8f, 21f); quadTo(11f, 22.5f, 14f, 21f); quadTo(17f, 19.5f, 20f, 21f) }
     }
 
+    /** Four corners opening out: watch it full screen. */
+    val FullScreen = icon("FullScreen") {
+        stroked(2.4f) {
+            moveTo(4f, 9f); verticalLineTo(4f); horizontalLineTo(9f)
+            moveTo(15f, 4f); horizontalLineTo(20f); verticalLineTo(9f)
+            moveTo(20f, 15f); verticalLineTo(20f); horizontalLineTo(15f)
+            moveTo(9f, 20f); horizontalLineTo(4f); verticalLineTo(15f)
+        }
+    }
+
+    /** A cross: close. */
+    val Close = icon("Close") {
+        stroked(2.6f) { moveTo(6f, 6f); lineTo(18f, 18f); moveTo(18f, 6f); lineTo(6f, 18f) }
+    }
+
     val Plus = icon("Plus") {
         stroked(2.6f) { moveTo(12f, 5f); verticalLineTo(19f); moveTo(5f, 12f); horizontalLineTo(19f) }
     }

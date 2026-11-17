@@ -34,7 +34,7 @@ True/false parameters are sent to Firebase as 1/0.
 
 | Event | Parameters | Why |
 | --- | --- | --- |
-| `screen_view` | `screen_name`: `fish`, `dex_fish`, `dex_secrets`, `dex_skins`, `shop_tackle`, `shop_style`, `shop_passes`, `battle_setup`, `cast`, `fish_detail`, `milestones`, `battle`, `online_lobby`, `boat_editor`, `aquarium`, `rope` (the rope workshop), `themes`, `settings`, and any later screen's name in lower case. `screen_class`: always `MainActivity`. | Where players spend their time and how they move around. Logged by `TrackScreens` (automatic screen reporting is off: the app is a single activity). Screens the tour flips through aren't counted. With crash reports allowed, the current screen is also attached to crash reports as the `screen` custom key. |
+| `screen_view` | `screen_name`: `fish`, `dex_fish`, `dex_secrets`, `dex_skins`, `shop_tackle`, `shop_style`, `shop_passes`, `battle_setup`, `cast`, `fish_detail`, `milestones`, `battle`, `online_lobby`, `boat_editor`, `aquarium`, `aquarium_full` (the aquarium full screen), `rope` (the rope workshop), `village` (home), `themes`, `settings`, and any later screen's name in lower case. `screen_class`: always `MainActivity`. | Where players spend their time and how they move around. Logged by `TrackScreens` (automatic screen reporting is off: the app is a single activity). Screens the tour flips through aren't counted. With crash reports allowed, the current screen is also attached to crash reports as the `screen` custom key. |
 
 ## The guided tour
 

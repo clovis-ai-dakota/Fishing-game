@@ -258,6 +258,15 @@ class AquariumUiTest : BoatUiTestBase() {
         )
         compose.openBuilding("aquarium")
         assertEquals(Screen.AQUARIUM, vm.screen)
+        // Full screen: the phone turns sideways, and back brings the aquarium screen back upright.
+        compose.onNodeWithTag("aquarium_fullscreen").performClick()
+        compose.waitForIdle()
+        assertEquals(Screen.AQUARIUM_FULL, vm.screen)
+        scenario!!.onActivity { assertEquals(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE, it.requestedOrientation) }
+        compose.onNodeWithTag("aquarium_full_close").performClick()
+        compose.waitForIdle()
+        assertEquals(Screen.AQUARIUM, vm.screen)
+        scenario!!.onActivity { assertEquals(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT, it.requestedOrientation) }
         compose.shot("70_aquarium")
         assertEquals(com.deepline.fishing.core.Showcase.TANK_SIZE, com.deepline.fishing.core.Showcase.tankFish(vm.progress).size)
         val first = com.deepline.fishing.core.Showcase.tankFish(vm.progress).first()

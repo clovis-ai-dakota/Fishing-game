@@ -82,3 +82,22 @@ class VillageSceneTest {
         }
     }
 }
+
+/** The 3D aquarium: every piece of decor builds, in both tanks, in a card and full screen. */
+class AquariumSceneTest {
+    @Test
+    fun framesBuildWithEveryDecorInBothTanks() {
+        val scene = com.deepline.fishing.ui.render3d.AquariumScene()
+        val fish = FishCatalog.all.take(12)
+        for (big in listOf(false, true)) for ((w, h) in listOf(1080 to 720, 2340 to 1080)) {
+            val frame = scene.build(w, h, 4.2f, fish, com.deepline.fishing.core.Decor.entries, big)
+            for (item in frame.items) {
+                val m = item.dynamicMesh ?: Meshes.get(item.meshKey!!)
+                assertTrue(m.indices.all { it < m.vertexCount })
+                for (v in item.uniforms.values) assertTrue(v.size in setOf(1, 2, 3, 4, 9, 16))
+            }
+        }
+        // An empty tank is fine too.
+        scene.build(1080, 720, 0f, emptyList(), emptyList(), false)
+    }
+}
