@@ -9,7 +9,6 @@
         <item quantity="one">Derinlerde bulunacak %d tür</item>
         <item quantity="other">Derinlerde bulunacak %d tür</item>
     </plurals>
-    <string name="dex_aquarium_button">Akvaryum</string>
 
     <!-- Secret tiers: 1 is easy, 5 is the rarest. -->
     <string name="dex_tier_legendary">Efsanevi</string>

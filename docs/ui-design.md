@@ -40,7 +40,7 @@ day and by night:
   melts into the scene: that is why actions are warm and the theme colour is kept for navigation.
 - Amber on a pale card only has about 1.7:1 of contrast: a raised button therefore always has a
   **darker edge and outline** (`drawRaised`), and the action zones sit on **deep water**
-  (`deepColor()`: the dock under a tab's content, the tab bar, pills over a scene), where it
+  (`deepColor()`: the dock under a menu's content, the name plates, pills over a scene), where it
   reaches about 4:1.
 - Text keeps 4.5:1 on its background (the existing theme rule). Don't hard-code colours outside
   `GameColors` and the theme.
@@ -58,12 +58,20 @@ day and by night:
 | `Modifier.dockBackground()` | The deep water under the action zone of a tab. |
 | `sceneChipColors()` | For chips placed straight on the scene (the Shop's pages, the Dex's filters): glass like a card, never see-through. |
 
-A tab's layout: the content (a scene or a list), then a **dock** on deep water holding the main
-action, then the tab bar. The main action never scrolls away.
+A menu's layout: the content (a scene or a list), then a **dock** on deep water holding the main
+action. The main action never scrolls away.
 
-The phone's own navigation bar always stands on deep water too: the tab bar reaches under it, and
-a pushed screen (`SubScreen`) paints that strip, so the scene's seabed never shows under the
-system buttons.
+The phone's own navigation bar always stands on deep water too: the Fish menu's dock reaches under
+it, and every other screen (`SubScreen`) paints that strip, so the scene's seabed never shows
+under the system buttons.
+
+**The village is home** (`ui/village/`): a 3D cove whose buildings are the menus. Each building
+must say what it opens at a glance: a name plate floats over it (the menu's pictogram and name,
+the red dot when something waits there), and its shape says it too (the pier with your boat, the
+hall with a golden fish, the market's striped awning, the rope workshop's giant spool, the glass
+pavilion, the duelling platform with two pennants). The plate and the building are both tap
+targets; the HUD keeps clear of the plates (`VillageCamera.fit` frames the six inside it). A new
+menu that deserves a building gets one in `VillageLayout` and `VillageModels`, and a plate.
 
 ## 4. One world, and moves that mean something
 
@@ -71,7 +79,7 @@ The menus are places along one coast (`Place` in `ui/theme/World.kt`), in the ta
 
 | Place | Menus | What shows it |
 | --- | --- | --- |
-| `SEA` | Fish tab and what opens from it (Daily, Milestones, Themes, Settings) | The boat's scene. |
+| `SEA` | The Fish menu and what opens from the village's HUD (Daily, Milestones, Themes, Settings) | The boat's scene (the village draws its own 3D cove). |
 | `DEEP` | Dex, a species' page, the aquarium | The camera sinks: the waterline leaves by the top, the water darkens. |
 | `PORT` | Shop | A quay, a market stall, moored masts, warm morning light. |
 | `ARENA` | Battle setup, battles, the online lobby | The setting sun and two rival boats. |
@@ -92,7 +100,8 @@ The menus are places along one coast (`Place` in `ui/theme/World.kt`), in the ta
 ## 5. Depth
 
 Menus feel like objects, without a 3D view per item (one live GL view per screen at most: the
-boat on the Fish tab, the fish on a species' page, the skins preview):
+boat in the Fish menu, the village, the aquarium's tank, the fish on a species' page, the skins
+preview):
 
 | Effect | Where | Code |
 | --- | --- | --- |

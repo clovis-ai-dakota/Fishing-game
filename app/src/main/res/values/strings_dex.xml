@@ -13,8 +13,6 @@
         <item quantity="one">%d species to find in the deep</item>
         <item quantity="other">%d species to find in the deep</item>
     </plurals>
-    <!-- Button at the top right of the Dex: opens the aquarium where caught fish swim. One short word. -->
-    <string name="dex_aquarium_button">Aquarium</string>
 
     <!-- Secret tiers (secret cards): 1 is easy, 5 is the rarest. Short label in a card's corner. -->
     <string name="dex_tier_legendary">Legendary</string>

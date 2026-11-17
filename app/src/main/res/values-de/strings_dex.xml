@@ -9,7 +9,6 @@
         <item quantity="one">%d Art in der Tiefe zu entdecken</item>
         <item quantity="other">%d Arten in der Tiefe zu entdecken</item>
     </plurals>
-    <string name="dex_aquarium_button">Aquarium</string>
 
     <!-- Stufen der Geheimnisse. -->
     <string name="dex_tier_legendary">Legendär</string>

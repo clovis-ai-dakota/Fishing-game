@@ -9,7 +9,6 @@
         <item quantity="many">%d de espécies para encontrar nas profundezas</item>
         <item quantity="other">%d espécies para encontrar nas profundezas</item>
     </plurals>
-    <string name="dex_aquarium_button">Aquário</string>
 
     <!-- Níveis dos segredos. -->
     <string name="dex_tier_legendary">Lendário</string>

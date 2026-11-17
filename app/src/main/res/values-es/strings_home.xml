@@ -23,7 +23,6 @@
     <string name="home_rope_stats_deepest">Lances: %1$s · Total ganado: %2$s pts · Captura más profunda: %3$s</string>
 
     <!-- The Dex card. -->
-    <string name="home_dex_title">Dex</string>
     <string name="home_dex_caught">Capturadas %1$d / %2$d</string>
     <string name="home_dex_seen">Vistas %1$d</string>
     <string name="home_dex_zone">%1$s %2$d/%3$d</string>

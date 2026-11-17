@@ -22,7 +22,6 @@
     <string name="home_rope_stats_deepest">Würfe: %1$s · Insgesamt verdient: %2$s Punkte · Tiefster Fang: %3$s</string>
 
     <!-- Die Dex-Karte. -->
-    <string name="home_dex_title">Dex</string>
     <string name="home_dex_caught">Gefangen: %1$d / %2$d</string>
     <string name="home_dex_seen">Gesehen: %1$d</string>
     <string name="home_dex_zone">%1$s %2$d/%3$d</string>

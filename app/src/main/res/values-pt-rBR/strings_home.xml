@@ -21,7 +21,6 @@
     <string name="home_rope_stats_deepest">Lançamentos: %1$s · Total ganho: %2$s pts · Captura mais funda: %3$s</string>
 
     <!-- O cartão do Dex. -->
-    <string name="home_dex_title">Dex</string>
     <string name="home_dex_caught">Capturados %1$d / %2$d</string>
     <string name="home_dex_seen">Vistos %1$d</string>
     <string name="home_dex_zone">%1$s %2$d/%3$d</string>

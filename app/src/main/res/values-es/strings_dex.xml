@@ -11,7 +11,6 @@
         <item quantity="other">%d especies por descubrir en las profundidades</item>
     </plurals>
     <!-- Opens the aquarium. One short word. -->
-    <string name="dex_aquarium_button">Acuario</string>
 
     <!-- Secret tiers: short label in a card's corner. -->
     <string name="dex_tier_legendary">Legendario</string>

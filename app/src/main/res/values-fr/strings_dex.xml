@@ -10,7 +10,6 @@
         <item quantity="many">%d d\'espèces à découvrir dans les profondeurs</item>
         <item quantity="other">%d espèces à découvrir dans les profondeurs</item>
     </plurals>
-    <string name="dex_aquarium_button">Aquarium</string>
 
     <!-- Secret tiers. -->
     <string name="dex_tier_legendary">Légendaire</string>

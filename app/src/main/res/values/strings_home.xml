@@ -29,8 +29,7 @@
     <!-- Same, with the deepest catch. %3$s: meters, already formatted (e.g. "312 m"). -->
     <string name="home_rope_stats_deepest">Casts: %1$s · Earned in total: %2$s pts · Deepest catch %3$s</string>
 
-    <!-- The Dex card: how much of the collection is done. -->
-    <string name="home_dex_title">Dex</string>
+    <!-- How much of the collection is done. -->
     <!-- %1$d: species caught; %2$d: species in all. -->
     <string name="home_dex_caught">Caught %1$d / %2$d</string>
     <!-- %1$d: species seen (met but maybe not caught). -->

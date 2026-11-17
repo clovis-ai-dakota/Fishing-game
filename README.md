@@ -37,21 +37,28 @@ monofilament line; the 2D fallback draws the same boat.
 
 ### Navigation
 
-Four tabs in a bottom navigation bar (Material 3: 3 to 5 top-level destinations, always
-labelled, in the thumb zone), so every main area is one tap away:
+Home is a **village**: a little fishing cove in 3D, seen from above. Drag to move around, pinch
+to zoom; every building opens a menu, with a name plate over it (its pictogram and name):
 
-- **Fish**: the hub. One dominant **Cast line** button at the bottom with the Lantern switch next
-  to it, your rope's reach drawn over the depth zones, Dex and milestone progress. The top bar
-  holds your points, a trophy for Milestones (with a badge when one can be claimed), a palette
-  for the themes and a gear for Settings (sound, notifications, language, privacy, and the tour).
-- **Dex**: the collection (see below).
-- **Shop**: rope upgrades and downgrades (points only), then tackle, style, passes and the
-  aquarium, each with a euro price and a points price (see below). A dot on the tab means
-  something is waiting there (a Club gift, season rewards, the starter pack offer).
-- **Battle**: battle setup, the way online, and friends and rankings.
+- **Fish** (the pier, your boat moored at its end): one dominant **Cast line** button at the
+  bottom with the tackle next to it, and your rope's three numbers (they open the rope workshop).
+  Tap the boat, its line or its hook to customise each.
+- **Dex** (the species hall): the collection (see below).
+- **Shop** (the market hall): tackle, style and passes, each with a euro price and a points price
+  (see below). A dot on its plate means something is waiting there (a Club gift, season
+  rewards, the starter pack offer).
+- **Battle** (the duelling platform on the water): battle setup, the way online, and friends and
+  rankings.
+- **Rope** (the rope workshop): rope upgrades and downgrades, points only.
+- **Aquarium** (the glass pavilion): your catches on show in a 3D tank, its decor for sale, and a
+  full-screen view with the phone sideways.
 
-Casts, battles, the online lobby, Milestones and Dex pages are full screens without the bar.
-System back goes from any tab to Fish, then leaves the app.
+Around the map: your points, a trophy for Milestones (with a badge when one can be claimed), a
+palette for the themes and a gear for Settings (sound, notifications, language, privacy, and the
+tour), and on the left today's reward, a migration and the season.
+
+Every menu is a full screen with a back button; system back goes up to the village, then leaves
+the app.
 
 ### Dex
 
@@ -123,7 +130,7 @@ cast, so they are bounded but trusted.
 
 ### Skins
 
-The Dex's **Skins** section is always there; tapping the boat at the top of the Fish tab opens it.
+The Dex's **Skins** section is always there; in the Fish menu, tapping the boat, its line or its hook opens it on that slot.
 It has an animated preview of what you wear, then:
 
 - **Your boat**: design your own in **Customise boat**: hull and bottom colours, a hull pattern,
@@ -148,7 +155,7 @@ It has an animated preview of what you wear, then:
 | Prismatic (Perfect cast) | Prism hook cycling colours | Rainbow line | Prism sail, rainbow trim | Prism trail | Perfectionist |
 | Sovereign (Master angler) | Crown hook in gold | Golden line with glints | Royal boat: purple crowned sail, gold trim | Golden trail | Master angler |
 
-The title shows under your name on the Fish tab and in battles (online opponents see it too).
+The title shows under your name in the village and in battles (online opponents see it too).
 Skins are purely visual: same hook size and hitbox, and all the effects are drawn under the
 darkness layer and only around your own gear, so they never light up dark water or reveal fish.
 

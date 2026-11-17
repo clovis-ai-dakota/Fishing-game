@@ -23,7 +23,6 @@
     <string name="home_rope_stats_deepest">Lancers : %1$s · Total gagné : %2$s pts · Prise la plus profonde : %3$s</string>
 
     <!-- The Dex card (counts of species, feminine in French). -->
-    <string name="home_dex_title">Dex</string>
     <string name="home_dex_caught">Pêchées %1$d / %2$d</string>
     <string name="home_dex_seen">Vues %1$d</string>
     <string name="home_dex_zone">%1$s %2$d/%3$d</string>

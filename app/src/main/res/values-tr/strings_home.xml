@@ -21,7 +21,6 @@
     <string name="home_rope_stats_deepest">Atış: %1$s · Toplam kazanç: %2$s puan · En derin av %3$s</string>
 
     <!-- The Dex card. -->
-    <string name="home_dex_title">Dex</string>
     <string name="home_dex_caught">Yakalanan %1$d / %2$d</string>
     <string name="home_dex_seen">Görülen %1$d</string>
     <string name="home_dex_zone">%1$s %2$d/%3$d</string>

@@ -34,8 +34,10 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
   (and in 2D by `SkinArt.kt`) before the darkness layer and only around the player's own gear, and chosen in the Dex's Skins
   section. Titles (`CosmeticSlot.TITLE`) are text shown under the player's name; the server only
   relays titles that match a cosmetic.
-- **Skins section** (always visible: everyone can customise a boat). Tapping the boat on the Fish
-  tab opens it. It holds:
+- **Skins section** (always visible: everyone can customise a boat). In the Fish menu's scene the
+  boat, the line and the hook each open it on their own slot (`vm.openSkins(slot)`, slot chips at
+  its top; `FishMenuHitAreas` says where each is, with the 2D renderer's formulas, and both
+  renderers draw the same `boatPreviewSession()`); the sea opens nothing. It holds:
   - **Your boat**: a hand-made `BoatDesign` (`core/.../BoatDesign.kt`), edited in
     `ui/boat/BoatEditorScreen`. Options unlock per `BoatParts` (free, bought once with points from
     the balance, or by progress: species caught, a fish from a zone, milestones claimed); all its
@@ -83,12 +85,18 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     Transitions stay within NN/g's durations (`ScreenMotion`: 100 ms feedback, 200 to 300 ms a
     screen change, 400 ms at most).
     At most one live GL view per screen.
-- **Navigation**: four bottom tabs (`MainTab`: Fish = `Screen.HOME`, Dex, Shop = `Screen.SHOP`,
-  Battle = `Screen.BATTLE_SETUP`) in `MainScaffold`; the Shop's pages are `ShopPage` (tour steps
-  pick one with `shopPage`); everything else is a full screen pushed on top (no
-  bar). Tab screens use `TabScreen` (title + actions), pushed ones `SubScreen` (back button). Back
-  from a tab goes to Fish. Tests tap tabs by tag (`tab_fish`, `tab_dex`...). Icons are drawn in
-  code in `GameIcons` (no icon library).
+- **Navigation**: home is the village (`Screen.VILLAGE`, `ui/village/`): a 3D cove (drag, pinch)
+  whose buildings (`Building`) open the menus: the pier = Fish menu (`Screen.HOME`, where you
+  cast), the species hall = Dex, the market hall = Shop, the duelling platform = Battle setup, the
+  rope workshop = `Screen.ROPE`, the glass pavilion = Aquarium. Each building has a name plate
+  (pictogram + menu name, tagged `village_<building>`); the HUD around the map (points,
+  milestones, themes, settings, daily, migration, season) replaced the Fish tab's. There is no tab
+  bar: every screen is full screen (`SubScreen`: back button, title, actions); back goes up a level
+  (`ScreenMotion.level`) and ends on the village. The Shop's pages are `ShopPage` (tour steps pick
+  one with `shopPage`). Tests go to a menu like a player, with `openBuilding("dex")` /
+  `backToVillage()` (`VillageTestNav.kt`). A building's layout, plate anchor and hit box live in
+  `VillageLayout`; `VillageCamera` projects, picks and frames them (tested). Icons are drawn in
+  code in `GameIcons` / `KitIcons` (no icon library).
 - **Dex**: every species picture goes through `ui/dex/FishPortrait` (`DexState` UNKNOWN / SEEN /
   CAUGHT from `Progression.dexState`). "Seen" is recorded by `CastSession` (see
   `GameConfig.SEEN_DISTANCE_M`) and is a log feature only: never scored or sent online. Locked
@@ -121,6 +129,13 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     translucent `waterSkirt` and the hull's depth fade keep it reading as under water.
   - Lighting follows the usual stylised recipe: a cel ramp with cool shadows, a stepped specular,
     rim light, hemispheric ambient and analytic AO in the material functions (no textures).
+  - The village (`ui/village/`: `VillageModels`, `VillageScene`) and the aquarium
+    (`render3d/AquariumScene`) are scenes of their own, hosted by `LivePreview` (render width and
+    pace as parameters: the village runs at 60 fps while moved, 30 at rest). Their architecture
+    uses the painted material (`uMaterial` 5: colour per vertex via `MeshBuilder.recolor`, parts
+    `GLASS` and `BULB` that light up with `uGlow` at night, fluttering `CLOTH`) and the village's
+    sea its own (`uMaterial` 6). Still parts are merged into a few big meshes (a triangle budget
+    is tested in `VillageSceneTest`); the 2D map and the 2D tank stay the fallbacks.
 - **Colours** come from `ui/ColorScript.kt`, shared by the 3D renderer, the 2D fallback and the
   Dex: the water, light and specks by depth (bright and warm in the shallows, then cooler, darker
   and less saturated, near-black with sparse red/cyan glows in the abyss), and `FishLooks` for
