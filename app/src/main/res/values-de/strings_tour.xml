@@ -16,13 +16,13 @@
     <string name="tour_welcome_title">Willkommen bei Deep Line!</string>
     <string name="tour_welcome_body">Fang jeden Fisch der Tiefe. Diese kurze Tour zeigt dir, wie das Spiel funktioniert und wofür alles da ist. Tippe auf „Weiter“ oder auf „Tour überspringen“, wenn du dich schon auskennst.</string>
 
-    <string name="tour_tabs_title">Vier Tabs</string>
-    <string name="tour_tabs_body">Die Leiste unten bringt dich überallhin: Unter „Angeln“ wirfst du aus, der Dex sammelt jede Art, der du begegnest, im Shop gibt es Seilverbesserungen, Zubehör und Looks für dein Boot, und unter „Duell“ trittst du eins gegen eins an.</string>
+    <string name="tour_village_title">Dein Dorf</string>
+    <string name="tour_village_body">Das Dorf ist dein Heimathafen. Jedes Gebäude öffnet ein Menü: „Angeln“ (der Steg, von dem du auswirfst), „Dex“ (jede Art, der du begegnest), „Shop“ (Zubehör und Looks), „Duell“ (Eins-gegen-eins-Matches), „Seil“ (seine Verbesserungen) und „Aquarium“ (deine Fänge zum Anschauen). Wische, um dich zu bewegen, und ziehe zwei Finger auseinander, um zu zoomen.</string>
     <string name="tour_look_title">Ein neuer Look</string>
     <string name="tour_look_body">Die Menüs sagen weniger und zeigen mehr. Die Farbe verrät, was ein Button tut: Bernstein für die Hauptaktion, Grün für eine kostenlose Belohnung, die du abholen kannst, die Münze für einen Preis in Punkten und Violett für einen Preis in Euro. Hinter den (i)-Buttons stehen die Details.</string>
 
     <string name="tour_cast_title">Wirf deine Angel aus</string>
-    <string name="tour_cast_body">Der große Button „Auswerfen“ unten im Tab „Angeln“ lässt deinen Haken vom Boot hinab.</string>
+    <string name="tour_cast_body">Der große Button „Auswerfen“ unten im Menü „Angeln“ (der Steg im Dorf) lässt deinen Haken vom Boot hinab.</string>
 
     <string name="tour_steer_title">Lenk den Haken</string>
     <string name="tour_steer_body">Zieh während eines Wurfs irgendwo auf dem Bildschirm nach links und rechts. Ein Ring zeigt, wo dein Finger ist: Der Haken gleitet dorthin und folgt ihm. Mit mehr Seilwendigkeit geht das schneller.</string>
@@ -40,7 +40,7 @@
     <string name="tour_fast_reel_body">Sobald du deine %1$d Stöße verbraucht hast oder nichts mehr an deine Schnur passt, erscheint beim Aufstieg der Button „Schnell einholen“: Er holt den Haken in höchstens %2$s Sekunden zum Boot, egal wo du bist. Danach wird nichts mehr gefangen. Praktisch gegen die Uhr in Duellen auf Zeit.</string>
 
     <string name="tour_themes_title">Designs</string>
-    <string name="tour_themes_body">Mit dem Paletten-Button oben änderst du, wie die Menüs aussehen: standardmäßig die Lagune, mit einer Meeresszene hinter jedem Tab. Weitere Designs gibt es im Shop für Euro oder Punkte, und die aufwendigeren kosten mehr. Das Wasser, in dem du angelst, ändert sich nie.</string>
+    <string name="tour_themes_body">Mit dem Paletten-Button oben änderst du, wie die Menüs aussehen: standardmäßig die Lagune, mit einer Meeresszene hinter jedem Menü. Weitere Designs gibt es im Shop für Euro oder Punkte, und die aufwendigeren kosten mehr. Das Wasser, in dem du angelst, ändert sich nie.</string>
 
     <string name="tour_night_mode_title">Nachtmodus</string>
     <string name="tour_night_mode_body">Jedes Design hat eine Nachtversion: Wähle „Tag“, „Nacht“ oder folge dem Dunkelmodus deines Handys.</string>
@@ -49,7 +49,7 @@
     <string name="tour_points_body">Tiefere Fänge bringen mehr Punkte, die hier oben angezeigt werden. Funkelnde Fische (goldener Umriss und Glitzern) sind %1$d× so viel wert.</string>
 
     <string name="tour_upgrades_title">Verbessere dein Seil</string>
-    <string name="tour_upgrades_body">Gib Punkte im Tab „Shop“ auf der Seite „Seil“ aus. Seillänge bringt dich in tiefere Zonen zu neuen Fischen, Seilstärke trägt mehr Gewicht und Seilwendigkeit lenkt schneller. Anders überlegt? Stufe eine Verbesserung zurück, und du bekommst jeden Punkt zurück, den sie gekostet hat.</string>
+    <string name="tour_upgrades_body">Gib Punkte in der Seilerei im Dorf („Seil“) aus. Seillänge bringt dich in tiefere Zonen zu neuen Fischen, Seilstärke trägt mehr Gewicht und Seilwendigkeit lenkt schneller. Anders überlegt? Stufe eine Verbesserung zurück, und du bekommst jeden Punkt zurück, den sie gekostet hat.</string>
 
     <string name="tour_tackle_title">Zubehör</string>
     <string name="tour_tackle_body">Auf der Seite „Zubehör“ gibt es Gegenstände für einen Wurf, die du vor dem Auswerfen einschaltest. Laternen erhellen das Dunkel, ein Raritätendetektor markiert Arten, die du noch nicht gefangen hast, im Umkreis von %1$d m um den Haken, ein Talisman gibt dir beim Abstieg einen Stoß mehr, und ein Funkelköder bringt %2$d× so viele funkelnde Fische. Die Preise steigen mit der Reichweite deines Seils.</string>
@@ -67,19 +67,19 @@
     <string name="tour_dex_filters_body">Filtere die Karten nach Tiefenzone oder zeig nur die Fische, die du gefangen hast. Tippe auf eine Karte, um ihre Seite zu öffnen, und wisch dann, um durch den Dex zu blättern.</string>
 
     <string name="tour_milestones_title">Meilenstein-Belohnungen</string>
-    <string name="tour_milestones_body">Jeder Punkt, den du verdienst, zählt für die Meilenstein-Belohnungen (Bonuspunkte und Laternen), auch nachdem du ihn ausgegeben hast. Der Pokal oben im Tab „Angeln“ öffnet sie, mit einem Hinweis, sobald eine abholbereit ist.</string>
+    <string name="tour_milestones_body">Jeder Punkt, den du verdienst, zählt für die Meilenstein-Belohnungen (Bonuspunkte und Laternen), auch nachdem du ihn ausgegeben hast. Der Pokal oben im Dorf öffnet sie, mit einem Hinweis, sobald eine abholbereit ist.</string>
 
     <string name="tour_secrets_title">Angelgeheimnisse</string>
     <string name="tour_secrets_body">Manche Tricks findest du nur beim Spielen, und sie lohnen sich: Jedes Mal, wenn dir einer gelingt, bringt er dem Wurf einen Bonus, auch in Duellen. Beim ersten Mal wird er sofort erklärt und bringt eine Entdeckerbelohnung, und im Dex erscheint der Bereich „Geheimnisse“. Die seltensten Geheimnisse schalten außerdem Skins für Haken, Schnur, Boot und Blasenspur frei, dazu einen Titel unter deinem Namen, auch in Online-Duellen. Sie sind zum Angeben da: nur Optik, nie ein Vorteil.</string>
 
     <string name="tour_boat_title">Gestalte dein Boot</string>
-    <string name="tour_boat_body">Tippe im Tab „Angeln“ auf dein Boot, um im Dex den Bereich „Skins“ zu öffnen. Mit „Boot gestalten“ lackierst du Rumpf, Zierleisten und Kabine und fügst ein Muster, Segel, eine Flagge und ein Emblem hinzu. Grundfarben sind gratis; der Rest wird mit Punkten freigeschaltet oder wenn du mehr Arten fängst, neue Zonen erreichst und Meilensteine abholst.</string>
+    <string name="tour_boat_body">Tippe im Menü „Angeln“ auf dein Boot, seine Schnur oder seinen Haken, um im Dex ihre Skins zu öffnen. Mit „Boot gestalten“ lackierst du Rumpf, Zierleisten und Kabine und fügst ein Muster, Segel, eine Flagge und ein Emblem hinzu. Grundfarben sind gratis; der Rest wird mit Punkten freigeschaltet oder wenn du mehr Arten fängst, neue Zonen erreichst und Meilensteine abholst.</string>
 
     <string name="tour_shop_style_title">Stil</string>
     <string name="tour_shop_style_body">Auf der Seite „Stil“ gibt es fertige Boote, Lackierungen, Embleme und Segeldrucke (als Vorschau an deinem eigenen Boot) sowie neue Haken, Schnüre und Spuren. Wie alle Skins ändern sie nur das Aussehen, nie das Spiel.</string>
 
     <string name="tour_aquarium_title">Dein Aquarium</string>
-    <string name="tour_aquarium_body">Die Fische, die du gefangen hast, schwimmen in deinem Aquarium: Öffne es mit dem Aquarium-Symbol oben im Dex und wähle aus, wer dort schwimmt. Deko und ein größeres Becken gibt es im Shop auf der Seite „Aquarium“.</string>
+    <string name="tour_aquarium_body">Die Fische, die du gefangen hast, schwimmen in deinem Aquarium, dem Glaspavillon im Dorf: Wähle aus, wer dort schwimmt, und kaufe direkt dort Deko oder ein größeres Becken. Im Vollbild drehst du das Handy quer, um ihnen zuzusehen.</string>
 
     <string name="tour_season_title">Saisons und Wochenend-Events</string>
     <string name="tour_season_body">Jede Saison dauert %1$s. Jeder Solo-Wurf bringt Saison-XP und schaltet Belohnungsstufen frei: Zubehör und Punkte für alle und mit dem Saisonpass noch mehr (ein Saisonboot, ein Abzeichen). Jedes Wochenende gibt es außerdem ein Angelziel mit eigener Belohnung. Nichts davon verändert Duelle.</string>
@@ -109,7 +109,7 @@
     <string name="tour_wager_body">Gegen den Computer kannst du Punkte auf das Ergebnis setzen: Ein Sieg zahlt deinen Einsatz %1$s× zurück gegen Leicht, %2$s× gegen Normal und %3$s× gegen Schwer. Bei einem Unentschieden bekommst du ihn zurück.</string>
 
     <string name="tour_settings_title">Einstellungen</string>
-    <string name="tour_settings_body">Das Zahnrad oben im Tab „Angeln“ öffnet die Einstellungen.</string>
+    <string name="tour_settings_body">Das Zahnrad oben im Dorf öffnet die Einstellungen.</string>
 
     <string name="tour_sound_title">Ton und Spielgefühl</string>
     <string name="tour_sound_body">Stell hier Lautstärke, Musik und Soundeffekte getrennt ein. Die Musik folgt deinem Haken: ruhig nahe der Oberfläche, düsterer in der Tiefe. Vibration lässt dich Stöße, Fänge und große Siege leicht spüren, und „Bewegung reduzieren“ schaltet Bildschirmwackeln, Zeitlupe und Blitze ab.</string>
@@ -125,7 +125,7 @@
     </plurals>
 
     <string name="tour_migrations_title">Wanderungen</string>
-    <string name="tour_migrations_body">Jede Woche wandern %1$s lang zwei weniger häufige Arten, eine nahe der Oberfläche und eine in der Tiefe: Dort, wo sie leben, sind sie dann viel häufiger. Ein Button mit einem Fischschwarm zeigt sie im Tab „Angeln“, eine Karte im Dex. Wanderungen gelten nur für Solo-Würfe: Duelle ändern sich nie.</string>
+    <string name="tour_migrations_body">Jede Woche wandern %1$s lang zwei weniger häufige Arten, eine nahe der Oberfläche und eine in der Tiefe: Dort, wo sie leben, sind sie dann viel häufiger. Ein Button mit einem Fischschwarm zeigt sie im Dorf, eine Karte im Dex. Wanderungen gelten nur für Solo-Würfe: Duelle ändern sich nie.</string>
 
     <string name="tour_reminders_title">Erinnerungen</string>
     <string name="tour_reminders_body">Möchtest du einen Hinweis, wenn deine Tagesbelohnung bereit ist, deine Serie bald endet oder eine Wanderung beginnt? Schalte Erinnerungen in den Einstellungen ein: höchstens eine pro Tag und nie zwischen %1$s und %2$s Uhr.</string>

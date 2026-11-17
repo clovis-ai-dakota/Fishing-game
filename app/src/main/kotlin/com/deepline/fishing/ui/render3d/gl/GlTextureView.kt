@@ -30,6 +30,8 @@ class GlTextureView(
     private val transparent: Boolean,
     private val maxRenderWidth: Int = 480,
     private val everyNthVsync: Int = 2,
+    /** When set, how many vsyncs per frame right now (1 while the player moves the view, 2 at rest). */
+    private val pace: (() -> Int)? = null,
 ) : TextureView(context), TextureView.SurfaceTextureListener {
     private var renderer: RenderThread? = null
     private var painted = false
@@ -49,7 +51,7 @@ class GlTextureView(
     override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
         val (rw, rh) = renderSize(width, height)
         surface.setDefaultBufferSize(rw, rh)
-        renderer = RenderThread(context.applicationContext, surface, rw, rh, source, transparent, everyNthVsync).also { it.begin() }
+        renderer = RenderThread(context.applicationContext, surface, rw, rh, source, transparent, everyNthVsync, pace).also { it.begin() }
     }
 
     override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
@@ -89,6 +91,7 @@ private class RenderThread(
     private val source: FrameSource,
     private val transparent: Boolean,
     private val everyNthVsync: Int,
+    private val pace: (() -> Int)?,
 ) : Choreographer.FrameCallback {
     private val thread = HandlerThread("DeepLine3D-preview")
     private lateinit var handler: Handler
@@ -131,7 +134,8 @@ private class RenderThread(
     override fun doFrame(frameTimeNanos: Long) {
         if (!running) return
         Choreographer.getInstance().postFrameCallback(this)
-        if (paused || vsyncs++ % everyNthVsync != 0) return
+        val every = (pace?.invoke() ?: everyNthVsync).coerceAtLeast(1)
+        if (paused || vsyncs++ % every != 0) return
         val b = backend ?: return
         try {
             val t = (System.nanoTime() - start) / 1_000_000_000f

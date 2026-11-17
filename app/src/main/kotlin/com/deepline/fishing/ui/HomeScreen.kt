@@ -3,6 +3,7 @@ package com.deepline.fishing.ui
 import com.deepline.fishing.ui.kit.rewardBalance
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.clickable
@@ -69,11 +70,9 @@ import com.deepline.fishing.ui.tour.TourTarget
 import com.deepline.fishing.ui.tour.tourTarget
 
 /**
- * The Fish tab: the game's hub, as a scene. The boat floats in the middle (tap it to customise
- * it); around it, round buttons with counts and countdowns stand in for cards of text: points and
- * milestones at the top, today's reward, a migration and the season on the left, the Dex on the
- * right, the rope's three numbers above the dock. The dock holds the tackle for the next cast and
- * the one main action, Cast line. Explanations are behind (i) buttons and in the tour.
+ * The Fish menu (the pier in the village): your boat at the surface (tap the boat, the line or the
+ * hook to customise each), the rope in three numbers (they open the rope workshop), and the dock
+ * with the tackle for the next cast and the one main action, Cast line. Back goes to the village.
  */
 @Composable
 fun HomeScreen(vm: GameViewModel) {
@@ -98,9 +97,7 @@ fun HomeScreen(vm: GameViewModel) {
             )
             // The boat, the line and the hook each open their own skins; the sea does nothing.
             SceneTaps(vm, Modifier.fillMaxSize())
-            TopBar(vm, Modifier.align(Alignment.TopCenter))
-            EventRail(vm, Modifier.align(Alignment.CenterStart).padding(start = 12.dp))
-            DexButton(vm, Modifier.align(Alignment.CenterEnd).padding(end = 12.dp))
+            FishTopBar(vm, Modifier.align(Alignment.TopCenter))
             RopeStrip(vm, Modifier.align(Alignment.BottomCenter).padding(bottom = 10.dp))
         }
         CastDock(vm)
@@ -163,9 +160,43 @@ private fun SceneTaps(vm: GameViewModel, modifier: Modifier = Modifier) {
     }
 }
 
-/** Points on the left (with the title worn, if any); milestones, themes and settings on the right. */
+/**
+ * The Fish menu's top: back to the village (a pictogram and its one word), and the points, which
+ * the tackle and the rope's upgrades spend.
+ */
 @Composable
-private fun TopBar(vm: GameViewModel, modifier: Modifier = Modifier) {
+private fun FishTopBar(vm: GameViewModel, modifier: Modifier = Modifier) {
+    val p = vm.progress
+    Row(
+        modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.Top,
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        RoundIconButton(
+            KitIcons.Village,
+            stringResource(R.string.common_back),
+            onClick = vm::onBack,
+            modifier = Modifier.testTag("back_village"),
+            caption = stringResource(R.string.shell_village),
+        )
+        ScenePill(Modifier.rewardBalance()) {
+            Icon(GameIcons.Coin, contentDescription = null, tint = SparkleGold, modifier = Modifier.size(20.dp))
+            Text(
+                if (p.pointsBalance >= 1_000_000) compactPoints(p.pointsBalance) else formatPoints(p.pointsBalance),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+            )
+        }
+    }
+}
+
+/**
+ * The village's top: points on the left (with the title worn, if any); milestones, themes and
+ * settings on the right.
+ */
+@Composable
+internal fun VillageTopBar(vm: GameViewModel, modifier: Modifier = Modifier) {
     val p = vm.progress
     Column(modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 12.dp, vertical = 10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -212,9 +243,12 @@ private fun TopBar(vm: GameViewModel, modifier: Modifier = Modifier) {
     }
 }
 
-/** What's on now, each with its count or countdown: today's reward and challenges, a migration, the season. */
+/**
+ * The village's left rail: what's on now, each with its count or countdown: today's reward and
+ * challenges, a migration, the season.
+ */
 @Composable
-private fun EventRail(vm: GameViewModel, modifier: Modifier = Modifier) {
+internal fun VillageEventRail(vm: GameViewModel, modifier: Modifier = Modifier) {
     val p = vm.progress
     val now = ShopClock.now()
     Column(modifier, verticalArrangement = Arrangement.spacedBy(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -255,20 +289,6 @@ private fun EventRail(vm: GameViewModel, modifier: Modifier = Modifier) {
     }
 }
 
-/** The collection so far, on the way to the Dex. */
-@Composable
-private fun DexButton(vm: GameViewModel, modifier: Modifier = Modifier) {
-    val p = vm.progress
-    RoundIconButton(
-        GameIcons.Dex,
-        stringResource(R.string.home_dex_caught, p.discoveredCount, FishCatalog.all.size),
-        onClick = { vm.openDex() },
-        modifier = modifier.testTag("dex_button"),
-        label = stringResource(R.string.common_fraction, p.discoveredCount, FishCatalog.all.size),
-        caption = stringResource(R.string.home_dex_title),
-    )
-}
-
 /** The rope in three numbers (how deep, how heavy, how fast); the rest is behind the (i) and in the Shop. */
 @Composable
 private fun RopeStrip(vm: GameViewModel, modifier: Modifier = Modifier) {
@@ -305,8 +325,9 @@ private fun RopeStrip(vm: GameViewModel, modifier: Modifier = Modifier) {
 private fun CastDock(vm: GameViewModel) {
     val p = vm.progress
     Column(Modifier.fillMaxWidth().testTag("cast_dock")) {
+        // The deep water reaches under the phone's navigation bar (no tab bar below any more).
         Box(Modifier.fillMaxWidth().dockBackground()) {
-            Column(Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 10.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(Modifier.navigationBarsPadding().padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally)) {
                     TackleTile(
                         GameIcons.Lantern, p.lanterns, vm.useLantern, vm::toggleLantern,

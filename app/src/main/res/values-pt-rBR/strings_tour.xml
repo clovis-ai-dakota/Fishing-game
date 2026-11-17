@@ -17,13 +17,13 @@
     <string name="tour_welcome_title">Boas-vindas ao Deep Line!</string>
     <string name="tour_welcome_body">Pesque todos os peixes das profundezas. Este tour rápido mostra como jogar e para que serve cada coisa. Toque em Próximo, ou em Pular tour se você já conhece o caminho.</string>
 
-    <string name="tour_tabs_title">Quatro abas</string>
-    <string name="tour_tabs_body">A barra de baixo leva você a todo lugar: Pescar é onde você lança a linha, o Dex reúne todas as espécies que você encontra, a Loja tem melhorias de corda, apetrechos e visuais para o seu barco, e Duelo é para partidas 1v1.</string>
+    <string name="tour_village_title">Sua vila</string>
+    <string name="tour_village_body">A vila é o seu porto. Cada construção abre um menu: Pescar (o píer, de onde você lança), Dex (todas as espécies que você encontra), Loja (apetrechos e visuais), Duelo (partidas 1v1), Corda (suas melhorias) e Aquário (suas capturas em exposição). Arraste para se mover e faça pinça para dar zoom.</string>
     <string name="tour_look_title">Um novo visual</string>
     <string name="tour_look_body">Os menus dizem menos e mostram mais. A cor indica o que um botão faz: âmbar para a ação principal, verde para uma recompensa grátis pronta para resgatar, a moeda para um preço em pontos e violeta para um preço em euros. Os botões (i) guardam os detalhes.</string>
 
     <string name="tour_cast_title">Lance sua linha</string>
-    <string name="tour_cast_body">O grande botão Lançar linha, embaixo na aba Pescar, solta o anzol do barco.</string>
+    <string name="tour_cast_body">O grande botão Lançar linha, embaixo no menu Pescar (o píer da vila), solta o anzol do barco.</string>
 
     <string name="tour_steer_title">Guie o anzol</string>
     <string name="tour_steer_body">Durante um lançamento, arraste para a esquerda e para a direita em qualquer lugar da tela. Um anel mostra onde está o seu dedo: o anzol desliza até ele e o acompanha. A Agilidade da corda deixa isso mais rápido.</string>
@@ -41,7 +41,7 @@
     <string name="tour_fast_reel_body">Assim que você gastar suas %1$d batidas, ou quando não couber mais nada na sua linha, aparece na subida um botão Recolher rápido: ele puxa o anzol até o barco em no máximo %2$s segundos, de onde você estiver. Nada mais é pescado depois disso. Útil contra o relógio nos duelos com tempo.</string>
 
     <string name="tour_themes_title">Temas</string>
-    <string name="tour_themes_body">O botão da paleta, no alto, muda o visual dos menus: a Lagoa por padrão, com uma cena do mar atrás de cada aba. Há mais temas na Loja, por euros ou pontos, e os mais elaborados custam mais. A água em que você pesca nunca muda.</string>
+    <string name="tour_themes_body">O botão da paleta, no alto, muda o visual dos menus: a Lagoa por padrão, com uma cena do mar atrás de cada menu. Há mais temas na Loja, por euros ou pontos, e os mais elaborados custam mais. A água em que você pesca nunca muda.</string>
 
     <string name="tour_night_mode_title">Modo noturno</string>
     <string name="tour_night_mode_body">Todo tema tem uma versão noturna: escolha Dia, Noite ou siga o modo escuro do seu celular.</string>
@@ -50,7 +50,7 @@
     <string name="tour_points_body">Capturas mais fundas valem mais pontos, mostrados aqui no alto. Peixes cintilantes (contorno dourado e brilhos) valem %1$d× mais.</string>
 
     <string name="tour_upgrades_title">Melhore sua corda</string>
-    <string name="tour_upgrades_body">Gaste pontos na aba Loja, na página Corda. Comprimento da corda deixa você chegar a zonas mais fundas e a peixes novos, Força da corda carrega mais peso e Agilidade da corda guia mais rápido. Mudou de ideia? Volte um nível e receba de volta cada ponto que ele custou.</string>
+    <string name="tour_upgrades_body">Gaste pontos na cordoaria da vila (Corda). Comprimento da corda deixa você chegar a zonas mais fundas e a peixes novos, Força da corda carrega mais peso e Agilidade da corda guia mais rápido. Mudou de ideia? Volte um nível e receba de volta cada ponto que ele custou.</string>
 
     <string name="tour_tackle_title">Apetrechos</string>
     <string name="tour_tackle_body">A página Apetrechos vende itens para um lançamento, que você ativa antes de lançar. Lanternas iluminam o escuro, um Detector de peixes raros marca as espécies que você ainda não capturou a até %1$d m do anzol, um Amuleto da sorte dá uma batida extra na descida e uma Isca cintilante traz %2$d× mais peixes cintilantes. Os preços crescem com o alcance da sua corda.</string>
@@ -68,19 +68,19 @@
     <string name="tour_dex_filters_body">Filtre as cartas por zona de profundidade ou mostre só os peixes que você capturou. Toque numa carta para abrir a página dela e deslize para folhear o Dex.</string>
 
     <string name="tour_milestones_title">Recompensas dos marcos</string>
-    <string name="tour_milestones_body">Todo ponto que você ganha conta para as recompensas dos marcos (pontos bônus e Lanternas), mesmo depois de gasto. O troféu no alto da aba Pescar abre os marcos, com um aviso quando houver um pronto para resgatar.</string>
+    <string name="tour_milestones_body">Todo ponto que você ganha conta para as recompensas dos marcos (pontos bônus e Lanternas), mesmo depois de gasto. O troféu no alto da vila abre os marcos, com um aviso quando houver um pronto para resgatar.</string>
 
     <string name="tour_secrets_title">Segredos de pesca</string>
     <string name="tour_secrets_body">Alguns truques só são descobertos jogando, e eles compensam: toda vez que você consegue um, ele dá um bônus ao lançamento, nos duelos também. Na primeira vez, ele é explicado na hora e rende uma recompensa de descoberta, e uma seção Segredos aparece no Dex. Os segredos mais raros também desbloqueiam Skins para o seu anzol, linha, barco e rastro de bolhas, além de um título mostrado abaixo do seu nome, nos duelos online também. Eles são feitos para exibir: só visual, nunca uma vantagem.</string>
 
     <string name="tour_boat_title">Personalize seu barco</string>
-    <string name="tour_boat_body">Toque no seu barco na aba Pescar para abrir a seção Skins do Dex. Personalizar barco deixa você pintar o casco, o friso e a cabine e adicionar um padrão, velas, uma bandeira e um emblema. As cores básicas são grátis; o resto é desbloqueado com pontos ou conforme você pesca mais espécies, chega a novas zonas e resgata marcos.</string>
+    <string name="tour_boat_body">No menu Pescar, toque no seu barco, na linha ou no anzol para abrir as skins deles no Dex. Personalizar barco deixa você pintar o casco, o friso e a cabine e adicionar um padrão, velas, uma bandeira e um emblema. As cores básicas são grátis; o resto é desbloqueado com pontos ou conforme você pesca mais espécies, chega a novas zonas e resgata marcos.</string>
 
     <string name="tour_shop_style_title">Estilo</string>
     <string name="tour_shop_style_body">A página Estilo tem barcos prontos, pinturas, emblemas e estampas de vela (visualizados no seu próprio barco), além de novos anzóis, linhas e rastros. Como toda skin, eles só mudam o visual, nunca o jogo.</string>
 
     <string name="tour_aquarium_title">Seu aquário</string>
-    <string name="tour_aquarium_body">Os peixes que você capturou nadam no seu aquário: abra-o com o botão do aquário, no alto do Dex, e escolha quem nada ali. A decoração e um tanque maior estão na página Aquário da Loja.</string>
+    <string name="tour_aquarium_body">Os peixes que você capturou nadam no seu aquário, o pavilhão de vidro da vila: escolha quem nada ali e compre ali mesmo decoração ou um tanque maior. A tela cheia gira o celular na horizontal para você assistir.</string>
 
     <string name="tour_season_title">Temporadas e eventos de fim de semana</string>
     <string name="tour_season_body">Cada temporada dura %1$s. Todo lançamento solo rende XP da temporada e libera níveis de recompensas: apetrechos e pontos para todos, e mais (um barco da temporada, uma insígnia) com o passe de temporada. Todo fim de semana também traz uma meta de pesca com sua própria recompensa. Nada disso muda os duelos.</string>
@@ -110,7 +110,7 @@
     <string name="tour_wager_body">Contra o computador, você pode apostar pontos no resultado: uma vitória paga a aposta de volta %1$s× no Fácil, %2$s× no Normal e %3$s× no Difícil. Um empate devolve a aposta.</string>
 
     <string name="tour_settings_title">Configurações</string>
-    <string name="tour_settings_body">A engrenagem no alto da aba Pescar abre as Configurações.</string>
+    <string name="tour_settings_body">A engrenagem no alto da vila abre as Configurações.</string>
 
     <string name="tour_sound_title">Som e sensações</string>
     <string name="tour_sound_body">Ajuste aqui o volume, a música e os efeitos sonoros separadamente. A música acompanha o seu anzol: calma perto da superfície, mais sombria nas profundezas. Vibração adiciona um toque leve às batidas, às capturas e às grandes vitórias, e Reduzir movimento desativa o tremor de tela, a câmera lenta e os clarões.</string>
@@ -127,7 +127,7 @@
     </plurals>
 
     <string name="tour_migrations_title">Migrações</string>
-    <string name="tour_migrations_body">Toda semana, por %1$s, duas espécies menos comuns migram: uma perto da superfície e outra nas profundezas, ambas muito mais comuns onde vivem. Um botão com um cardume mostra quais são na aba Pescar, e um cartão no Dex. As migrações valem para os lançamentos solo: os duelos nunca mudam.</string>
+    <string name="tour_migrations_body">Toda semana, por %1$s, duas espécies menos comuns migram: uma perto da superfície e outra nas profundezas, ambas muito mais comuns onde vivem. Um botão com um cardume mostra quais são na vila, e um cartão no Dex. As migrações valem para os lançamentos solo: os duelos nunca mudam.</string>
 
     <string name="tour_reminders_title">Lembretes</string>
     <string name="tour_reminders_body">Quer um aviso quando sua recompensa diária estiver pronta, sua sequência estiver para acabar ou uma migração começar? Ative os lembretes em Configurações: no máximo um por dia, e nunca entre %1$s e %2$s.</string>

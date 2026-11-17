@@ -71,7 +71,7 @@ fun milestoneRewardText(m: Milestone): UiText = UiText.join(
 fun MilestonesScreen(vm: GameViewModel) {
     val p = vm.progress
     val scheme = MaterialTheme.colorScheme
-    SubScreen(title = stringResource(R.string.milestones_title), onBack = { vm.navigate(Screen.HOME) }) {
+    SubScreen(title = stringResource(R.string.milestones_title), onBack = vm::onBack) {
         LazyColumn(contentPadding = PaddingValues(16.dp)) {
             item {
                 val earned = stringResource(R.string.milestones_earned, formatPoints(p.pointsEarned))

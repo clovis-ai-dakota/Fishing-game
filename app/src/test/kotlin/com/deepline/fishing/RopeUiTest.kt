@@ -41,6 +41,6 @@ class RopeUiTest : BoatUiTestBase() {
         assertEquals(start.pointsBalance, vm.progress.pointsBalance)
 
         vm.onBack()
-        assertEquals(Screen.HOME, vm.screen)
+        assertEquals(Screen.VILLAGE, vm.screen)
     }
 }

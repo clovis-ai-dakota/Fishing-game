@@ -328,9 +328,10 @@ class SceneBuilder {
         }
     }
 
-    private fun boatItems(skin: Cosmetic?, at: Vec3, t: Float, design: com.deepline.fishing.core.BoatDesign? = null): List<DrawItem> {
+    /** The boat wearing [skin] (or the custom [design]) at [at], turned [rotY] (the village moors it along the pier). */
+    internal fun boatItems(skin: Cosmetic?, at: Vec3, t: Float, design: com.deepline.fishing.core.BoatDesign? = null, rotY: Float = 0f): List<DrawItem> {
         val roll = sin(t * 1.1f) * 0.025f
-        val m = Mat4.trs(at, rotZ = roll)
+        val m = Mat4.trs(at, rotY = rotY, rotZ = roll)
         if (skin == null && design != null) {
             return listOf(
                 DrawItem(

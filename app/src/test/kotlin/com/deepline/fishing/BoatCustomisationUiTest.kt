@@ -130,6 +130,7 @@ class BoatCustomisationUiTest : BoatUiTestBase() {
         val stripe = BoatPart.of(HullPattern.STRIPE)
         val stripeCost = (BoatParts.requirement(stripe) as PartRequirement.Points).cost
         val vm = launch(PlayerProgress(pointsBalance = 5_000, pointsEarned = 5_000))
+        compose.openBuilding("fish")
 
         // The boat at the top of the Fish tab opens the Dex's Skins section, on the boat's skins.
         compose.clickDescription("Customise your boat")
@@ -203,7 +204,9 @@ class AtmosphereUiTest : BoatUiTestBase() {
         val deepCast = CastResult(emptyList(), DepthZone.ABYSS.minDepth + 5f, 0, ReverseReason.ROPE_END, lanternUsed = false)
         val vm = launch(Progression.applyCast(PlayerProgress(), deepCast))
         assertTrue(vm.progress.atmosphereUnlocked)
+        compose.openBuilding("fish")
         compose.clickDescription("Customise your boat")
+        compose.onNodeWithTag("skins_filter_all").performClick()
         compose.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText(Atmosphere.NIGHTMARE.displayName))
         compose.click(Atmosphere.NIGHTMARE.displayName)
         assertEquals(Atmosphere.NIGHTMARE, vm.progress.atmosphere)

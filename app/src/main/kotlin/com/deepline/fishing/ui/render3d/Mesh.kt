@@ -68,6 +68,15 @@ object Part {
     const val CORK = 47f
     const val REEL = 48f
     const val ROPE = 49f
+    // The village (the painted material: colour per vertex, see VillageModels).
+    /** Walls, roofs, wood, stone, ground: lit like everything else, in their vertex colour. */
+    const val PAINTED = 60f
+    /** Window glass: a sky reflection by day, warm light at night. */
+    const val GLASS = 61f
+    /** Lamps and lanterns: they glow, strongly at night. */
+    const val BULB = 62f
+    /** Flags and pennants: they flutter (u runs from the pole to the tip). */
+    const val CLOTH = 63f
     const val KELP = 40f
     const val DECOR_ROCK = 41f
     const val CORAL = 42f
@@ -143,6 +152,17 @@ class MeshBuilder {
         }
         ensureIndex(m.indices.size)
         for (k in m.indices) idx[iCount++] = base + k
+    }
+
+    /**
+     * Paints vertices [from] until the end with [color] (r, g, b, a): the painted material reads
+     * it (see [Part.PAINTED]). Shapes are built with the usual calls, then painted.
+     */
+    fun recolor(from: Int, color: FloatArray) {
+        hasColors = true
+        for (i in from until vCount) {
+            col[i * 4] = color[0]; col[i * 4 + 1] = color[1]; col[i * 4 + 2] = color[2]; col[i * 4 + 3] = color[3]
+        }
     }
 
     /** Replaces the normals of vertices [from] until the end by smooth normals from the faces. */

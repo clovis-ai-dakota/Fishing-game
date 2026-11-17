@@ -16,13 +16,13 @@
     <string name="tour_welcome_title">Deep Line\'a hoş geldin!</string>
     <string name="tour_welcome_body">Derinlerdeki her balığı yakala. Bu kısa tanıtım, nasıl oynanacağını ve her şeyin ne işe yaradığını gösterir. İleri düğmesine dokun ya da yolunu zaten biliyorsan Tanıtımı geç düğmesine bas.</string>
 
-    <string name="tour_tabs_title">Dört sekme</string>
-    <string name="tour_tabs_body">Alttaki çubuk seni her yere götürür: Balık sekmesinde olta atarsın, Dex karşılaştığın her türü toplar, Mağaza sekmesinde halat geliştirmeleri, ekipman ve teknen için görünümler bulunur, Düello sekmesi ise 1v1 maçlar içindir.</string>
+    <string name="tour_village_title">Köyün</string>
+    <string name="tour_village_body">Köy senin limanın. Her bina bir menü açar: Balık (olta attığın iskele), Dex (karşılaştığın her tür), Mağaza (ekipman ve görünümler), Düello (1v1 maçlar), Halat (geliştirmeleri) ve Akvaryum (sergilenen avların). Gezinmek için kaydır, yakınlaştırmak için iki parmakla sıkıştır.</string>
     <string name="tour_look_title">Yeni bir görünüm</string>
     <string name="tour_look_body">Menüler artık daha az söyleyip daha çok gösteriyor. Renk, bir düğmenin ne yaptığını söyler: kehribar ana eylem, yeşil almaya hazır ücretsiz ödül, madeni para puan fiyatı, mor ise euro fiyatıdır. Ayrıntılar (i) düğmelerinde.</string>
 
     <string name="tour_cast_title">Oltanı at</string>
-    <string name="tour_cast_body">Balık sekmesinin altındaki büyük Oltayı at düğmesi, iğneni tekneden suya bırakır.</string>
+    <string name="tour_cast_body">Balık menüsünün (köydeki iskele) altındaki büyük Oltayı at düğmesi, iğneni tekneden suya bırakır.</string>
 
     <string name="tour_steer_title">İğneyi yönlendir</string>
     <string name="tour_steer_body">Atış sırasında ekranın herhangi bir yerinde parmağını sola ve sağa kaydır. Bir halka parmağının nerede olduğunu gösterir: iğne ona doğru süzülür ve onu takip eder. Halat Çevikliği onu hızlandırır.</string>
@@ -43,7 +43,7 @@
     <string name="tour_fast_reel_body">%1$d çarpma hakkını kullandığın anda ya da misinana artık bir şey sığmadığında, çıkarken bir Hızlı sar düğmesi belirir: nerede olursan ol, iğneyi en fazla %2$s saniyede tekneye çeker. Bundan sonra başka bir şey yakalanmaz. Süreli düellolarda zamana karşı çok işe yarar.</string>
 
     <string name="tour_themes_title">Temalar</string>
-    <string name="tour_themes_body">Üstteki palet düğmesi menülerin görünümünü değiştirir: varsayılan tema Lagün, her sekmenin arkasında bir deniz manzarası var. Mağaza\'da euro ya da puanla alınabilen başka temalar da var; daha zengin olanlar daha pahalı. Balık tuttuğun su asla değişmez.</string>
+    <string name="tour_themes_body">Üstteki palet düğmesi menülerin görünümünü değiştirir: varsayılan tema Lagün, her menünün arkasında bir deniz manzarası var. Mağaza\'da euro ya da puanla alınabilen başka temalar da var; daha zengin olanlar daha pahalı. Balık tuttuğun su asla değişmez.</string>
 
     <string name="tour_night_mode_title">Gece modu</string>
     <string name="tour_night_mode_body">Her temanın bir gece sürümü var: Gündüz ya da Gece seç veya telefonunun karanlık modunu takip et.</string>
@@ -53,7 +53,7 @@
     <string name="tour_points_body">Derindeki avlar daha çok puan getirir; puanların burada, üstte görünür. Parıldayan balıklar (altın kontur ve ışıltılar) %1$d× daha değerlidir.</string>
 
     <string name="tour_upgrades_title">Halatını geliştir</string>
-    <string name="tour_upgrades_body">Puanlarını Mağaza sekmesinin Halat sayfasında harca. Halat Uzunluğu daha derin bölgelere ve yeni balıklara ulaştırır, Halat Gücü daha fazla ağırlık taşır, Halat Çevikliği daha hızlı yönlendirir. Fikrin mi değişti? Bir seviye düşür ve harcadığın her puanı geri al.</string>
+    <string name="tour_upgrades_body">Puanlarını köydeki halat atölyesinde (Halat) harca. Halat Uzunluğu daha derin bölgelere ve yeni balıklara ulaştırır, Halat Gücü daha fazla ağırlık taşır, Halat Çevikliği daha hızlı yönlendirir. Fikrin mi değişti? Bir seviye düşür ve harcadığın her puanı geri al.</string>
 
     <string name="tour_tackle_title">Ekipman</string>
     <!-- %1$d: the detector's radius in meters; %2$d: how many times more Sparkling fish the lure brings. -->
@@ -75,7 +75,7 @@
     <string name="tour_dex_filters_body">Kartları derinlik bölgesine göre filtrele ya da yalnızca yakaladığın balıkları göster. Sayfasını açmak için bir karta dokun, sonra Dex\'te gezinmek için kaydır.</string>
 
     <string name="tour_milestones_title">Kilometre taşı ödülleri</string>
-    <string name="tour_milestones_body">Kazandığın her puan, harcasan bile kilometre taşı ödüllerine (bonus puan ve Fenerler) sayılır. Balık sekmesinin üstündeki kupa onları açar; alınmaya hazır bir ödül olduğunda kupanın üstünde bir işaret belirir.</string>
+    <string name="tour_milestones_body">Kazandığın her puan, harcasan bile kilometre taşı ödüllerine (bonus puan ve Fenerler) sayılır. Köyün üstündeki kupa onları açar; alınmaya hazır bir ödül olduğunda kupanın üstünde bir işaret belirir.</string>
 
     <string name="tour_secrets_title">Balıkçılık sırları</string>
     <!-- Hints that secrets exist, never what they are. -->
@@ -83,13 +83,13 @@
 
     <string name="tour_boat_title">Tekneni özelleştir</string>
     <!-- "Tekneyi özelleştir" is the button's label in the Skins section. -->
-    <string name="tour_boat_body">Dex\'in Görünümler bölümünü açmak için Balık sekmesindeki teknene dokun. Tekneyi özelleştir düğmesiyle gövdeyi, süslemeleri ve kabini boyayabilir; desen, yelken, bayrak ve amblem ekleyebilirsin. Temel renkler ücretsiz; geri kalanların kilidi puanla ya da daha çok tür yakaladıkça, yeni bölgelere ulaştıkça ve kilometre taşlarını aldıkça açılır.</string>
+    <string name="tour_boat_body">Balık menüsünde teknene, misinasına ya da iğnesine dokunarak Dex\'te görünümlerini aç. Tekneyi özelleştir düğmesiyle gövdeyi, süslemeleri ve kabini boyayabilir; desen, yelken, bayrak ve amblem ekleyebilirsin. Temel renkler ücretsiz; geri kalanların kilidi puanla ya da daha çok tür yakaladıkça, yeni bölgelere ulaştıkça ve kilometre taşlarını aldıkça açılır.</string>
 
     <string name="tour_shop_style_title">Stil</string>
     <string name="tour_shop_style_body">Stil sayfasında hazır tekneler, boyalar, amblemler ve yelken desenleri (kendi teknende önizlenir), ayrıca yeni iğneler, misinalar ve izler var. Her görünüm gibi bunlar da yalnızca görüntüyü değiştirir, oyunu asla.</string>
 
     <string name="tour_aquarium_title">Akvaryumun</string>
-    <string name="tour_aquarium_body">Yakaladığın balıklar akvaryumunda yüzer: onu Dex\'in üstündeki akvaryum düğmesiyle aç ve orada kimlerin yüzeceğini seç. Dekorlar ve daha büyük bir tank Mağaza\'nın Akvaryum sayfasında.</string>
+    <string name="tour_aquarium_body">Yakaladığın balıklar akvaryumunda, köydeki cam köşkte yüzer: orada kimlerin yüzeceğini seç, dekoru ya da daha büyük bir tankı hemen orada satın al. Tam ekran, onları izlemen için telefonu yan çevirir.</string>
 
     <string name="tour_season_title">Sezonlar ve hafta sonu etkinlikleri</string>
     <!-- %1$s: how long a season lasts (e.g. "6 hafta"). -->
@@ -123,7 +123,7 @@
     <string name="tour_wager_body">Bilgisayara karşı sonuca puan yatırabilirsin: kazanırsan bahsin Kolay rakibe karşı %1$s×, Normal rakibe karşı %2$s×, Zor rakibe karşı %3$s× olarak geri ödenir. Beraberlikte bahis iade edilir.</string>
 
     <string name="tour_settings_title">Ayarlar</string>
-    <string name="tour_settings_body">Balık sekmesinin üstündeki dişli simgesi Ayarlar\'ı açar.</string>
+    <string name="tour_settings_body">Köyün üstündeki dişli simgesi Ayarlar\'ı açar.</string>
 
     <string name="tour_sound_title">Ses ve hissiyat</string>
     <!-- Ses düzeyi, Müzik, Ses efektleri, Titreşim and Hareketi azalt are the settings' names. -->
@@ -144,7 +144,7 @@
 
     <string name="tour_migrations_title">Göçler</string>
     <!-- %1$s: how long a migration lasts (e.g. "2 gün"). -->
-    <string name="tour_migrations_body">Her hafta %1$s boyunca, daha az yaygın iki tür göç eder: biri yüzeye yakın, biri derinlerde; ikisi de yaşadıkları yerde çok daha yaygın olur. Balık sekmesinde balık sürüsü düğmesi, Dex\'te ise bir kart onları gösterir. Göçler solo atışlar içindir: düellolar asla değişmez.</string>
+    <string name="tour_migrations_body">Her hafta %1$s boyunca, daha az yaygın iki tür göç eder: biri yüzeye yakın, biri derinlerde; ikisi de yaşadıkları yerde çok daha yaygın olur. Köyde balık sürüsü düğmesi, Dex\'te ise bir kart onları gösterir. Göçler solo atışlar içindir: düellolar asla değişmez.</string>
 
     <string name="tour_reminders_title">Hatırlatmalar</string>
     <!-- %1$s and %2$s: times on the hour, start and end of the quiet hours. -->

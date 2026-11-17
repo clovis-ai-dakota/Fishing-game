@@ -106,7 +106,8 @@ class TourUiTest {
         compose.onNodeWithText("Show the tour next time?").assertExists()
         compose.shot("26_tour_ask_next_time")
         compose.click("No thanks")
-        compose.onNodeWithText("Cast line").assertExists()
+        // The tour ends on the village, home.
+        assertEquals(true, compose.inVillage())
         assertEquals("false", store.getString("tour.showAgain"))
 
         // Next launch: no tour.

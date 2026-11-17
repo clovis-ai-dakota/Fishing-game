@@ -15,12 +15,12 @@ import com.deepline.fishing.ui.i18n.UiText
 /** A UI element a tour step can point at (see `Modifier.tourTarget`). */
 enum class TourTarget {
     HOME_CAST, HOME_POINTS, HOME_LANTERN, HOME_MILESTONES, HOME_SETTINGS, HOME_BOAT,
-    NAV_BAR, TAB_DEX, TAB_SHOP, TAB_BATTLE,
+    VILLAGE_MAP,
     ROPE_FIRST, DEX_HEADER, DEX_FILTERS, MILESTONES_FIRST, BATTLE_MODES, BATTLE_OPPONENT,
     SKINS_CUSTOMISE, SKINS_ATMOSPHERE, SHOP_STYLE,
     SHOP_TACKLE, BATTLE_WAGER,
     SHOP_PRICES, SHOP_PASSES, BATTLE_TACKLE, SHOP_SEASON,
-    DEX_AQUARIUM, AQUARIUM_TANK, SKINS_BADGE,
+    AQUARIUM_TANK, SKINS_BADGE,
     HOME_THEMES, THEMES_MODE, SHOP_THEMES,
     SETTINGS_TOUR,
     // -- Game feel (sound, haptics) targets below.
@@ -91,8 +91,10 @@ object Tour {
      * 11: Settings (the gear), sound and haptics, daily rewards and challenges, friends,
      *     leaderboards, tournaments and clubs, privacy choices and languages.
      * 12: the redesigned menus: fewer words, colours that say what a button does, (i) buttons.
+     * 13: the village replaces the tabs (a building per menu, the rope workshop and the aquarium
+     *     among them); the boat, line and hook each open their skins; the 3D aquarium.
      */
-    const val VERSION = 12
+    const val VERSION = 13
 
     private val bumps = GameConfig.DESCENT_TOUCH_LIMIT
     private val calendarDays get() = UiText.plural(R.plurals.common_days, com.deepline.fishing.core.DailyRewards.calendar.size)
@@ -103,15 +105,15 @@ object Tour {
             id = "welcome",
             title = text(R.string.tour_welcome_title),
             body = text(R.string.tour_welcome_body),
-            screen = Screen.HOME,
+            screen = Screen.VILLAGE,
         ),
         TourStep(
-            id = "tabs",
-            title = text(R.string.tour_tabs_title),
-            body = text(R.string.tour_tabs_body),
-            screen = Screen.HOME,
-            target = TourTarget.NAV_BAR,
-            sinceVersion = 9,
+            id = "village",
+            title = text(R.string.tour_village_title),
+            body = text(R.string.tour_village_body),
+            screen = Screen.VILLAGE,
+            target = TourTarget.VILLAGE_MAP,
+            sinceVersion = 13,
         ),
         TourStep(
             id = "look",
@@ -171,7 +173,7 @@ object Tour {
             id = "themes",
             title = text(R.string.tour_themes_title),
             body = text(R.string.tour_themes_body),
-            screen = Screen.HOME,
+            screen = Screen.VILLAGE,
             target = TourTarget.HOME_THEMES,
             sinceVersion = 10,
         ),
@@ -187,7 +189,7 @@ object Tour {
             id = "points",
             title = text(R.string.tour_points_title),
             body = text(R.string.tour_points_body, GameConfig.SPARKLING_MULTIPLIER),
-            screen = Screen.HOME,
+            screen = Screen.VILLAGE,
             target = TourTarget.HOME_POINTS,
             art = TourArt.SPARKLING,
             sinceVersion = 5,
@@ -198,7 +200,7 @@ object Tour {
             body = text(R.string.tour_upgrades_body),
             screen = Screen.ROPE,
             target = TourTarget.ROPE_FIRST,
-            sinceVersion = 9,
+            sinceVersion = 13,
         ),
         TourStep(
             id = "tackle",
@@ -265,7 +267,7 @@ object Tour {
             title = text(R.string.tour_secrets_title),
             body = text(R.string.tour_secrets_body),
             screen = Screen.DEX,
-            target = TourTarget.TAB_DEX,
+            target = TourTarget.DEX_HEADER,
             sinceVersion = 5,
         ),
         TourStep(
@@ -274,7 +276,7 @@ object Tour {
             body = text(R.string.tour_boat_body),
             screen = Screen.HOME,
             target = TourTarget.HOME_BOAT,
-            sinceVersion = 6,
+            sinceVersion = 13,
         ),
         TourStep(
             id = "shop_style",
@@ -291,7 +293,7 @@ object Tour {
             body = text(R.string.tour_aquarium_body),
             screen = Screen.AQUARIUM,
             target = TourTarget.AQUARIUM_TANK,
-            sinceVersion = 9,
+            sinceVersion = 13,
         ),
         TourStep(
             id = "season",
@@ -375,7 +377,7 @@ object Tour {
             id = "settings",
             title = text(R.string.tour_settings_title),
             body = text(R.string.tour_settings_body),
-            screen = Screen.HOME,
+            screen = Screen.VILLAGE,
             target = TourTarget.HOME_SETTINGS,
             sinceVersion = 11,
         ),
@@ -394,7 +396,7 @@ object Tour {
             id = "daily",
             title = text(R.string.tour_daily_title),
             body = text(R.string.tour_daily_body, calendarDays, GameConfig.STARTING_STREAK_SHIELDS, GameConfig.MAX_STREAK_SHIELDS),
-            screen = Screen.HOME,
+            screen = Screen.VILLAGE,
             target = TourTarget.HOME_DAILY,
             sinceVersion = 11,
         ),

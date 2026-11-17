@@ -17,7 +17,6 @@ import com.deepline.fishing.DexSection
 import com.deepline.fishing.GameViewModel
 import com.deepline.fishing.R
 import com.deepline.fishing.core.FishCatalog
-import com.deepline.fishing.ui.TabScreen
 import com.deepline.fishing.ui.tour.tourTarget
 
 /**
@@ -29,17 +28,10 @@ import com.deepline.fishing.ui.tour.tourTarget
 fun DexScreen(vm: GameViewModel) {
     val sections = vm.availableDexSections
     val section = vm.dexSection.takeIf { it in sections } ?: DexSection.FISH
-    TabScreen(
+    // The aquarium is a building of its own in the village.
+    com.deepline.fishing.ui.SubScreen(
         title = stringResource(R.string.shell_tab_dex),
-        actions = {
-            // The aquarium shows off caught fish.
-            com.deepline.fishing.ui.kit.RoundIconButton(
-                com.deepline.fishing.ui.kit.KitIcons.Tank,
-                stringResource(R.string.dex_aquarium_button),
-                onClick = vm::openAquarium,
-                modifier = androidx.compose.ui.Modifier.padding(end = 8.dp).tourTarget(com.deepline.fishing.ui.tour.TourTarget.DEX_AQUARIUM),
-            )
-        },
+        onBack = vm::onBack,
     ) {
         if (sections.size > 1) {
             SingleChoiceSegmentedButtonRow(

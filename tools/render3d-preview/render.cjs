@@ -90,7 +90,7 @@ function drawFrame(frame) {
     if (keep && isDynamic) { dynamic.push(made); return made; }
     return (vaos[key] = made);
   }
-  const defaults = { uOpacity: [1], uFlags: [0, 0, 0, 0], uSwim: [0, 0, 0, 0], uFish: [0, 0, 0, 0], uFish2: [0, 0, 0, 0], uEye: [0.1, 0.1, 0.15, 1], uBase: [0.5, 0.5, 0.5], uAccent: [0.5, 0.5, 0.5], uExtra: [0.5, 0.5, 0.5], uExtra2: [0.9, 0.9, 0.85], uBoatMode: [0, 0, 0, 0], uSailColor: [0.96, 0.92, 0.85], uFlagColor: [1, 0.5, 0.42], uMaterial: [0], uMode: [0], uAdditive: [0] };
+  const defaults = { uOpacity: [1], uFlags: [0, 0, 0, 0], uSwim: [0, 0, 0, 0], uFish: [0, 0, 0, 0], uFish2: [0, 0, 0, 0], uEye: [0.1, 0.1, 0.15, 1], uBase: [0.5, 0.5, 0.5], uAccent: [0.5, 0.5, 0.5], uExtra: [0.5, 0.5, 0.5], uExtra2: [0.9, 0.9, 0.85], uBoatMode: [0, 0, 0, 0], uSailColor: [0.96, 0.92, 0.85], uFlagColor: [1, 0.5, 0.42], uMaterial: [0], uMode: [0], uAdditive: [0], uGlow: [0] };
   function set(prog, name, v) {
     const loc = prog.uniforms[name];
     if (loc === undefined || loc === null) return;

@@ -97,7 +97,6 @@ import com.deepline.fishing.core.ShopSection
 import com.deepline.fishing.core.Tackle
 import com.deepline.fishing.ui.GameIcons
 import com.deepline.fishing.ui.SparkleGold
-import com.deepline.fishing.ui.TabScreen
 import com.deepline.fishing.ui.compactPoints
 import com.deepline.fishing.ui.dex.drawSlotArt
 import com.deepline.fishing.ui.drawBoatTile
@@ -130,8 +129,9 @@ fun ShopScreen(vm: GameViewModel) {
     )
     val actions = ShopActions(vm, LocalContext.current.findActivity(), onPoints = { confirm = it })
 
-    TabScreen(
+    com.deepline.fishing.ui.SubScreen(
         title = stringResource(R.string.shell_tab_shop),
+        onBack = vm::onBack,
         actions = {
             if (vm.isClubMember) ClubChip()
             val balance = stringResource(R.string.shop_balance, formatPoints(p.pointsBalance))

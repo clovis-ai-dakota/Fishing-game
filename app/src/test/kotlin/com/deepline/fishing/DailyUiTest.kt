@@ -140,7 +140,7 @@ class DailyUiTest : DailyUiTestBase() {
         vm.setMenuTheme(com.deepline.fishing.core.MenuTheme.LAGOON)
         vm.setNightMode(com.deepline.fishing.core.NightMode.DAY)
         vm.onBack()
-        assertEquals(Screen.HOME, vm.screen)
+        assertEquals(Screen.VILLAGE, vm.screen)
         // Everything is saved.
         val saved = ProgressRepository(store).load()
         assertEquals(1, saved.dailyStreak)

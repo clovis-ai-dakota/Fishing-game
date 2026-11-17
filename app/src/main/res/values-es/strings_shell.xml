@@ -9,6 +9,7 @@
     <string name="shell_tab_dex">Dex</string>
     <string name="shell_tab_shop">Tienda</string>
     <string name="shell_tab_battle">Duelo</string>
+    <string name="shell_village">Pueblo</string>
 
     <!-- Pages of the Shop tab (chips in a row). -->
     <string name="shell_shop_page_rope">Cuerda</string>
@@ -24,7 +25,7 @@
 
     <!-- Asked when the guided tour closes. -->
     <string name="shell_tour_again_title">¿Mostrar la guía la próxima vez?</string>
-    <string name="shell_tour_again_body">¿Quieres que la guía vuelva a abrirse la próxima vez que inicies Deep Line? También puedes verla cuando quieras desde Ajustes, con el engranaje de la parte superior de la pestaña Pescar.</string>
+    <string name="shell_tour_again_body">¿Quieres que la guía vuelva a abrirse la próxima vez que inicies Deep Line? También puedes verla cuando quieras desde Ajustes, con el engranaje de la parte superior del pueblo.</string>
     <string name="shell_tour_again_yes">Sí, la próxima vez</string>
 
     <!-- Debug builds only: a fake payment sheet. -->

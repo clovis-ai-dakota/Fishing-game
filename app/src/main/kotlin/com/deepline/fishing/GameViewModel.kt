@@ -68,10 +68,13 @@ import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 /**
- * Where the player is. [HOME] (the Fish tab), [DEX], [SHOP] and [BATTLE_SETUP] are the four
- * bottom-bar tabs; the others are full screens pushed on top of them (no tab bar).
+ * Where the player is. [VILLAGE] is home: a map whose buildings open [HOME] (the Fish menu, from
+ * the pier), [DEX], [SHOP], [BATTLE_SETUP], [ROPE] and [AQUARIUM] (see [Building]). Every screen is
+ * a full screen; back goes up towards the village.
  */
 enum class Screen {
+    /** The village map, the home screen. */
+    VILLAGE,
     HOME, DEX, SHOP, BATTLE_SETUP, CAST, FISH_DETAIL, MILESTONES, BATTLE, ONLINE_LOBBY, BOAT_EDITOR, AQUARIUM, THEMES,
     /** Settings (the gear on the Fish tab): sound, notifications, privacy, language, the tour. */
     SETTINGS,
@@ -86,15 +89,26 @@ enum class Screen {
     SOCIAL, FRIENDS, LEADERBOARDS, TOURNAMENT, CLUBS,
 }
 
-/** The four top-level destinations of the bottom navigation bar, in order. [labelRes]: strings_shell.xml. */
-enum class MainTab(@param:androidx.annotation.StringRes val labelRes: Int, val screen: Screen) {
-    FISH(R.string.shell_tab_fish, Screen.HOME),
+/**
+ * The village's buildings, each opening its menu (see ui/village/). [labelRes] is the menu's name,
+ * on the building's plate (strings_shell.xml).
+ */
+enum class Building(@param:androidx.annotation.StringRes val labelRes: Int, val screen: Screen) {
+    /** The pier, where your boat is moored: the Fish menu, where you cast. */
+    FISHING(R.string.shell_tab_fish, Screen.HOME),
+    /** The species hall. */
     DEX(R.string.shell_tab_dex, Screen.DEX),
+    /** The market hall. */
     SHOP(R.string.shell_tab_shop, Screen.SHOP),
-    BATTLE(R.string.shell_tab_battle, Screen.BATTLE_SETUP);
+    /** The duelling platform on the water. */
+    DUEL(R.string.shell_tab_battle, Screen.BATTLE_SETUP),
+    /** The rope workshop. */
+    ROPE(R.string.shell_shop_page_rope, Screen.ROPE),
+    /** The glass pavilion. */
+    AQUARIUM(R.string.shell_shop_page_aquarium, Screen.AQUARIUM);
 
     companion object {
-        fun of(screen: Screen): MainTab? = entries.firstOrNull { it.screen == screen }
+        fun of(screen: Screen): Building? = entries.firstOrNull { it.screen == screen }
     }
 }
 
@@ -136,7 +150,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
 
     var progress by mutableStateOf(repository.load())
         private set
-    var screen by mutableStateOf(Screen.HOME)
+    var screen by mutableStateOf(Screen.VILLAGE)
         private set
     var dexSection by mutableStateOf(DexSection.FISH)
         private set
@@ -257,7 +271,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         if (session != null || tour != null) return
         when (target) {
             com.deepline.fishing.daily.ReminderTarget.DAILY -> openDaily()
-            com.deepline.fishing.daily.ReminderTarget.MIGRATION -> screen = Screen.HOME
+            com.deepline.fishing.daily.ReminderTarget.MIGRATION -> screen = Screen.VILLAGE
             com.deepline.fishing.daily.ReminderTarget.EVENT -> openShop(ShopPage.PASSES)
         }
     }
@@ -301,7 +315,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     private fun endTour(completed: Boolean) {
         tour?.let { GameAnalytics.tourEnded(it, completed) }
         tour = null
-        screen = Screen.HOME
+        screen = Screen.VILLAGE
         store.putString(KEY_TOUR_SEEN, Tour.VERSION.toString())
         askTourAgain = true
     }
@@ -323,11 +337,29 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /** A tap on the bottom navigation bar. */
-    fun selectTab(tab: MainTab) {
-        if (screen != tab.screen) feel.cue(com.deepline.fishing.feel.Cue.UI_TAP)
-        screen = tab.screen
+    /**
+     * Where on the screen the last building was opened from, as fractions of the screen (its menu
+     * grows out of there and shrinks back into it), or null for the middle.
+     */
+    var openOrigin by mutableStateOf<Pair<Float, Float>?>(null)
+        private set
+
+    /** The village's camera: kept here so coming back shows the village as it was left. */
+    val villageCamera = com.deepline.fishing.ui.village.VillageCamera()
+
+    /** Remembers whether [villageCamera] has been framed for this screen size yet. */
+    var villageFramedFor: Pair<Int, Int>? = null
+
+    /** Opens [building]'s menu, from [origin] (fractions of the screen) when it was tapped on the map. */
+    fun openBuilding(building: Building, origin: Pair<Float, Float>? = null) {
+        feel.cue(com.deepline.fishing.feel.Cue.UI_TAP)
+        openOrigin = origin
         shopMessage = null
-        if (tab == MainTab.SHOP) checkGifts()
+        when (building) {
+            Building.DEX -> openDex()
+            Building.SHOP -> openShop()
+            else -> screen = building.screen
+        }
     }
 
     /** Opens the Dex on [section] (falls back to Species if that section isn't unlocked yet). */
@@ -1354,24 +1386,21 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
      */
     fun onBack() {
         when (screen) {
-            Screen.HOME -> Unit
+            Screen.VILLAGE -> Unit
             Screen.CAST -> if (pendingResult != null) collectResult() else if (paused) resume() else pause()
             Screen.BATTLE -> if (battle?.isOver != false) leaveBattle() else Unit
             Screen.ONLINE_LOBBY -> closeOnlineLobby()
             Screen.FISH_DETAIL -> screen = Screen.DEX
             Screen.BOAT_EDITOR -> openDex(DexSection.SKINS)
-            Screen.AQUARIUM -> openDex(DexSection.FISH)
-            Screen.THEMES -> screen = Screen.HOME
-            Screen.SETTINGS -> screen = Screen.HOME
-            Screen.ROPE -> screen = Screen.HOME
+            Screen.THEMES, Screen.SETTINGS, Screen.ROPE, Screen.AQUARIUM -> screen = Screen.VILLAGE
             // -- Daily loop screens' back below.
-            Screen.DAILY -> screen = Screen.HOME
+            Screen.DAILY -> screen = Screen.VILLAGE
 
             // -- Social screens' back below.
             Screen.SOCIAL -> screen = Screen.BATTLE_SETUP
             Screen.FRIENDS, Screen.LEADERBOARDS, Screen.TOURNAMENT, Screen.CLUBS -> screen = Screen.SOCIAL
 
-            Screen.DEX, Screen.SHOP, Screen.BATTLE_SETUP, Screen.MILESTONES -> screen = Screen.HOME
+            Screen.HOME, Screen.DEX, Screen.SHOP, Screen.BATTLE_SETUP, Screen.MILESTONES -> screen = Screen.VILLAGE
         }
     }
 

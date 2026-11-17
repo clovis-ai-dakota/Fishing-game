@@ -17,13 +17,13 @@
     <string name="tour_welcome_title">Bienvenue dans Deep Line !</string>
     <string name="tour_welcome_body">Pêchez tous les poissons des profondeurs. Cette courte visite montre comment jouer et à quoi sert chaque chose. Touchez Suivant, ou Passer la visite si vous connaissez déjà le jeu.</string>
 
-    <string name="tour_tabs_title">Quatre onglets</string>
-    <string name="tour_tabs_body">La barre du bas vous emmène partout : Pêche, c\'est là que vous lancez votre ligne ; le Dex rassemble toutes les espèces que vous rencontrez ; la Boutique propose des améliorations de corde, du matériel et des looks pour votre bateau ; et Duel sert aux matchs en 1 contre 1.</string>
+    <string name="tour_village_title">Votre village</string>
+    <string name="tour_village_body">Le village est votre port d\'attache. Chaque bâtiment ouvre un menu : Pêche (le ponton, d\'où vous lancez), Dex (toutes les espèces rencontrées), Boutique (matériel et looks), Duel (matchs en 1 contre 1), Corde (ses améliorations) et Aquarium (vos prises exposées). Faites glisser pour vous déplacer, pincez pour zoomer.</string>
     <string name="tour_look_title">Un nouveau look</string>
     <string name="tour_look_body">Les menus en disent moins et en montrent plus. La couleur indique ce que fait un bouton : ambre pour l\'action principale, vert pour une récompense gratuite prête à être récupérée, la pièce pour un prix en points et violet pour un prix en euros. Les boutons (i) donnent les détails.</string>
 
     <string name="tour_cast_title">Lancez votre ligne</string>
-    <string name="tour_cast_body">Le grand bouton Lancer la ligne, en bas de l\'onglet Pêche, fait descendre votre hameçon depuis le bateau.</string>
+    <string name="tour_cast_body">Le grand bouton Lancer la ligne, en bas du menu Pêche (le ponton du village), fait descendre votre hameçon depuis le bateau.</string>
 
     <string name="tour_steer_title">Dirigez l\'hameçon</string>
     <string name="tour_steer_body">Pendant un lancer, faites glisser votre doigt à gauche et à droite, n\'importe où sur l\'écran. Un anneau montre où se trouve votre doigt : l\'hameçon file vers lui et le suit. L\'Agilité de corde le rend plus rapide.</string>
@@ -41,7 +41,7 @@
     <string name="tour_fast_reel_body">Dès que vous avez utilisé vos %1$d chocs, ou quand plus rien ne tient sur votre ligne, un bouton Remontée rapide apparaît à la remontée : il ramène l\'hameçon au bateau en %2$s secondes au plus, où que vous soyez. Plus rien n\'est pêché ensuite. Pratique contre la montre dans les duels chronométrés.</string>
 
     <string name="tour_themes_title">Thèmes</string>
-    <string name="tour_themes_body">Le bouton palette, en haut, change le look des menus : le Lagon par défaut, avec une scène marine derrière chaque onglet. D\'autres thèmes sont dans la Boutique, en euros ou en points, et les plus riches coûtent plus cher. L\'eau où vous pêchez ne change jamais.</string>
+    <string name="tour_themes_body">Le bouton palette, en haut, change le look des menus : le Lagon par défaut, avec une scène marine derrière chaque menu. D\'autres thèmes sont dans la Boutique, en euros ou en points, et les plus riches coûtent plus cher. L\'eau où vous pêchez ne change jamais.</string>
 
     <string name="tour_night_mode_title">Mode nuit</string>
     <string name="tour_night_mode_body">Chaque thème a une version nuit : choisissez Jour, Nuit, ou suivez le mode sombre de votre téléphone.</string>
@@ -50,7 +50,7 @@
     <string name="tour_points_body">Plus une prise est profonde, plus elle rapporte de points, affichés ici en haut. Les poissons scintillants (contour doré et reflets) valent %1$d fois plus.</string>
 
     <string name="tour_upgrades_title">Améliorez votre corde</string>
-    <string name="tour_upgrades_body">Dépensez vos points dans l\'onglet Boutique, sur sa page Corde. Longueur de corde vous fait atteindre des zones plus profondes et de nouveaux poissons, Solidité de corde porte plus de poids et Agilité de corde dirige plus vite. Changé d\'avis ? Redescendez d\'un niveau et récupérez tous les points qu\'il a coûtés.</string>
+    <string name="tour_upgrades_body">Dépensez vos points à la corderie du village (Corde). Longueur de corde vous fait atteindre des zones plus profondes et de nouveaux poissons, Solidité de corde porte plus de poids et Agilité de corde dirige plus vite. Changé d\'avis ? Redescendez d\'un niveau et récupérez tous les points qu\'il a coûtés.</string>
 
     <string name="tour_tackle_title">Matériel</string>
     <string name="tour_tackle_body">La page Matériel vend des objets pour un seul lancer, à activer avant de lancer. Les Lanternes éclairent le noir, un Détecteur de poissons rares signale les espèces que vous n\'avez pas encore pêchées à moins de %1$d m de l\'hameçon, un Porte-bonheur donne un choc de plus à la descente, et un Leurre scintillant apporte %2$d fois plus de poissons scintillants. Les prix augmentent avec la portée de votre corde.</string>
@@ -68,7 +68,7 @@
     <string name="tour_dex_filters_body">Filtrez les cartes par zone de profondeur, ou n\'affichez que les poissons que vous avez pêchés. Touchez une carte pour ouvrir sa page, puis balayez l\'écran pour feuilleter le Dex.</string>
 
     <string name="tour_milestones_title">Récompenses des paliers</string>
-    <string name="tour_milestones_body">Chaque point gagné compte pour les récompenses des paliers (points bonus et Lanternes), même après l\'avoir dépensé. Le trophée en haut de l\'onglet Pêche les ouvre, avec une pastille quand une récompense est prête à être récupérée.</string>
+    <string name="tour_milestones_body">Chaque point gagné compte pour les récompenses des paliers (points bonus et Lanternes), même après l\'avoir dépensé. Le trophée en haut du village les ouvre, avec une pastille quand une récompense est prête à être récupérée.</string>
 
     <string name="tour_secrets_title">Secrets de pêche</string>
     <!-- Hints that secrets exist, never what they are. -->
@@ -76,13 +76,13 @@
 
     <string name="tour_boat_title">Personnalisez votre bateau</string>
     <!-- "Personnaliser" is the button's label in the Skins section (dex_skins_boat_customise). -->
-    <string name="tour_boat_body">Touchez votre bateau sur l\'onglet Pêche pour ouvrir la rubrique Apparences du Dex. Le bouton Personnaliser vous permet de peindre la coque, le liseré et la cabine, et d\'ajouter un motif, des voiles, un pavillon et un emblème. Les couleurs de base sont gratuites ; le reste se débloque avec des points, ou à mesure que vous pêchez plus d\'espèces, atteignez de nouvelles zones et récupérez des paliers.</string>
+    <string name="tour_boat_body">Dans le menu Pêche, touchez votre bateau, sa ligne ou son hameçon pour ouvrir leurs apparences dans le Dex. Le bouton Personnaliser vous permet de peindre la coque, le liseré et la cabine, et d\'ajouter un motif, des voiles, un pavillon et un emblème. Les couleurs de base sont gratuites ; le reste se débloque avec des points, ou à mesure que vous pêchez plus d\'espèces, atteignez de nouvelles zones et récupérez des paliers.</string>
 
     <string name="tour_shop_style_title">Style</string>
     <string name="tour_shop_style_body">La page Style propose des bateaux tout faits, des peintures, des emblèmes et des imprimés de voile (en aperçu sur votre propre bateau), ainsi que de nouveaux hameçons, lignes et traînées. Comme toutes les apparences, ils ne changent que le look, jamais le jeu.</string>
 
     <string name="tour_aquarium_title">Votre aquarium</string>
-    <string name="tour_aquarium_body">Les poissons que vous avez pêchés nagent dans votre aquarium : ouvrez-le avec le bouton en forme d\'aquarium en haut du Dex et choisissez qui y nage. Le décor et un bac plus grand sont sur la page Aquarium de la Boutique.</string>
+    <string name="tour_aquarium_body">Les poissons que vous avez pêchés nagent dans votre aquarium, le pavillon de verre du village : choisissez qui y nage, et achetez sur place du décor ou un bac plus grand. Le plein écran tourne le téléphone à l\'horizontale pour les regarder.</string>
 
     <string name="tour_season_title">Saisons et événements du week-end</string>
     <!-- %1$s: how long a season lasts (e.g. "6 semaines"). -->
@@ -114,7 +114,7 @@
     <string name="tour_wager_body">Contre l\'ordinateur, vous pouvez miser des points sur le résultat : une victoire rapporte %1$s fois la mise contre Facile, %2$s fois contre Normal et %3$s fois contre Difficile. Un match nul la rembourse.</string>
 
     <string name="tour_settings_title">Paramètres</string>
-    <string name="tour_settings_body">La roue dentée en haut de l\'onglet Pêche ouvre les Paramètres.</string>
+    <string name="tour_settings_body">La roue dentée en haut du village ouvre les Paramètres.</string>
 
     <string name="tour_sound_title">Son et sensations</string>
     <string name="tour_sound_body">Réglez ici séparément le volume, la musique et les effets sonores. La musique suit votre hameçon : calme près de la surface, plus sombre dans les profondeurs. Vibrations ajoute une légère vibration aux chocs, aux prises et aux grosses victoires, et Réduire les animations coupe les tremblements d\'écran, le ralenti et les flashs.</string>
@@ -133,7 +133,7 @@
 
     <string name="tour_migrations_title">Migrations</string>
     <!-- %1$s: how long a migration lasts (e.g. "2 jours"). -->
-    <string name="tour_migrations_body">Chaque semaine, pendant %1$s, deux espèces moins communes migrent : une près de la surface et une dans les profondeurs, toutes deux bien plus fréquentes là où elles vivent. Un bouton avec un banc de poissons les affiche sur l\'onglet Pêche, et une carte dans le Dex. Les migrations concernent les lancers en solo : les duels ne changent jamais.</string>
+    <string name="tour_migrations_body">Chaque semaine, pendant %1$s, deux espèces moins communes migrent : une près de la surface et une dans les profondeurs, toutes deux bien plus fréquentes là où elles vivent. Un bouton avec un banc de poissons les affiche dans le village, et une carte dans le Dex. Les migrations concernent les lancers en solo : les duels ne changent jamais.</string>
 
     <string name="tour_reminders_title">Rappels</string>
     <string name="tour_reminders_body">Envie d\'un petit rappel quand votre récompense du jour est prête, que votre série va s\'arrêter ou qu\'une migration commence ? Activez les rappels dans les Paramètres : au maximum un par jour, et jamais entre %1$s et %2$s.</string>

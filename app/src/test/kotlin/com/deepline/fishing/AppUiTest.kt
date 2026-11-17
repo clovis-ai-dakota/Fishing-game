@@ -119,12 +119,14 @@ class AppUiTest {
         node.performClick()
     }
 
-    /** Taps a tab of the bottom navigation bar. */
-    private fun ComposeTestRule.tab(name: String) = onNodeWithTag("tab_$name").performClick()
 
     @Test
     fun freshPlayerCastsAndCollects() {
         launch()
+        // The game opens on the village; the pier leads to the Fish menu.
+        org.junit.Assert.assertTrue(compose.inVillage())
+        compose.shot("00_village")
+        compose.openBuilding("fish")
         compose.onNodeWithTag("cast_dock").assertExists()
         compose.shot("01_home")
 
@@ -146,7 +148,7 @@ class AppUiTest {
     @Test
     fun battleAgainstTheComputer() {
         launch()
-        compose.tab("battle")
+        compose.openBuilding("battle")
         compose.shot("09_battle_setup")
         compose.click("Start battle")
         compose.shot("10_battle_hub")
@@ -166,7 +168,7 @@ class AppUiTest {
     @Test
     fun onlineLobby() {
         launch()
-        compose.tab("battle")
+        compose.openBuilding("battle")
         compose.onNodeWithTag("opponent_online").performScrollTo().performClick()
         compose.click("Go online")
         compose.onNodeWithText("Create room").assertExists()

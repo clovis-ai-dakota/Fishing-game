@@ -37,7 +37,7 @@ class ShopPointsUiTest : BoatUiTestBase() {
     @Test
     fun buyingWithPointsAsksFirst() {
         val vm = launch(midGamePlayer())
-        compose.onNodeWithTag("tab_shop").performClick()
+        compose.openBuilding("shop")
         assertEquals(Screen.SHOP, vm.screen)
         compose.onNodeWithTag("shop_page_tackle").performClick()
         val crate = ShopCatalog.byId("lantern_crate")!!
@@ -65,7 +65,7 @@ class ShopStoreUiTest : BoatUiTestBase() {
     fun payingThroughTheTestStore() {
         val vm = launch(midGamePlayer(points = 0))
         assertNotNull("debug builds use the test store", vm.testStore)
-        compose.onNodeWithTag("tab_shop").performClick()
+        compose.openBuilding("shop")
         compose.onNodeWithTag("shop_page_tackle").performClick()
         val pouch = ShopCatalog.byId("lantern_pouch")!!
         val count = ShopCatalog.packCount(pouch, pouch.grants.first() as Grant.TacklePack, vm.progress)
@@ -136,7 +136,7 @@ class ShopPassesUiTest : BoatUiTestBase() {
         val now = ShopClock.now()
         val vm = launch(midGamePlayer().copy(clubUntilMs = now + 10 * 86_400_000L))
         assertTrue(vm.isClubMember)
-        compose.onNodeWithTag("tab_shop").performClick()
+        compose.openBuilding("shop")
         compose.shot("66_shop_club_pouch")
         val before = vm.progress.lanterns
         compose.onNodeWithTag("claim_club_pouch").performClick()
@@ -175,7 +175,7 @@ class BattleTackleUiTest : BoatUiTestBase() {
     @Test
     fun sightTackleWorksInBattles() {
         val vm = launch(midGamePlayer().copy(lanterns = 3, detectors = 2))
-        compose.onNodeWithTag("tab_battle").performClick()
+        compose.openBuilding("battle")
         compose.onNodeWithTag("battle_lantern").performScrollTo().performClick()
         compose.onNodeWithTag("battle_detector").performScrollTo().performClick()
         assertTrue("lantern on", vm.useLantern)
@@ -256,8 +256,7 @@ class AquariumUiTest : BoatUiTestBase() {
         val vm = launch(
             midGamePlayer().copy(collection = caught.withIndex().associate { (i, s) -> s.id to com.deepline.fishing.core.CollectionEntry(1, 0, 20f, 100 + i) }),
         )
-        compose.onNodeWithTag("tab_dex").performClick()
-        compose.onNodeWithContentDescription("Aquarium").performClick()
+        compose.openBuilding("aquarium")
         assertEquals(Screen.AQUARIUM, vm.screen)
         compose.shot("70_aquarium")
         assertEquals(com.deepline.fishing.core.Showcase.TANK_SIZE, com.deepline.fishing.core.Showcase.tankFish(vm.progress).size)
@@ -343,12 +342,12 @@ class ThemesUiTest : BoatUiTestBase() {
         // A few other screens in the default theme, by day.
         vm.setMenuTheme(com.deepline.fishing.core.MenuTheme.LAGOON)
         vm.setNightMode(com.deepline.fishing.core.NightMode.DAY)
-        compose.onNodeWithTag("tab_shop").performClick()
+        compose.openBuilding("shop")
         compose.onNodeWithTag("shop_page_style").performClick()
         compose.shot("82_shop_style_day")
-        compose.onNodeWithTag("tab_dex").performClick()
+        compose.openBuilding("dex")
         compose.shot("83_dex_day")
-        compose.onNodeWithTag("tab_battle").performClick()
+        compose.openBuilding("battle")
         compose.shot("84_battle_day")
     }
 }

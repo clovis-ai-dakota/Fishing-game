@@ -81,7 +81,6 @@ class DexUiTest {
         node.performClick()
     }
 
-    private fun ComposeTestRule.tab(name: String) = onNodeWithTag("tab_$name").performClick()
 
     private fun isShowing(text: String, substring: Boolean = false) =
         compose.onAllNodes(hasText(text, substring = substring)).fetchSemanticsNodes().isNotEmpty()
@@ -118,30 +117,31 @@ class DexUiTest {
     }
 
     @Test
-    fun theFishTabIsTheHubAndBackReturnsToIt() {
+    fun theVillageIsTheHubAndBackReturnsToIt() {
         val vm = launch(midGame())
-        compose.onNodeWithText("Cast line").assertExists()
+        assertEquals(Screen.VILLAGE, vm.screen)
         compose.onNodeWithContentDescription("Milestones").assertExists()
-        compose.shot("49_fish_tab")
-        compose.tab("shop")
-        assertEquals(Screen.SHOP, vm.screen)
-        // System back from any tab goes to the Fish tab.
-        compose.waitForIdle()
-        scenario!!.onActivity { it.onBackPressedDispatcher.onBackPressed() }
-        compose.waitForIdle()
-        assertEquals(Screen.HOME, vm.screen)
-        // Milestones are pushed on top of the Fish tab, with a back button.
+        compose.shot("49_village")
+        // Every building opens its menu, and system back comes home.
+        for ((name, screen) in listOf("fish" to Screen.HOME, "dex" to Screen.DEX, "shop" to Screen.SHOP, "battle" to Screen.BATTLE_SETUP, "rope" to Screen.ROPE, "aquarium" to Screen.AQUARIUM)) {
+            compose.openBuilding(name)
+            assertEquals(screen, vm.screen)
+            scenario!!.onActivity { it.onBackPressedDispatcher.onBackPressed() }
+            compose.waitForIdle()
+            assertEquals(Screen.VILLAGE, vm.screen)
+        }
+        // Milestones open from the village, with a back button.
         compose.onNodeWithContentDescription("Milestones").performClick()
         assertEquals(Screen.MILESTONES, vm.screen)
         compose.click("‹ Back")
-        assertEquals(Screen.HOME, vm.screen)
+        assertEquals(Screen.VILLAGE, vm.screen)
     }
 
     @Test
     fun speciesGridFiltersAndPages() {
         val vm = launch(midGame())
         val p = vm.progress
-        compose.tab("dex")
+        compose.openBuilding("dex")
         compose.onNodeWithText("Seen ${p.seenCount} · Caught ${p.discoveredCount} / ${FishCatalog.all.size}").assertExists()
         // Unknown species show ???, seen ones their name, caught ones everything.
         assertTrue(isShowing("???"))
@@ -180,7 +180,7 @@ class DexUiTest {
     @Test
     fun lockedSecretsShowTierAndRewardOnly() {
         val vm = launch(midGame())
-        compose.tab("dex")
+        compose.openBuilding("dex")
         compose.click("Secrets")
         compose.onNodeWithText("Discovered 4 of ${Secrets.all.size}").assertExists()
         // Found: titles. Locked: never the title, only the tier and the reward.
@@ -204,7 +204,7 @@ class DexUiTest {
     @Test
     fun skinsLibraryEquipsAndHidesLockedNames() {
         val vm = launch(midGame())
-        compose.tab("dex")
+        compose.openBuilding("dex")
         compose.click("Skins")
         compose.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Giant-slayer set"))
         compose.onNodeWithText("Giant-slayer set").assertExists()

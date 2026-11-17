@@ -12,6 +12,8 @@
     <string name="shell_tab_dex">Dex</string>
     <string name="shell_tab_shop">Shop</string>
     <string name="shell_tab_battle">Battle</string>
+    <!-- The village, the home screen: one word under the button that goes back to it. -->
+    <string name="shell_village">Village</string>
 
     <!-- Pages of the Shop tab (chips in a row). -->
     <string name="shell_shop_page_rope">Rope</string>
@@ -27,7 +29,7 @@
 
     <!-- Asked when the guided tour closes. -->
     <string name="shell_tour_again_title">Show the tour next time?</string>
-    <string name="shell_tour_again_body">Should the tour open again the next time you start Deep Line? You can also take it any time from Settings, with the gear at the top of the Fish tab.</string>
+    <string name="shell_tour_again_body">Should the tour open again the next time you start Deep Line? You can also take it any time from Settings, with the gear at the top of the village.</string>
     <string name="shell_tour_again_yes">Yes, next time</string>
 
     <!-- Debug builds only: a fake payment sheet for testing purchases (no real money). -->

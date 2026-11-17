@@ -12,6 +12,8 @@ const float M_HOOK = 1.0;
 const float M_OBSTACLE = 2.0;
 const float M_BOAT = 3.0;
 const float M_DECOR = 4.0;
+const float M_PAINTED = 5.0;  // the village: colour per vertex (walls, roofs, ground)
+const float M_SEA = 6.0;      // the village's sea surface
 
 bool isPart(float part, float id) { return abs(part - id) < 0.5; }
 

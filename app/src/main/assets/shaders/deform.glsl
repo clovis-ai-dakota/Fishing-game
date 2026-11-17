@@ -12,6 +12,9 @@ vec3 deform(vec3 p, float part, vec2 uv) {
             float t = clamp((p.x - 0.44) / 0.16, 0.0, 1.0);
             p.y += sin(uTime * 5.0 + p.x * 25.0 + p.y * 40.0 + uSwim.z) * 0.03 * t;
         }
+    } else if (uMaterial > 4.5 && uMaterial < 5.5) {
+        // The village's flags flutter, more towards their tip (u along the cloth).
+        if (isPart(part, 63.0)) p.z += sin(uTime * 4.0 + uv.x * 5.0 + p.x * 0.7) * 0.22 * uv.x;
     } else if (uMaterial < 1.5) {
         // The hook doesn't move.
     } else if (uMaterial < 2.5) {

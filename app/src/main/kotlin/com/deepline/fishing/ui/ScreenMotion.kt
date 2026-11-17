@@ -7,23 +7,18 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
-import com.deepline.fishing.MainTab
+import androidx.compose.ui.graphics.TransformOrigin
 import com.deepline.fishing.Screen
-import com.deepline.fishing.ui.theme.CAMERA_MS
-import com.deepline.fishing.ui.theme.Place
 
 /**
  * How the game moves from one screen to the next (see docs/ui-design.md). Every move says where
- * the player is going in the world, and none lasts a second:
+ * the player is going, and none lasts a second:
  *
- * - between tabs, the content slides the way the camera travels ([CAMERA_MS]): sideways along the
- *   coast, down into the water for the Dex;
- * - a screen opened from a menu grows out of it, and shrinks back into it faster on the way back;
+ * - a building's menu grows out of the building that was tapped on the village map, and shrinks
+ *   back into it on the way back (faster); any other screen grows out of the middle;
  * - casting dives: the menu leaves by the top as the water comes up from below; collecting the
  *   catch surfaces again.
  *
@@ -52,40 +47,43 @@ object ScreenMotion {
 
     private val calmFade: ContentTransform get() = fadeIn(tween(CALM_MS)) togetherWith fadeOut(tween(CALM_MS))
 
-    /** Between the tab layer (null) and pushed screens. */
-    fun between(from: Screen?, to: Screen?, calm: Boolean): ContentTransform = when {
-        instant -> none
-        calm -> calmFade
-        to == Screen.CAST || to == Screen.BATTLE && from == Screen.CAST ->
-            if (to == Screen.CAST) {
-                (slideInVertically(tween(DIVE_MS, easing = FastOutSlowInEasing)) { it } + fadeIn(tween(DIVE_MS / 2))) togetherWith
-                    (slideOutVertically(tween(DIVE_MS, easing = FastOutSlowInEasing)) { -it } + fadeOut(tween(DIVE_MS)))
-            } else {
-                fadeIn(tween(PUSH_MS)) togetherWith fadeOut(tween(PUSH_MS))
-            }
-        from == Screen.CAST ->
-            (slideInVertically(tween(SURFACE_MS, easing = FastOutSlowInEasing)) { -it } + fadeIn(tween(SURFACE_MS))) togetherWith
-                (slideOutVertically(tween(SURFACE_MS, easing = FastOutSlowInEasing)) { it } + fadeOut(tween(SURFACE_MS / 2)))
-        // Back to the tabs: the screen shrinks away, faster than it came.
-        to == null ->
-            fadeIn(tween(POP_MS)) togetherWith (scaleOut(tween(POP_MS), targetScale = 0.94f) + fadeOut(tween(POP_MS)))
-        else ->
-            (scaleIn(tween(PUSH_MS, easing = FastOutSlowInEasing), initialScale = 0.94f) + fadeIn(tween(PUSH_MS))) togetherWith fadeOut(tween(PUSH_MS / 2))
+    /** How far from the village a screen is: back always goes up a level. */
+    fun level(screen: Screen): Int = when (screen) {
+        Screen.VILLAGE -> 0
+        Screen.HOME, Screen.DEX, Screen.SHOP, Screen.BATTLE_SETUP, Screen.ROPE, Screen.AQUARIUM,
+        Screen.MILESTONES, Screen.THEMES, Screen.SETTINGS, Screen.DAILY -> 1
+        else -> 2
     }
 
-    /** Between two tabs: the way the camera goes from one place to the other. */
-    fun betweenTabs(from: MainTab, to: MainTab, calm: Boolean): ContentTransform {
+    /**
+     * From [from] to [to]. [origin] is where a building's menu grows from (fractions of the
+     * screen; the middle when null).
+     */
+    fun between(from: Screen, to: Screen, calm: Boolean, origin: Pair<Float, Float>? = null): ContentTransform {
         if (instant) return none
         if (calm) return calmFade
-        val a = Place.of(from.screen)
-        val b = Place.of(to.screen)
-        val spec = tween<androidx.compose.ui.unit.IntOffset>(CAMERA_MS, easing = FastOutSlowInEasing)
+        val pivot = origin?.let { TransformOrigin(it.first, it.second) } ?: TransformOrigin.Center
         return when {
-            // Down into the water, or back up to the surface.
-            b.y > a.y -> (slideInVertically(spec) { it } + fadeIn(tween(CAMERA_MS))) togetherWith (slideOutVertically(spec) { -it } + fadeOut(tween(CAMERA_MS)))
-            b.y < a.y -> (slideInVertically(spec) { -it } + fadeIn(tween(CAMERA_MS))) togetherWith (slideOutVertically(spec) { it } + fadeOut(tween(CAMERA_MS)))
-            b.x >= a.x -> slideInHorizontally(spec) { it } togetherWith slideOutHorizontally(spec) { -it }
-            else -> slideInHorizontally(spec) { -it } togetherWith slideOutHorizontally(spec) { it }
+            to == Screen.CAST || to == Screen.BATTLE && from == Screen.CAST ->
+                if (to == Screen.CAST) {
+                    (slideInVertically(tween(DIVE_MS, easing = FastOutSlowInEasing)) { it } + fadeIn(tween(DIVE_MS / 2))) togetherWith
+                        (slideOutVertically(tween(DIVE_MS, easing = FastOutSlowInEasing)) { -it } + fadeOut(tween(DIVE_MS)))
+                } else {
+                    fadeIn(tween(PUSH_MS)) togetherWith fadeOut(tween(PUSH_MS))
+                }
+            from == Screen.CAST ->
+                (slideInVertically(tween(SURFACE_MS, easing = FastOutSlowInEasing)) { -it } + fadeIn(tween(SURFACE_MS))) togetherWith
+                    (slideOutVertically(tween(SURFACE_MS, easing = FastOutSlowInEasing)) { it } + fadeOut(tween(SURFACE_MS / 2)))
+            // Back up a level: the screen shrinks away (into its building), faster than it came.
+            level(to) < level(from) -> {
+                val into = if (to == Screen.VILLAGE) pivot else TransformOrigin.Center
+                fadeIn(tween(POP_MS)) togetherWith (scaleOut(tween(POP_MS), targetScale = 0.6f, transformOrigin = into) + fadeOut(tween(POP_MS)))
+            }
+            else -> {
+                val out = if (from == Screen.VILLAGE) pivot else TransformOrigin.Center
+                val start = if (from == Screen.VILLAGE) 0.6f else 0.94f
+                (scaleIn(tween(PUSH_MS, easing = FastOutSlowInEasing), initialScale = start, transformOrigin = out) + fadeIn(tween(PUSH_MS))) togetherWith fadeOut(tween(PUSH_MS / 2))
+            }
         }
     }
 }

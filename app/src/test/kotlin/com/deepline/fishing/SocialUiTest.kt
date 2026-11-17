@@ -274,7 +274,7 @@ class SocialFriendsUiTest : SocialUiTestBase() {
         val bob = PlayerCard("BOBBBBBB", "Bob", "Giant-slayer", "OCEAN")
         fake.incoming += bob
         // The Battle tab leads to friends and rankings.
-        compose.onNodeWithTag("tab_battle").performClick()
+        compose.openBuilding("battle")
         tap("battle_social")
         assertEquals(Screen.SOCIAL, vm.screen)
         compose.onNodeWithTag("my_player_id").assertExists()
@@ -512,7 +512,7 @@ class SocialClubsOffUiTest : SocialUiTestBase() {
     fun withClubsOffThereIsNoClubAnywhere() {
         FeatureFlags.clubs = false
         val (vm, fake) = launchSocial()
-        compose.onNodeWithTag("tab_battle").performClick()
+        compose.openBuilding("battle")
         assertTrue(exists("battle_social"))
         tap("battle_social")
         compose.waitUntil(5_000) { vm.social.tournament != null }

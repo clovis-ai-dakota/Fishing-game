@@ -185,6 +185,7 @@ class GlBackend(
             "uMaterial" to floatArrayOf(0f),
             "uMode" to floatArrayOf(0f),
             "uAdditive" to floatArrayOf(0f),
+            "uGlow" to floatArrayOf(0f),
         )
     }
 }

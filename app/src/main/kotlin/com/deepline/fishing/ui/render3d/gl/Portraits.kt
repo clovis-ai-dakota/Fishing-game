@@ -130,15 +130,27 @@ fun SkinPreview3d(
     }
 }
 
-/** Hosts a [GlTextureView], paused with the screen's lifecycle. */
+/**
+ * Hosts a [GlTextureView], paused with the screen's lifecycle. [maxRenderWidth] caps the drawing's
+ * width in pixels; [pace] (vsyncs per frame, read every frame) lets a view run faster while it's
+ * being moved.
+ */
 @Composable
-private fun LivePreview(source: FrameSource, transparent: Boolean, modifier: Modifier, key: Any, onPainted: ((Boolean) -> Unit)? = null) {
+internal fun LivePreview(
+    source: FrameSource,
+    transparent: Boolean,
+    modifier: Modifier,
+    key: Any,
+    onPainted: ((Boolean) -> Unit)? = null,
+    maxRenderWidth: Int = 480,
+    pace: (() -> Int)? = null,
+) {
     val painted = androidx.compose.runtime.rememberUpdatedState(onPainted)
     val lifecycle = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
     val viewRef = remember(key) { arrayOfNulls<GlTextureView>(1) }
     androidx.compose.runtime.key(key) {
         androidx.compose.ui.viewinterop.AndroidView(
-            factory = { ctx -> GlTextureView(ctx, source, transparent).also { viewRef[0] = it; it.onPainted = { on -> painted.value?.invoke(on) } } },
+            factory = { ctx -> GlTextureView(ctx, source, transparent, maxRenderWidth = maxRenderWidth, pace = pace).also { viewRef[0] = it; it.onPainted = { on -> painted.value?.invoke(on) } } },
             modifier = modifier,
         )
     }

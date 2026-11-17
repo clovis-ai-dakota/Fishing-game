@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -83,7 +84,7 @@ fun AppRoot(vm: GameViewModel) {
         com.deepline.fishing.ui.kit.LocalRewardFx provides rewardFx.takeIf { !calmMotion },
         com.deepline.fishing.ui.theme.LocalBackdropCover provides backdropCover,
     ) {
-        BackHandler(enabled = vm.screen != Screen.HOME) { vm.onBack() }
+        BackHandler(enabled = vm.screen != Screen.VILLAGE) { vm.onBack() }
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             Box(Modifier.fillMaxSize()) {
                 // The theme's sea scene behind every menu (a cast draws its own water): the camera
@@ -101,20 +102,21 @@ fun AppRoot(vm: GameViewModel) {
                         hidden = { backdropCover.covered },
                     )
                 }
-                // The four tabs are one layer (they move inside MainScaffold, under a tab bar that
-                // stays put); every other screen is pushed on top of it.
-                val pushed: Screen? = vm.screen.takeIf { !isTabScreen(it) }
+                // One screen at a time, each full-screen: the village, a building's menu, or what
+                // opens from it. A move says where the player goes (see ScreenMotion).
                 AnimatedContent(
-                    targetState = pushed,
-                    transitionSpec = { ScreenMotion.between(initialState, targetState, calm) },
+                    targetState = vm.screen,
+                    transitionSpec = { ScreenMotion.between(initialState, targetState, calm, vm.openOrigin) },
                     label = "screen",
                     modifier = Modifier.fillMaxSize(),
                 ) { screen ->
                     CompositionLocalProvider(com.deepline.fishing.ui.theme.LocalScreenSettled provides atRest) {
                     when (screen) {
-                        // The four tabs share the bottom navigation bar.
-                        null, Screen.HOME, Screen.DEX, Screen.SHOP, Screen.BATTLE_SETUP -> MainScaffold(vm)
-                        // Full screens, without the bar.
+                        Screen.VILLAGE -> com.deepline.fishing.ui.village.VillageScreen(vm)
+                        Screen.HOME -> HomeScreen(vm)
+                        Screen.DEX -> com.deepline.fishing.ui.dex.DexScreen(vm)
+                        Screen.SHOP -> com.deepline.fishing.ui.shop.ShopScreen(vm)
+                        Screen.BATTLE_SETUP -> BattleSetupScreen(vm)
                         Screen.CAST -> CastScreen(vm)
                         Screen.FISH_DETAIL -> FishDetailScreen(vm)
                         Screen.MILESTONES -> MilestonesScreen(vm)
@@ -140,13 +142,13 @@ fun AppRoot(vm: GameViewModel) {
                 vm.tour?.let { TourOverlay(it, onNext = vm::tourNext, onBack = vm::tourBack, onSkip = vm::skipTour) }
                 // What just happened in the shop (a purchase, a pending payment), above the tab bar.
                 val message = vm.shopMessage
-                if (message != null && isTabScreen(vm.screen) && vm.tour == null) {
+                if (message != null && (vm.screen == Screen.VILLAGE || vm.screen == Screen.SHOP) && vm.tour == null) {
                     Snackbar(
                         action = { TextButton(onClick = vm::dismissShopMessage) { Text(stringResource(R.string.common_ok)) } },
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .navigationBarsPadding()
-                            .padding(start = 12.dp, end = 12.dp, bottom = 88.dp),
+                            .padding(start = 12.dp, end = 12.dp, bottom = 16.dp),
                     ) { Text(message.asString()) }
                 }
             }
@@ -203,7 +205,15 @@ private fun TestStoreDialog(item: com.deepline.fishing.core.ShopItem, onAnswer: 
 
 /** Shared layout for the secondary screens: a back button, a title, then the content. */
 @Composable
-fun SubScreen(title: String, onBack: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
+fun SubScreen(
+    title: String,
+    onBack: () -> Unit,
+    /** Buttons at the right of the header (a balance, a shortcut). */
+    actions: @Composable RowScope.() -> Unit = {},
+    /** A line under the title. */
+    subtitle: (@Composable () -> Unit)? = null,
+    content: @Composable ColumnScope.() -> Unit,
+) {
     Box(Modifier.fillMaxSize()) {
         // The phone's navigation bar stands on the same deep water as the tab bar and a screen's
         // dock: without it the scene's seabed shows under the system buttons, cut off by the
@@ -215,12 +225,18 @@ fun SubScreen(title: String, onBack: () -> Unit, content: @Composable ColumnScop
                 .windowInsetsBottomHeight(WindowInsets.navigationBars)
                 .background(com.deepline.fishing.ui.kit.deepColor()),
         )
-        SubScreenContent(title, onBack, content)
+        SubScreenContent(title, onBack, actions, subtitle, content)
     }
 }
 
 @Composable
-private fun SubScreenContent(title: String, onBack: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
+private fun SubScreenContent(
+    title: String,
+    onBack: () -> Unit,
+    actions: @Composable RowScope.() -> Unit,
+    subtitle: (@Composable () -> Unit)?,
+    content: @Composable ColumnScope.() -> Unit,
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -233,12 +249,16 @@ private fun SubScreenContent(title: String, onBack: () -> Unit, content: @Compos
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            TextButton(onClick = onBack) { Text(stringResource(R.string.common_back)) }
-            Text(
-                title,
-                style = MaterialTheme.typography.titleLarge.copy(brush = headlineBrush()),
-                fontWeight = FontWeight.Black,
-            )
+            TextButton(onClick = onBack, modifier = Modifier.testTag("back")) { Text(stringResource(R.string.common_back)) }
+            Column(Modifier.weight(1f)) {
+                Text(
+                    title,
+                    style = MaterialTheme.typography.titleLarge.copy(brush = headlineBrush()),
+                    fontWeight = FontWeight.Black,
+                )
+                subtitle?.invoke()
+            }
+            actions()
         }
         content()
     }

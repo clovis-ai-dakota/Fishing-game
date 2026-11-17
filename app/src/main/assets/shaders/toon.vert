@@ -19,6 +19,7 @@ out vec3 vLocalNormal;
 out vec2 vUv;
 out float vPart;
 out vec3 vViewNormal;
+out vec4 vColor;
 
 void main() {
     vec3 p = deform(aPos, aPart, aUv);
@@ -30,5 +31,6 @@ void main() {
     vLocalNormal = aNormal;
     vUv = aUv;
     vPart = aPart;
+    vColor = aColor;
     gl_Position = uProj * uView * world;
 }

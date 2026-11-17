@@ -129,6 +129,7 @@ class LegendarySecretUiTest {
         val pointsBefore = vm.progress.pointsBalance
         val lanternsBefore = vm.progress.lanterns
 
+        compose.openBuilding("fish")
         compose.click("Cast line")
         compose.advanceSeconds(7f)
         // The last bump hooked the leviathan: that secret first, mid-cast.
@@ -150,7 +151,7 @@ class LegendarySecretUiTest {
         assertTrue(vm.progress.unlockedCosmetics.isNotEmpty())
 
         // Skins: wear the whole set (hook, line, boat, trail and title), then fish with them.
-        compose.onNodeWithTag("tab_dex").performClick()
+        compose.openBuilding("dex")
         compose.click("Skins")
         val set = com.deepline.fishing.core.Cosmetic.entries.filter { it.unlockedBy == Secrets.DAVID_AND_GOLIATH }
         assertEquals(com.deepline.fishing.core.CosmeticSlot.entries.size, set.size)
@@ -163,9 +164,10 @@ class LegendarySecretUiTest {
         compose.click("Tide trail")
         assertEquals(null, vm.progress.equippedSkins[com.deepline.fishing.core.CosmeticSlot.TRAIL])
         compose.click("Tide trail")
-        compose.onNodeWithTag("tab_fish").performClick()
-        // The title is shown off on the home screen.
+        compose.backToVillage()
+        // The title is shown off on the village.
         compose.onNodeWithText("★ Giant-slayer").assertExists()
+        compose.openBuilding("fish")
 
         compose.click("Cast line")
         compose.mainClock.autoAdvance = false

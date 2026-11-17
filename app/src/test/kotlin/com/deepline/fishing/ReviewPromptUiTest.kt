@@ -161,6 +161,7 @@ class ReviewPromptUiTest {
         val start = System.currentTimeMillis()
         ShopClock.override = start
         val vm = launchSeasonedPlayer()
+        compose.openBuilding("fish")
 
         // 1. A rare catch (the 4th bump hooks a Sparkling fish). Its secret is explained mid-cast:
         //    no card during the cast, nor while the results are showing.
@@ -204,8 +205,8 @@ class ReviewPromptUiTest {
         vm.buyWithMoney(item, null)
         vm.testStore!!.answer(TestStore.TestOutcome.FAIL)
         compose.waitForIdle()
-        // The failure's message covers the Cast button until it's dismissed.
-        compose.click("OK")
+        // The failure's message shows on the village and in the Shop, not over the Fish menu.
+        vm.dismissShopMessage()
         compose.waitForIdle()
         castToResults()
         collect()

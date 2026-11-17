@@ -9,6 +9,7 @@
     <string name="shell_tab_dex">Dex</string>
     <string name="shell_tab_shop">Shop</string>
     <string name="shell_tab_battle">Duell</string>
+    <string name="shell_village">Dorf</string>
 
     <!-- Seiten des Shops (Chips). -->
     <string name="shell_shop_page_rope">Seil</string>
@@ -24,7 +25,7 @@
 
     <!-- Am Ende der Tour. -->
     <string name="shell_tour_again_title">Tour beim nächsten Mal zeigen?</string>
-    <string name="shell_tour_again_body">Soll die Tour beim nächsten Start von Deep Line wieder erscheinen? Du kannst sie auch jederzeit in den Einstellungen starten, über das Zahnrad oben im Tab „Angeln“.</string>
+    <string name="shell_tour_again_body">Soll die Tour beim nächsten Start von Deep Line wieder erscheinen? Du kannst sie auch jederzeit in den Einstellungen starten, über das Zahnrad oben im Dorf.</string>
     <string name="shell_tour_again_yes">Ja, nächstes Mal</string>
 
     <!-- Nur Debug-Builds: ein falsches Bezahlfenster zum Testen. -->

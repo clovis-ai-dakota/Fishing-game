@@ -258,7 +258,7 @@ abstract class LocaleLayoutTest(private val language: String) {
         }
         vm.openBoatEditor()
         pages("boat_editor", max = 5)
-        vm.selectTab(MainTab.BATTLE)
+        vm.openBuilding(Building.DUEL)
         pages("battle_setup", max = 4)
         vm.openOnlineLobby(BattleMode.BEST_OF_FIVE)
         pages("online_lobby", max = 2)
@@ -347,7 +347,7 @@ abstract class LocaleLayoutTest(private val language: String) {
     }
 
     private fun social() {
-        vm.selectTab(MainTab.BATTLE)
+        vm.openBuilding(Building.DUEL)
         vm.openSocial(Screen.SOCIAL)
         waitFor("my_player_id")
         pages("social_hub", max = 3)

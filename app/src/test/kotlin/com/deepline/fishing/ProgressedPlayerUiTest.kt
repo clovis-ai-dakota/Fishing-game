@@ -120,8 +120,6 @@ class ProgressedPlayerUiTest {
         node.performClick()
     }
 
-    /** Taps a tab of the bottom navigation bar. */
-    private fun ComposeTestRule.tab(name: String) = onNodeWithTag("tab_$name").performClick()
 
     @Test
     fun deepCastWithLanternAndFullerLog() {
@@ -138,18 +136,22 @@ class ProgressedPlayerUiTest {
         )
         compose.shot("04_home_progressed")
 
-        compose.tab("dex")
+        compose.openBuilding("dex")
         compose.onNodeWithText("Seen 9 · Caught 9 / ${FishCatalog.all.size}").assertExists()
         compose.shot("05_fish_log")
 
-        compose.tab("shop")
-        compose.shot("06_shop_rope")
+        compose.openBuilding("shop")
+        compose.shot("06_shop")
 
-        compose.tab("fish")
+        compose.openBuilding("rope")
+        compose.shot("06b_rope_workshop")
+
+        compose.backToVillage()
         compose.onNodeWithContentDescription("Milestones").performClick()
         compose.shot("07_milestones")
         compose.click("‹ Back")
 
+        compose.openBuilding("fish")
         compose.click("Cast line")
         compose.mainClock.autoAdvance = false
         // Sink towards the dark zone (it may turn back early after 4 bumps).

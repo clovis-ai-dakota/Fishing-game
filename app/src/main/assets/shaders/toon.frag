@@ -21,6 +21,7 @@ uniform vec3 uAmbient;
 uniform vec3 uFogColor;
 uniform vec3 uWaterTint;
 uniform float uOpacity;
+uniform float uGlow;      // the village's lights: 0 by day, 1 at night
 
 in vec3 vWorld;
 in vec3 vNormal;
@@ -29,6 +30,7 @@ in vec3 vLocalNormal;
 in vec2 vUv;
 in float vPart;
 in vec3 vViewNormal;
+in vec4 vColor;
 out vec4 fragColor;
 
 struct Surface {
@@ -472,16 +474,85 @@ Surface decorSurface() {
     return s;
 }
 
+// ---- The village ----------------------------------------------------------------------------
+
+// Painted architecture and ground: the vertex colour, with window glass and lamps that light up
+// at night (uGlow), and a little grain so large walls and fields aren't flat.
+Surface paintedSurface() {
+    vec3 c = vColor.rgb;
+    if (isPart(vPart, 61.0)) {
+        // Glass: the sky by day (brighter at the top), warm lamplight at night.
+        vec3 day = mix(vec3(0.42, 0.62, 0.78), vec3(0.85, 0.95, 1.0), clamp(vUv.y, 0.0, 1.0));
+        vec3 night = vec3(1.0, 0.78, 0.42) * (0.9 + 0.1 * sin(uTime * 2.0 + vWorld.x));
+        Surface s = surface(mix(day, night, uGlow));
+        s.spec = 0.9;
+        s.emissive = mix(0.25, 0.95, uGlow);
+        return s;
+    }
+    if (isPart(vPart, 62.0)) {
+        Surface s = surface(c);
+        s.emissive = mix(0.35, 1.0, uGlow);
+        s.rim = 0.0;
+        return s;
+    }
+    float grain = noise2(vWorld.xz * 0.9 + vWorld.y * 0.5);
+    Surface s = surface(c * (0.93 + 0.12 * grain));
+    s.spec = 0.08;
+    s.rim = 0.25;
+    s.shadowCool = 0.8;
+    return s;
+}
+
+// The sea: deep water (uBase) far out, shallow water (uAccent) over the sand, the sky (uExtra)
+// mirrored at grazing angles, moving wave bands and foam where it meets the beach. vColor.r is
+// the depth (0 at the shore, 1 deep), vColor.g the foam.
+bool gSea = false;
+vec3 gSeaNormal = vec3(0.0, 1.0, 0.0);
+
+Surface seaSurface() {
+    gSea = true;
+    vec2 q = vWorld.xz;
+    float w1 = sin(q.x * 0.35 + q.y * 0.22 + uTime * 0.9);
+    float w2 = sin(q.x * -0.21 + q.y * 0.41 - uTime * 1.2);
+    float w3 = noise2(q * 0.3 + vec2(uTime * 0.15, -uTime * 0.1));
+    gSeaNormal = normalize(vec3(0.10 * (w1 + 0.6 * w2) + 0.08 * (w3 - 0.5), 1.0, 0.10 * (w2 - 0.4 * w1)));
+    float depth = vColor.r;
+    vec3 water = mix(uAccent, uBase, smoothstep(0.0, 1.0, depth));
+    // Bands of light on the swell, and caustic sparkle in the shallows.
+    // (Softer at night: under the moon, bright specks read as noise.)
+    float sparkle = 1.0 - 0.75 * uGlow;
+    float bands = smoothstep(0.82, 0.98, sin(q.y * 0.55 + w1 * 1.4 + uTime * 0.6));
+    water += vec3(0.9, 0.97, 1.0) * bands * 0.08 * (1.0 - 0.5 * depth) * sparkle;
+    float c = noise2(q * 1.4 + uTime * 0.35) * noise2(q * 1.9 - uTime * 0.27);
+    water += vec3(0.9, 1.0, 1.0) * smoothstep(0.32, 0.5, c) * 0.18 * (1.0 - depth) * sparkle;
+    // Foam where the waves meet the sand, coming and going.
+    float lap = 0.5 + 0.5 * sin(uTime * 1.3 + q.x * 0.25 + w3 * 3.0);
+    float foam = smoothstep(0.35, 0.75, vColor.g * (0.75 + 0.35 * lap) + 0.25 * noise2(q * 2.5 + uTime * 0.4));
+    water = mix(water, vec3(0.97, 0.99, 1.0), foam * 0.85);
+    // The sky in the water at a grazing angle.
+    vec3 v = normalize(uCamPos - vWorld);
+    float fres = pow(1.0 - max(dot(gSeaNormal, v), 0.0), 3.0);
+    water = mix(water, uExtra, clamp(fres * 0.6, 0.0, 0.5));
+    Surface s = surface(water);
+    s.spec = 1.0;
+    s.rim = 0.0;
+    s.shadowCool = 0.0;
+    return s;
+}
+
 void main() {
     Surface s;
     if (uMaterial < 0.5) s = fishSurface();
     else if (uMaterial < 1.5) s = hookSurface();
     else if (uMaterial < 2.5) s = obstacleSurface();
     else if (uMaterial < 3.5) s = boatSurface();
-    else s = decorSurface();
+    else if (uMaterial < 4.5) s = decorSurface();
+    else if (uMaterial < 5.5) s = paintedSurface();
+    else s = seaSurface();
 
     vec3 n = normalize(vNormal);
     if (!gl_FrontFacing) n = -n;
+    if (gSea) n = gSeaNormal;
     vec3 l = normalize(uLightDir);
     vec3 v = normalize(uCamPos - vWorld);
 

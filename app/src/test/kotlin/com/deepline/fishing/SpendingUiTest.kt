@@ -29,7 +29,7 @@ class TackleShopUiTest : BoatUiTestBase() {
     @Test
     fun buyAndUseALuckyCharm() {
         val vm = launch(PlayerProgress(pointsBalance = 50_000, pointsEarned = 50_000, ropeLevels = mapOf(RopeStat.LENGTH to 4)))
-        compose.onNodeWithTag("tab_shop").performClick()
+        compose.openBuilding("shop")
         val price = Progression.tacklePrice(vm.progress, Tackle.LUCKY_CHARM)
         compose.onNodeWithTag("shop_page_tackle").performClick()
         compose.shot("60_tackle_shop")
@@ -40,7 +40,7 @@ class TackleShopUiTest : BoatUiTestBase() {
         assertEquals(before - price, vm.progress.pointsBalance)
         assertEquals(1, vm.progress.luckyCharms)
 
-        compose.onNodeWithTag("tab_fish").performClick()
+        compose.openBuilding("fish")
         compose.onNodeWithTag("tackle_charm").assertExists()
         compose.onNodeWithContentDescription("Lucky charm ×1").performClick()
         assertTrue(vm.useCharm)
@@ -59,7 +59,7 @@ class WagerUiTest : BoatUiTestBase() {
     @Test
     fun stakeAndLoseAWager() {
         val vm = launch(PlayerProgress(pointsBalance = 10_000, pointsEarned = 10_000))
-        compose.onNodeWithTag("tab_battle").performClick()
+        compose.openBuilding("battle")
         compose.click("Wager (optional)")
         val stake = GameConfig.WAGER_STAKES.first { it <= 10_000 }
         compose.click(com.deepline.fishing.ui.compactPointsText(stake).text)

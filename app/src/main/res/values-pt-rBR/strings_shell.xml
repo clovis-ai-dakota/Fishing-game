@@ -9,6 +9,7 @@
     <string name="shell_tab_dex">Dex</string>
     <string name="shell_tab_shop">Loja</string>
     <string name="shell_tab_battle">Duelo</string>
+    <string name="shell_village">Vila</string>
 
     <!-- Páginas da Loja. -->
     <string name="shell_shop_page_rope">Corda</string>
@@ -24,7 +25,7 @@
 
     <!-- Pergunta quando o tour termina. -->
     <string name="shell_tour_again_title">Mostrar o tour da próxima vez?</string>
-    <string name="shell_tour_again_body">O tour deve abrir de novo na próxima vez que você iniciar o Deep Line? Você também pode fazê-lo quando quiser em Configurações, pela engrenagem no alto da aba Pescar.</string>
+    <string name="shell_tour_again_body">O tour deve abrir de novo na próxima vez que você iniciar o Deep Line? Você também pode fazê-lo quando quiser em Configurações, pela engrenagem no alto da vila.</string>
     <string name="shell_tour_again_yes">Sim, da próxima vez</string>
 
     <!-- Só em versões de teste: uma tela de pagamento falsa. -->

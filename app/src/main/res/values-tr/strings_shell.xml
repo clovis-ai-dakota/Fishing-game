@@ -9,6 +9,7 @@
     <string name="shell_tab_dex">Dex</string>
     <string name="shell_tab_shop">Mağaza</string>
     <string name="shell_tab_battle">Düello</string>
+    <string name="shell_village">Köy</string>
 
     <!-- Pages of the Shop tab. -->
     <string name="shell_shop_page_rope">Halat</string>
@@ -24,7 +25,7 @@
 
     <!-- Asked when the guided tour closes. -->
     <string name="shell_tour_again_title">Tanıtım bir dahaki sefere de gösterilsin mi?</string>
-    <string name="shell_tour_again_body">Deep Line\'ı bir sonraki açışında tanıtım yeniden açılsın mı? Tanıtımı istediğin zaman Ayarlar\'dan da başlatabilirsin: Balık sekmesinin üstündeki dişli simgesi.</string>
+    <string name="shell_tour_again_body">Deep Line\'ı bir sonraki açışında tanıtım yeniden açılsın mı? Tanıtımı istediğin zaman Ayarlar\'dan da başlatabilirsin: köyün üstündeki dişli simgesi.</string>
     <string name="shell_tour_again_yes">Evet, bir dahaki sefere</string>
 
     <!-- Debug builds only: a fake payment sheet. %1$s: the price; %2$s: the item's name. -->

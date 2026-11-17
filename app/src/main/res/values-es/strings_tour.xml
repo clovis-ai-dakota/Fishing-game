@@ -19,13 +19,13 @@
     <!-- "Siguiente" and "Saltar guía" are the card's buttons. -->
     <string name="tour_welcome_body">Pesca todos los peces de las profundidades. Esta breve guía te enseña cómo se juega y para qué sirve cada cosa. Toca Siguiente, o Saltar guía si ya te manejas bien.</string>
 
-    <string name="tour_tabs_title">Cuatro pestañas</string>
-    <string name="tour_tabs_body">La barra inferior te lleva a todas partes: en Pescar lanzas el sedal, el Dex reúne todas las especies que encuentras, la Tienda tiene mejoras de cuerda, aparejos y aspectos para tu barco, y Duelo es para partidas 1 contra 1.</string>
+    <string name="tour_village_title">Tu pueblo</string>
+    <string name="tour_village_body">El pueblo es tu puerto base. Cada edificio abre un menú: Pescar (el muelle, desde donde lanzas), Dex (todas las especies que encuentras), Tienda (aparejos y aspectos), Duelo (partidas 1 contra 1), Cuerda (sus mejoras) y Acuario (tus capturas a la vista). Arrastra para moverte y pellizca para hacer zoom.</string>
     <string name="tour_look_title">Un nuevo aspecto</string>
     <string name="tour_look_body">Los menús dicen menos y muestran más. El color indica qué hace un botón: ámbar para la acción principal, verde para una recompensa gratis lista para reclamar, la moneda para un precio en puntos y violeta para un precio en euros. Los botones (i) guardan los detalles.</string>
 
     <string name="tour_cast_title">Lanza el sedal</string>
-    <string name="tour_cast_body">El gran botón Lanzar sedal, abajo en la pestaña Pescar, deja caer tu anzuelo desde el barco.</string>
+    <string name="tour_cast_body">El gran botón Lanzar sedal, abajo en el menú Pescar (el muelle del pueblo), deja caer tu anzuelo desde el barco.</string>
 
     <string name="tour_steer_title">Guía el anzuelo</string>
     <string name="tour_steer_body">Durante un lance, arrastra a izquierda y derecha en cualquier parte de la pantalla. Un aro muestra dónde está tu dedo: el anzuelo se desliza hacia él y lo sigue. La Agilidad de cuerda lo hace más rápido.</string>
@@ -47,7 +47,7 @@
 
     <string name="tour_themes_title">Temas</string>
     <!-- Laguna is the default theme's name (core_theme_lagoon). -->
-    <string name="tour_themes_body">El botón de la paleta, arriba, cambia la apariencia de los menús: Laguna por defecto, con una escena marina detrás de cada pestaña. En la Tienda hay más temas por euros o por puntos, y los más elaborados cuestan más. El agua en la que pescas nunca cambia.</string>
+    <string name="tour_themes_body">El botón de la paleta, arriba, cambia la apariencia de los menús: Laguna por defecto, con una escena marina detrás de cada menú. En la Tienda hay más temas por euros o por puntos, y los más elaborados cuestan más. El agua en la que pescas nunca cambia.</string>
 
     <string name="tour_night_mode_title">Modo noche</string>
     <!-- Día and Noche are the night mode's choices (core_night_*). -->
@@ -59,7 +59,7 @@
 
     <string name="tour_upgrades_title">Mejora tu cuerda</string>
     <!-- Longitud de cuerda, Fuerza de cuerda and Agilidad de cuerda are the upgrades (core_rope_*). -->
-    <string name="tour_upgrades_body">Gasta puntos en la pestaña Tienda, en su página Cuerda. La Longitud de cuerda te lleva a zonas más profundas y a peces nuevos, la Fuerza de cuerda aguanta más peso y la Agilidad de cuerda guía más rápido. ¿Has cambiado de idea? Baja un nivel y recupera todos los puntos que costó.</string>
+    <string name="tour_upgrades_body">Gasta puntos en el taller de cuerdas del pueblo (Cuerda). La Longitud de cuerda te lleva a zonas más profundas y a peces nuevos, la Fuerza de cuerda aguanta más peso y la Agilidad de cuerda guía más rápido. ¿Has cambiado de idea? Baja un nivel y recupera todos los puntos que costó.</string>
 
     <string name="tour_tackle_title">Aparejos</string>
     <!-- The four tackle names match core_tackle_*. %1$d: the detector's radius in meters;
@@ -82,7 +82,7 @@
     <string name="tour_dex_filters_body">Filtra las cartas por zona de profundidad, o muestra solo los peces que has capturado. Toca una carta para abrir su página y desliza para hojear el Dex.</string>
 
     <string name="tour_milestones_title">Recompensas de los hitos</string>
-    <string name="tour_milestones_body">Cada punto que ganas cuenta para las recompensas de los hitos (puntos extra y Faroles), aunque después lo gastes. El trofeo de la parte superior de la pestaña Pescar las abre, con una marca cuando hay alguna lista para reclamar.</string>
+    <string name="tour_milestones_body">Cada punto que ganas cuenta para las recompensas de los hitos (puntos extra y Faroles), aunque después lo gastes. El trofeo de la parte superior del pueblo las abre, con una marca cuando hay alguna lista para reclamar.</string>
 
     <string name="tour_secrets_title">Secretos de pesca</string>
     <!-- Hints that secrets exist, never what they are. The slots match core_slot_*. -->
@@ -90,13 +90,13 @@
 
     <string name="tour_boat_title">Personaliza tu barco</string>
     <!-- "Personalizar barco" is the button's label in the Skins section. -->
-    <string name="tour_boat_body">Toca tu barco en la pestaña Pescar para abrir la sección Aspectos del Dex. Personalizar barco te permite pintar el casco, los ribetes y la cabina, y añadir un diseño, velas, una bandera y un emblema. Los colores básicos son gratis; el resto se desbloquea con puntos, o a medida que capturas más especies, llegas a zonas nuevas y reclamas hitos.</string>
+    <string name="tour_boat_body">En el menú Pescar, toca tu barco, su sedal o su anzuelo para abrir sus aspectos en el Dex. Personalizar barco te permite pintar el casco, los ribetes y la cabina, y añadir un diseño, velas, una bandera y un emblema. Los colores básicos son gratis; el resto se desbloquea con puntos, o a medida que capturas más especies, llegas a zonas nuevas y reclamas hitos.</string>
 
     <string name="tour_shop_style_title">Estilo</string>
     <string name="tour_shop_style_body">La página Estilo tiene barcos prediseñados, pinturas, emblemas y estampados de vela (que se previsualizan en tu propio barco), además de nuevos anzuelos, sedales y estelas. Como todos los aspectos, solo cambian la apariencia, nunca el juego.</string>
 
     <string name="tour_aquarium_title">Tu acuario</string>
-    <string name="tour_aquarium_body">Los peces que has capturado nadan en tu acuario: ábrelo con el botón de la pecera, arriba en el Dex, y elige quién nada en él. La decoración y una pecera más grande están en la página Acuario de la Tienda.</string>
+    <string name="tour_aquarium_body">Los peces que has capturado nadan en tu acuario, el pabellón de cristal del pueblo: elige quién nada en él y compra allí mismo decoración o una pecera más grande. La pantalla completa gira el teléfono en horizontal para verlos.</string>
 
     <string name="tour_season_title">Temporadas y eventos de fin de semana</string>
     <!-- %1$s: how long a season lasts (e.g. "6 semanas"). -->
@@ -132,7 +132,7 @@
     <string name="tour_wager_body">Contra la máquina puedes apostar puntos al resultado: una victoria te devuelve la apuesta ×%1$s en nivel Fácil, ×%2$s en nivel Normal y ×%3$s en nivel Difícil. Un empate te la devuelve.</string>
 
     <string name="tour_settings_title">Ajustes</string>
-    <string name="tour_settings_body">El engranaje de la parte superior de la pestaña Pescar abre Ajustes.</string>
+    <string name="tour_settings_body">El engranaje de la parte superior del pueblo abre Ajustes.</string>
 
     <string name="tour_sound_title">Sonido y sensaciones</string>
     <!-- Volumen, Música, Efectos de sonido, Vibración and Reducir movimiento are the settings (settings_sound_*). -->
@@ -154,7 +154,7 @@
 
     <string name="tour_migrations_title">Migraciones</string>
     <!-- %1$s: how long a migration lasts (e.g. "2 días"). -->
-    <string name="tour_migrations_body">Cada semana, durante %1$s, migran dos especies poco comunes: una cerca de la superficie y otra en las profundidades, las dos mucho más comunes donde viven. Un botón con un banco de peces las muestra en la pestaña Pescar, y una tarjeta en el Dex. Las migraciones son para lances en solitario: los duelos nunca cambian.</string>
+    <string name="tour_migrations_body">Cada semana, durante %1$s, migran dos especies poco comunes: una cerca de la superficie y otra en las profundidades, las dos mucho más comunes donde viven. Un botón con un banco de peces las muestra en el pueblo, y una tarjeta en el Dex. Las migraciones son para lances en solitario: los duelos nunca cambian.</string>
 
     <string name="tour_reminders_title">Recordatorios</string>
     <!-- %1$s and %2$s: times on the hour, start and end of the quiet hours. -->

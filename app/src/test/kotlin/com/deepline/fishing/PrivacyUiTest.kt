@@ -174,7 +174,7 @@ class ConsentAllowUiTest : PrivacyUiTestBase() {
         assertEquals("the tour starts once answered", "full", recorder.last(GameAnalytics.TUTORIAL_BEGIN)?.params?.get("tour"))
         skipTour()
         assertEquals("welcome", recorder.last(GameAnalytics.TUTORIAL_SKIP)?.params?.get("step_id"))
-        assertTrue("the Fish tab is a screen view", "fish" in recorder.screens)
+        assertTrue("the village is a screen view", "village" in recorder.screens)
         assertEquals("user properties arrive with the consent", "lagoon", recorder.userProperties[GameAnalytics.PROP_THEME])
 
         vm.startCast()
@@ -221,7 +221,7 @@ class PrivacySettingsUiTest : PrivacyUiTestBase() {
         assertEquals("true", store.getString(ConsentStore.KEY_ANALYTICS))
         vm.onBack()
         compose.waitForIdle()
-        assertEquals(listOf("fish"), recorder.screens)
+        assertEquals(listOf("village"), recorder.screens)
         openPrivacySettings(vm)
         compose.onNodeWithTag("privacy_reset_analytics").performScrollTo().performClick()
         assertEquals(1, recorder.resets)
@@ -251,6 +251,8 @@ class PrivacySettingsUiTest : PrivacyUiTestBase() {
                 deleted += who
             }
         }
+        // The abandoned cast left the Fish menu showing: Settings is on the village.
+        compose.backToVillage()
         openPrivacySettings(vm)
         compose.onNodeWithTag("privacy_delete_account").performScrollTo().performClick()
         compose.onNodeWithText("Delete your online account?").assertExists()

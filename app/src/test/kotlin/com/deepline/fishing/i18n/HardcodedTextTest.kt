@@ -87,7 +87,6 @@ class HardcodedTextTest {
             // The app shell.
             "MainActivity.kt",
             "ui/AppRoot.kt",
-            "ui/MainScaffold.kt",
             "ui/Format.kt",
             // The Fish tab and Milestones.
             "ui/HomeScreen.kt",
@@ -136,6 +135,8 @@ class HardcodedTextTest {
             "ui/shop/SeasonUi.kt",
             "ui/shop/ThemesScreen.kt",
             "ui/shop/AquariumScreen.kt",
+            "ui/rope/RopeScreen.kt",
+            "ui/village/VillageScreen.kt",
             "ui/dex/DexScreen.kt",
             "ui/dex/DexStyle.kt",
             "ui/dex/SpeciesDex.kt",

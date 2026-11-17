@@ -194,7 +194,7 @@ class OnlineUiTest {
         }
         scenario = ActivityScenario.launch(MainActivity::class.java)
 
-        compose.onNodeWithTag("tab_battle").performClick()
+        compose.openBuilding("battle")
         compose.click("Heavy Haul")
         compose.onNodeWithTag("opponent_online").performScrollTo().performClick()
         compose.click("Go online")

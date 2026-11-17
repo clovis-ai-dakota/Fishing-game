@@ -107,6 +107,7 @@ class FastReelUiTest {
         scenario!!.onActivity { vm = ViewModelProvider(it)[GameViewModel::class.java] }
         vm.castFactory = ::fullLineWater
 
+        compose.openBuilding("fish")
         compose.click("Cast line")
         compose.mainClock.autoAdvance = false
         frames(15f)

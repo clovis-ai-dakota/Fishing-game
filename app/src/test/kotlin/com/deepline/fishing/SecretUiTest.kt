@@ -121,9 +121,9 @@ class SecretUiTest {
         scenario!!.onActivity { vm = ViewModelProvider(it)[GameViewModel::class.java] }
         vm.castFactory = ::snagWater
 
-        compose.onNodeWithTag("tab_dex").performClick()
+        compose.openBuilding("dex")
         assertTrue("no Secrets section before any discovery", !isShowing("Secrets"))
-        compose.onNodeWithTag("tab_fish").performClick()
+        compose.openBuilding("fish")
 
         // First snag: the cast pauses and the secret is explained.
         compose.click("Cast line")
@@ -142,11 +142,11 @@ class SecretUiTest {
         assertEquals(1, vm.progress.objectsSnagged)
 
         // The secret is now listed in the Dex's Secrets section.
-        compose.onNodeWithTag("tab_dex").performClick()
+        compose.openBuilding("dex")
         compose.click("Secrets")
         compose.onNodeWithText("The last bump hooks what it hits").assertExists()
         compose.shot("29_fishing_secrets")
-        compose.onNodeWithTag("tab_fish").performClick()
+        compose.openBuilding("fish")
 
         // Second snag: the player said "No thanks", so no popup this time.
         compose.click("Cast line")

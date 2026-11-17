@@ -68,22 +68,22 @@ class TourContentTest {
             assertTrue("Tour doesn't mention $topic", text.contains(topic, ignoreCase = true))
         }
         val boatStep = Tour.steps.first { it.id == "boat" }
-        assertTrue("The boat step points at the Fish tab's boat", boatStep.screen == Screen.HOME && boatStep.target == com.deepline.fishing.ui.tour.TourTarget.HOME_BOAT)
+        assertTrue("The boat step points at the Fish menu's boat", boatStep.screen == Screen.HOME && boatStep.target == com.deepline.fishing.ui.tour.TourTarget.HOME_BOAT)
         for (slot in com.deepline.fishing.core.CosmeticSlot.entries) {
             assertTrue("Tour doesn't mention the ${slot.displayName} skin slot", slot.labelText().shown.lowercase() in text.lowercase())
         }
-        // Version 5: every tab of the bottom bar, the Dex's seen/caught states, filters and pages.
-        for (tab in com.deepline.fishing.MainTab.entries) assertTrue("Tour doesn't mention the ${tab.name} tab", str(tab.labelRes) in text)
+        // Every building of the village (the menus), the Dex's seen/caught states, filters and pages.
+        for (b in com.deepline.fishing.Building.entries) assertTrue("Tour doesn't mention the ${b.name} building", str(b.labelRes) in text)
         for (topic in listOf("Seen", "Catch it", "Filter", "swipe", "trophy", "Secrets section", "Settings")) {
             assertTrue("Tour doesn't mention $topic", text.contains(topic, ignoreCase = true))
         }
     }
 
     @Test
-    fun everyTabIsPointedAt() {
-        // The bar itself, and every tab the tour sends the player to, is highlighted at least once.
+    fun everyMenuIsPointedAt() {
+        // The village map, and every menu the tour sends the player to, is highlighted at least once.
         val targets = Tour.steps.mapNotNull { it.target }.toSet()
-        assertTrue(TourTarget.NAV_BAR in targets)
+        assertTrue(TourTarget.VILLAGE_MAP in targets)
         for (t in listOf(TourTarget.HOME_CAST, TourTarget.HOME_POINTS, TourTarget.HOME_SETTINGS, TourTarget.SETTINGS_TOUR, TourTarget.DEX_HEADER, TourTarget.DEX_FILTERS)) {
             assertTrue("No step points at $t", t in targets)
         }
@@ -95,7 +95,7 @@ class TourContentTest {
         assertTrue(v11.containsAll(listOf("settings", "replay")))
         // Version 6: customising the boat and the atmosphere.
         val v6 = Tour.steps.filter { it.sinceVersion == 6 }.map { it.id }
-        assertTrue(v6.containsAll(listOf("boat", "atmosphere")))
+        assertTrue(v6.containsAll(listOf("atmosphere")))
         // Version 7: the fast reel, the deeper bump-free zone and the brighter Lantern.
         val v7 = Tour.steps.filter { it.sinceVersion == 7 }.map { it.id }
         assertTrue(v7.containsAll(listOf("descent", "lantern")))
@@ -117,7 +117,7 @@ class TourContentTest {
         // Version 9: the Shop tab replaced Upgrades, with two prices for everything, passes, the
         // detector and sight tackle in battles. Returning players see these as "What's new".
         val v9 = Tour.steps.filter { it.sinceVersion == 9 }.map { it.id }
-        assertTrue(v9.containsAll(listOf("tabs", "upgrades", "tackle", "two_prices", "shop_style", "aquarium", "season", "passes", "badges", "gifts", "battle_tackle")))
+        assertTrue(v9.containsAll(listOf("tackle", "two_prices", "shop_style", "season", "passes", "badges", "gifts", "battle_tackle")))
         val targets = Tour.steps.mapNotNull { it.target }.toSet()
         for (t in listOf(TourTarget.ROPE_FIRST, TourTarget.AQUARIUM_TANK, TourTarget.SHOP_TACKLE, TourTarget.SHOP_PRICES, TourTarget.SHOP_STYLE, TourTarget.SHOP_SEASON, TourTarget.SHOP_PASSES, TourTarget.BATTLE_TACKLE)) {
             assertTrue("No step points at $t", t in targets)
@@ -194,7 +194,29 @@ class TourContentTest {
         for (word in listOf("amber", "green", "coin", "violet", "(i)")) assertTrue("The new look step doesn't mention $word", word in look.body.shown)
         // Steps that point at what the redesign moved say where it is now.
         assertTrue("flame" in Tour.steps.single { it.id == "daily" }.body.shown)
-        assertTrue("tank button" in Tour.steps.single { it.id == "aquarium" }.body.shown)
+        assertTrue("glass pavilion" in Tour.steps.single { it.id == "aquarium" }.body.shown)
+    }
+
+    @Test
+    fun theVillageIsExplained() {
+        // Version 13: the village replaced the tabs; the rope workshop and the aquarium are
+        // buildings of their own; the boat, line and hook each open their skins.
+        val v13 = Tour.steps.filter { it.sinceVersion == 13 }.map { it.id }
+        assertTrue(v13.containsAll(listOf("village", "upgrades", "aquarium", "boat")))
+        val village = Tour.steps.single { it.id == "village" }
+        assertEquals(Screen.VILLAGE, village.screen)
+        assertEquals(TourTarget.VILLAGE_MAP, village.target)
+        for (b in com.deepline.fishing.Building.entries) {
+            assertTrue("The village step doesn't name the ${b.name} building", str(b.labelRes) in village.body.shown)
+        }
+        for (word in listOf("Drag", "pinch")) assertTrue(word in village.body.shown)
+        assertEquals(Screen.ROPE, Tour.steps.single { it.id == "upgrades" }.screen)
+        assertEquals(Screen.AQUARIUM, Tour.steps.single { it.id == "aquarium" }.screen)
+        assertTrue("Full screen" in Tour.steps.single { it.id == "aquarium" }.body.shown)
+        val boat = Tour.steps.single { it.id == "boat" }.body.shown
+        for (word in listOf("boat", "line", "hook")) assertTrue("The boat step doesn't mention the $word", word in boat)
+        // The first step shows the village: it is where the game opens.
+        assertEquals(Screen.VILLAGE, Tour.steps.first().screen)
     }
 
     @Test

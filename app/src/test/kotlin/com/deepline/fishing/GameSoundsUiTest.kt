@@ -63,10 +63,10 @@ class GameSoundsUiTest {
     @Test
     fun tabsTapAndCastsSplash() {
         launch()
-        compose.onNodeWithTag("tab_dex").performClick()
+        compose.openBuilding("dex")
         compose.waitForIdle()
         assertTrue(Sfx.UI_TAP in audio.played)
-        compose.onNodeWithTag("tab_fish").performClick()
+        compose.openBuilding("fish")
         compose.onNodeWithText("Cast line").performClick()
         compose.mainClock.autoAdvance = false
         repeat(4 * 60) { compose.mainClock.advanceTimeBy(16) }

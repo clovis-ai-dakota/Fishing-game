@@ -181,6 +181,13 @@ object KitIcons {
         stroked { moveTo(16f, 4f); verticalLineTo(13.5f) }
     }
 
+    /** Two houses by the water: the village, home. */
+    val Village = icon("Village") {
+        filled { moveTo(2.5f, 12f); lineTo(8f, 6.5f); lineTo(13.5f, 12f); verticalLineTo(18f); horizontalLineTo(2.5f); close() }
+        filled { moveTo(12.5f, 10f); lineTo(16.5f, 6f); lineTo(21.5f, 11f); verticalLineTo(18f); horizontalLineTo(14.5f); verticalLineTo(12f); close() }
+        stroked(1.8f) { moveTo(2f, 21f); quadTo(5f, 19.5f, 8f, 21f); quadTo(11f, 22.5f, 14f, 21f); quadTo(17f, 19.5f, 20f, 21f) }
+    }
+
     val Plus = icon("Plus") {
         stroked(2.6f) { moveTo(12f, 5f); verticalLineTo(19f); moveTo(5f, 12f); horizontalLineTo(19f) }
     }

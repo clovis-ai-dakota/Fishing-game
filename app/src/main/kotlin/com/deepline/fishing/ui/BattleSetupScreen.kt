@@ -155,8 +155,9 @@ fun BattleSetupScreen(vm: GameViewModel) {
     var stake by rememberSaveable { mutableStateOf(0L) }
     val p = vm.progress
 
-    TabScreen(
+    SubScreen(
         title = stringResource(R.string.battle_setup_title),
+        onBack = vm::onBack,
         actions = { com.deepline.fishing.ui.social.SocialEntryButton(vm, Modifier.padding(end = 8.dp)) },
     ) {
         // A plain scrolling column (not a lazy list) so every section exists for the tour to scroll to.
