@@ -70,6 +70,7 @@ object ProgressCodec {
 
         // -- Shop: new lines below.
         appendLine("packsBought=${p.packsBought.sorted().joinToString(",")}")
+        appendLine("decorSpots=${p.decorSpots.entries.sortedBy { it.key }.joinToString(",") { "${it.key.name}:${it.value}" }}")
         appendLine("singles=${p.singlesDay ?: ""};${p.singlesBought.entries.joinToString(",") { "${it.key.name}:${it.value}" }}")
 
         for ((stat, level) in p.ropeLevels) appendLine("rope.${stat.name}=$level")
@@ -163,6 +164,14 @@ object ProgressCodec {
                 key == "clubClaims" -> p = p.copy(clubClaims = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet())
 
                 // -- Shop: new keys below.
+                key == "decorSpots" -> p = p.copy(
+                    decorSpots = value.split(',').mapNotNull { entry ->
+                        val (name, x) = entry.split(':').takeIf { it.size == 2 } ?: return@mapNotNull null
+                        val d = Decor.entries.firstOrNull { it.name == name.trim() }
+                        val f = x.trim().toFloatOrNull()
+                        if (d != null && f != null && f.isFinite()) d to f.coerceIn(0f, 1f) else null
+                    }.toMap(),
+                )
                 key == "packsBought" -> p = p.copy(packsBought = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet())
                 key == "singles" -> value.split(';').takeIf { it.size == 2 }?.let { (day, counts) ->
                     p = p.copy(

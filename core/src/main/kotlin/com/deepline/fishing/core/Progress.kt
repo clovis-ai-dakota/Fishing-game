@@ -101,6 +101,10 @@ data class PlayerProgress(
     /** The local day [singlesBought] counts (tackle bought one at a time, see [GameConfig.TACKLE_SINGLES_PER_DAY]). */
     val singlesDay: Long? = null,
     val singlesBought: Map<Tackle, Int> = emptyMap(),
+
+    // -- Aquarium: new fields below this line.
+    /** Where the player put each piece of decor along the tank (0 left to 1 right, see `Showcase.decorSpot`). */
+    val decorSpots: Map<Decor, Float> = emptyMap(),
 ) {
     fun level(stat: RopeStat): Int = ropeLevels[stat] ?: 0
     val specs: RopeSpecs get() = RopeSpecs.fromLevels(ropeLevels)

@@ -120,21 +120,62 @@ class VillageSceneTest {
     }
 }
 
-/** The 3D aquarium: every piece of decor builds, in both tanks, in a card and full screen. */
+/** The 3D aquarium: every piece of decor builds, in both tanks, in a card and full screen, and moves. */
 class AquariumSceneTest {
+    private val all = com.deepline.fishing.core.Decor.entries.map { com.deepline.fishing.ui.render3d.AquariumScene.Piece(it, com.deepline.fishing.core.Showcase.decorSpot(com.deepline.fishing.core.PlayerProgress(), it)) }
+
     @Test
     fun framesBuildWithEveryDecorInBothTanks() {
         val scene = com.deepline.fishing.ui.render3d.AquariumScene()
         val fish = FishCatalog.all.take(12)
-        for (big in listOf(false, true)) for ((w, h) in listOf(1080 to 720, 2340 to 1080)) {
-            val frame = scene.build(w, h, 4.2f, fish, com.deepline.fishing.core.Decor.entries, big)
+        for (big in listOf(false, true)) for ((w, h) in listOf(1080 to 720, 1080 to 2340)) for (full in listOf(false, true)) {
+            val camera = if (full) com.deepline.fishing.ui.render3d.AquariumScene.Camera() else null
+            val frame = scene.build(w, h, 4.2f, fish, all, big, camera)
             for (item in frame.items) {
                 val m = item.dynamicMesh ?: Meshes.get(item.meshKey!!)
                 assertTrue(m.indices.all { it < m.vertexCount })
+                for (v in m.positions) assertTrue(v.isFinite())
                 for (v in item.uniforms.values) assertTrue(v.size in setOf(1, 2, 3, 4, 9, 16))
             }
         }
         // An empty tank is fine too.
         scene.build(1080, 720, 0f, emptyList(), emptyList(), false)
+    }
+
+    @Test
+    fun everyPieceFitsInTheSmallTankAndPiecesCanBeMovedAndSink() {
+        // At their own spots, every piece stays inside the small tank.
+        for (p in all) {
+            val (lo, hi) = com.deepline.fishing.ui.render3d.AquariumModels.bounds(p.decor)
+            val x = com.deepline.fishing.ui.render3d.AquariumScene.xOf(p.spot, 8f)
+            if (p.decor != com.deepline.fishing.core.Decor.LANTERN_LIGHTS) assertTrue("${p.decor} sticks out", x + lo.x > -4f && x + hi.x < 4f)
+            assertTrue("${p.decor} is too tall", hi.y < com.deepline.fishing.ui.render3d.AquariumScene.HEIGHT)
+        }
+        // Full screen, upright: pick the ship, lift it and move it right, let go: it sinks to the sand.
+        val scene = com.deepline.fishing.ui.render3d.AquariumScene()
+        val camera = com.deepline.fishing.ui.render3d.AquariumScene.Camera()
+        val w = 1080
+        val h = 2340
+        scene.build(w, h, 0f, emptyList(), all, false, camera)
+        val ship = all.first { it.decor == com.deepline.fishing.core.Decor.SUNKEN_SHIP }
+        val shipX = com.deepline.fishing.ui.render3d.AquariumScene.xOf(ship.spot, 8f)
+        // Find the ship on screen by scanning for the pixel that picks it.
+        var at: Pair<Float, Float>? = null
+        loop@ for (y in 0 until h step 10) for (x in 0 until w step 10) {
+            val p = camera.unproject(x.toFloat(), y.toFloat(), com.deepline.fishing.ui.render3d.AquariumScene.zOf(ship.decor))!!
+            if (kotlin.math.abs(p.x - shipX) < 0.05f && kotlin.math.abs(p.y - 0.6f) < 0.05f) { at = x.toFloat() to y.toFloat(); break@loop }
+        }
+        val (sx, sy) = at!!
+        assertTrue(camera.pick(sx, sy, all) == com.deepline.fishing.core.Decor.SUNKEN_SHIP)
+        camera.grab(com.deepline.fishing.core.Decor.SUNKEN_SHIP, sx, sy, all)
+        camera.move(sx + 120f, sy - 200f)
+        assertTrue(camera.heightOf(com.deepline.fishing.core.Decor.SUNKEN_SHIP) > 0.3f)
+        val (d, spot) = camera.release()!!
+        assertTrue(d == com.deepline.fishing.core.Decor.SUNKEN_SHIP && spot > ship.spot)
+        var t = 0f
+        while (t < 3f) { t += 1f / 30f; scene.build(w, h, t, emptyList(), all, false, camera) }
+        assertTrue(camera.heightOf(com.deepline.fishing.core.Decor.SUNKEN_SHIP) == 0f)
+        // Nothing to pick in empty water.
+        assertTrue(camera.pick(5f, 5f, all) == null)
     }
 }

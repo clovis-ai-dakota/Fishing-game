@@ -204,10 +204,13 @@ class TourContentTest {
         // buildings of their own; the boat, line and hook each open their skins.
         val v13 = Tour.steps.filter { it.sinceVersion == 13 }.map { it.id }
         assertTrue(v13.containsAll(listOf("village", "upgrades", "boat")))
-        // Version 14: the island wears the player's skin, one tackle pack at a time, the
-        // full-screen aquarium zooms (its step moved to 14 with its new text).
+        // Version 14: the island wears the player's skin, one tackle pack at a time.
         val v14 = Tour.steps.filter { it.sinceVersion == 14 }.map { it.id }
-        assertTrue(v14.containsAll(listOf("island_look", "tackle_offers", "aquarium")))
+        assertTrue(v14.containsAll(listOf("island_look", "tackle_offers")))
+        // Version 15: the aquarium opens full screen with a double tap, and its decor moves.
+        val aquarium = Tour.steps.single { it.id == "aquarium" }
+        assertEquals(15, aquarium.sinceVersion)
+        assertTrue("double-tap" in aquarium.body.shown.lowercase())
         val village = Tour.steps.single { it.id == "village" }
         assertEquals(Screen.VILLAGE, village.screen)
         assertEquals(TourTarget.VILLAGE_MAP, village.target)
@@ -217,7 +220,7 @@ class TourContentTest {
         for (word in listOf("Drag", "pinch")) assertTrue(word in village.body.shown)
         assertEquals(Screen.ROPE, Tour.steps.single { it.id == "upgrades" }.screen)
         assertEquals(Screen.AQUARIUM, Tour.steps.single { it.id == "aquarium" }.screen)
-        assertTrue("Full screen" in Tour.steps.single { it.id == "aquarium" }.body.shown)
+        assertTrue("full screen" in Tour.steps.single { it.id == "aquarium" }.body.shown)
         val boat = Tour.steps.single { it.id == "boat" }.body.shown
         for (word in listOf("boat", "line", "hook")) assertTrue("The boat step doesn't mention the $word", word in boat)
         // The first step shows the village: it is where the game opens.

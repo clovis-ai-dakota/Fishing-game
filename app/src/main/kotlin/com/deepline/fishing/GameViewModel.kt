@@ -1158,6 +1158,11 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         com.deepline.fishing.core.Showcase.toggleDecor(progress, decor)?.let(::update)
     }
 
+    /** Puts a piece of decor at [spot] (0..1) along the tank (moved full screen). */
+    fun placeDecor(decor: com.deepline.fishing.core.Decor, spot: Float) {
+        com.deepline.fishing.core.Showcase.placeDecor(progress, decor, spot)?.let(::update)
+    }
+
     fun openAquariumFull() {
         screen = Screen.AQUARIUM_FULL
     }

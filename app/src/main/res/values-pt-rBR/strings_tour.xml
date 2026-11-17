@@ -80,7 +80,7 @@
     <string name="tour_shop_style_body">A página Estilo tem barcos prontos, pinturas, emblemas e estampas de vela (visualizados no seu próprio barco), além de novos anzóis, linhas e rastros. Como toda skin, eles só mudam o visual, nunca o jogo.</string>
 
     <string name="tour_aquarium_title">Seu aquário</string>
-    <string name="tour_aquarium_body">Os peixes que você capturou nadam no seu aquário, o pavilhão de vidro da vila: escolha quem nada ali e compre ali mesmo decoração ou um tanque maior. A tela cheia gira o celular na horizontal para você assistir. Ali, faça pinça para aproximar um peixe, arraste para olhar em volta e toque duas vezes para ver o tanque inteiro de novo.</string>
+    <string name="tour_aquarium_body">Os peixes que você capturou nadam no seu aquário, o pavilhão de vidro da vila: escolha quem nada ali e compre ali mesmo decoração ou um tanque maior. Toque duas vezes no tanque para vê-lo em tela cheia: faça pinça para aproximar, arraste a água para olhar em volta e arraste uma decoração para movê-la (ao soltar, ela afunda até a areia).</string>
 
     <string name="tour_season_title">Temporadas e eventos de fim de semana</string>
     <string name="tour_season_body">Cada temporada dura %1$s. Todo lançamento solo rende XP da temporada e libera níveis de recompensas: apetrechos e pontos para todos, e mais (um barco da temporada, uma insígnia) com o passe de temporada. Todo fim de semana também traz uma meta de pesca com sua própria recompensa. Nada disso muda os duelos.</string>

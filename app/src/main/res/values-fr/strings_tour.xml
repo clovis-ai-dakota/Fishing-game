@@ -82,7 +82,7 @@
     <string name="tour_shop_style_body">La page Style propose des bateaux tout faits, des peintures, des emblèmes et des imprimés de voile (en aperçu sur votre propre bateau), ainsi que de nouveaux hameçons, lignes et traînées. Comme toutes les apparences, ils ne changent que le look, jamais le jeu.</string>
 
     <string name="tour_aquarium_title">Votre aquarium</string>
-    <string name="tour_aquarium_body">Les poissons que vous avez pêchés nagent dans votre aquarium, le pavillon de verre du village : choisissez qui y nage, et achetez sur place du décor ou un bac plus grand. Le plein écran tourne le téléphone à l\'horizontale pour les regarder. Là, pincez pour zoomer sur un poisson, faites glisser pour regarder autour, et touchez deux fois pour revoir tout l\'aquarium.</string>
+    <string name="tour_aquarium_body">Les poissons que vous avez pêchés nagent dans votre aquarium, le pavillon de verre du village : choisissez qui y nage, et achetez sur place du décor ou un bac plus grand. Touchez deux fois l\'aquarium pour le voir en plein écran : pincez pour zoomer, faites glisser l\'eau pour regarder autour, et faites glisser un décor pour le déplacer (lâché, il coule jusqu\'au sable).</string>
 
     <string name="tour_season_title">Saisons et événements du week-end</string>
     <!-- %1$s: how long a season lasts (e.g. "6 semaines"). -->

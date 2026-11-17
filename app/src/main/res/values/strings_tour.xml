@@ -109,7 +109,7 @@
     <string name="tour_shop_style_body">The Style page has premade boats, paints, emblems and sail prints (previewed on your own boat), and new hooks, lines and trails. Like every skin, they only change the look, never the game.</string>
 
     <string name="tour_aquarium_title">Your aquarium</string>
-    <string name="tour_aquarium_body">The fish you\'ve caught swim in your aquarium, the glass pavilion in the village: pick who swims there, and buy decor or a bigger tank right there. Full screen turns the phone sideways to watch them. There, pinch to zoom in on a fish, drag to look around, and double-tap to see the whole tank again.</string>
+    <string name="tour_aquarium_body">The fish you\'ve caught swim in your aquarium, the glass pavilion in the village: pick who swims there, and buy decor or a bigger tank right there. Double-tap the tank to see it full screen: pinch to zoom, drag the water to look around, and drag a piece of decor to move it (let go and it sinks to the sand).</string>
 
     <string name="tour_season_title">Seasons and weekend events</string>
     <!-- %1$s: how long a season lasts (e.g. "6 weeks"). -->

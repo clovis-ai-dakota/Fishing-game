@@ -99,6 +99,33 @@ object Showcase {
         }
     }
 
+    /**
+     * Where [d] stands along the tank, from 0 (left) to 1 (right): where the player put it, or its
+     * own default spot. Every piece has a spot of its own, so a new one never moves the others.
+     */
+    fun decorSpot(p: PlayerProgress, d: Decor): Float = p.decorSpots[d] ?: DEFAULT_SPOTS.getValue(d)
+
+    /** How far back [d] stands in the tank (-1 against the back glass, 1 at the front). */
+    fun decorDepth(d: Decor): Float = DEPTHS.getValue(d)
+
+    /** Pieces the player can move; the lantern lights hang along the top, all the way across. */
+    fun isMovable(d: Decor): Boolean = d != Decor.LANTERN_LIGHTS
+
+    /** Puts [d] at [x] (0..1) along the tank; null if it isn't owned or can't move. */
+    fun placeDecor(p: PlayerProgress, d: Decor, x: Float): PlayerProgress? {
+        if (!ownsDecor(p, d) || !isMovable(d) || !x.isFinite()) return null
+        return p.copy(decorSpots = p.decorSpots + (d to x.coerceIn(0f, 1f)))
+    }
+
+    private val DEFAULT_SPOTS = mapOf(
+        Decor.PLANTS to 0.08f, Decor.PEBBLES to 0.3f, Decor.SAND_CASTLE to 0.2f, Decor.BUBBLER to 0.86f,
+        Decor.TREASURE_CHEST to 0.64f, Decor.CORAL_GARDEN to 0.94f, Decor.LANTERN_LIGHTS to 0.5f, Decor.SUNKEN_SHIP to 0.46f,
+    )
+    private val DEPTHS = mapOf(
+        Decor.PLANTS to -0.75f, Decor.PEBBLES to 0.55f, Decor.SAND_CASTLE to -0.1f, Decor.BUBBLER to 0.05f,
+        Decor.TREASURE_CHEST to 0.45f, Decor.CORAL_GARDEN to -0.7f, Decor.LANTERN_LIGHTS to -0.8f, Decor.SUNKEN_SHIP to -0.55f,
+    )
+
     fun toggleDecor(p: PlayerProgress, d: Decor): PlayerProgress? {
         if (!ownsDecor(p, d)) return null
         return p.copy(hiddenDecor = if (d.name in p.hiddenDecor) p.hiddenDecor - d.name else p.hiddenDecor + d.name)

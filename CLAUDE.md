@@ -145,8 +145,11 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     `GLASS` and `BULB` that light up with `uGlow` at night, fluttering `CLOTH`) and the village's
     sea its own (`uMaterial` 6). Still parts are merged into a few big meshes (a triangle budget
     is tested in `VillageSceneTest`); the 2D map and the 2D tank stay the fallbacks. The
-    full-screen aquarium zooms and looks around (`AquariumScene.Camera`, clamped to the back
-    wall) and renders at the screen's width.
+    aquarium opens full screen with a double tap on the tank, upright: the whole tank on its
+    stand, zoom and look around (`AquariumScene.Camera`), and decor the player drags (let go in
+    the water, it sinks). Each piece has its own default spot (`Showcase.decorSpot`, saved in
+    `decorSpots`), so a new piece never moves the others; keep every piece inside the small tank
+    (`AquariumSceneTest`).
   - The village is an island with only the six places that open a menu (research:
     `docs/research/village-visuals.md`): no decor building. Its light is baked once into the
     vertex colours, as mobile games do: cast shadows from `VillageModels.SUN` (soft, several

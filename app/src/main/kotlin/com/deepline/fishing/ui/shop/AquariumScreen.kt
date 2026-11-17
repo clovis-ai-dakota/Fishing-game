@@ -58,7 +58,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculatePan
+import androidx.compose.foundation.gestures.calculateZoom
+import androidx.compose.ui.input.pointer.positionChanged
+import androidx.compose.ui.semantics.onClick
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import com.deepline.fishing.core.Decor
@@ -96,17 +101,20 @@ fun AquariumScreen(vm: GameViewModel) {
             modifier = Modifier.testTag("aquarium_list"),
         ) {
             item(span = { GridItemSpan(maxLineSpan) }) {
-                // The live tank (3D where available), with a button to watch it full screen.
-                androidx.compose.foundation.layout.Box(Modifier.fillMaxWidth().height(260.dp).tourTarget(TourTarget.AQUARIUM_TANK)) {
-                    AquariumView(p, Modifier.fillMaxWidth().height(260.dp).clip(RoundedCornerShape(16.dp)))
-                    com.deepline.fishing.ui.kit.RoundIconButton(
-                        com.deepline.fishing.ui.kit.KitIcons.FullScreen,
-                        stringResource(R.string.shop_aquarium_fullscreen),
-                        onClick = vm::openAquariumFull,
-                        modifier = Modifier.align(androidx.compose.ui.Alignment.BottomEnd).padding(10.dp).testTag("aquarium_fullscreen"),
-                        diameter = 38.dp,
-                    )
-                }
+                // The live tank (3D where available): a double tap opens it full screen (screen
+                // readers get it as the tank's action).
+                val fullScreen = stringResource(R.string.shop_aquarium_fullscreen)
+                AquariumView(
+                    p,
+                    Modifier
+                        .fillMaxWidth()
+                        .height(260.dp)
+                        .tourTarget(TourTarget.AQUARIUM_TANK)
+                        .clip(RoundedCornerShape(16.dp))
+                        .pointerInput(Unit) { detectTapGestures(onDoubleTap = { vm.openAquariumFull() }) }
+                        .semantics { onClick(label = fullScreen) { vm.openAquariumFull(); true } }
+                        .testTag("aquarium_tank"),
+                )
             }
             item(span = { GridItemSpan(maxLineSpan) }) {
                 Text(
@@ -187,9 +195,9 @@ fun AquariumView(
         androidx.compose.foundation.layout.BoxWithConstraints(modifier) { AquariumTank(p, height = maxHeight) }
         return
     }
-    // What the render thread draws: the latest fish and decor.
-    val looks = remember { arrayOfNulls<Triple<List<FishSpecies>, List<Decor>, Boolean>>(1) }
-    looks[0] = Triple(fish, Showcase.shownDecor(p), Showcase.hasBigTank(p))
+    // What the render thread draws: the latest fish and decor, where the player put it.
+    val looks = remember { arrayOfNulls<Triple<List<FishSpecies>, List<com.deepline.fishing.ui.render3d.AquariumScene.Piece>, Boolean>>(1) }
+    looks[0] = Triple(fish, piecesOf(p), Showcase.hasBigTank(p))
     val source = remember {
         val scene = com.deepline.fishing.ui.render3d.AquariumScene()
         com.deepline.fishing.ui.render3d.gl.FrameSource { w, h, t -> looks[0]!!.let { (f, d, big) -> scene.build(w, h, t, f, d, big, camera) } }
@@ -205,10 +213,14 @@ fun AquariumView(
     }
 }
 
+/** The decor shown in the tank, each where the player put it. */
+internal fun piecesOf(p: PlayerProgress) = Showcase.shownDecor(p).map { com.deepline.fishing.ui.render3d.AquariumScene.Piece(it, Showcase.decorSpot(p, it)) }
+
 /**
- * The aquarium full screen: the phone turns sideways and the system bars hide while it shows, and
- * both come back when it closes (back, or the button in the corner). Pinch to zoom in on a fish,
- * drag to look around the tank, double-tap to see all of it again.
+ * The aquarium full screen, upright: the system bars hide while it shows. The whole tank stands on
+ * its cabinet; pinch to zoom, drag the water to look around, double-tap to zoom in or out. Drag a
+ * piece of decor to move it: let go in the water and it sinks to the sand; it stays where it was
+ * put (saved), and new pieces never move it.
  */
 @Composable
 fun AquariumFullScreen(vm: GameViewModel) {
@@ -216,30 +228,52 @@ fun AquariumFullScreen(vm: GameViewModel) {
     androidx.compose.runtime.DisposableEffect(activity) {
         val window = activity?.window
         val insets = window?.let { androidx.core.view.WindowCompat.getInsetsController(it, it.decorView) }
-        activity?.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
         insets?.systemBarsBehavior = androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         insets?.hide(androidx.core.view.WindowInsetsCompat.Type.systemBars())
-        onDispose {
-            insets?.show(androidx.core.view.WindowInsetsCompat.Type.systemBars())
-            activity?.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        }
+        onDispose { insets?.show(androidx.core.view.WindowInsetsCompat.Type.systemBars()) }
     }
     val camera = remember { com.deepline.fishing.ui.render3d.AquariumScene.Camera() }
+    val pieces = androidx.compose.runtime.rememberUpdatedState(piecesOf(vm.progress))
     androidx.compose.foundation.layout.Box(Modifier.fillMaxSize().background(Color.Black).testTag("aquarium_full")) {
         AquariumView(
             vm.progress,
             Modifier
                 .fillMaxSize()
                 .pointerInput(Unit) {
-                    detectTransformGestures { _, pan, zoom, _ ->
-                        camera.zoomBy(zoom)
-                        camera.drag(pan.x, pan.y)
+                    awaitEachGesture {
+                        val down = awaitFirstDown(requireUnconsumed = false)
+                        val hit = camera.pick(down.position.x, down.position.y, pieces.value)
+                        if (hit != null) {
+                            // Moving a piece of decor: it follows the finger until it's let go.
+                            camera.grab(hit, down.position.x, down.position.y, pieces.value)
+                            while (true) {
+                                val event = awaitPointerEvent()
+                                val finger = event.changes.firstOrNull { it.id == down.id }
+                                if (finger == null || !finger.pressed || event.changes.count { it.pressed } > 1) break
+                                if (finger.positionChanged()) {
+                                    camera.move(finger.position.x, finger.position.y)
+                                    finger.consume()
+                                }
+                            }
+                            camera.release()?.let { (d, spot) -> vm.placeDecor(d, spot) }
+                        } else {
+                            // The water: look around and zoom.
+                            while (true) {
+                                val event = awaitPointerEvent()
+                                if (event.changes.none { it.pressed }) break
+                                val zoom = event.calculateZoom()
+                                val pan = event.calculatePan()
+                                if (zoom != 1f) camera.zoomBy(zoom)
+                                if (pan != androidx.compose.ui.geometry.Offset.Zero) camera.drag(pan.x, pan.y)
+                                event.changes.forEach { if (it.positionChanged()) it.consume() }
+                            }
+                        }
                     }
                 }
-                .pointerInput(Unit) { detectTapGestures(onDoubleTap = { camera.reset() }) },
+                .pointerInput(Unit) { detectTapGestures(onDoubleTap = { camera.toggleZoom(it.x, it.y) }) },
             camera = camera,
-            // Sideways the view is the phone's full width: drawn sharp, not stretched from a small image.
-            maxRenderWidth = 1800,
+            // Full screen: drawn at the phone's own width, not stretched from a small image.
+            maxRenderWidth = 1080,
         )
         com.deepline.fishing.ui.kit.RoundIconButton(
             com.deepline.fishing.ui.kit.KitIcons.Close,

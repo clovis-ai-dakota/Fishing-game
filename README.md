@@ -53,7 +53,8 @@ the island takes the colours of the boat and gear you wear, more so the rarer th
   rankings.
 - **Rope** (the rope workshop): rope upgrades and downgrades, points only.
 - **Aquarium** (the glass pavilion): your catches on show in a 3D tank, its decor for sale, and a
-  full-screen view with the phone sideways (pinch to zoom, drag to look around).
+  full-screen view with a double tap on the tank (pinch to zoom, drag the water to look around,
+  drag a piece of decor to move it: it sinks to the sand where you let go).
 
 Around the map: your points, a trophy for Milestones (with a badge when one can be claimed), a
 palette for the themes and a gear for Settings (sound, notifications, language, privacy, and the

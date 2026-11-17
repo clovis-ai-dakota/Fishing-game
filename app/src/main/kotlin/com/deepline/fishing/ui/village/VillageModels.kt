@@ -7,6 +7,7 @@ import com.deepline.fishing.ui.render3d.MeshData
 import com.deepline.fishing.ui.render3d.Part
 import com.deepline.fishing.ui.render3d.PropModels
 import com.deepline.fishing.ui.render3d.Vec3
+import com.deepline.fishing.ui.render3d.bevelBox
 import com.deepline.fishing.ui.render3d.hash01
 import kotlin.math.PI
 import kotlin.math.abs
@@ -450,61 +451,6 @@ object VillageModels {
         val from = vertexCount
         block()
         recolor(from, color)
-    }
-
-    /**
-     * A box with bevelled (chamfered) edges, [size] centred on the origin of [m]: the bevels catch
-     * the light and the rim, which reads as crafted rather than as a cardboard cube.
-     */
-    private fun MeshBuilder.bevelBox(m: FloatArray, size: Vec3, color: FloatArray, bevel: Float = 0.08f, part: Float = Part.PAINTED) {
-        val h = floatArrayOf(size.x / 2f, size.y / 2f, size.z / 2f)
-        // Seen from the village's camera a pixel is about 8 cm: a smaller bevel wouldn't show,
-        // so small boxes stay plain (12 triangles instead of 44).
-        val b = if (bevel < 0.06f) 0f else min(bevel, min(h[0], min(h[1], h[2])) * 0.45f)
-        val nm = Mat4.normalMatrix(m)
-        fun tn(n: Vec3) = Vec3(
-            nm[0] * n.x + nm[3] * n.y + nm[6] * n.z,
-            nm[1] * n.x + nm[4] * n.y + nm[7] * n.z,
-            nm[2] * n.x + nm[5] * n.y + nm[8] * n.z,
-        ).normalized()
-        fun axis(k: Int, s: Float) = when (k) { 0 -> Vec3(s, 0f, 0f); 1 -> Vec3(0f, s, 0f); else -> Vec3(0f, 0f, s) }
-        // The corner of face (axis a, side s) towards the signs [sg] on the other two axes.
-        fun facePoint(a: Int, s: Float, sg: FloatArray): Vec3 {
-            val q = FloatArray(3) { k -> if (k == a) s * h[k] else sg[k] * (h[k] - b) }
-            return Vec3(q[0], q[1], q[2])
-        }
-        fun poly(points: List<Vec3>, n: Vec3) {
-            val wn = tn(n)
-            val ids = points.map { vertex(Mat4.transformPoint(m, it), wn, 0f, 0f, part, color) }
-            val flip = (((points[1] - points[0]) cross (points[2] - points[0])) dot n) < 0f
-            for (k in 1 until ids.size - 1) if (flip) triangle(ids[0], ids[k + 1], ids[k]) else triangle(ids[0], ids[k], ids[k + 1])
-        }
-        val signs = listOf(-1f, 1f)
-        for (a in 0..2) for (s in signs) {
-            val u = (a + 1) % 3
-            val v = (a + 2) % 3
-            val pts = listOf(-1f to -1f, 1f to -1f, 1f to 1f, -1f to 1f).map { (su, sv) ->
-                facePoint(a, s, FloatArray(3).also { it[u] = su; it[v] = sv })
-            }
-            poly(pts, axis(a, s))
-        }
-        if (b <= 1e-4f) return
-        for (a1 in 0..2) for (a2 in a1 + 1..2) for (s1 in signs) for (s2 in signs) {
-            val a3 = 3 - a1 - a2
-            fun on1(s3: Float) = facePoint(a1, s1, FloatArray(3).also { it[a2] = s2; it[a3] = s3 })
-            fun on2(s3: Float) = facePoint(a2, s2, FloatArray(3).also { it[a1] = s1; it[a3] = s3 })
-            poly(listOf(on1(-1f), on1(1f), on2(1f), on2(-1f)), (axis(a1, s1) + axis(a2, s2)).normalized())
-        }
-        for (sx in signs) for (sy in signs) for (sz in signs) {
-            poly(
-                listOf(
-                    facePoint(0, sx, floatArrayOf(0f, sy, sz)),
-                    facePoint(1, sy, floatArrayOf(sx, 0f, sz)),
-                    facePoint(2, sz, floatArrayOf(sx, sy, 0f)),
-                ),
-                Vec3(sx, sy, sz).normalized(),
-            )
-        }
     }
 
     private fun MeshBuilder.box(c: Vec3, size: Vec3, color: FloatArray, bevel: Float = 0.08f, part: Float = Part.PAINTED) =

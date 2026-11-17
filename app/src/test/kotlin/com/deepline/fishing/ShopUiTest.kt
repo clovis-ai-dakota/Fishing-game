@@ -8,6 +8,8 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.doubleClick
 import com.deepline.fishing.core.BotDifficulty
 import com.deepline.fishing.core.Grant
 import com.deepline.fishing.core.PlayerProgress
@@ -17,6 +19,7 @@ import com.deepline.fishing.core.ShopClock
 import com.deepline.fishing.core.BattleMode
 import com.deepline.fishing.billing.TestStore
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -278,15 +281,15 @@ class AquariumUiTest : BoatUiTestBase() {
         )
         compose.openBuilding("aquarium")
         assertEquals(Screen.AQUARIUM, vm.screen)
-        // Full screen: the phone turns sideways, and back brings the aquarium screen back upright.
-        compose.onNodeWithTag("aquarium_fullscreen").performClick()
+        // Full screen with a double tap on the tank, upright; back brings the aquarium screen back.
+        compose.onNodeWithTag("aquarium_tank").performTouchInput { doubleClick() }
         compose.waitForIdle()
         assertEquals(Screen.AQUARIUM_FULL, vm.screen)
-        scenario!!.onActivity { assertEquals(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE, it.requestedOrientation) }
+        // Upright: the phone doesn't turn any more.
+        scenario!!.onActivity { assertNotEquals(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE, it.requestedOrientation) }
         compose.onNodeWithTag("aquarium_full_close").performClick()
         compose.waitForIdle()
         assertEquals(Screen.AQUARIUM, vm.screen)
-        scenario!!.onActivity { assertEquals(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT, it.requestedOrientation) }
         compose.shot("70_aquarium")
         assertEquals(com.deepline.fishing.core.Showcase.TANK_SIZE, com.deepline.fishing.core.Showcase.tankFish(vm.progress).size)
         val first = com.deepline.fishing.core.Showcase.tankFish(vm.progress).first()
