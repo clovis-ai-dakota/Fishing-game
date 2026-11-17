@@ -141,8 +141,7 @@
     <string name="shop_set_contents">%1$s.</string>
 
     <!-- Aquarium page. -->
-    <string name="shop_aquarium_page_note">Vos poissons pêchés nagent dans votre aquarium (Dex > Aquarium). Le décor et un bac plus grand ne changent que son aspect.</string>
-    <string name="shop_aquarium_open">Ouvrir votre aquarium</string>
+    <string name="shop_aquarium_page_note">Le décor et un bac plus grand ne changent que l\'aspect de votre aquarium.</string>
 
     <!-- Passes page. -->
     <string name="shop_passes_title">Pass et packs</string>
@@ -220,7 +219,7 @@
     <string name="shop_aquarium_count_empty">Dans le bac : %1$d / %2$d. Pêchez des poissons pour le remplir.</string>
     <string name="shop_aquarium_count">Dans le bac : %1$d / %2$d. Touchez une espèce pour l\'ajouter ou la retirer.</string>
     <string name="shop_aquarium_decor">Décor</string>
-    <string name="shop_aquarium_more">Plus de décors et un bac plus grand dans la Boutique</string>
+    <string name="shop_aquarium_for_sale">Décor à acheter</string>
     <string name="shop_aquarium_catches">Vos prises</string>
     <plurals name="shop_aquarium_cd_tank">
         <item quantity="one">Aquarium avec %d poisson</item>

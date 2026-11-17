@@ -171,8 +171,7 @@
     <string name="shop_set_contents">%1$s.</string>
 
     <!-- Aquarium page of the Shop. -->
-    <string name="shop_aquarium_page_note">Los peces que capturas nadan en tu acuario (Dex > Acuario). La decoración y una pecera más grande solo cambian su apariencia.</string>
-    <string name="shop_aquarium_open">Abrir tu acuario</string>
+    <string name="shop_aquarium_page_note">La decoración y una pecera más grande solo cambian la apariencia de tu acuario.</string>
 
     <!-- Passes page. -->
     <string name="shop_passes_title">Pases y packs</string>
@@ -271,7 +270,7 @@
     <string name="shop_aquarium_count_empty">En la pecera: %1$d / %2$d. Captura peces para llenarla.</string>
     <string name="shop_aquarium_count">En la pecera: %1$d / %2$d. Toca una especie para añadirla o sacarla.</string>
     <string name="shop_aquarium_decor">Decoración</string>
-    <string name="shop_aquarium_more">Más decoración y una pecera más grande en la Tienda</string>
+    <string name="shop_aquarium_for_sale">Decoración a la venta</string>
     <string name="shop_aquarium_catches">Tus capturas</string>
     <plurals name="shop_aquarium_cd_tank">
         <item quantity="one">Acuario con %d pez</item>

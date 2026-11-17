@@ -124,6 +124,7 @@ fun AppRoot(vm: GameViewModel) {
                         Screen.AQUARIUM -> com.deepline.fishing.ui.shop.AquariumScreen(vm)
                         Screen.THEMES -> com.deepline.fishing.ui.shop.ThemesScreen(vm)
                         Screen.SETTINGS -> com.deepline.fishing.ui.settings.SettingsScreen(vm)
+                        Screen.ROPE -> com.deepline.fishing.ui.rope.RopeScreen(vm)
                         Screen.DAILY -> com.deepline.fishing.ui.daily.DailyScreen(vm)
                         Screen.SOCIAL -> com.deepline.fishing.ui.social.SocialHubScreen(vm)
                         Screen.FRIENDS -> com.deepline.fishing.ui.social.FriendsScreen(vm)

@@ -120,7 +120,7 @@ import java.util.Date
 fun ShopScreen(vm: GameViewModel) {
     val p = vm.progress
     val pages = vm.shopPages
-    val page = vm.shopPage.takeIf { it in pages } ?: ShopPage.ROPE
+    val page = vm.shopPage.takeIf { it in pages } ?: ShopPage.TACKLE
     var confirm by remember { mutableStateOf<ShopItem?>(null) }
     val time by rememberInfiniteTransition(label = "shop").animateFloat(
         initialValue = 0f,
@@ -172,13 +172,11 @@ fun ShopScreen(vm: GameViewModel) {
         ) {
             banners(vm, page, actions)
             when (page) {
-                ShopPage.ROPE -> ropePage(vm)
                 ShopPage.TACKLE -> tacklePage(vm, actions)
                 ShopPage.STYLE -> stylePage(vm, actions, time)
                 ShopPage.PASSES -> passesPage(vm, actions)
-                ShopPage.AQUARIUM -> aquariumPage(vm, actions)
             }
-            if (page != ShopPage.ROPE) footer(vm)
+            footer(vm)
         }
     }
 
@@ -233,11 +231,9 @@ private fun LazyGridScope.header(key: String, @StringRes title: Int, @StringRes 
 
 private val ShopPage.icon: androidx.compose.ui.graphics.vector.ImageVector
     get() = when (this) {
-        ShopPage.ROPE -> com.deepline.fishing.ui.kit.KitIcons.Rope
         ShopPage.TACKLE -> com.deepline.fishing.ui.GameIcons.Lantern
         ShopPage.STYLE -> com.deepline.fishing.ui.GameIcons.Palette
         ShopPage.PASSES -> com.deepline.fishing.ui.kit.KitIcons.Ticket
-        ShopPage.AQUARIUM -> com.deepline.fishing.ui.kit.KitIcons.Tank
     }
 
 /** A bundle's saving as a badge ("-25%"). */
@@ -410,79 +406,6 @@ internal fun Badge(text: String) {
         fontWeight = FontWeight.Bold,
     )
 }
-
-// ---- Rope (points only) ------------------------------------------------------------------------
-
-private fun LazyGridScope.ropePage(vm: GameViewModel) {
-    header("rope_header", R.string.shop_rope_title, R.string.shop_rope_note)
-    for (stat in RopeStat.entries) {
-        full("rope_${stat.name}") {
-            val tagged = if (stat == RopeStat.entries.first()) Modifier.tourTarget(TourTarget.SHOP_ROPE) else Modifier
-            RopeCard(vm, stat, tagged)
-        }
-    }
-}
-
-@Composable
-private fun RopeCard(vm: GameViewModel, stat: RopeStat, modifier: Modifier) {
-    val p = vm.progress
-    val level = p.level(stat)
-    val cost = Progression.upgradeCost(p, stat)
-    val current = formatStat(stat, stat.valueAt(level))
-    Card(Modifier.fillMaxWidth().then(modifier)) {
-        Column(Modifier.padding(start = 14.dp, end = 8.dp, top = 10.dp, bottom = 14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Icon(stat.icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(28.dp))
-                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                    Text(stat.label(), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    val levelText = stringResource(R.string.shop_rope_level, level, stat.maxLevel)
-                    com.deepline.fishing.ui.kit.Pips(level, stat.maxLevel, Modifier.semantics { contentDescription = levelText })
-                }
-                com.deepline.fishing.ui.kit.InfoButton(stat.label(), stat.description())
-            }
-            Row(Modifier.padding(end = 6.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (cost == null) {
-                    Text(stringResource(R.string.shop_rope_maxed, current), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                } else {
-                    Text("$current → ${formatStat(stat, stat.valueAt(level + 1))}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                }
-                // One level back, fully refunded: the arrow, where it goes back to and what comes back.
-                Progression.downgradeRefund(p, stat)?.let { refund ->
-                    val label = stringResource(R.string.shop_rope_downgrade, formatStat(stat, stat.valueAt(level - 1)), formatPoints(refund))
-                    Row(
-                        Modifier
-                            .clip(RoundedCornerShape(50))
-                            .clickable(role = androidx.compose.ui.semantics.Role.Button) { vm.downgrade(stat) }
-                            .semantics { contentDescription = label }
-                            .testTag("downgrade_${stat.name.lowercase()}")
-                            .padding(horizontal = 8.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    ) {
-                        Icon(com.deepline.fishing.ui.kit.KitIcons.Undo, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
-                        com.deepline.fishing.ui.kit.CoinAmount("+" + compactPoints(refund.toLong()), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                }
-                if (cost != null) {
-                    val price = stringResource(R.string.common_points, formatPoints(cost))
-                    GameButton(
-                        onClick = { vm.buyUpgrade(stat) },
-                        modifier = Modifier.testTag("upgrade_${stat.name.lowercase()}").semantics { contentDescription = price },
-                        role = ActionRole.POINTS,
-                        enabled = p.pointsBalance >= cost,
-                    ) { CoinPrice(formatPoints(cost)) }
-                }
-            }
-        }
-    }
-}
-
-private val RopeStat.icon: androidx.compose.ui.graphics.vector.ImageVector
-    get() = when (this) {
-        RopeStat.LENGTH -> com.deepline.fishing.ui.kit.KitIcons.Depth
-        RopeStat.STRENGTH -> com.deepline.fishing.ui.kit.KitIcons.Weight
-        RopeStat.AGILITY -> com.deepline.fishing.ui.kit.KitIcons.Speed
-    }
 
 internal val Tackle.icon: androidx.compose.ui.graphics.vector.ImageVector
     get() = when (this) {
@@ -736,27 +659,6 @@ private fun CardStyleTile(vm: GameViewModel, item: ShopItem, actions: ShopAction
             vm.cardStyle == style -> OwnedRow(stringResource(R.string.shop_in_use))
             ShopCatalog.owns(vm.progress, key) -> OwnedRow { TextButton(onClick = { vm.setCardStyle(style) }) { Text(stringResource(R.string.shop_use)) } }
             else -> PriceButtons(item, actions)
-        }
-    }
-}
-
-// ---- Aquarium ----------------------------------------------------------------------------------------
-
-private fun LazyGridScope.aquariumPage(vm: GameViewModel, actions: ShopActions) {
-    val p = vm.progress
-    val items = ShopCatalog.inSection(ShopSection.AQUARIUM)
-    header("aquarium_header", R.string.shop_aquarium_title, R.string.shop_aquarium_page_note)
-    full("aquarium_tank") {
-        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            AquariumTank(p, height = 200.dp, modifier = Modifier.tourTarget(TourTarget.SHOP_AQUARIUM))
-            TextButton(onClick = vm::openAquarium, modifier = Modifier.testTag("open_aquarium")) { Text(stringResource(R.string.shop_aquarium_open)) }
-        }
-    }
-    for (item in items.filter { (it.grants.single() as? Grant.Unlock)?.key == "aquarium:big" }) full(item.id) { ItemCard(vm, item, actions) }
-    items(items.filter { (it.grants.single() as? Grant.Unlock)?.key?.startsWith("decor:") == true }, key = { it.id }) { item ->
-        val decor = com.deepline.fishing.core.Decor.entries.first { it.unlockKey == (item.grants.single() as Grant.Unlock).key }
-        Tile(item.label(), item.badgeText()?.asString(), preview = { AquariumTank(p, height = 120.dp, extraDecor = decor) }) {
-            if (ShopCatalog.owns(p, item.id)) OwnedRow() else PriceButtons(item, actions)
         }
     }
 }

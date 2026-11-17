@@ -193,10 +193,8 @@
     <!-- What a set gives, as a sentence. %1$s: the list of what it gives. -->
     <string name="shop_set_contents">%1$s.</string>
 
-    <!-- Aquarium page of the Shop. "Dex > Aquarium" is where the aquarium opens: keep the words
-         of shell_tab_dex and dex_aquarium_button. -->
-    <string name="shop_aquarium_page_note">Your caught fish swim in your aquarium (Dex > Aquarium). Decor and a bigger tank only change how it looks.</string>
-    <string name="shop_aquarium_open">Open your aquarium</string>
+    <!-- Behind the (i) of the aquarium's "Decor for sale" section. -->
+    <string name="shop_aquarium_page_note">Decor and a bigger tank only change how your aquarium looks.</string>
 
     <!-- Passes page: seasons, weekend events, the Captain's Club and one-time packs. -->
     <string name="shop_passes_title">Passes and packs</string>
@@ -306,7 +304,7 @@
     <string name="shop_aquarium_count">In the tank: %1$d / %2$d. Tap a species to add it or take it out.</string>
     <!-- Heading over the decor chips (plants, a treasure chest...). -->
     <string name="shop_aquarium_decor">Decor</string>
-    <string name="shop_aquarium_more">More decor and a bigger tank in the Shop</string>
+    <string name="shop_aquarium_for_sale">Decor for sale</string>
     <!-- Heading over the species the player caught (chips to put them in the tank). -->
     <string name="shop_aquarium_catches">Your catches</string>
     <plurals name="shop_aquarium_cd_tank">

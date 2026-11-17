@@ -140,8 +140,7 @@
     <string name="shop_set_contents">%1$s.</string>
 
     <!-- Página Aquário. -->
-    <string name="shop_aquarium_page_note">Os peixes que você capturou nadam no seu aquário (Dex > Aquário). A decoração e um tanque maior só mudam o visual.</string>
-    <string name="shop_aquarium_open">Abrir seu aquário</string>
+    <string name="shop_aquarium_page_note">A decoração e um tanque maior só mudam o visual do seu aquário.</string>
 
     <!-- Página Passes. -->
     <string name="shop_passes_title">Passes e pacotes</string>
@@ -220,7 +219,7 @@
     <string name="shop_aquarium_count_empty">No tanque: %1$d / %2$d. Pesque peixes para enchê-lo.</string>
     <string name="shop_aquarium_count">No tanque: %1$d / %2$d. Toque numa espécie para colocá-la ou tirá-la.</string>
     <string name="shop_aquarium_decor">Decoração</string>
-    <string name="shop_aquarium_more">Mais decoração e um tanque maior na Loja</string>
+    <string name="shop_aquarium_for_sale">Decoração à venda</string>
     <string name="shop_aquarium_catches">Suas capturas</string>
     <plurals name="shop_aquarium_cd_tank">
         <item quantity="one">Aquário com %d peixe</item>

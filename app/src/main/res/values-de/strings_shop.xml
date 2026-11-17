@@ -136,8 +136,7 @@
     <string name="shop_set_contents">%1$s.</string>
 
     <!-- Seite „Aquarium“. -->
-    <string name="shop_aquarium_page_note">Deine gefangenen Fische schwimmen in deinem Aquarium (Dex > Aquarium). Deko und ein größeres Becken ändern nur, wie es aussieht.</string>
-    <string name="shop_aquarium_open">Dein Aquarium öffnen</string>
+    <string name="shop_aquarium_page_note">Deko und ein größeres Becken ändern nur, wie dein Aquarium aussieht.</string>
 
     <!-- Seite „Pässe“. -->
     <string name="shop_passes_title">Pässe und Pakete</string>
@@ -213,7 +212,7 @@
     <string name="shop_aquarium_count_empty">Im Becken: %1$d / %2$d. Fang Fische, um es zu füllen.</string>
     <string name="shop_aquarium_count">Im Becken: %1$d / %2$d. Tippe auf eine Art, um sie hinzuzufügen oder herauszunehmen.</string>
     <string name="shop_aquarium_decor">Deko</string>
-    <string name="shop_aquarium_more">Mehr Deko und ein größeres Becken im Shop</string>
+    <string name="shop_aquarium_for_sale">Deko zu kaufen</string>
     <string name="shop_aquarium_catches">Deine Fänge</string>
     <plurals name="shop_aquarium_cd_tank">
         <item quantity="one">Aquarium mit %d Fisch</item>

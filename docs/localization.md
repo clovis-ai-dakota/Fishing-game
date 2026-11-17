@@ -317,7 +317,7 @@ your language's glossary file). Resource keys show where the term is the label.
 | Skins, Title, title badge, Dex cards | Looks; text under the name; its frame; card styles | Translate |
 | Atmosphere: Family, Nightmare | Moods of the deep | Translate |
 | Themes; Day, Night, Like my phone | Menu looks and their night mode | Translate |
-| Rope, Tackle, Style, Passes, Aquarium | Shop pages | Translate (`shell_shop_page_*`) |
+| Tackle, Style, Passes | Shop pages | Translate (`shell_shop_page_*`) |
 | Captain's Club | The monthly membership | Translate as a name, consistently (also in the store listing) |
 | Season pass, Collector's edition, Weekend event, Starter pack, Founder's pack | Passes | Translate as names |
 | Best of 5, 3-Minute Rush, Heavy Haul, Species Hunt, Deep Dive | Battle modes | Translate as names (`core_mode_*`) |

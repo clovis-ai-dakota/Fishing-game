@@ -3,6 +3,9 @@ package com.deepline.fishing.ui
 import com.deepline.fishing.ui.kit.rewardBalance
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.offset
 import androidx.compose.ui.input.pointer.pointerInput
@@ -279,10 +282,20 @@ private fun RopeStrip(vm: GameViewModel, modifier: Modifier = Modifier) {
         } else {
             stringResource(R.string.home_rope_stats, formatPoints(p.castsMade), formatPoints(p.pointsEarned))
         }
+    // The three numbers open the rope workshop, where they're upgraded.
+    val upgrade = stringResource(R.string.shop_rope_title)
     Row(modifier.testTag("rope_strip"), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-        StatPill(KitIcons.Depth, formatStat(RopeStat.LENGTH, RopeStat.LENGTH.valueAt(p.level(RopeStat.LENGTH))))
-        StatPill(KitIcons.Weight, formatStat(RopeStat.STRENGTH, RopeStat.STRENGTH.valueAt(p.level(RopeStat.STRENGTH))))
-        StatPill(KitIcons.Speed, formatStat(RopeStat.AGILITY, RopeStat.AGILITY.valueAt(p.level(RopeStat.AGILITY))))
+        Row(
+            Modifier
+                .clip(RoundedCornerShape(50))
+                .clickable(onClickLabel = upgrade, role = androidx.compose.ui.semantics.Role.Button, onClick = vm::openRope)
+                .testTag("rope_open"),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            StatPill(KitIcons.Depth, formatStat(RopeStat.LENGTH, RopeStat.LENGTH.valueAt(p.level(RopeStat.LENGTH))))
+            StatPill(KitIcons.Weight, formatStat(RopeStat.STRENGTH, RopeStat.STRENGTH.valueAt(p.level(RopeStat.STRENGTH))))
+            StatPill(KitIcons.Speed, formatStat(RopeStat.AGILITY, RopeStat.AGILITY.valueAt(p.level(RopeStat.AGILITY))))
+        }
         ScenePill { InfoButton(stringResource(R.string.home_rope_title), details, Modifier.size(22.dp), tint = GameColors.OnDeep, tag = "rope_info") }
     }
 }

@@ -245,13 +245,13 @@ class SeasonUiTest : BoatUiTestBase() {
     }
 }
 
-/** The aquarium: caught fish swim there, picked from the Dex; decor comes from the Shop. */
+/** The aquarium: caught fish swim there, picked from the catches; its decor is sold right there. */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(sdk = [36], qualifiers = "w400dp-h860dp-xxhdpi")
 class AquariumUiTest : BoatUiTestBase() {
     @Test
-    fun fishSwimInTheAquariumAndDecorComesFromTheShop() {
+    fun fishSwimInTheAquariumAndItSellsItsDecor() {
         val caught = com.deepline.fishing.core.FishCatalog.all.take(8)
         val vm = launch(
             midGamePlayer().copy(collection = caught.withIndex().associate { (i, s) -> s.id to com.deepline.fishing.core.CollectionEntry(1, 0, 20f, 100 + i) }),
@@ -266,9 +266,9 @@ class AquariumUiTest : BoatUiTestBase() {
         compose.onNodeWithTag("tank_${first.id}").performClick()
         assertFalse(first in com.deepline.fishing.core.Showcase.tankFish(vm.progress))
 
-        vm.openShop(ShopPage.AQUARIUM)
-        compose.waitForIdle()
-        compose.shot("71_shop_aquarium")
+        // Decor for sale, at the bottom of the aquarium: euros or points, like everything in the Shop.
+        compose.onNodeWithTag("aquarium_list").performScrollToNode(hasTestTag("buy_eur_decor_sunken_ship"))
+        compose.shot("71_aquarium_for_sale")
         vm.buyWithMoney(ShopCatalog.byId("decor_sunken_ship")!!, null)
         vm.testStore!!.answer(TestStore.TestOutcome.APPROVE)
         compose.waitForIdle()

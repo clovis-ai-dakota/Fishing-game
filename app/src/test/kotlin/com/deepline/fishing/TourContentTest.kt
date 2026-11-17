@@ -37,8 +37,7 @@ class TourContentTest {
         // explained from the screens that lead to them. A species' page (FISH_DETAIL) is
         // explained from the Dex, which opens it. The boat editor is explained from the Fish tab's
         // boat, which leads to it.
-        // The aquarium is explained from the Shop's Aquarium page (and opened from the Dex).
-        val explainedElsewhere = setOf(Screen.CAST, Screen.BATTLE, Screen.ONLINE_LOBBY, Screen.FISH_DETAIL, Screen.BOAT_EDITOR, Screen.AQUARIUM) +
+        val explainedElsewhere = setOf(Screen.CAST, Screen.BATTLE, Screen.ONLINE_LOBBY, Screen.FISH_DETAIL, Screen.BOAT_EDITOR) +
             // Clubs ship later: with the flag off there is no club screen to explain.
             (if (FeatureFlags.clubs) emptySet() else setOf(Screen.CLUBS))
         val visited = Tour.steps.map { it.screen }.toSet()
@@ -120,13 +119,13 @@ class TourContentTest {
         val v9 = Tour.steps.filter { it.sinceVersion == 9 }.map { it.id }
         assertTrue(v9.containsAll(listOf("tabs", "upgrades", "tackle", "two_prices", "shop_style", "aquarium", "season", "passes", "badges", "gifts", "battle_tackle")))
         val targets = Tour.steps.mapNotNull { it.target }.toSet()
-        for (t in listOf(TourTarget.SHOP_ROPE, TourTarget.SHOP_TACKLE, TourTarget.SHOP_PRICES, TourTarget.SHOP_STYLE, TourTarget.SHOP_SEASON, TourTarget.SHOP_PASSES, TourTarget.BATTLE_TACKLE)) {
+        for (t in listOf(TourTarget.ROPE_FIRST, TourTarget.AQUARIUM_TANK, TourTarget.SHOP_TACKLE, TourTarget.SHOP_PRICES, TourTarget.SHOP_STYLE, TourTarget.SHOP_SEASON, TourTarget.SHOP_PASSES, TourTarget.BATTLE_TACKLE)) {
             assertTrue("No step points at $t", t in targets)
         }
         // Every Shop page with something on sale is shown by a step.
-        val shown = Tour.steps.filter { it.screen == Screen.SHOP }.map { it.shopPage ?: ShopPage.ROPE }.toSet()
+        val shown = Tour.steps.filter { it.screen == Screen.SHOP }.map { it.shopPage ?: ShopPage.TACKLE }.toSet()
         for (page in ShopPage.entries) {
-            val hasItems = page.section == null || com.deepline.fishing.core.ShopCatalog.inSection(page.section).isNotEmpty()
+            val hasItems = com.deepline.fishing.core.ShopCatalog.inSection(page.section).isNotEmpty()
             if (hasItems) assertTrue("The tour never shows the Shop's ${page.name} page", page in shown)
         }
         val text = text

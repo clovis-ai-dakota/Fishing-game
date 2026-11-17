@@ -75,6 +75,8 @@ enum class Screen {
     HOME, DEX, SHOP, BATTLE_SETUP, CAST, FISH_DETAIL, MILESTONES, BATTLE, ONLINE_LOBBY, BOAT_EDITOR, AQUARIUM, THEMES,
     /** Settings (the gear on the Fish tab): sound, notifications, privacy, language, the tour. */
     SETTINGS,
+    /** The rope workshop: the rope's upgrades, bought with points (from the Fish menu's rope numbers). */
+    ROPE,
     // -- Daily loop screens below.
     /** The daily reward calendar, today's challenges and migrations (from the Fish tab's daily card). */
     DAILY,
@@ -100,12 +102,10 @@ enum class MainTab(@param:androidx.annotation.StringRes val labelRes: Int, val s
  * The pages of the Shop tab: rope upgrades (points only), then the shop's sections, where every
  * item has a euro price and a points price. A section only shows once it has items.
  */
-enum class ShopPage(@param:androidx.annotation.StringRes val labelRes: Int, val section: ShopSection?) {
-    ROPE(R.string.shell_shop_page_rope, null),
+enum class ShopPage(@param:androidx.annotation.StringRes val labelRes: Int, val section: ShopSection) {
     TACKLE(R.string.shell_shop_page_tackle, ShopSection.TACKLE),
     STYLE(R.string.shell_shop_page_style, ShopSection.STYLE),
     PASSES(R.string.shell_shop_page_passes, ShopSection.PASSES),
-    AQUARIUM(R.string.shell_shop_page_aquarium, ShopSection.AQUARIUM),
 }
 
 /** The sections of the Dex tab. Secrets only appears once one is found; Skins is always there. */
@@ -292,7 +292,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     private fun showTourStep(t: TourSession) {
         screen = t.current.screen
         if (screen == Screen.DEX) dexSection = t.current.dexSection ?: DexSection.FISH
-        if (screen == Screen.SHOP) shopPage = t.current.shopPage ?: ShopPage.ROPE
+        if (screen == Screen.SHOP) shopPage = t.current.shopPage ?: ShopPage.TACKLE
     }
 
     /** Skipping and finishing both close the tour and ask about next time. */
@@ -378,7 +378,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
 
     // --- Shop ----------------------------------------------------------------------------
 
-    var shopPage by mutableStateOf(ShopPage.ROPE)
+    var shopPage by mutableStateOf(ShopPage.TACKLE)
         private set
 
     /** Opens the Shop tab on [page]. */
@@ -394,7 +394,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Pages with something to show (the Aquarium once it has items). */
     val shopPages: List<ShopPage>
-        get() = ShopPage.entries.filter { it.section == null || ShopCatalog.inSection(it.section).isNotEmpty() }
+        get() = ShopPage.entries.filter { ShopCatalog.inSection(it.section).isNotEmpty() }
 
     /** What just happened in the shop (a purchase, a pending payment...), until dismissed. */
     var shopMessage by mutableStateOf<UiText?>(null)
@@ -1124,6 +1124,10 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         com.deepline.fishing.core.Showcase.toggleDecor(progress, decor)?.let(::update)
     }
 
+    fun openRope() {
+        screen = Screen.ROPE
+    }
+
     fun openAquarium() {
         screen = Screen.AQUARIUM
     }
@@ -1359,6 +1363,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             Screen.AQUARIUM -> openDex(DexSection.FISH)
             Screen.THEMES -> screen = Screen.HOME
             Screen.SETTINGS -> screen = Screen.HOME
+            Screen.ROPE -> screen = Screen.HOME
             // -- Daily loop screens' back below.
             Screen.DAILY -> screen = Screen.HOME
 

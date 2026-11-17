@@ -44,7 +44,18 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.deepline.fishing.GameViewModel
 import com.deepline.fishing.R
-import com.deepline.fishing.ShopPage
+import com.deepline.fishing.core.Grant
+import com.deepline.fishing.core.ShopCatalog
+import com.deepline.fishing.core.ShopItem
+import com.deepline.fishing.core.ShopSection
+import com.deepline.fishing.ui.i18n.asString
+import com.deepline.fishing.ui.i18n.badgeText
+import com.deepline.fishing.ui.tour.TourTarget
+import com.deepline.fishing.ui.tour.tourTarget
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import com.deepline.fishing.core.Decor
 import com.deepline.fishing.core.FishCatalog
 import com.deepline.fishing.core.FishSpecies
@@ -59,13 +70,17 @@ import kotlin.math.sin
 
 /**
  * The aquarium: caught fish swimming among the decor the player owns. Pick which species swim
- * here (the tank holds [Showcase.tankSize]); decor and a bigger tank are in the Shop. Looks only.
+ * here (the tank holds [Showcase.tankSize]); decor and a bigger tank are sold here, with the same
+ * two prices as in the Shop. Looks only.
  */
 @Composable
 fun AquariumScreen(vm: GameViewModel) {
     val p = vm.progress
     val caught = FishCatalog.all.filter { p.isDiscovered(it) }
     val inTank = Showcase.tankFish(p).map { it.id }.toSet()
+    var confirm by remember { mutableStateOf<ShopItem?>(null) }
+    val actions = ShopActions(vm, LocalContext.current.findActivity(), onPoints = { confirm = it })
+    val forSale = ShopCatalog.inSection(ShopSection.AQUARIUM)
     SubScreen(title = stringResource(R.string.shop_aquarium_title), onBack = vm::onBack) {
         LazyVerticalGrid(
             // Two columns on a phone: species and decor names are read in full (two lines at most).
@@ -75,7 +90,7 @@ fun AquariumScreen(vm: GameViewModel) {
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.testTag("aquarium_list"),
         ) {
-            item(span = { GridItemSpan(maxLineSpan) }) { AquariumTank(p, height = 260.dp) }
+            item(span = { GridItemSpan(maxLineSpan) }) { AquariumTank(p, height = 260.dp, modifier = Modifier.tourTarget(TourTarget.AQUARIUM_TANK)) }
             item(span = { GridItemSpan(maxLineSpan) }) {
                 Text(
                     stringResource(
@@ -103,9 +118,6 @@ fun AquariumScreen(vm: GameViewModel) {
                 )
             }
             item(span = { GridItemSpan(maxLineSpan) }) {
-                TextButton(onClick = { vm.openShop(ShopPage.AQUARIUM) }) { Text(stringResource(R.string.shop_aquarium_more)) }
-            }
-            item(span = { GridItemSpan(maxLineSpan) }) {
                 Text(stringResource(R.string.shop_aquarium_catches), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             }
             items(caught, key = { it.id }) { s ->
@@ -116,11 +128,29 @@ fun AquariumScreen(vm: GameViewModel) {
                     modifier = Modifier.testTag("tank_${s.id}"),
                 )
             }
+            // What's for sale: the bigger tank, then each piece of decor in a tank of its own.
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                com.deepline.fishing.ui.kit.SectionTitle(
+                    stringResource(R.string.shop_aquarium_for_sale),
+                    stringResource(R.string.shop_aquarium_page_note),
+                    Modifier.fillMaxWidth().padding(top = 8.dp),
+                )
+            }
+            for (item in forSale.filter { (it.grants.single() as? Grant.Unlock)?.key == "aquarium:big" }) {
+                item(key = item.id, span = { GridItemSpan(maxLineSpan) }) { ItemCard(vm, item, actions) }
+            }
+            items(forSale.filter { (it.grants.single() as? Grant.Unlock)?.key?.startsWith("decor:") == true }, key = { it.id }) { item ->
+                val decor = Decor.entries.first { it.unlockKey == (item.grants.single() as Grant.Unlock).key }
+                Tile(item.label(), item.badgeText()?.asString(), preview = { AquariumTank(p, height = 120.dp, extraDecor = decor) }) {
+                    if (ShopCatalog.owns(p, item.id)) OwnedRow() else PriceButtons(item, actions)
+                }
+            }
         }
     }
+    confirm?.let { item -> PointsConfirmDialog(vm, item, onDone = { confirm = null }) }
 }
 
-/** The tank itself, animated: shown on the aquarium screen and in the Shop's Aquarium page. */
+/** The tank itself, animated (2D): the aquarium screen's tank and the decor previews. */
 @Composable
 fun AquariumTank(p: PlayerProgress, height: Dp, modifier: Modifier = Modifier, extraDecor: Decor? = null, big: Boolean = Showcase.hasBigTank(p)) {
     val t by rememberInfiniteTransition(label = "tank").animateFloat(

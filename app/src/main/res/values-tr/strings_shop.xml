@@ -154,8 +154,7 @@
     <string name="shop_set_contents">%1$s.</string>
 
     <!-- Aquarium page of the Shop. "Dex > Akvaryum" uses shell_tab_dex and dex_aquarium_button. -->
-    <string name="shop_aquarium_page_note">Yakaladığın balıklar akvaryumunda yüzer (Dex > Akvaryum). Dekorlar ve daha büyük bir tank yalnızca görünümünü değiştirir.</string>
-    <string name="shop_aquarium_open">Akvaryumunu aç</string>
+    <string name="shop_aquarium_page_note">Dekorlar ve daha büyük bir tank yalnızca akvaryumunun görünümünü değiştirir.</string>
 
     <!-- Passes page. -->
     <string name="shop_passes_title">Biletler ve paketler</string>
@@ -245,7 +244,7 @@
     <string name="shop_aquarium_count_empty">Tankta: %1$d / %2$d. Doldurmak için balık yakala.</string>
     <string name="shop_aquarium_count">Tankta: %1$d / %2$d. Eklemek ya da çıkarmak için bir türe dokun.</string>
     <string name="shop_aquarium_decor">Dekor</string>
-    <string name="shop_aquarium_more">Mağaza\'da daha fazla dekor ve daha büyük bir tank</string>
+    <string name="shop_aquarium_for_sale">Satılık dekorlar</string>
     <string name="shop_aquarium_catches">Avların</string>
     <plurals name="shop_aquarium_cd_tank">
         <item quantity="one">%d balıklı akvaryum</item>
