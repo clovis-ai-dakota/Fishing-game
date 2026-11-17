@@ -495,8 +495,9 @@ Surface paintedSurface() {
         s.rim = 0.0;
         return s;
     }
-    float grain = noise2(vWorld.xz * 0.9 + vWorld.y * 0.5);
-    Surface s = surface(c * (0.93 + 0.12 * grain));
+    // (No per-pixel grain: the village covers the whole screen, and the GPU is the limit. The
+    // ground's colours already vary per vertex.)
+    Surface s = surface(c);
     s.spec = 0.08;
     s.rim = 0.25;
     s.shadowCool = 0.8;
@@ -514,7 +515,7 @@ Surface seaSurface() {
     vec2 q = vWorld.xz;
     float w1 = sin(q.x * 0.35 + q.y * 0.22 + uTime * 0.9);
     float w2 = sin(q.x * -0.21 + q.y * 0.41 - uTime * 1.2);
-    float w3 = noise2(q * 0.3 + vec2(uTime * 0.15, -uTime * 0.1));
+    float w3 = 0.5 + 0.25 * sin(q.x * 0.13 + uTime * 0.4) + 0.25 * sin(q.y * 0.17 - uTime * 0.3);
     gSeaNormal = normalize(vec3(0.10 * (w1 + 0.6 * w2) + 0.08 * (w3 - 0.5), 1.0, 0.10 * (w2 - 0.4 * w1)));
     float depth = vColor.r;
     vec3 water = mix(uAccent, uBase, smoothstep(0.0, 1.0, depth));
@@ -523,11 +524,11 @@ Surface seaSurface() {
     float sparkle = 1.0 - 0.75 * uGlow;
     float bands = smoothstep(0.82, 0.98, sin(q.y * 0.55 + w1 * 1.4 + uTime * 0.6));
     water += vec3(0.9, 0.97, 1.0) * bands * 0.08 * (1.0 - 0.5 * depth) * sparkle;
-    float c = noise2(q * 1.4 + uTime * 0.35) * noise2(q * 1.9 - uTime * 0.27);
-    water += vec3(0.9, 1.0, 1.0) * smoothstep(0.32, 0.5, c) * 0.18 * (1.0 - depth) * sparkle;
+    float c = noise2(q * 1.4 + uTime * 0.35) * (0.6 + 0.4 * sin(q.x * 1.9 - uTime * 0.8 + q.y));
+    water += vec3(0.9, 1.0, 1.0) * smoothstep(0.42, 0.56, c) * 0.12 * (1.0 - depth) * sparkle;
     // Foam where the waves meet the sand, coming and going.
     float lap = 0.5 + 0.5 * sin(uTime * 1.3 + q.x * 0.25 + w3 * 3.0);
-    float foam = smoothstep(0.35, 0.75, vColor.g * (0.75 + 0.35 * lap) + 0.25 * noise2(q * 2.5 + uTime * 0.4));
+    float foam = smoothstep(0.35, 0.75, vColor.g * (0.75 + 0.35 * lap) + 0.25 * fract(sin(dot(floor(q * 2.5), vec2(12.9, 78.2))) * 43758.5));
     water = mix(water, vec3(0.97, 0.99, 1.0), foam * 0.85);
     // The sky in the water at a grazing angle.
     vec3 v = normalize(uCamPos - vWorld);

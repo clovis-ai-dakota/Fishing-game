@@ -47,7 +47,7 @@ object VillageModels {
     fun height(x: Float, z: Float): Float {
         val d = shoreZ(x) - z // inland distance
         val base = when {
-            d < -3.5f -> -0.6f - 0.06f * (-d - 3.5f)
+            d < -3.5f -> -0.6f - 0.25f * (-d - 3.5f)
             d < 0f -> 0.5f + (d / 3.5f) * 1.1f
             else -> 0.5f + 0.025f * d
         }

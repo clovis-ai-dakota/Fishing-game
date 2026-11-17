@@ -61,7 +61,8 @@ class VillageScene {
         )
         val items = ArrayList<DrawItem>()
         val painted = mapOf("uModel" to Mat4.identity(), "uNormalMatrix" to Mat4.normalMatrix(Mat4.identity()), "uMaterial" to floatArrayOf(5f), "uGlow" to floatArrayOf(glow))
-        items += DrawItem(Program.TOON, "village:terrain", uniforms = painted)
+        // The big occluders first (the town, the boat, then the sea), the ground last: the depth
+        // test then skips what's hidden (the ground under the buildings, the sea bed) before it's shaded.
         items += DrawItem(Program.TOON, "village:town", uniforms = painted, cullBack = false)
         // Your boat moored along the pier, bow out to sea, in your skins.
         items += boats.boatItems(looks.skins.boat, VillageLayout.boatAt, t, looks.skins.customBoat, rotY = PI.toFloat() / 2f)
@@ -77,8 +78,9 @@ class VillageScene {
             items += SceneBuilder.fishItem(s, at, yaw, 0f, t * 5f + i, 1f, false, i.toFloat(), len = 0.9f)
         }
         // The sea, then the glass (see-through, after what's behind it).
-        val deep = rgb(lerp(p.sea.last(), Color(0xFF0B4A66), if (night) 0.3f else 0.15f))
-        val shallow = rgb(lerp(p.sea.first(), Color(0xFF7FE6E0), if (night) 0.1f else 0.35f))
+        // A real turquoise over the sand and blue further out, nudged towards the theme's sea.
+        val deep = rgb(lerp(Color(0xFF1677A8), p.sea.last(), if (night) 0.6f else 0.25f))
+        val shallow = rgb(lerp(Color(0xFF34C3CF), p.sea.first(), if (night) 0.5f else 0.15f))
         items += DrawItem(
             Program.TOON, "village:sea",
             uniforms = mapOf(
@@ -86,6 +88,7 @@ class VillageScene {
                 "uBase" to deep, "uAccent" to shallow, "uExtra" to sky, "uGlow" to floatArrayOf(glow),
             ),
         )
+        items += DrawItem(Program.TOON, "village:terrain", uniforms = painted)
         items += DrawItem(
             Program.TOON, "village:glass",
             uniforms = painted + mapOf("uOpacity" to floatArrayOf(if (night) 0.55f else 0.34f)),

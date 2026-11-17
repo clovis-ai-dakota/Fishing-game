@@ -131,7 +131,7 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     rim light, hemispheric ambient and analytic AO in the material functions (no textures).
   - The village (`ui/village/`: `VillageModels`, `VillageScene`) and the aquarium
     (`render3d/AquariumScene`) are scenes of their own, hosted by `LivePreview` (render width and
-    pace as parameters: the village runs at 60 fps while moved, 30 at rest). Their architecture
+    pace as parameters: the village runs at 60 fps while moved, 20 at rest). Their architecture
     uses the painted material (`uMaterial` 5: colour per vertex via `MeshBuilder.recolor`, parts
     `GLASS` and `BULB` that light up with `uGlow` at night, fluttering `CLOTH`) and the village's
     sea its own (`uMaterial` 6). Still parts are merged into a few big meshes (a triangle budget

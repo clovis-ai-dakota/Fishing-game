@@ -121,7 +121,9 @@ fun VillageScreen(vm: GameViewModel) {
             camera,
             { moved },
             onPainted = { painted = it },
-            pace = { if (System.nanoTime() - lastMove[0] < 900_000_000L) 1 else 2 },
+            // 60 fps under the finger; at rest only the sea, the gulls and the fish move, slowly
+            // enough for 20 fps, which keeps the full-screen scene's GPU load near the Fish menu's.
+            pace = { if (System.nanoTime() - lastMove[0] < 900_000_000L) 1 else 3 },
             modifier = Modifier
                 .fillMaxSize()
                 .tourTarget(TourTarget.VILLAGE_MAP)
@@ -189,7 +191,8 @@ private fun VillageMap(
                 modifier = Modifier.fillMaxSize(),
                 key = "village",
                 onPainted = onPainted,
-                maxRenderWidth = 720,
+                // Sharp enough with 4x MSAA, and a third fewer pixels to shade than 720.
+                maxRenderWidth = 600,
                 pace = pace,
             )
         }

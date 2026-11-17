@@ -22,7 +22,8 @@ class AquariumScene {
     fun build(widthPx: Int, heightPx: Int, t: Float, fish: List<FishSpecies>, decor: List<Decor>, big: Boolean): Frame {
         val tw = width(big)
         val aspect = widthPx / heightPx.toFloat()
-        val fov = 32f * PI.toFloat() / 180f
+        // A long lens: the front of the tank hardly bigger than its back, like looking through glass.
+        val fov = 18f * PI.toFloat() / 180f
         val halfTan = tan(fov / 2f)
         // Framed so the back wall fills the view (the water reaches every edge, the frame's front
         // bars just inside or past them): the closest distance at which the back wall covers it.
