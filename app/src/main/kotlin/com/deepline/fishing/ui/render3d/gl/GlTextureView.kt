@@ -32,6 +32,10 @@ class GlTextureView(
     private val everyNthVsync: Int = 2,
 ) : TextureView(context), TextureView.SurfaceTextureListener {
     private var renderer: RenderThread? = null
+    private var painted = false
+
+    /** Called on the main thread: true when the first frame is on screen, false when the surface is lost. */
+    var onPainted: ((Boolean) -> Unit)? = null
 
     init {
         isOpaque = !transparent
@@ -57,10 +61,19 @@ class GlTextureView(
     override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
         renderer?.end()
         renderer = null
+        if (painted) {
+            painted = false
+            onPainted?.invoke(false)
+        }
         return true
     }
 
-    override fun onSurfaceTextureUpdated(surface: SurfaceTexture) = Unit
+    override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
+        if (!painted) {
+            painted = true
+            onPainted?.invoke(true)
+        }
+    }
 
     private fun renderSize(w: Int, h: Int): Pair<Int, Int> {
         val k = minOf(1f, maxRenderWidth / w.coerceAtLeast(1).toFloat())

@@ -112,9 +112,14 @@ The menus were run on a mid-range phone (Fairphone 4, Adreno 619, 1080 x 2340, 6
 with `adb shell dumpsys gfxinfo <package> framestats` (per-stage times of the last 120 frames) and
 `simpleperf` on the render thread. What it taught, and the rules that follow:
 
-- **The phone's GPU is the limit, not Kotlin.** A still menu already keeps the GPU about 70% busy
-  (the scene is redrawn on every frame), so there is little room left for a transition. Keep what
-  a frame draws cheap before adding anything to the scene.
+- **The phone's GPU is the limit, not Kotlin.** The scene moves, so the whole window is redrawn on
+  every frame: a menu at rest costs about 12 ms of GPU a frame (70 to 80% busy at 60 fps), of which
+  the light rays are about 2 ms, the places' light 1.3 ms and the seabed decor 0.6 ms; the rest is
+  the sky, the sea and the glass cards. Keep what a frame draws cheap before adding anything.
+- **Don't draw the scene where nothing of it shows.** The Fish tab's boat scene, dock and tab bar
+  cover the whole window, so the backdrop isn't drawn under it (`BackdropCover`): only once the
+  tab is at rest (`LocalScreenSettled`) and its scene has painted a picture. That took the Fish
+  tab from 75% to about 34% GPU at rest. A new screen that covers the window can do the same.
 - **Never draw a big path that changes on every frame.** A path that isn't convex is rasterised on
   the CPU at its full size and uploaded again each time it changes: the sea, as one path with a
   wavy top, cost about 10 ms a frame in every menu. Anything "below a wavy line" goes through
@@ -128,9 +133,16 @@ with `adb shell dumpsys gfxinfo <package> framestats` (per-stage times of the la
 - Tests and Robolectric have no navigation bar, no GPU and one screen size: after changing the
   scene, a transition or a screen's frame, look at it on a phone.
 
-Not settled: screen changes still drop frames in debug builds (composing the next screen takes
-150 to 270 ms on the main thread there). Measure a release build (R8) before changing the
-transitions: debug builds overstate that cost several times over.
+Transitions, measured in a release build (R8, compiled ahead of time like a Play install; debug
+builds overstate composition three to four times): the tap's frame composes and lays out the next
+screen (50 to 80 ms here for the Dex, the Shop, Milestones and Daily, under 20 ms for the social
+screens), then the move starts. Logging the transitions' clock on every frame showed that a
+tab's slide then runs on every frame without a jump; a screen pushed from the Fish tab can still
+lose two or three frames while both screens fade (two full-screen alpha layers on top of the
+scene). Drawing the scene at 30 fps would halve the GPU load of menus at rest (74% to 38%) but
+didn't help the transitions, and leaving out the rays or cutting the tabs' fade didn't either:
+what is left is the cost of composing the next screen. To go further, make the heavy screens
+cheaper to compose, not the moves shorter.
 
 ## 7. Patterns taken from the most played games
 

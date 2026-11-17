@@ -114,6 +114,8 @@ fun SkinPreview(
     /** When set, the preview is a button (the Fish tab's boat opens the Skins section). */
     onClick: (() -> Unit)? = null,
     clickLabel: String? = null,
+    /** Told true once the scene fills its place with a picture, false if it loses it (see `BackdropCover`). */
+    onPainted: ((Boolean) -> Unit)? = null,
 ) {
     val measurer = rememberTextMeasurer()
     val session = remember {
@@ -138,7 +140,7 @@ fun SkinPreview(
                 .semantics { contentDescription = description }
         }
     // 3D where the phone supports it, otherwise (and in tests) the 2D scene.
-    com.deepline.fishing.ui.render3d.gl.SkinPreview3d(skins, box, cameraTop) {
+    com.deepline.fishing.ui.render3d.gl.SkinPreview3d(skins, box, cameraTop, onPainted) {
         Canvas(Modifier.matchParentSize()) {
             // Framed on the boat, the line and the hook, with room for the masts.
             drawCastScene(session, 0.8f + time, measurer, skins = skins, cameraTop = cameraTop)

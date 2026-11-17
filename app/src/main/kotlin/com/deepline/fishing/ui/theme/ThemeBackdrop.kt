@@ -7,6 +7,8 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -44,6 +46,8 @@ fun ThemeBackdrop(
     travelMs: Int = CAMERA_MS,
     /** How the phone is tilted, -1..1 on each axis (see `rememberDeviceTilt`): near layers shift more. */
     tilt: androidx.compose.runtime.State<Offset>? = null,
+    /** Nothing of the scene shows right now (see [BackdropCover]): it isn't drawn, nor redrawn. */
+    hidden: () -> Boolean = { false },
 ) {
     val camX = androidx.compose.animation.core.animateFloatAsState(place.x, tween(travelMs, easing = androidx.compose.animation.core.FastOutSlowInEasing), label = "camera x")
     val camY = androidx.compose.animation.core.animateFloatAsState(place.y, tween(travelMs, easing = androidx.compose.animation.core.FastOutSlowInEasing), label = "camera y")
@@ -54,8 +58,39 @@ fun ThemeBackdrop(
         animationSpec = infiniteRepeatable(tween(600_000, easing = LinearEasing)),
         label = "backdrop time",
     )
-    Canvas(modifier) { drawBackdrop(palette, if (animate) t.value else 12f, camX.value, camY.value, tilt?.value ?: Offset.Zero) }
+    Canvas(modifier) {
+        // Read first, and alone: a hidden scene then reads no clock, so it asks for no new frame.
+        if (hidden()) return@Canvas
+        drawBackdrop(palette, if (animate) t.value else 12f, camX.value, camY.value, tilt?.value ?: Offset.Zero)
+    }
 }
+
+/**
+ * Says when a screen hides the whole backdrop behind something opaque: the Fish tab, whose boat
+ * scene, dock and tab bar fill the window. The backdrop moves on every frame, so drawing it there
+ * for nothing made the Fish tab the heaviest menu (on a Fairphone 4 it dropped two or three
+ * frames a second standing still). Only a screen that has finished arriving, isn't leaving and
+ * has painted its own scene may set [covered] (see [LocalScreenSettled]).
+ */
+@androidx.compose.runtime.Stable
+class BackdropCover {
+    var covered by androidx.compose.runtime.mutableStateOf(false)
+}
+
+/** The app's [BackdropCover], or null where there is no backdrop (previews, tests of one screen). */
+val LocalBackdropCover = androidx.compose.runtime.staticCompositionLocalOf<BackdropCover?> { null }
+
+/**
+ * Whether the screen being composed is at rest: fully arrived and not leaving. False during a
+ * tab change or while a screen is pushed over it or popped, when the backdrop shows around it.
+ */
+val LocalScreenSettled = androidx.compose.runtime.compositionLocalOf { true }
+
+/** Whether this content of an `AnimatedContent` is at rest (neither entering nor leaving). */
+@OptIn(androidx.compose.animation.ExperimentalAnimationApi::class)
+val androidx.compose.animation.AnimatedVisibilityScope.atRest: Boolean
+    @Composable get() = transition.currentState == androidx.compose.animation.EnterExitState.Visible &&
+        transition.targetState == androidx.compose.animation.EnterExitState.Visible
 
 /** How long the camera takes to travel between two places (a tab change), in milliseconds. */
 const val CAMERA_MS = 280

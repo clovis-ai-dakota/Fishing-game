@@ -44,6 +44,7 @@ import com.deepline.fishing.ui.secrets.SecretDiscoveredDialog
 import com.deepline.fishing.ui.tour.LocalTourTargets
 import com.deepline.fishing.ui.tour.TourOverlay
 import com.deepline.fishing.ui.tour.TourTargets
+import com.deepline.fishing.ui.theme.atRest
 
 @Composable
 fun AppRoot(vm: GameViewModel) {
@@ -58,6 +59,7 @@ fun AppRoot(vm: GameViewModel) {
         }
     }
     val rewardFx = remember { com.deepline.fishing.ui.kit.RewardFx() }
+    val backdropCover = remember { com.deepline.fishing.ui.theme.BackdropCover() }
     val calmMotion = vm.feel.settings.reduceMotion
     // Points in motion: when the balance goes down coins leave it for what was bought, and when a
     // cast's points arrive they fly to it (once the menu is back on screen).
@@ -79,6 +81,7 @@ fun AppRoot(vm: GameViewModel) {
         com.deepline.fishing.ui.kit.LocalPressFeedback provides pressFeedback,
         com.deepline.fishing.ui.kit.LocalCalmMotion provides calmMotion,
         com.deepline.fishing.ui.kit.LocalRewardFx provides rewardFx.takeIf { !calmMotion },
+        com.deepline.fishing.ui.theme.LocalBackdropCover provides backdropCover,
     ) {
         BackHandler(enabled = vm.screen != Screen.HOME) { vm.onBack() }
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
@@ -94,6 +97,8 @@ fun AppRoot(vm: GameViewModel) {
                         travelMs = if (calm || ScreenMotion.instant) 0 else com.deepline.fishing.ui.theme.CAMERA_MS,
                         // The scene's layers shift as the phone tilts: depth without a 3D view.
                         tilt = com.deepline.fishing.ui.kit.rememberDeviceTilt(enabled = !calm),
+                        // Not drawn while the Fish tab's own scene covers all of it.
+                        hidden = { backdropCover.covered },
                     )
                 }
                 // The four tabs are one layer (they move inside MainScaffold, under a tab bar that
@@ -105,6 +110,7 @@ fun AppRoot(vm: GameViewModel) {
                     label = "screen",
                     modifier = Modifier.fillMaxSize(),
                 ) { screen ->
+                    CompositionLocalProvider(com.deepline.fishing.ui.theme.LocalScreenSettled provides atRest) {
                     when (screen) {
                         // The four tabs share the bottom navigation bar.
                         null, Screen.HOME, Screen.DEX, Screen.SHOP, Screen.BATTLE_SETUP -> MainScaffold(vm)
@@ -125,6 +131,7 @@ fun AppRoot(vm: GameViewModel) {
                         Screen.TOURNAMENT -> com.deepline.fishing.ui.social.TournamentScreen(vm)
                         // Clubs ship in a later update: without the flag there is no club screen at all.
                         Screen.CLUBS -> if (com.deepline.fishing.FeatureFlags.clubs) com.deepline.fishing.ui.social.ClubsScreen(vm) else com.deepline.fishing.ui.social.SocialHubScreen(vm)
+                    }
                     }
                 }
                 // Coins burst out of claimed rewards, above the screens.

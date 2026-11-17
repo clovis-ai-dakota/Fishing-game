@@ -102,10 +102,19 @@ private fun FishTurntable(species: FishSpecies, look: PortraitLook, sparkling: B
  * screens), or [fallback] where 3D isn't available.
  */
 @Composable
-fun SkinPreview3d(skins: Skins, modifier: Modifier = Modifier, cameraTop: Float = -6.5f, fallback: @Composable androidx.compose.foundation.layout.BoxScope.() -> Unit) {
+fun SkinPreview3d(
+    skins: Skins,
+    modifier: Modifier = Modifier,
+    cameraTop: Float = -6.5f,
+    /** Told true when the first frame is on screen, false when the surface is lost. */
+    onPainted: ((Boolean) -> Unit)? = null,
+    fallback: @Composable androidx.compose.foundation.layout.BoxScope.() -> Unit,
+) {
     val context = LocalContext.current
     val supported = remember { Render3d.isSupported(context) } && !OffscreenGl.failed
     if (!supported) {
+        // The 2D scene paints its whole place from its first frame.
+        androidx.compose.runtime.SideEffect { onPainted?.invoke(true) }
         Box(modifier) { fallback() }
         return
     }
@@ -120,18 +129,19 @@ fun SkinPreview3d(skins: Skins, modifier: Modifier = Modifier, cameraTop: Float 
         FrameSource { w, h, t -> builder.build(session, 0.8f + t, w, h, current[0], cameraTop = cameraTop) }
     }
     Box(modifier) {
-        LivePreview(source, transparent = false, modifier = Modifier.matchParentSize(), key = "skins")
+        LivePreview(source, transparent = false, modifier = Modifier.matchParentSize(), key = "skins", onPainted = onPainted)
     }
 }
 
 /** Hosts a [GlTextureView], paused with the screen's lifecycle. */
 @Composable
-private fun LivePreview(source: FrameSource, transparent: Boolean, modifier: Modifier, key: Any) {
+private fun LivePreview(source: FrameSource, transparent: Boolean, modifier: Modifier, key: Any, onPainted: ((Boolean) -> Unit)? = null) {
+    val painted = androidx.compose.runtime.rememberUpdatedState(onPainted)
     val lifecycle = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
     val viewRef = remember(key) { arrayOfNulls<GlTextureView>(1) }
     androidx.compose.runtime.key(key) {
         androidx.compose.ui.viewinterop.AndroidView(
-            factory = { ctx -> GlTextureView(ctx, source, transparent).also { viewRef[0] = it } },
+            factory = { ctx -> GlTextureView(ctx, source, transparent).also { viewRef[0] = it; it.onPainted = { on -> painted.value?.invoke(on) } } },
             modifier = modifier,
         )
     }

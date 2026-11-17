@@ -49,6 +49,7 @@ import com.deepline.fishing.Screen
 import com.deepline.fishing.ui.dex.DexScreen
 import com.deepline.fishing.ui.tour.TourTarget
 import com.deepline.fishing.ui.tour.tourTarget
+import com.deepline.fishing.ui.theme.atRest
 
 private val MainTab.icon: ImageVector
     get() = when (this) {
@@ -85,11 +86,15 @@ fun MainScaffold(vm: GameViewModel) {
             label = "tab",
             modifier = Modifier.weight(1f).fillMaxWidth(),
         ) { tab ->
-            when (tab) {
-                MainTab.FISH -> HomeScreen(vm)
-                MainTab.DEX -> DexScreen(vm)
-                MainTab.SHOP -> com.deepline.fishing.ui.shop.ShopScreen(vm)
-                MainTab.BATTLE -> BattleSetupScreen(vm)
+            // At rest: the tab has arrived and isn't leaving, and neither is the tab layer itself.
+            val settled = com.deepline.fishing.ui.theme.LocalScreenSettled.current && atRest
+            androidx.compose.runtime.CompositionLocalProvider(com.deepline.fishing.ui.theme.LocalScreenSettled provides settled) {
+                when (tab) {
+                    MainTab.FISH -> HomeScreen(vm)
+                    MainTab.DEX -> DexScreen(vm)
+                    MainTab.SHOP -> com.deepline.fishing.ui.shop.ShopScreen(vm)
+                    MainTab.BATTLE -> BattleSetupScreen(vm)
+                }
             }
         }
         TabBar(vm, current)

@@ -15,6 +15,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -61,6 +66,15 @@ import com.deepline.fishing.ui.tour.tourTarget
  */
 @Composable
 fun HomeScreen(vm: GameViewModel) {
+    // The boat's scene, the dock and the tab bar fill the window: once this tab is at rest and its
+    // scene is painted, the menus' backdrop behind it is hidden, and isn't drawn for nothing.
+    val cover = com.deepline.fishing.ui.theme.LocalBackdropCover.current
+    val settled = com.deepline.fishing.ui.theme.LocalScreenSettled.current
+    var painted by remember { mutableStateOf(false) }
+    DisposableEffect(cover, settled && painted) {
+        cover?.covered = settled && painted
+        onDispose { cover?.covered = false }
+    }
     Column(Modifier.fillMaxSize()) {
         Box(Modifier.weight(1f).fillMaxWidth()) {
             // Your boat at the surface, wearing your skins (live 3D where available).
@@ -71,6 +85,7 @@ fun HomeScreen(vm: GameViewModel) {
                 cameraTop = -11.5f,
                 onClick = { vm.openDex(DexSection.SKINS) },
                 clickLabel = stringResource(R.string.home_boat_action),
+                onPainted = { painted = it },
             )
             TopBar(vm, Modifier.align(Alignment.TopCenter))
             EventRail(vm, Modifier.align(Alignment.CenterStart).padding(start = 12.dp))
