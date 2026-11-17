@@ -66,7 +66,8 @@ class GlBackend(
     }
 
     override fun onDrawFrame(unused: GL10?) {
-        GLES30.glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3])
+        val c = latest.get()?.clearColor
+        if (c != null) GLES30.glClearColor(c[0], c[1], c[2], 1f) else GLES30.glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3])
         GLES30.glClearDepthf(1f)
         GLES30.glDepthMask(true)
         GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT or GLES30.GL_DEPTH_BUFFER_BIT)

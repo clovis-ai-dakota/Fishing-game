@@ -51,8 +51,9 @@ object VillageModels {
             d < 0f -> 0.5f + (d / 3.5f) * 1.1f
             else -> 0.5f + 0.025f * d
         }
-        val hill = 12f * smooth(36f, 70f, d) * (0.8f + 0.2f * sin(x / 13f))
-        val headland = 10f * smooth(24f, 40f, abs(x)) * smooth(-14f, 4f, d)
+        val hill = 12f * smooth(36f, 90f, d) * (0.8f + 0.2f * sin(x / 13f)) + 10f * smooth(90f, 180f, d)
+        // Gentle headlands either side of the cove (no walls: a long, soft rise).
+        val headland = 5f * smooth(26f, 70f, abs(x)) * smooth(-20f, 10f, d)
         val bumps = 0.5f * (noise(x * 0.11f, z * 0.11f) - 0.5f) * smooth(2f, 8f, d)
         return max(base + hill + headland + bumps, -6f)
     }
@@ -110,7 +111,8 @@ object VillageModels {
     private fun terrain(): MeshData {
         val b = MeshBuilder()
         val xs = (-60..60).map { it * 2f }
-        val zs = (-60..17).map { it * 2f }
+        // Fine where the village is, coarser up the hill to the horizon.
+        val zs = (-14..-1).map { -120f + it * 10f } + (-60..17).map { it * 2f }
         val stride = xs.size
         val sand = rgb(0xFFE8D3A0)
         val wetSand = rgb(0xFFC9B07A)
@@ -260,6 +262,9 @@ object VillageModels {
             Triple(-24f, -9f, 1), Triple(24f, -7f, 2), Triple(-5f, -44f, 2), Triple(8f, -45f, 1),
             Triple(-15f, -38f, 1), Triple(17f, -39f, 2), Triple(23f, 2f, 1), Triple(-25f, 3f, 1),
             Triple(-30f, -18f, 2), Triple(31f, -17f, 1), Triple(0f, -56f, 1), Triple(-12f, -52f, 1),
+            Triple(12f, -55f, 2), Triple(-24f, -45f, 1), Triple(27f, -48f, 1), Triple(-6f, -68f, 2),
+            Triple(9f, -70f, 1), Triple(-18f, -64f, 1), Triple(21f, -63f, 2), Triple(-33f, -32f, 1),
+            Triple(34f, -30f, 2), Triple(2f, -82f, 1), Triple(-28f, -76f, 1), Triple(26f, -80f, 1),
         )
         spots.mapIndexed { i, (x, z, storeys) ->
             val w = 4.6f + 1.8f * hash01(i, 1, 5)
@@ -272,9 +277,9 @@ object VillageModels {
     private val trees: List<Vec3> by lazy {
         val out = ArrayList<Vec3>()
         var k = 0
-        while (out.size < 70 && k < 2000) {
-            val x = -58f + 116f * hash01(k, 11, 7)
-            val z = -110f + 112f * hash01(k, 12, 7)
+        while (out.size < 170 && k < 5000) {
+            val x = -100f + 200f * hash01(k, 11, 7)
+            val z = -150f + 152f * hash01(k, 12, 7)
             k++
             val d = shoreZ(x) - z
             if (d < 6f) continue
@@ -645,6 +650,25 @@ object VillageModels {
             val col = rgb(listOf(0xFF3B7EA1, 0xFFE07A3F, 0xFF2E8C88)[k])
             paint(col) { append(MeshBuilder().apply { extrude(hull, 1.2f, Part.PAINTED) }.build(), Mat4.trs(Vec3(at.x, y, at.z), rotY = 0.6f + k * 0.9f)) }
             paint(rgb(0xFFF5EBD8)) { append(MeshBuilder().apply { box(Vec3(0f, 0.42f, 0f), Vec3(2.9f, 0.08f, 1.0f), Part.PAINTED) }.build(), Mat4.trs(Vec3(at.x, y, at.z), rotY = 0.6f + k * 0.9f)) }
+        }
+        // Sailing boats moored in the bay, on their buoys.
+        for ((k, at) in listOf(Vec3(-20f, 0f, 22f), Vec3(22f, 0f, 16f), Vec3(-2f, 0f, 34f), Vec3(30f, 0f, 30f)).withIndex()) {
+            val hull = listOf(-1.8f to 0.7f, -1.4f to -0.3f, 1.6f to -0.3f, 2.2f to 0.7f)
+            val col = rgb(listOf(0xFFFFFBF2, 0xFF3B7EA1, 0xFFE07A3F, 0xFF2E8C88)[k])
+            val turn = 0.4f + k * 1.3f
+            paint(col) { append(MeshBuilder().apply { extrude(hull, 1.4f, Part.PAINTED) }.build(), Mat4.trs(at, rotY = turn)) }
+            paint(rgb(0xFF6D4C35)) { append(MeshBuilder().apply { box(Vec3(0f, 0.72f, 0f), Vec3(3.4f, 0.08f, 1.2f), Part.PAINTED) }.build(), Mat4.trs(at, rotY = turn)) }
+            pole(at + Vec3(0f, 0.7f, 0f), at + Vec3(0f, 5.5f, 0f), 0.08f, rgb(0xFF5D4037), 5)
+            paint(rgb(0xFFFFF8EC)) {
+                val n = Vec3(0f, 0f, 1f)
+                val base = vertexCount
+                val a = vertex(at + Vec3(0.05f, 5.3f, 0f), n, 0f, 1f, Part.CLOTH)
+                val b = vertex(at + Vec3(0.05f, 1.1f, 0f), n, 0f, 0f, Part.CLOTH)
+                val c = vertex(at + Vec3(2.2f * cos(turn), 1.1f, -2.2f * sin(turn)), n, 1f, 0f, Part.CLOTH)
+                triangle(a, b, c)
+                triangle(a, c, b)
+                if (base < 0) Unit
+            }
         }
         // Nets drying between poles.
         for (x in listOf(-22f, 18f)) {

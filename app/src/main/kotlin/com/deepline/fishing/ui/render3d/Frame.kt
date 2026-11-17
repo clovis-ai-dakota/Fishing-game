@@ -14,6 +14,8 @@ class Frame(
     /** Uniforms shared by every program (camera, light, fog, darkness...). */
     val globals: Map<String, FloatArray>,
     val items: List<DrawItem>,
+    /** What the frame is cleared to (r, g, b), when not the view's own colour (the village's haze). */
+    val clearColor: FloatArray? = null,
 )
 
 enum class Blend { OPAQUE, ALPHA, ADD }

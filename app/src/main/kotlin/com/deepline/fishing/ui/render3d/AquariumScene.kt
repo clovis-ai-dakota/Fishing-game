@@ -24,12 +24,14 @@ class AquariumScene {
         val aspect = widthPx / heightPx.toFloat()
         val fov = 32f * PI.toFloat() / 180f
         val halfTan = tan(fov / 2f)
-        // Fit the tank's front: its width and its height, with a little room around.
-        val distance = max(tw * 0.5f * 1.04f / (halfTan * aspect), HEIGHT * 0.5f * 1.06f / halfTan) + DEPTH / 2f
+        // Framed so the back wall fills the view (the water reaches every edge, the frame's front
+        // bars just inside or past them): the closest distance at which the back wall covers it.
+        val toBack = kotlin.math.min(tw * 0.5f / (halfTan * aspect), HEIGHT * 0.5f / halfTan) * 0.98f
+        val distance = toBack - DEPTH / 2f
         val center = Vec3(0f, HEIGHT / 2f, 0f)
-        val eye = Vec3(0f, HEIGHT * 0.55f, distance)
+        val eye = Vec3(0f, HEIGHT * 0.5f, distance)
         val view = Mat4.lookAt(eye, center, Vec3.UP)
-        val proj = Mat4.perspective(fov, aspect, max(0.5f, distance - DEPTH * 2f), distance + DEPTH * 3f)
+        val proj = Mat4.perspective(fov, aspect, 0.3f, distance + DEPTH * 3f)
         val globals = mapOf(
             "uView" to view,
             "uProj" to proj,
@@ -83,7 +85,7 @@ class AquariumScene {
             sprites.quad(Vec3(x, HEIGHT * 0.55f, -DEPTH / 2f + 0.05f), 0.9f, HEIGHT * 1.1f, floatArrayOf(1f, 1f, 0.9f, 0.06f), 7f)
         }
         items += sprites.toItem(Blend.ALPHA)
-        return Frame(widthPx, heightPx, globals, items)
+        return Frame(widthPx, heightPx, globals, items, clearColor = f(0.02f, 0.3f, 0.52f))
     }
 
     private fun decorItems(d: Decor, at: Vec3, t: Float, i: Int, tw: Float): List<DrawItem> = when (d) {

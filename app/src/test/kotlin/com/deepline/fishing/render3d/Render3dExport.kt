@@ -19,6 +19,7 @@ object Render3dExport {
         val meshes = LinkedHashMap<String, MeshData>()
         val sb = StringBuilder()
         sb.append("{\"width\":").append(frame.widthPx).append(",\"height\":").append(frame.heightPx)
+        frame.clearColor?.let { c -> sb.append(",\"clearColor\":[").append(c.joinToString(",")).append("]") }
         sb.append(",\"globals\":").append(uniforms(frame.globals))
         sb.append(",\"items\":[")
         frame.items.forEachIndexed { i, item ->

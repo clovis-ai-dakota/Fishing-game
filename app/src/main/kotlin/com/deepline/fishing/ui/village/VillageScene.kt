@@ -92,7 +92,7 @@ class VillageScene {
             blend = Blend.ALPHA, depthWrite = false,
         )
         items += gulls(t, night)
-        return Frame(widthPx, heightPx, globals, items)
+        return Frame(widthPx, heightPx, globals, items, clearColor = sky)
     }
 
     /** A few gulls circling over the bay: two wings each, flapping. */

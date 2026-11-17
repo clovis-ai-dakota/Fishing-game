@@ -15,10 +15,10 @@ import org.junit.Test
 class VillageCameraTest {
     /** Phone screens in pixels, short and tall, and the HUD's insets (left, top, right, bottom). */
     private val screens = listOf(
-        Triple(1080f, 1920f, floatArrayOf(346f, 394f, 42f, 95f)),
-        Triple(1080f, 2340f, floatArrayOf(346f, 394f, 42f, 95f)),
-        Triple(1200f, 2580f, floatArrayOf(396f, 450f, 48f, 108f)),
-        Triple(720f, 1280f, floatArrayOf(231f, 262f, 28f, 63f)),
+        Triple(1080f, 1920f, floatArrayOf(52f, 394f, 52f, 105f)),
+        Triple(1080f, 2340f, floatArrayOf(52f, 394f, 52f, 105f)),
+        Triple(1200f, 2580f, floatArrayOf(60f, 450f, 60f, 120f)),
+        Triple(720f, 1280f, floatArrayOf(35f, 262f, 35f, 70f)),
     )
 
     @Test

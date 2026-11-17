@@ -85,8 +85,9 @@ fun VillageScreen(vm: GameViewModel) {
     var moved by remember { mutableIntStateOf(0) }
     var size by remember { mutableStateOf(IntSize.Zero) }
     // The HUD around the map: the six buildings are framed inside it the first time.
-    // (Left: the rail of round buttons plus half a plate, so no plate sits under them.)
-    val insets = with(density) { floatArrayOf(132.dp.toPx(), 150.dp.toPx(), 16.dp.toPx(), 36.dp.toPx()) }
+    // The six fill the width; the plates keep clear of the left rail of buttons (see BuildingPlate).
+    val insets = with(density) { floatArrayOf(20.dp.toPx(), 150.dp.toPx(), 20.dp.toPx(), 40.dp.toPx()) }
+    val railRight = with(density) { 88.dp.toPx() }
     if (size.width > 0 && vm.villageFramedFor != size.width to size.height) {
         camera.fit(size.width.toFloat(), size.height.toFloat(), insets)
         vm.villageFramedFor = size.width to size.height
@@ -147,6 +148,7 @@ fun VillageScreen(vm: GameViewModel) {
                         moved
                         camera.toScreen(VillageLayout.spots.getValue(b).plate, size.width.toFloat(), size.height.toFloat())
                     },
+                    minLeft = railRight,
                     onClick = { at -> open(b, at) },
                 )
             }
@@ -212,7 +214,7 @@ private fun VillageMap(
  * or null when off screen). Tapping it opens the building, like tapping the building.
  */
 @Composable
-private fun BuildingPlate(b: Building, badge: Boolean, place: () -> Pair<Float, Float>?, onClick: (Offset?) -> Unit) {
+private fun BuildingPlate(b: Building, badge: Boolean, place: () -> Pair<Float, Float>?, minLeft: Float, onClick: (Offset?) -> Unit) {
     val name = stringResource(b.labelRes)
     var anchor by remember { mutableStateOf<Offset?>(null) }
     Layout(
@@ -241,8 +243,10 @@ private fun BuildingPlate(b: Building, badge: Boolean, place: () -> Pair<Float, 
         layout(constraints.maxWidth, constraints.maxHeight) {
             if (at != null) {
                 anchor = Offset(at.first, at.second)
-                // Centred over the building, its bottom at the plate's anchor point.
-                placeable.place(IntOffset((at.first - placeable.width / 2f).toInt(), (at.second - placeable.height).toInt()))
+                // Centred over the building, its bottom at the plate's anchor point; never under
+                // the left rail of buttons, never off the right edge.
+                val left = (at.first - placeable.width / 2f).coerceAtMost(constraints.maxWidth - placeable.width - 8f).coerceAtLeast(minLeft)
+                placeable.place(IntOffset(left.toInt(), (at.second - placeable.height).toInt()))
             }
         }
     }

@@ -111,7 +111,8 @@ function drawFrame(frame) {
     else gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ZERO, gl.ONE);
   }
   gl.viewport(0, 0, frame.width, frame.height);
-  gl.clearColor(0, 0, 0, 1);
+  const cc = frame.clearColor || [0, 0, 0];
+  gl.clearColor(cc[0], cc[1], cc[2], 1);
   gl.clearDepth(1);
   // As GlBackend: the last item may have left depth writes off, which would keep glClear from
   // clearing the depth buffer of a reused context (a sequence's next frame).
