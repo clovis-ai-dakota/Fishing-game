@@ -141,6 +141,15 @@ private class RenderThread(
             val t = (System.nanoTime() - start) / 1_000_000_000f
             val w = width
             val h = height
+            // TextureView puts the buffer back to the view's full size, without telling its
+            // listener, whenever it rebuilds its layer (after the app was stopped: the phone
+            // locked, Home pressed). Ask for the reduced size again before every frame, or the
+            // frame fills only a corner of the view. (Cheap: nothing happens when it's unchanged.)
+            try {
+                texture.setDefaultBufferSize(w, h)
+            } catch (_: Exception) {
+                // Released while the view goes away: end() is on its way.
+            }
             b.submit(source.frame(w, h, t))
             b.onSurfaceChanged(null, w, h)
             b.onDrawFrame(null)
