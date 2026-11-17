@@ -38,24 +38,27 @@ monofilament line; the 2D fallback draws the same boat.
 ### Navigation
 
 Home is a **village**: a little fishing island in 3D, seen from above. Drag to move around, pinch
-to zoom; every building opens a menu, with a name plate over it (its pictogram and name):
+to zoom; every building opens a menu (nothing is written on the island: the tour names them, and
+the island takes the colours of the boat and gear you wear, more so the rarer they are):
 
 - **Fish** (the pier, your boat moored at its end): one dominant **Cast line** button at the
   bottom with the tackle next to it, and your rope's three numbers (they open the rope workshop).
   Tap the boat, its line or its hook to customise each.
 - **Dex** (the lighthouse): the collection (see below).
 - **Shop** (the market hall): tackle, style and passes, each with a euro price and a points price
-  (see below). A dot on its plate means something is waiting there (a Club gift, season
-  rewards, the starter pack offer).
+  (see below). A red dot over it means something is waiting there (a Club gift, season
+  rewards, the starter pack offer). Tackle comes one pack at a time (the next bigger one once
+  bought), and single pieces with points, a few a day.
 - **Battle** (the duelling platform on the water): battle setup, the way online, and friends and
   rankings.
 - **Rope** (the rope workshop): rope upgrades and downgrades, points only.
 - **Aquarium** (the glass pavilion): your catches on show in a 3D tank, its decor for sale, and a
-  full-screen view with the phone sideways.
+  full-screen view with the phone sideways (pinch to zoom, drag to look around).
 
 Around the map: your points, a trophy for Milestones (with a badge when one can be claimed), a
 palette for the themes and a gear for Settings (sound, notifications, language, privacy, and the
-tour), and on the left today's reward, a migration and the season.
+tour), and under the points today's reward (migrations are on the Daily screen, the season in
+the Shop).
 
 Every menu is a full screen with a back button; system back goes up to the village, then leaves
 the app.

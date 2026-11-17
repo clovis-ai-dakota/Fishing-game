@@ -187,6 +187,10 @@ class GlBackend(
             "uMode" to floatArrayOf(0f),
             "uAdditive" to floatArrayOf(0f),
             "uGlow" to floatArrayOf(0f),
+            // The village's parts in the colours of the player's skin: off (alpha 0) by default.
+            "uDressRoof" to floatArrayOf(0f, 0f, 0f, 0f),
+            "uDressFlag" to floatArrayOf(0f, 0f, 0f, 0f),
+            "uDressTrim" to floatArrayOf(0f, 0f, 0f, 0f),
         )
     }
 }

@@ -32,7 +32,7 @@ class VillageScene {
     private val lighthouseLamp = VillageModels.lighthouseLamp
 
     /** What the scene shows besides the village itself (read on the render thread). */
-    class Looks(val palette: MenuPalette, val skins: Skins, val tankFish: List<FishSpecies>)
+    class Looks(val palette: MenuPalette, val skins: Skins, val tankFish: List<FishSpecies>, val dress: IslandDress = IslandDress.CLASSIC)
 
     fun build(widthPx: Int, heightPx: Int, t: Float, camera: VillageCamera, looks: Looks): Frame {
         val w = widthPx.toFloat()
@@ -66,7 +66,16 @@ class VillageScene {
         val painted = mapOf("uModel" to Mat4.identity(), "uNormalMatrix" to Mat4.normalMatrix(Mat4.identity()), "uMaterial" to floatArrayOf(5f), "uGlow" to floatArrayOf(glow))
         // The big occluders first (the town, the boat, the island, then the sea): the depth test
         // then skips what's hidden (the ground under the buildings, the water under the island).
-        items += DrawItem(Program.TOON, "village:town", uniforms = painted, cullBack = false)
+        // The town in the colours of the skin the player wears (see IslandDress).
+        val d = looks.dress
+        val dressed = painted + mapOf(
+            "uDressRoof" to dressColor(d.roof, if (d.level >= 4) 1f else 0.85f),
+            "uDressFlag" to dressColor(d.flag, 1f),
+            "uDressTrim" to dressColor(d.trim, 1f),
+        )
+        items += DrawItem(Program.TOON, "village:town", uniforms = dressed, cullBack = false)
+        if (d.bunting) items += DrawItem(Program.TOON, "village:dress:bunting", uniforms = dressed, cullBack = false)
+        d.legend?.let { items += DrawItem(Program.TOON, "village:dress:$it", uniforms = dressed) }
         // Your boat moored along the pier, bow out to sea, in your skins.
         items += boats.boatItems(looks.skins.boat, VillageLayout.boatAt, t, looks.skins.customBoat, rotY = PI.toFloat() / 2f)
         // The aquarium's fish swimming circles under the dome.
@@ -144,4 +153,7 @@ class VillageScene {
     }
 
     private fun rgb(c: Color) = floatArrayOf(c.red, c.green, c.blue)
+
+    private fun dressColor(argb: Long?, amount: Float): FloatArray =
+        if (argb == null) floatArrayOf(0f, 0f, 0f, 0f) else floatArrayOf(((argb shr 16) and 0xFF) / 255f, ((argb shr 8) and 0xFF) / 255f, (argb and 0xFF) / 255f, amount)
 }

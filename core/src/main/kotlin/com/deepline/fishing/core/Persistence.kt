@@ -68,6 +68,10 @@ object ProgressCodec {
         appendLine("tournamentClaims=${p.tournamentClaims.sorted().joinToString(",")}")
         appendLine("clubClaims=${p.clubClaims.sorted().joinToString(",")}")
 
+        // -- Shop: new lines below.
+        appendLine("packsBought=${p.packsBought.sorted().joinToString(",")}")
+        appendLine("singles=${p.singlesDay ?: ""};${p.singlesBought.entries.joinToString(",") { "${it.key.name}:${it.value}" }}")
+
         for ((stat, level) in p.ropeLevels) appendLine("rope.${stat.name}=$level")
         for ((id, e) in p.collection) {
             appendLine("fish.$id=${e.caught},${e.sparklingCaught},${e.deepestM},${e.bestPoints}")
@@ -157,6 +161,20 @@ object ProgressCodec {
                 // -- Social: new keys below.
                 key == "tournamentClaims" -> p = p.copy(tournamentClaims = value.split(',').mapNotNull { it.trim().toLongOrNull() }.toSet())
                 key == "clubClaims" -> p = p.copy(clubClaims = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet())
+
+                // -- Shop: new keys below.
+                key == "packsBought" -> p = p.copy(packsBought = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet())
+                key == "singles" -> value.split(';').takeIf { it.size == 2 }?.let { (day, counts) ->
+                    p = p.copy(
+                        singlesDay = day.trim().toLongOrNull(),
+                        singlesBought = counts.split(',').mapNotNull { entry ->
+                            val (name, n) = entry.split(':').takeIf { it.size == 2 } ?: return@mapNotNull null
+                            val t = Tackle.entries.firstOrNull { it.name == name.trim() }
+                            val count = n.trim().toIntOrNull()
+                            if (t != null && count != null && count >= 0) t to count else null
+                        }.toMap(),
+                    )
+                }
 
                 key == "battle" -> {
                     val parts = value.split(',').map { it.trim().toIntOrNull() }

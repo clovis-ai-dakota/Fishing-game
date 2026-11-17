@@ -67,12 +67,16 @@ under the system buttons.
 
 **The village is home** (`ui/village/`): a 3D island whose buildings are the menus, and nothing
 else stands on it (trees, rocks and paths only: a building that opens nothing is noise). Each
-building must say what it opens at a glance: a name plate floats over it (the menu's pictogram
-and name, the red dot when something waits there), and its shape says it too (the pier with your
-boat, the lighthouse with its golden fish for the Dex, the market's striped awning, the rope
-workshop's giant spool, the glass pavilion, the duelling platform with two pennants). The plate and the building are both tap
-targets; the HUD keeps clear of the plates (`VillageCamera.fit` frames the six inside it). A new
-menu that deserves a building gets one in `VillageLayout` and `VillageModels`, and a plate.
+building must say what it opens by its shape alone (the pier with your boat, the lighthouse with
+its golden fish for the Dex, the market's striped awning, the rope workshop's giant spool, the
+glass pavilion, the duelling platform with two pennants): nothing is written on the island, the
+tour names the buildings, and only a red dot floats over one when something waits there. Each
+building is a tap target (with an invisible, named target for screen readers); the HUD stays off
+the island at first sight (`VillageCamera.fit` frames the six inside it). A new menu that deserves
+a building gets one in `VillageLayout` and `VillageModels`, and a tour mention.
+
+**Choices fold away**: a screen with several settings to pick (Battle: mode, opponent, wager) shows
+each as one row with what's picked; tapped, its options open under it, and picking one closes it.
 
 ## 4. One world, and moves that mean something
 

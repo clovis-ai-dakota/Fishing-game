@@ -95,6 +95,12 @@ data class PlayerProgress(
     /** Club goal rewards given on this phone ("week:tier", see `Clubs.claimKey`). */
     val clubClaims: Set<String> = emptySet(),
 
+    // -- Shop: new fields below this line.
+    /** Tackle packs bought at least once (ids): the shop then offers the next bigger pack. */
+    val packsBought: Set<String> = emptySet(),
+    /** The local day [singlesBought] counts (tackle bought one at a time, see [GameConfig.TACKLE_SINGLES_PER_DAY]). */
+    val singlesDay: Long? = null,
+    val singlesBought: Map<Tackle, Int> = emptyMap(),
 ) {
     fun level(stat: RopeStat): Int = ropeLevels[stat] ?: 0
     val specs: RopeSpecs get() = RopeSpecs.fromLevels(ropeLevels)
@@ -269,10 +275,27 @@ object Progression {
         Tackle.DETECTOR -> p.copy(detectors = count)
     }
 
-    fun buyTackle(p: PlayerProgress, item: Tackle): PlayerProgress? {
+    /** How many more [item]s can be bought one at a time on local [day] (the count resets each day). */
+    fun singlesLeft(p: PlayerProgress, item: Tackle, day: Long = LocalDays.today()): Int {
+        // Days only move forwards: an earlier day (clock set back) still counts the later day's buys.
+        val bought = if (p.singlesDay != null && day <= p.singlesDay) p.singlesBought[item] ?: 0 else 0
+        return (GameConfig.TACKLE_SINGLES_PER_DAY - bought).coerceAtLeast(0)
+    }
+
+    /**
+     * Buys one [item] with points; null when the player can't afford it or already bought
+     * [GameConfig.TACKLE_SINGLES_PER_DAY] of them on local [day] (packs have no such limit).
+     */
+    fun buyTackle(p: PlayerProgress, item: Tackle, day: Long = LocalDays.today()): PlayerProgress? {
         val price = tacklePrice(p, item)
-        if (p.pointsBalance < price) return null
-        return withTackle(p.copy(pointsBalance = p.pointsBalance - price), item, tackleCount(p, item) + 1)
+        if (p.pointsBalance < price || singlesLeft(p, item, day) <= 0) return null
+        // A day earlier than the one counted (clock set back) keeps the later day's count.
+        val (countDay, counts) = when {
+            p.singlesDay == null || day > p.singlesDay -> day to emptyMap()
+            else -> p.singlesDay to p.singlesBought
+        }
+        val bought = withTackle(p.copy(pointsBalance = p.pointsBalance - price), item, tackleCount(p, item) + 1)
+        return bought.copy(singlesDay = countDay, singlesBought = counts + (item to (counts[item] ?: 0) + 1))
     }
 
     /** Uses one [item] (for the cast about to start); null when the player has none. */

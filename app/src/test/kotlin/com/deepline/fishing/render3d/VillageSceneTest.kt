@@ -8,6 +8,7 @@ import com.deepline.fishing.ui.render3d.MeshData
 import com.deepline.fishing.ui.render3d.Meshes
 import com.deepline.fishing.ui.render3d.Vec3
 import com.deepline.fishing.ui.theme.MenuPalettes
+import com.deepline.fishing.ui.village.IslandDress
 import com.deepline.fishing.ui.village.VillageCamera
 import com.deepline.fishing.ui.village.VillageLayout
 import com.deepline.fishing.ui.village.VillageModels
@@ -32,8 +33,36 @@ class VillageSceneTest {
             assertSound(key, m)
             triangles += m.triangleCount
         }
+        // The decorations of the richest look: the bunting and the biggest monument.
+        val dress = (listOf("village:dress:bunting") + IslandDress.legends.map { "village:dress:$it" }).map { key ->
+            Meshes.get(key).also { assertSound(key, it) }.triangleCount
+        }
+        triangles += dress[0] + dress.drop(1).max()
         // A mid-range phone's GPU is the limit (docs/ui-design.md): keep the whole village small.
         assertTrue("The village has $triangles triangles", triangles < 150_000)
+    }
+
+    @Test
+    fun framesBuildInEveryLookOfTheIsland() {
+        val scene = VillageScene()
+        val camera = VillageCamera().apply { fit(1080f, 2156f, floatArrayOf(220f, 394f, 42f, 95f)) }
+        val looks = listOf(
+            IslandDress.CLASSIC,
+            IslandDress(1, flag = 0xFFE53935L),
+            IslandDress(2, flag = 0xFFE53935L, trim = 0xFFFFFFFFL),
+            IslandDress(3, 0xFF1565C0L, 0xFFE53935L, 0xFFFFFFFFL),
+        ) + IslandDress.legends.map { IslandDress(4, 0xFF6A3FA0L, 0xFFF2C14EL, 0xFFF2C14EL, it) }
+        for (dress in looks) {
+            val frame = scene.build(720, 1437, 3.2f, camera, VillageScene.Looks(MenuPalettes.of(MenuTheme.LAGOON, false), Skins.CLASSIC, emptyList(), dress))
+            val keys = frame.items.mapNotNull { it.meshKey }
+            assertTrue(dress.bunting == ("village:dress:bunting" in keys))
+            dress.legend?.let { assertTrue("village:dress:$it" in keys) }
+            for (item in frame.items) {
+                val m = item.dynamicMesh ?: Meshes.get(item.meshKey!!)
+                assertTrue(m.indices.all { it < m.vertexCount })
+                for (v in item.uniforms.values) assertTrue(v.size in setOf(1, 2, 3, 4, 9, 16))
+            }
+        }
     }
 
     @Test

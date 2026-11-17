@@ -172,6 +172,13 @@
     <string name="shop_tackle_desc_solo">%1$s Solo casts only.</string>
     <!-- Buying a single piece of tackle (rather than a pack). -->
     <string name="shop_tackle_single">Just one</string>
+    <!-- Under "Just one": how many more can be bought one at a time today. %1$d: left, %2$d: the daily limit. -->
+    <string name="shop_tackle_singles_left">%1$d/%2$d left today</string>
+    <!-- Behind a tackle's (i): the daily limit on single pieces. %1$d: the limit. -->
+    <plurals name="shop_tackle_singles_info">
+        <item quantity="one">One at a time: up to %1$d of each per day, with points only. Packs have no limit.</item>
+        <item quantity="other">One at a time: up to %1$d of each per day, with points only. Packs have no limit.</item>
+    </plurals>
 
     <!-- Style page: looks only. Each heading has a note under it. -->
     <string name="shop_style_boats_title">Premade boats</string>

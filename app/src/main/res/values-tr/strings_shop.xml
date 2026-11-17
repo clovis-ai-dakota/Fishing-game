@@ -134,6 +134,13 @@
     <string name="shop_tackle_desc_battles">%1$s Düellolarda da çalışır.</string>
     <string name="shop_tackle_desc_solo">%1$s Yalnızca solo atışlarda.</string>
     <string name="shop_tackle_single">Tek bir tane</string>
+    <!-- Under "Just one": how many more can be bought one at a time today. %1$d: left, %2$d: the daily limit. -->
+    <string name="shop_tackle_singles_left">Bugün kalan: %1$d/%2$d</string>
+    <!-- Behind a tackle's (i): the daily limit on single pieces. %1$d: the limit. -->
+    <plurals name="shop_tackle_singles_info">
+        <item quantity="one">Tek tek: her birinden günde en fazla %1$d tane, yalnızca puanla. Paketlerin sınırı yok.</item>
+        <item quantity="other">Tek tek: her birinden günde en fazla %1$d tane, yalnızca puanla. Paketlerin sınırı yok.</item>
+    </plurals>
 
     <!-- Style page. -->
     <string name="shop_style_boats_title">Hazır tekneler</string>

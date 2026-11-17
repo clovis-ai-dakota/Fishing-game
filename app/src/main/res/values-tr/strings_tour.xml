@@ -89,7 +89,7 @@
     <string name="tour_shop_style_body">Stil sayfasında hazır tekneler, boyalar, amblemler ve yelken desenleri (kendi teknende önizlenir), ayrıca yeni iğneler, misinalar ve izler var. Her görünüm gibi bunlar da yalnızca görüntüyü değiştirir, oyunu asla.</string>
 
     <string name="tour_aquarium_title">Akvaryumun</string>
-    <string name="tour_aquarium_body">Yakaladığın balıklar akvaryumunda, köydeki cam köşkte yüzer: orada kimlerin yüzeceğini seç, dekoru ya da daha büyük bir tankı hemen orada satın al. Tam ekran, onları izlemen için telefonu yan çevirir.</string>
+    <string name="tour_aquarium_body">Yakaladığın balıklar akvaryumunda, köydeki cam köşkte yüzer: orada kimlerin yüzeceğini seç, dekoru ya da daha büyük bir tankı hemen orada satın al. Tam ekran, onları izlemen için telefonu yan çevirir. Orada bir balığa yakınlaşmak için iki parmakla büyüt, etrafa bakmak için sürükle, tüm tankı yeniden görmek için iki kez dokun.</string>
 
     <string name="tour_season_title">Sezonlar ve hafta sonu etkinlikleri</string>
     <!-- %1$s: how long a season lasts (e.g. "6 hafta"). -->
@@ -182,4 +182,11 @@
     <!-- "Rastgele!" is the Turkish anglers' wish for good fishing. -->
     <string name="tour_replay_title">Hepsi bu kadar, rastgele!</string>
     <string name="tour_replay_body">Bu tanıtımı istediğin zaman Ayarlar\'dan yeniden izleyebilirsin.</string>
+
+    <!-- The island in the colours of the player's skin (see IslandDress). Never name a secret or a legendary set here. -->
+    <string name="tour_island_look_title">Adadaki tarzın</string>
+    <string name="tour_island_look_body">Giydiklerin adada görünür: teknen ve takımın flamayı, tenteleri ve çatıları boyar. Tarzın ne kadar nadirse kutlama o kadar büyük olur.</string>
+    <!-- The Tackle page offers one pack at a time. %1$d: single pieces per day. -->
+    <string name="tour_tackle_offers_title">Her seferinde bir paket</string>
+    <string name="tour_tackle_offers_body">Her takım önce en küçük paketini sunar, onu satın alınca bir sonraki büyüğünü. Tek tek ise puanla alınır, her birinden günde en fazla %1$d tane.</string>
 </resources>

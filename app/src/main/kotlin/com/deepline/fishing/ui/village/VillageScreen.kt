@@ -43,6 +43,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -50,7 +52,6 @@ import androidx.compose.ui.unit.dp
 import com.deepline.fishing.Building
 import com.deepline.fishing.GameViewModel
 import com.deepline.fishing.ui.GameIcons
-import com.deepline.fishing.ui.VillageEventRail
 import com.deepline.fishing.ui.VillageTopBar
 import com.deepline.fishing.ui.kit.GameColors
 import com.deepline.fishing.ui.kit.KitIcons
@@ -71,10 +72,11 @@ val Building.icon: ImageVector
     }
 
 /**
- * The village, the home screen: a cove seen from above, where each building opens a menu. Drag to
- * move around, pinch to zoom (within the village's grounds); tap a building or its name plate.
- * The plates carry the menu's pictogram and name, so every building says what it's for. Around
- * the map: the points, milestones, themes and settings at the top, and what's on now on the left.
+ * The village, the home screen: an island seen from above, where each building opens a menu. Drag
+ * to move around, pinch to zoom (within the island's waters); tap a building. Nothing is written on
+ * the island: each building's shape says what it is (the tour names them), a red dot shows where
+ * something waits. Around the map: the points and the daily rewards on the left, milestones,
+ * themes and settings on the right.
  */
 @Composable
 fun VillageScreen(vm: GameViewModel) {
@@ -84,10 +86,9 @@ fun VillageScreen(vm: GameViewModel) {
     // them without recomposing the screen.
     var moved by remember { mutableIntStateOf(0) }
     var size by remember { mutableStateOf(IntSize.Zero) }
-    // The HUD around the map: the six buildings are framed inside it the first time.
-    // The six fill the width; the plates keep clear of the left rail of buttons (see BuildingPlate).
+    // The HUD around the map: the six buildings are framed inside it the first time (the top bar
+    // and the daily button under the points stay over the sea).
     val insets = with(density) { floatArrayOf(20.dp.toPx(), 150.dp.toPx(), 20.dp.toPx(), 40.dp.toPx()) }
-    val railRight = with(density) { 88.dp.toPx() }
     if (size.width > 0 && vm.villageFramedFor != size.width to size.height) {
         camera.fit(size.width.toFloat(), size.height.toFloat(), insets)
         vm.villageFramedFor = size.width to size.height
@@ -143,20 +144,23 @@ fun VillageScreen(vm: GameViewModel) {
         )
         if (size.width > 0) {
             for (b in Building.entries) {
-                BuildingPlate(
+                val spot = VillageLayout.spots.getValue(b)
+                BuildingSpot(
                     b,
                     badge = b == Building.SHOP && (vm.clubPouchReady || vm.starterOfferOpen || vm.seasonRewardsReady),
                     place = {
                         moved
-                        camera.toScreen(VillageLayout.spots.getValue(b).plate, size.width.toFloat(), size.height.toFloat())
+                        camera.toScreen(spot.center, size.width.toFloat(), size.height.toFloat())
                     },
-                    minLeft = railRight,
+                    badgeAt = {
+                        moved
+                        camera.toScreen(spot.plate, size.width.toFloat(), size.height.toFloat())
+                    },
                     onClick = { at -> open(b, at) },
                 )
             }
         }
         VillageTopBar(vm, Modifier.align(Alignment.TopCenter))
-        VillageEventRail(vm, Modifier.align(Alignment.CenterStart).padding(start = 12.dp))
     }
 }
 
@@ -179,7 +183,7 @@ private fun VillageMap(
     if (supported) {
         // What the render thread draws: the latest palette, skins and tank, read every frame.
         val looks = remember { arrayOfNulls<VillageScene.Looks>(1) }
-        looks[0] = VillageScene.Looks(palette, vm.skins, com.deepline.fishing.core.Showcase.tankFish(vm.progress))
+        looks[0] = VillageScene.Looks(palette, vm.skins, com.deepline.fishing.core.Showcase.tankFish(vm.progress), IslandDress.of(vm.progress))
         val source = remember {
             val scene = VillageScene()
             com.deepline.fishing.ui.render3d.gl.FrameSource { w, h, t -> scene.build(w, h, t, camera, looks[0]!!) }
@@ -214,44 +218,60 @@ private fun VillageMap(
 }
 
 /**
- * A building's name plate, floating above it: the menu's pictogram and name on deep water, a red
- * dot when something there is waiting. It follows the building as the map moves ([place]: where,
- * or null when off screen). Tapping it opens the building, like tapping the building.
+ * What makes a building a button without drawing anything on the island: an invisible target over
+ * the building (its name for screen readers and tests, `village_<building>`), and a small red dot
+ * floating above it when something there is waiting. Both follow the map as it moves ([place] and
+ * [badgeAt]: where on screen, or null when off it). Tapping the building itself works the same.
  */
 @Composable
-private fun BuildingPlate(b: Building, badge: Boolean, place: () -> Pair<Float, Float>?, minLeft: Float, onClick: (Offset?) -> Unit) {
+private fun BuildingSpot(
+    b: Building,
+    badge: Boolean,
+    place: () -> Pair<Float, Float>?,
+    badgeAt: () -> Pair<Float, Float>?,
+    onClick: (Offset?) -> Unit,
+) {
     val name = stringResource(b.labelRes)
     var anchor by remember { mutableStateOf<Offset?>(null) }
     Layout(
         content = {
-            Row(
+            Box(
                 Modifier
-                    .clip(RoundedCornerShape(50))
-                    .background(deepColor().copy(alpha = 0.88f))
-                    .border(1.5.dp, Color.White.copy(alpha = 0.55f), RoundedCornerShape(50))
-                    .clickable(role = Role.Button, onClickLabel = name) { onClick(anchor) }
-                    .testTag("village_${b.name.lowercase()}")
-                    .padding(start = 8.dp, end = 12.dp, top = 5.dp, bottom = 5.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                Icon(b.icon, contentDescription = null, tint = GameColors.OnDeep, modifier = Modifier.size(20.dp))
-                Text(name, color = GameColors.OnDeep, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold, maxLines = 1)
-                if (badge) Box(Modifier.size(9.dp).background(GameColors.Badge, CircleShape))
+                    .size(56.dp)
+                    .clickable(
+                        interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                        indication = null,
+                        role = Role.Button,
+                        onClickLabel = name,
+                    ) { onClick(anchor) }
+                    .semantics { contentDescription = name }
+                    .testTag("village_${b.name.lowercase()}"),
+            )
+            if (badge) {
+                Box(
+                    Modifier
+                        .size(14.dp)
+                        .background(GameColors.Badge, CircleShape)
+                        .border(2.dp, Color.White, CircleShape)
+                        .testTag("village_badge_${b.name.lowercase()}"),
+                )
             }
         },
-        // As big as the map, so the plate can sit anywhere on it (it only catches touches on itself).
+        // As big as the map, so the target can sit anywhere on it (it only catches touches on itself).
         modifier = Modifier.fillMaxSize(),
     ) { measurables, constraints ->
-        val placeable = measurables.single().measure(constraints.copy(minWidth = 0, minHeight = 0))
+        val loose = constraints.copy(minWidth = 0, minHeight = 0)
+        val target = measurables[0].measure(loose)
+        val dot = measurables.getOrNull(1)?.measure(loose)
         val at = place()
+        val dotAt = badgeAt()
         layout(constraints.maxWidth, constraints.maxHeight) {
             if (at != null) {
                 anchor = Offset(at.first, at.second)
-                // Centred over the building, its bottom at the plate's anchor point; never under
-                // the left rail of buttons, never off the right edge.
-                val left = (at.first - placeable.width / 2f).coerceAtMost(constraints.maxWidth - placeable.width - 8f).coerceAtLeast(minLeft)
-                placeable.place(IntOffset(left.toInt(), (at.second - placeable.height).toInt()))
+                target.place(IntOffset((at.first - target.width / 2f).toInt(), (at.second - target.height / 2f).toInt()))
+            }
+            if (dot != null && dotAt != null) {
+                dot.place(IntOffset((dotAt.first - dot.width / 2f).toInt(), (dotAt.second - dot.height).toInt()))
             }
         }
     }

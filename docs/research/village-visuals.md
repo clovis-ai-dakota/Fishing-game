@@ -80,7 +80,7 @@ textures and no post-processing pass on a mid-range GPU (a Fairphone 4 is the re
   shader draws three depth bands, thin foam lines running out from the beach, foam collars, a
   sky reflection at grazing angles and stepped glints.
 - **A light grade** in the shader (a bit more saturation, warm lights, cool shadows) and a
-  **vignette** drawn by Compose over the map: they frame the island like Croakwood's darkened
-  edges and keep the HUD readable, for no GPU cost.
+  **vignette** in the same shader pass: they frame the island like Croakwood's darkened edges
+  and keep the HUD readable, for almost no GPU cost (a Compose overlay cost 2.5 ms a frame).
 - **Not done**: tilt-shift and bloom (full-screen passes the reference phone can't afford while
   the village already uses most of its GPU), and real-time shadows (the scene doesn't move).

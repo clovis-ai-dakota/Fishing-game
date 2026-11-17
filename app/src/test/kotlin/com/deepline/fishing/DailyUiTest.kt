@@ -99,8 +99,10 @@ class DailyUiTest : DailyUiTestBase() {
     @Test
     fun claimTheDailyRewardThenAChallengeAndSwapAnother() {
         val vm = launch(player())
-        // A migration is under way: its banner is on the Fish tab, next to the daily button.
-        compose.onNodeWithTag("migration_banner").assertExists()
+        // A migration is under way: the village shows only the daily button (the migration is on
+        // the Daily screen and in the Dex).
+        compose.onNodeWithTag("daily_button").assertExists()
+        compose.onNodeWithTag("migration_banner").assertDoesNotExist()
         compose.shot("90_daily_card")
 
         // The Daily screen: the calendar, challenges and the migration.

@@ -77,6 +77,14 @@ object Part {
     const val BULB = 62f
     /** Flags and pennants: they flutter (u runs from the pole to the tip). */
     const val CLOTH = 63f
+    // The village's parts that take the colours of the skin the player wears (see IslandDress):
+    // tinted in the shader by uDressRoof / uDressFlag / uDressTrim, untouched when those are off.
+    /** Roofs, the lighthouse's red bands and dome. */
+    const val DRESS_ROOF = 64f
+    /** Flags and bunting that flutter like [CLOTH]. */
+    const val DRESS_FLAG = 65f
+    /** Still trims: the market's awning stripes, the pavilion's tiles. */
+    const val DRESS_TRIM = 66f
     const val KELP = 40f
     const val DECOR_ROCK = 41f
     const val CORAL = 42f

@@ -55,6 +55,12 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
   - **Atmosphere**: `Atmosphere.NIGHTMARE` unlocks when a cast reaches
     `DepthZone.ABYSS.minDepth` (`Progression.applyCast`). It only changes the mood: the player
     must see exactly as much as in FAMILY.
+  - **The island wears it too** (`ui/village/IslandDress`): what the player wears colours the
+    village, more the harder it was to get (0 classic, 1 own design: the arena's pennant, 2 shop
+    look: awnings and tiles, 3 premium: roofs, lighthouse and bunting, 4 legendary: the set's
+    colours, a monument in the square and a crown for the lighthouse). Parts are marked
+    `Part.DRESS_ROOF/FLAG/TRIM` and tinted in the shader (`uDress*`, off by default). Looks only,
+    nothing that opens a menu; never name a secret or a set in its tour step.
   - The 2D boat (classic, skins and designs) is drawn by `drawBoat` in `BoatArt.kt`; every
     `HullPattern`, `SailStyle`, `FlagStyle` and `Emblem` must also be drawn in 3D.
 - **Menu design** (rules and kit: `docs/ui-design.md`; components in `ui/kit/`):
@@ -88,9 +94,12 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
 - **Navigation**: home is the village (`Screen.VILLAGE`, `ui/village/`): a 3D island (drag, pinch)
   whose buildings (`Building`) open the menus: the pier = Fish menu (`Screen.HOME`, where you
   cast), the lighthouse = Dex, the market hall = Shop, the duelling platform = Battle setup, the
-  rope workshop = `Screen.ROPE`, the glass pavilion = Aquarium. Each building has a name plate
-  (pictogram + menu name, tagged `village_<building>`); the HUD around the map (points,
-  milestones, themes, settings, daily, migration, season) replaced the Fish tab's. There is no tab
+  rope workshop = `Screen.ROPE`, the glass pavilion = Aquarium. Nothing is written on the island:
+  each building has an invisible target (named for screen readers, tagged `village_<building>`)
+  and a red dot when something waits there; the tour names the buildings. The HUD: the points and
+  the daily button under them (top left, kept off the island), milestones, themes and settings
+  (top right); migrations are on the Daily screen and in the Dex, the season on the Shop's Pass
+  page. There is no tab
   bar: every screen is full screen (`SubScreen`: back button, title, actions); back goes up a level
   (`ScreenMotion.level`) and ends on the village. The Shop's pages are `ShopPage` (tour steps pick
   one with `shopPage`). Tests go to a menu like a player, with `openBuilding("dex")` /
@@ -135,7 +144,9 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     uses the painted material (`uMaterial` 5: colour per vertex via `MeshBuilder.recolor`, parts
     `GLASS` and `BULB` that light up with `uGlow` at night, fluttering `CLOTH`) and the village's
     sea its own (`uMaterial` 6). Still parts are merged into a few big meshes (a triangle budget
-    is tested in `VillageSceneTest`); the 2D map and the 2D tank stay the fallbacks.
+    is tested in `VillageSceneTest`); the 2D map and the 2D tank stay the fallbacks. The
+    full-screen aquarium zooms and looks around (`AquariumScene.Camera`, clamped to the back
+    wall) and renders at the screen's width.
   - The village is an island with only the six places that open a menu (research:
     `docs/research/village-visuals.md`): no decor building. Its light is baked once into the
     vertex colours, as mobile games do: cast shadows from `VillageModels.SUN` (soft, several
@@ -198,6 +209,10 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
   cancel, fail, pending). Purchases are granted once per token. Seasonal items and passes live in
   `Seasons.kt`, showcase items in `Showcase.kt`; new kinds of grant go through `Grant.Feature`.
   Bump the tour when the shop changes (`TourContentTest` checks every Shop page with items).
+  Tackle shows one pack at a time (`ShopCatalog.offeredPack`: the cheapest not bought yet, then
+  the next; purchases, not gifts, are recorded in `packsBought`), and single pieces are points
+  only, `GameConfig.TACKLE_SINGLES_PER_DAY` of each per local day (only moving forwards, like
+  the daily loop).
 - **Daily loop** (`core/.../Daily.kt`, `Migrations.kt`, `Reminders.kt`; app `daily/` and
   `ui/daily/`; research and decisions in `docs/research/daily-loop.md`):
   - Days are the player's **local** calendar days (`LocalDays`: epoch ms + the zone's offset, no

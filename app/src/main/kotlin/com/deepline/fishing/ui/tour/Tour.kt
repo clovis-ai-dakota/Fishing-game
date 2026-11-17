@@ -93,8 +93,10 @@ object Tour {
      * 12: the redesigned menus: fewer words, colours that say what a button does, (i) buttons.
      * 13: the village replaces the tabs (a building per menu, the rope workshop and the aquarium
      *     among them); the boat, line and hook each open their skins; the 3D aquarium.
+     * 14: the island in the colours of the skin worn, one tackle pack offered at a time (single
+     *     pieces limited per day), zoom and look around in the full-screen aquarium.
      */
-    const val VERSION = 13
+    const val VERSION = 14
 
     private val bumps = GameConfig.DESCENT_TOUCH_LIMIT
     private val calendarDays get() = UiText.plural(R.plurals.common_days, com.deepline.fishing.core.DailyRewards.calendar.size)
@@ -114,6 +116,14 @@ object Tour {
             screen = Screen.VILLAGE,
             target = TourTarget.VILLAGE_MAP,
             sinceVersion = 13,
+        ),
+        TourStep(
+            id = "island_look",
+            title = text(R.string.tour_island_look_title),
+            body = text(R.string.tour_island_look_body),
+            screen = Screen.VILLAGE,
+            target = TourTarget.VILLAGE_MAP,
+            sinceVersion = 14,
         ),
         TourStep(
             id = "look",
@@ -212,6 +222,15 @@ object Tour {
             shopPage = com.deepline.fishing.ShopPage.TACKLE,
         ),
         TourStep(
+            id = "tackle_offers",
+            title = text(R.string.tour_tackle_offers_title),
+            body = text(R.string.tour_tackle_offers_body, GameConfig.TACKLE_SINGLES_PER_DAY),
+            screen = Screen.SHOP,
+            target = TourTarget.SHOP_PRICES,
+            sinceVersion = 14,
+            shopPage = com.deepline.fishing.ShopPage.TACKLE,
+        ),
+        TourStep(
             id = "two_prices",
             title = text(R.string.tour_two_prices_title),
             body = text(
@@ -293,7 +312,7 @@ object Tour {
             body = text(R.string.tour_aquarium_body),
             screen = Screen.AQUARIUM,
             target = TourTarget.AQUARIUM_TANK,
-            sinceVersion = 13,
+            sinceVersion = 14,
         ),
         TourStep(
             id = "season",

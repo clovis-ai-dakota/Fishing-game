@@ -150,6 +150,14 @@
     <string name="shop_tackle_desc_battles">%1$s También funciona en los duelos.</string>
     <string name="shop_tackle_desc_solo">%1$s Solo en lances en solitario.</string>
     <string name="shop_tackle_single">Solo uno</string>
+    <!-- Under "Just one": how many more can be bought one at a time today. %1$d: left, %2$d: the daily limit. -->
+    <string name="shop_tackle_singles_left">Quedan hoy: %1$d/%2$d</string>
+    <!-- Behind a tackle's (i): the daily limit on single pieces. %1$d: the limit. -->
+    <plurals name="shop_tackle_singles_info">
+        <item quantity="one">Por unidad: hasta %1$d de cada uno al día, solo con puntos. Los lotes no tienen límite.</item>
+        <item quantity="many">Por unidad: hasta %1$d de cada uno al día, solo con puntos. Los lotes no tienen límite.</item>
+        <item quantity="other">Por unidad: hasta %1$d de cada uno al día, solo con puntos. Los lotes no tienen límite.</item>
+    </plurals>
 
     <!-- Style page: looks only. -->
     <string name="shop_style_boats_title">Barcos prediseñados</string>

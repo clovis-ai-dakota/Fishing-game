@@ -22,6 +22,9 @@ uniform vec3 uFogColor;
 uniform vec3 uWaterTint;
 uniform float uOpacity;
 uniform float uGlow;      // the village's lights: 0 by day, 1 at night
+uniform vec4 uDressRoof;  // the village in the player's skin: rgb a colour, a how much (0: off)
+uniform vec4 uDressFlag;
+uniform vec4 uDressTrim;
 
 in vec3 vWorld;
 in vec3 vNormal;
@@ -478,8 +481,21 @@ Surface decorSurface() {
 
 // Painted architecture and ground: the vertex colour, with window glass and lamps that light up
 // at night (uGlow), and a little grain so large walls and fields aren't flat.
+// A part in the colours of the skin the player wears (see IslandDress): the new colour, keeping
+// some of the old one's brightness so the baked light and the tiles' shading stay.
+vec3 dressed(vec3 c, vec4 d) {
+    if (d.a <= 0.0) return c;
+    const vec3 lum = vec3(0.299, 0.587, 0.114);
+    float k = dot(c, lum) / max(dot(d.rgb, lum), 0.05);
+    vec3 t = d.rgb * mix(1.0, clamp(k, 0.35, 1.3), 0.6);
+    return mix(c, t, d.a);
+}
+
 Surface paintedSurface() {
     vec3 c = vColor.rgb;
+    if (isPart(vPart, 64.0)) c = dressed(c, uDressRoof);
+    else if (isPart(vPart, 65.0)) c = dressed(c, uDressFlag);
+    else if (isPart(vPart, 66.0)) c = dressed(c, uDressTrim);
     if (isPart(vPart, 61.0)) {
         // Glass: the sky by day (brighter at the top), warm lamplight at night.
         vec3 day = mix(vec3(0.42, 0.62, 0.78), vec3(0.85, 0.95, 1.0), clamp(vUv.y, 0.0, 1.0));

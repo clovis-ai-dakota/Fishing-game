@@ -312,7 +312,36 @@ object ShopCatalog {
         if (!canBuy(item, p, now)) return null
         val price = pointsPrice(item, p)
         if (p.pointsBalance < price) return null
-        return grant(p.copy(pointsBalance = p.pointsBalance - price), item, now)
+        return bought(p.copy(pointsBalance = p.pointsBalance - price), item, now)
+    }
+
+    /**
+     * Gives [item] after the player bought it (with points or in the store): like [grant], and a
+     * tackle pack also counts as bought, so the shop moves on to the next bigger one. (Gifts and
+     * the Club's pouch go through [grant] alone.)
+     */
+    fun bought(p: PlayerProgress, item: ShopItem, now: Long): PlayerProgress {
+        val q = grant(p, item, now)
+        return if (isTacklePack(item)) q.copy(packsBought = q.packsBought + item.id) else q
+    }
+
+    // ---- Tackle packs: one offer at a time -------------------------------------------------------
+
+    /** A pack of one kind of tackle sold in the Tackle section (not a bundle like the starter pack). */
+    fun isTacklePack(item: ShopItem): Boolean =
+        item.section == ShopSection.TACKLE && item.kind == ItemKind.CONSUMABLE && item.grants.singleOrNull() is Grant.TacklePack
+
+    /** The packs of [tackle], cheapest first. */
+    fun packsOf(tackle: Tackle): List<ShopItem> =
+        all.filter { isTacklePack(it) && (it.grants.single() as Grant.TacklePack).tackle == tackle }.sortedBy { it.euroCents }
+
+    /**
+     * The one pack of [tackle] the shop offers: the cheapest not bought yet, then the next bigger
+     * one once it is; the biggest stays on offer once every pack was bought. Null if none is sold.
+     */
+    fun offeredPack(p: PlayerProgress, tackle: Tackle): ShopItem? {
+        val packs = packsOf(tackle)
+        return packs.firstOrNull { it.id !in p.packsBought } ?: packs.lastOrNull()
     }
 
     /**

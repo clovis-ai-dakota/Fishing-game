@@ -1,6 +1,7 @@
 package com.deepline.fishing
 
 import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -40,12 +41,14 @@ class ShopPointsUiTest : BoatUiTestBase() {
         compose.openBuilding("shop")
         assertEquals(Screen.SHOP, vm.screen)
         compose.onNodeWithTag("shop_page_tackle").performClick()
-        val crate = ShopCatalog.byId("lantern_crate")!!
-        val price = vm.shopPointsPrice(crate)
-        val count = ShopCatalog.packCount(crate, crate.grants.first() as Grant.TacklePack, vm.progress)
+        // One pack on offer at a time: the smallest first.
+        val pouch = ShopCatalog.byId("lantern_pouch")!!
+        val price = vm.shopPointsPrice(pouch)
+        val count = ShopCatalog.packCount(pouch, pouch.grants.first() as Grant.TacklePack, vm.progress)
+        compose.onNodeWithTag("buy_pts_lantern_crate").assertDoesNotExist()
         compose.shot("62_shop_tackle")
-        compose.onNodeWithTag("shop_list").performScrollToNode(hasTestTag("buy_pts_lantern_crate"))
-        compose.onNodeWithTag("buy_pts_lantern_crate").performClick()
+        compose.onNodeWithTag("shop_list").performScrollToNode(hasTestTag("buy_pts_lantern_pouch"))
+        compose.onNodeWithTag("buy_pts_lantern_pouch").performClick()
         // Nothing is spent until the player confirms.
         assertEquals(400_000L, vm.progress.pointsBalance)
         compose.shot("63_shop_confirm_points")
@@ -53,6 +56,16 @@ class ShopPointsUiTest : BoatUiTestBase() {
         assertEquals(400_000L - price, vm.progress.pointsBalance)
         assertEquals(2 + count, vm.progress.lanterns)
         assertTrue(vm.shopMessage!!.text.contains("$count Lanterns"))
+        // Bought: the next bigger pack takes its place.
+        compose.onNodeWithTag("buy_pts_lantern_pouch").assertDoesNotExist()
+        compose.onNodeWithTag("shop_list").performScrollToNode(hasTestTag("buy_pts_lantern_crate"))
+        // Single Lanterns: a few a day, with points.
+        repeat(com.deepline.fishing.core.GameConfig.TACKLE_SINGLES_PER_DAY) {
+            compose.onNodeWithTag("shop_list").performScrollToNode(hasTestTag("buy_one_lantern"))
+            compose.onNodeWithTag("buy_one_lantern").performClick()
+        }
+        assertEquals(2 + count + com.deepline.fishing.core.GameConfig.TACKLE_SINGLES_PER_DAY, vm.progress.lanterns)
+        compose.onNodeWithTag("buy_one_lantern").assertIsNotEnabled()
     }
 }
 
@@ -79,19 +92,26 @@ class ShopStoreUiTest : BoatUiTestBase() {
         assertEquals(2 + count, vm.progress.lanterns)
         compose.onNodeWithText("Thank you!", substring = true).assertExists()
 
+        // Bought: the next bigger pack is on offer now.
+        val crate = ShopCatalog.byId("lantern_crate")!!
+        val crateCount = ShopCatalog.packCount(crate, crate.grants.first() as Grant.TacklePack, vm.progress)
+        compose.onNodeWithTag("buy_eur_lantern_pouch").assertDoesNotExist()
+
         // Pending: nothing yet, then it arrives when purchases are restored.
-        compose.onNodeWithTag("buy_eur_lantern_pouch").performClick()
+        compose.onNodeWithTag("shop_list").performScrollToNode(hasTestTag("buy_eur_lantern_crate"))
+        compose.onNodeWithTag("buy_eur_lantern_crate").performClick()
         compose.onNodeWithTag("test_store_pending").performClick()
         assertEquals(2 + count, vm.progress.lanterns)
         assertTrue(vm.shopMessage!!.text.contains("waiting for the payment"))
         vm.restorePurchases()
         compose.waitForIdle()
-        assertEquals(2 + 2 * count, vm.progress.lanterns)
+        assertEquals(2 + count + crateCount, vm.progress.lanterns)
 
         // Failed: nothing changes.
-        compose.onNodeWithTag("buy_eur_lantern_pouch").performClick()
+        compose.onNodeWithTag("shop_list").performScrollToNode(hasTestTag("buy_eur_lantern_chest"))
+        compose.onNodeWithTag("buy_eur_lantern_chest").performClick()
         compose.onNodeWithTag("test_store_fail").performClick()
-        assertEquals(2 + 2 * count, vm.progress.lanterns)
+        assertEquals(2 + count + crateCount, vm.progress.lanterns)
         assertTrue(vm.shopMessage!!.text.startsWith("The payment didn't go through"))
     }
 

@@ -21,6 +21,28 @@ class ShopTest {
     }
 
     @Test
+    fun theShopOffersOnePackAtATimeCheapestFirst() {
+        var p = PlayerProgress(pointsBalance = 100_000_000)
+        val lanterns = ShopCatalog.packsOf(Tackle.LANTERN)
+        assertEquals(listOf(50, 99, 199, 499), lanterns.map { it.euroCents })
+        for (pack in lanterns) {
+            assertEquals(pack, ShopCatalog.offeredPack(p, Tackle.LANTERN))
+            p = ShopCatalog.buyWithPoints(p, pack, now)!!
+        }
+        // Every pack bought: the biggest stays on offer.
+        assertEquals(lanterns.last(), ShopCatalog.offeredPack(p, Tackle.LANTERN))
+        // Bought in the store, it moves on too; a gift doesn't.
+        var q = ShopCatalog.bought(PlayerProgress(), lanterns[0], now)
+        assertEquals(lanterns[1], ShopCatalog.offeredPack(q, Tackle.LANTERN))
+        q = ShopCatalog.grant(PlayerProgress(), lanterns[0], now)
+        assertEquals(lanterns[0], ShopCatalog.offeredPack(q, Tackle.LANTERN))
+        // Saved and loaded.
+        assertEquals(p.packsBought, ProgressCodec.decode(ProgressCodec.encode(p)).packsBought)
+        // Every kind of tackle has a pack on offer.
+        for (t in Tackle.entries) assertNotNull(ShopCatalog.offeredPack(PlayerProgress(), t), "$t")
+    }
+
+    @Test
     fun pointsPricesAreFishingTimeAtTheRopesReach() {
         val item = ShopCatalog.byId("paint_flames")!!
         // €0.50 at 45 min per euro: 22.5 minutes of fishing.

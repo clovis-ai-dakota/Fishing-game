@@ -203,7 +203,11 @@ class TourContentTest {
         // Version 13: the village replaced the tabs; the rope workshop and the aquarium are
         // buildings of their own; the boat, line and hook each open their skins.
         val v13 = Tour.steps.filter { it.sinceVersion == 13 }.map { it.id }
-        assertTrue(v13.containsAll(listOf("village", "upgrades", "aquarium", "boat")))
+        assertTrue(v13.containsAll(listOf("village", "upgrades", "boat")))
+        // Version 14: the island wears the player's skin, one tackle pack at a time, the
+        // full-screen aquarium zooms (its step moved to 14 with its new text).
+        val v14 = Tour.steps.filter { it.sinceVersion == 14 }.map { it.id }
+        assertTrue(v14.containsAll(listOf("island_look", "tackle_offers", "aquarium")))
         val village = Tour.steps.single { it.id == "village" }
         assertEquals(Screen.VILLAGE, village.screen)
         assertEquals(TourTarget.VILLAGE_MAP, village.target)

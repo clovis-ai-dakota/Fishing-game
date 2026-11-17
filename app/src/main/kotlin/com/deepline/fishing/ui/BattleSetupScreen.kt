@@ -50,6 +50,10 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.semantics.stateDescription
 import com.deepline.fishing.ui.kit.ActionRole
 import com.deepline.fishing.ui.kit.ButtonSize
 import com.deepline.fishing.ui.kit.CoinAmount
@@ -99,6 +103,58 @@ private val BattleMode.icon: ImageVector
         BattleMode.SPECIES_HUNT -> GameIcons.Fish
         BattleMode.DEEP_DIVE -> KitIcons.Depth
     }
+
+
+/**
+ * A choice that folds away: closed, one row with the section's name, what's picked (pictogram and
+ * name) and a chevron; tapped, the options open under it, and picking one closes it again.
+ */
+@Composable
+private fun ChoiceSection(
+    title: String,
+    icon: ImageVector,
+    choice: String,
+    expanded: Boolean,
+    onToggle: () -> Unit,
+    modifier: Modifier = Modifier,
+    info: String? = null,
+    trailing: @Composable () -> Unit = {},
+    options: @Composable () -> Unit,
+) {
+    val scheme = MaterialTheme.colorScheme
+    val calm = com.deepline.fishing.ui.kit.LocalCalmMotion.current
+    Column(
+        modifier.then(if (calm) Modifier else Modifier.animateContentSize(tween(CHOICE_MOTION_MS))),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Card(
+            onClick = onToggle,
+            modifier = Modifier.fillMaxWidth().semantics { stateDescription = choice },
+            colors = CardDefaults.cardColors(containerColor = scheme.surface),
+        ) {
+            Row(Modifier.padding(start = 14.dp, end = 4.dp, top = 6.dp, bottom = 6.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Icon(icon, contentDescription = null, tint = scheme.primary, modifier = Modifier.size(26.dp))
+                Column(Modifier.weight(1f).padding(vertical = 4.dp)) {
+                    Text(title, style = MaterialTheme.typography.labelMedium, color = scheme.onSurfaceVariant, maxLines = 1)
+                    Text(choice, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, maxLines = 2)
+                }
+                trailing()
+                if (info != null) InfoButton(title, info)
+                Icon(
+                    GameIcons.ChevronRight,
+                    contentDescription = null,
+                    tint = scheme.onSurfaceVariant,
+                    modifier = Modifier.size(22.dp).rotate(if (expanded) -90f else 90f),
+                )
+                Spacer(Modifier.width(6.dp))
+            }
+        }
+        if (expanded) options()
+    }
+}
+
+/** How long a choice takes to open or close (a small change: under NN/g's 300 ms). */
+private const val CHOICE_MOTION_MS = 200
 
 /**
  * A choice among a few: a pictogram and a short name, lit when chosen. [info] is what the tile
@@ -168,44 +224,106 @@ fun BattleSetupScreen(vm: GameViewModel) {
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Column(Modifier.tourTarget(TourTarget.BATTLE_MODES), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                SectionTitle(stringResource(R.string.battle_setup_mode), info = null)
+            // Mode, opponent and wager fold away: each shows only what's picked until it's tapped.
+            var open by rememberSaveable { mutableStateOf<String?>(null) }
+            fun toggle(key: String) { open = if (open == key) null else key }
+
+            val modeInfo = mode.rules()
+            ChoiceSection(
+                title = stringResource(R.string.battle_setup_mode),
+                icon = mode.icon,
+                choice = mode.label(),
+                expanded = open == "mode",
+                onToggle = { toggle("mode") },
+                modifier = Modifier.tourTarget(TourTarget.BATTLE_MODES).testTag("battle_mode_picker"),
+                info = modeInfo,
+            ) {
                 for (pair in BattleMode.entries.chunked(2)) {
                     Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         for (m in pair) {
-                            ChoiceTile(m.icon, m.label(), m == mode, { mode = m }, Modifier.weight(1f).fillMaxHeight().testTag("mode_${m.name.lowercase()}"), info = m.rules())
+                            ChoiceTile(m.icon, m.label(), m == mode, { mode = m; open = null }, Modifier.weight(1f).fillMaxHeight().testTag("mode_${m.name.lowercase()}"), info = m.rules())
                         }
                         if (pair.size == 1) Spacer(Modifier.weight(1f))
                     }
                 }
             }
 
-            Column(Modifier.tourTarget(TourTarget.BATTLE_OPPONENT), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                SectionTitle(
-                    stringResource(R.string.battle_setup_opponent),
-                    info = if (opponentKey == ONLINE) {
-                        stringResource(R.string.battle_setup_info_online, OnlineProtocol.TOURNAMENT_ROPE_LEVEL)
-                    } else {
-                        stringResource(R.string.battle_setup_info_local)
-                    },
-                )
+            val rivalPicked = BotDifficulty.entries.firstOrNull { it.name == opponentKey }
+            ChoiceSection(
+                title = stringResource(R.string.battle_setup_opponent),
+                icon = when (opponentKey) {
+                    FRIEND -> KitIcons.Phone
+                    ONLINE -> KitIcons.Globe
+                    else -> KitIcons.Robot
+                },
+                choice = when (opponentKey) {
+                    FRIEND -> stringResource(R.string.battle_setup_friend)
+                    ONLINE -> stringResource(R.string.battle_setup_online)
+                    else -> rivalPicked?.label() ?: ""
+                },
+                expanded = open == "opponent",
+                onToggle = { toggle("opponent") },
+                modifier = Modifier.tourTarget(TourTarget.BATTLE_OPPONENT).testTag("battle_opponent_picker"),
+                info = if (opponentKey == ONLINE) {
+                    stringResource(R.string.battle_setup_info_online, OnlineProtocol.TOURNAMENT_ROPE_LEVEL)
+                } else {
+                    stringResource(R.string.battle_setup_info_local)
+                },
+            ) {
                 Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     for (d in BotDifficulty.entries) {
                         ChoiceTile(
-                            KitIcons.Robot, d.label(), opponentKey == d.name, { opponentKey = d.name },
+                            KitIcons.Robot, d.label(), opponentKey == d.name, { opponentKey = d.name; open = null },
                             Modifier.weight(1f).fillMaxHeight().testTag("opponent_${d.name.lowercase()}"), vertical = true,
                         )
                     }
                 }
                 Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     ChoiceTile(
-                        KitIcons.Phone, stringResource(R.string.battle_setup_friend_short), opponentKey == FRIEND, { opponentKey = FRIEND },
+                        KitIcons.Phone, stringResource(R.string.battle_setup_friend_short), opponentKey == FRIEND, { opponentKey = FRIEND; open = null },
                         Modifier.weight(1f).fillMaxHeight().testTag("opponent_friend"), description = stringResource(R.string.battle_setup_friend), vertical = true,
                     )
                     ChoiceTile(
-                        KitIcons.Globe, stringResource(R.string.battle_setup_online_short), opponentKey == ONLINE, { opponentKey = ONLINE },
+                        KitIcons.Globe, stringResource(R.string.battle_setup_online_short), opponentKey == ONLINE, { opponentKey = ONLINE; open = null },
                         Modifier.weight(1f).fillMaxHeight().testTag("opponent_online"), description = stringResource(R.string.battle_setup_online), vertical = true,
                     )
+                }
+            }
+
+            // Wagers: only against the computer.
+            val rival = BotDifficulty.entries.firstOrNull { it.name == opponentKey }
+            if (rival != null) {
+                val payout = GameConfig.wagerPayout(rival)
+                val multiplier = formatDecimal(payout.toDouble(), 2)
+                val staked = stake > 0 && p.pointsBalance >= stake
+                ChoiceSection(
+                    title = stringResource(R.string.battle_setup_wager_title),
+                    icon = GameIcons.Coin,
+                    choice = if (staked) compactPoints(stake) else stringResource(R.string.battle_setup_wager_none),
+                    expanded = open == "wager",
+                    onToggle = { toggle("wager") },
+                    modifier = Modifier.tourTarget(TourTarget.BATTLE_WAGER).testTag("battle_wager_picker"),
+                    info = stringResource(R.string.battle_setup_wager_hint, rival.label(), multiplier),
+                    trailing = {
+                        // What a win brings back, once something is staked.
+                        if (staked) {
+                            val terms = stringResource(R.string.battle_setup_wager_terms, formatPoints((stake * payout).toLong()), multiplier, rival.label())
+                            CoinAmount("+" + formatPoints((stake * payout).toLong()), Modifier.semantics { contentDescription = terms }.testTag("wager_win"), color = rewardTextColor())
+                        }
+                    },
+                ) {
+                    // Wraps rather than squeezing the last stake ("100 k") into two lines.
+                    androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        FilterChip(selected = stake == 0L, onClick = { stake = 0L; open = null }, label = { Text(stringResource(R.string.battle_setup_wager_none)) })
+                        for (s in GameConfig.WAGER_STAKES) {
+                            FilterChip(
+                                selected = stake == s,
+                                onClick = { stake = s; open = null },
+                                enabled = p.pointsBalance >= s,
+                                label = { Text(compactPoints(s), maxLines = 1, softWrap = false) },
+                            )
+                        }
+                    }
                 }
             }
 
@@ -213,37 +331,6 @@ fun BattleSetupScreen(vm: GameViewModel) {
                 Column(Modifier.tourTarget(TourTarget.BATTLE_TACKLE), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     SectionTitle(stringResource(R.string.battle_setup_tackle_title), info = stringResource(R.string.battle_setup_tackle_info), modifier = Modifier.width(IntrinsicSize.Max))
                     SightTackleChips(vm, showShopLink = true)
-                }
-            }
-            // Wagers: only against the computer.
-            val rival = BotDifficulty.entries.firstOrNull { it.name == opponentKey }
-            if (rival != null) {
-                val payout = GameConfig.wagerPayout(rival)
-                val multiplier = formatDecimal(payout.toDouble(), 2)
-                Column(Modifier.tourTarget(TourTarget.BATTLE_WAGER), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    SectionTitle(
-                        stringResource(R.string.battle_setup_wager_title),
-                        info = stringResource(R.string.battle_setup_wager_hint, rival.label(), multiplier),
-                        trailing = {
-                            // What a win brings back, once something is staked.
-                            if (stake > 0) {
-                                val terms = stringResource(R.string.battle_setup_wager_terms, formatPoints((stake * payout).toLong()), multiplier, rival.label())
-                                CoinAmount("+" + formatPoints((stake * payout).toLong()), Modifier.semantics { contentDescription = terms }.testTag("wager_win"), color = rewardTextColor())
-                            }
-                        },
-                    )
-                    // Wraps rather than squeezing the last stake ("100 k") into two lines.
-                    androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        FilterChip(selected = stake == 0L, onClick = { stake = 0L }, label = { Text(stringResource(R.string.battle_setup_wager_none)) })
-                        for (s in GameConfig.WAGER_STAKES) {
-                            FilterChip(
-                                selected = stake == s,
-                                onClick = { stake = s },
-                                enabled = p.pointsBalance >= s,
-                                label = { Text(compactPoints(s), maxLines = 1, softWrap = false) },
-                            )
-                        }
-                    }
                 }
             }
             Text(

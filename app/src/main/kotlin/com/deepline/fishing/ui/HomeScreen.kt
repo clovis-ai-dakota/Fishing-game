@@ -219,6 +219,7 @@ internal fun VillageTopBar(vm: GameViewModel, modifier: Modifier = Modifier) {
                     // A badge frame without a title yet: the player's name, framed.
                     TitleBadge(vm.playerName, frame = frame)
                 }
+                VillageDailyButton(vm)
             }
             RoundIconButton(
                 GameIcons.Trophy,
@@ -243,50 +244,23 @@ internal fun VillageTopBar(vm: GameViewModel, modifier: Modifier = Modifier) {
     }
 }
 
-/**
- * The village's left rail: what's on now, each with its count or countdown: today's reward and
- * challenges, a migration, the season.
- */
+/** The daily rewards and challenges: under the points, high enough to stay off the island. */
 @Composable
-internal fun VillageEventRail(vm: GameViewModel, modifier: Modifier = Modifier) {
+private fun VillageDailyButton(vm: GameViewModel) {
     val p = vm.progress
-    val now = ShopClock.now()
-    Column(modifier, verticalArrangement = Arrangement.spacedBy(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-        val status = Daily.status(p, vm.daily.today)
-        val ready = (if (status.canClaim) 1 else 0) + vm.daily.challenges.count { it.claimable }
-        RoundIconButton(
-            DailyIcons.Flame,
-            stringResource(R.string.daily_title),
-            onClick = vm::openDaily,
-            modifier = Modifier.tourTarget(TourTarget.HOME_DAILY).testTag("daily_button"),
-            role = if (ready > 0) ActionRole.CLAIM else ActionRole.NAV,
-            badge = ready,
-            // The streak, in days in a row.
-            label = if (status.streak > 0) formatPoints(status.streak) else null,
-            caption = stringResource(R.string.daily_title),
-        )
-        val migration = vm.daily.migration
-        if (migration != null) {
-            RoundIconButton(
-                DailyIcons.School,
-                stringResource(R.string.daily_migration_banner_title),
-                onClick = vm::openDaily,
-                modifier = Modifier.testTag("migration_banner"),
-                label = ShopText.timeLeft(migration.msLeft(now)).asString(),
-                caption = stringResource(R.string.home_caption_migration),
-            )
-        }
-        val season = Seasons.at(now)
-        RoundIconButton(
-            GameIcons.Star,
-            stringResource(R.string.shop_season_title, season.number, season.label()),
-            onClick = { vm.openShop(ShopPage.PASSES) },
-            modifier = Modifier.testTag("season_button"),
-            role = if (vm.seasonRewardsReady) ActionRole.CLAIM else ActionRole.NAV,
-            label = ShopText.timeLeft(season.msLeft(now)).asString(),
-            caption = stringResource(R.string.home_caption_season),
-        )
-    }
+    val status = Daily.status(p, vm.daily.today)
+    val ready = (if (status.canClaim) 1 else 0) + vm.daily.challenges.count { it.claimable }
+    RoundIconButton(
+        DailyIcons.Flame,
+        stringResource(R.string.daily_title),
+        onClick = vm::openDaily,
+        modifier = Modifier.tourTarget(TourTarget.HOME_DAILY).testTag("daily_button"),
+        role = if (ready > 0) ActionRole.CLAIM else ActionRole.NAV,
+        badge = ready,
+        // The streak, in days in a row.
+        label = if (status.streak > 0) formatPoints(status.streak) else null,
+        caption = stringResource(R.string.daily_title),
+    )
 }
 
 /** The rope in three numbers (how deep, how heavy, how fast); the rest is behind the (i) and in the Shop. */

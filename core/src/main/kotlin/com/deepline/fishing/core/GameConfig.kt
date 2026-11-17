@@ -310,6 +310,8 @@ object GameConfig {
     /** Boat options bought with points cost their table price times this. */
     const val BOAT_PART_PRICE_SCALE = 6
     const val STARTING_LANTERNS = 1
+    /** Tackle bought one at a time (points only), at most this many of each kind per local day. */
+    const val TACKLE_SINGLES_PER_DAY = 5
 
     /** Simulation never advances more than this per frame, and sub-steps at this size. */
     const val MAX_FRAME_DT = 1f / 20f

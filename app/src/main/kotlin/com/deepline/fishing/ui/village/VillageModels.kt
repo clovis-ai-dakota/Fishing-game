@@ -27,7 +27,8 @@ import kotlin.math.sqrt
  * gentle darkening towards the ground in the colour), edges are bevelled so they catch the light,
  * shapes are few, chunky and readable, and the still parts are merged into a few big meshes so a
  * frame is a handful of draws. Keys: `village:terrain`, `village:sea`, `village:town`,
- * `village:glass` and `village:beam` (see [mesh]).
+ * `village:glass` and `village:beam`, and the decorations of the skin the player wears
+ * (`village:dress:bunting` and one monument per legendary set, see [IslandDress]).
  */
 object VillageModels {
     private val cache = HashMap<String, MeshData>()
@@ -41,7 +42,8 @@ object VillageModels {
                 "village:town" -> town()
                 "village:glass" -> glass()
                 "village:beam" -> beam()
-                else -> error("Unknown village mesh $key")
+                "village:dress:bunting" -> bunting()
+                else -> if (key.startsWith("village:dress:")) monument(key.removePrefix("village:dress:")) else error("Unknown village mesh $key")
             }
         }
     }
@@ -544,17 +546,17 @@ object VillageModels {
             // The slab, centred halfway down the slope and sunk by half its thickness.
             val mid = Vec3(cx, top + h / 2f + thick * 0.5f * cos(slope), cz + side * run / 2f + side * thick * 0.5f * sin(slope))
             val m = Mat4.trs(mid, rotX = rot)
-            bevelBox(m, Vec3(width, thick, len), shade(color, if (side > 0f) 1f else 0.9f), 0.1f)
+            bevelBox(m, Vec3(width, thick, len), shade(color, if (side > 0f) 1f else 0.9f), 0.1f, Part.DRESS_ROOF)
             // Rows of tiles: thin ribs across the slope, each a touch darker at its lower edge.
             val rows = (len / 0.62f).toInt()
             for (k in 1 until rows) {
                 val along = -len / 2f + k * (len / rows)
                 val local = Mat4.multiply(m, Mat4.translation(0f, thick / 2f + 0.03f, along * side))
-                bevelBox(local, Vec3(width - 0.1f, 0.08f, 0.16f), shade(color, 0.86f), 0.03f)
+                bevelBox(local, Vec3(width - 0.1f, 0.08f, 0.16f), shade(color, 0.86f), 0.03f, Part.DRESS_ROOF)
             }
         }
         // The ridge cap.
-        box(Vec3(cx, top + h + thick * 0.6f, cz), Vec3(width + 0.1f, 0.34f, 0.5f), shade(color, 0.78f), 0.1f)
+        box(Vec3(cx, top + h + thick * 0.6f, cz), Vec3(width + 0.1f, 0.34f, 0.5f), shade(color, 0.78f), 0.1f, Part.DRESS_ROOF)
         // Gable ends: the wall up under the roof, to the ridge.
         val atWall = top + h * o / run
         for ((x, sign) in listOf(cx - w / 2f to -1f, cx + w / 2f to 1f)) {
@@ -622,14 +624,14 @@ object VillageModels {
     }
 
     /** A pennant on its pole: the cloth flutters (u along it). */
-    private fun MeshBuilder.pennant(foot: Vec3, height: Float, length: Float, dir: Float, color: FloatArray) {
+    private fun MeshBuilder.pennant(foot: Vec3, height: Float, length: Float, dir: Float, color: FloatArray, part: Float = Part.CLOTH) {
         pole(foot, foot + Vec3(0f, height, 0f), 0.09f, rgb(0xFF5D4037), 6)
         paint(rgb(0xFFF2B33D)) { sphere(foot + Vec3(0f, height + 0.1f, 0f), 0.16f, Part.PAINTED, 4, 6) }
         val top = foot + Vec3(0f, height - 0.15f, 0f)
         val n = Vec3(0f, 0f, 1f)
-        val a = vertex(top, n, 0f, 0f, Part.CLOTH, color)
-        val b = vertex(top + Vec3(0f, -1.5f, 0f), n, 0f, 1f, Part.CLOTH, color)
-        val c = vertex(top + Vec3(dir * length, -0.75f, 0f), n, 1f, 0.5f, Part.CLOTH, color)
+        val a = vertex(top, n, 0f, 0f, part, color)
+        val b = vertex(top + Vec3(0f, -1.5f, 0f), n, 0f, 1f, part, color)
+        val c = vertex(top + Vec3(dir * length, -0.75f, 0f), n, 1f, 0.5f, part, color)
         if (dir > 0f) triangle(a, b, c) else triangle(a, c, b)
     }
 
@@ -766,7 +768,7 @@ object VillageModels {
         // The light baked into the colours: ambient occlusion towards the ground (and the water),
         // so everything sits on the island instead of floating over it.
         b.bakeColors { p, n, part, c ->
-            if (part == Part.GLASS || part == Part.BULB || part == Part.CLOTH) return@bakeColors
+            if (part == Part.GLASS || part == Part.BULB || part == Part.CLOTH || part == Part.DRESS_FLAG) return@bakeColors
             val ground = max(height(p.x, p.z), 0f)
             val ao = 0.7f + 0.3f * smooth(0f, 2.4f, p.y - ground)
             // Faces looking down (under eaves and decks) get a little less sky.
@@ -811,7 +813,7 @@ object VillageModels {
         for (k in 0 until bands) {
             val lo = y0 + k * tall / bands
             val hi = lo + tall / bands
-            paint(if (k % 2 == 0) white else red) { lathe(listOf(r(hi) to hi, r(lo) to lo), 28, Part.PAINTED, at) }
+            paint(if (k % 2 == 0) white else red) { lathe(listOf(r(hi) to hi, r(lo) to lo), 28, if (k % 2 == 0) Part.PAINTED else Part.DRESS_ROOF, at) }
         }
         // A trim ring between each band.
         for (k in 1 until bands) {
@@ -833,7 +835,7 @@ object VillageModels {
         // The door, under a little roof.
         onTower(y0 + 1.15f, PI.toFloat() / 2f, Vec3(1.5f, 2.3f, 0.2f), white, out = 0.02f)
         onTower(y0 + 1.1f, PI.toFloat() / 2f, Vec3(1.1f, 2.1f, 0.14f), rgb(0xFF2F6E8E), out = 0.1f)
-        onTower(y0 + 2.45f, PI.toFloat() / 2f, Vec3(1.8f, 0.16f, 0.8f), red, out = 0.4f)
+        onTower(y0 + 2.45f, PI.toFloat() / 2f, Vec3(1.8f, 0.16f, 0.8f), red, Part.DRESS_ROOF, out = 0.4f)
         // The gallery: a deck on brackets, posts and a rail.
         val gy = y0 + tall
         paint(iron) { lathe(listOf(2.75f to gy + 0.32f, 2.75f to gy), 28, Part.PAINTED, at) }
@@ -849,7 +851,7 @@ object VillageModels {
         for (p in circle(Vec3(c.x, 0f, c.z), 1.24f, 8)) pole(Vec3(p.x, gy + 0.85f, p.z), Vec3(p.x, gy + 2.6f, p.z), 0.06f, iron, 4)
         // The dome, the finial and the fish weathervane.
         paint(red) {
-            lathe(listOf(0.05f to gy + 3.75f, 0.6f to gy + 3.55f, 1.05f to gy + 3.15f, 1.38f to gy + 2.7f, 1.5f to gy + 2.55f), 20, Part.PAINTED, at)
+            lathe(listOf(0.05f to gy + 3.75f, 0.6f to gy + 3.55f, 1.05f to gy + 3.15f, 1.38f to gy + 2.7f, 1.5f to gy + 2.55f), 20, Part.DRESS_ROOF, at)
         }
         loop(circle(Vec3(c.x, gy + 2.56f, c.z), 1.5f, 24), 0.08f, iron, 4)
         pole(Vec3(c.x, gy + 3.7f, c.z), Vec3(c.x, gy + 5.2f, c.z), 0.06f, iron, 5)
@@ -905,8 +907,9 @@ object VillageModels {
         for (k in 0 until stripes) {
             val x = c.x - (w + 0.4f) / 2f + (k + 0.5f) * sw
             val col = if (k % 2 == 0) rgb(0xFFE5483C) else rgb(0xFFFFFBF2)
-            boxR(Vec3(x, f + wallH - 0.95f, front + 1.0f), Vec3(sw, 0.1f, 2.5f), col, rotX = 0.42f, bevel = 0.03f)
-            boxR(Vec3(x, f + wallH - 1.62f, front + 2.12f), Vec3(sw * 0.9f, 0.42f, 0.06f), col, bevel = 0.03f)
+            val part = if (k % 2 == 0) Part.DRESS_TRIM else Part.PAINTED
+            boxR(Vec3(x, f + wallH - 0.95f, front + 1.0f), Vec3(sw, 0.1f, 2.5f), col, rotX = 0.42f, bevel = 0.03f, part = part)
+            boxR(Vec3(x, f + wallH - 1.62f, front + 2.12f), Vec3(sw * 0.9f, 0.42f, 0.06f), col, bevel = 0.03f, part = part)
         }
         // Stalls: fish on ice, and fruit.
         val stall = rgb(0xFFB98652)
@@ -1053,7 +1056,7 @@ object VillageModels {
         val iron = rgb(0xFF2E6B70)
         val top = f + 1.3f
         paint(stone) { lathe(listOf(r + 0.4f to top, r + 0.4f to f - 1.6f), 36, Part.PAINTED, at) }
-        paint(rgb(0xFF4A9BC4)) { lathe(listOf(r + 0.43f to top - 0.45f, r + 0.43f to top - 0.85f), 36, Part.PAINTED, at) }
+        paint(rgb(0xFF4A9BC4)) { lathe(listOf(r + 0.43f to top - 0.45f, r + 0.43f to top - 0.85f), 36, Part.DRESS_TRIM, at) }
         paint(shade(stone, 0.95f)) { lathe(listOf(r - 0.1f to top + 0.12f, r + 0.6f to top + 0.12f, r + 0.6f to top - 0.1f), 36, Part.PAINTED, at) }
         // The water inside, seen through the glass.
         disc(Vec3(c.x, top + 2.6f, c.z), r - 0.3f, rgb(0xFF2BB3C8), 32)
@@ -1083,7 +1086,7 @@ object VillageModels {
         for (side in listOf(-1f, 1f)) bevelBox(Mat4.multiply(m, Mat4.translation(side * 1.05f, 1.5f, 0.2f)), Vec3(0.45f, 3.0f, 0.7f), stone, 0.06f)
         bevelBox(Mat4.multiply(m, Mat4.translation(0f, 3.2f, 0.2f)), Vec3(2.8f, 0.5f, 0.75f), stone, 0.08f)
         bevelBox(Mat4.multiply(m, Mat4.translation(0f, 1.25f, 0.05f)), Vec3(1.65f, 2.5f, 0.4f), rgb(0xFF1F4E5A), 0.04f)
-        bevelBox(Mat4.multiply(m, Mat4.translation(0f, 3.55f, 0.25f)), Vec3(1.1f, 0.3f, 0.6f), rgb(0xFF4A9BC4), 0.05f)
+        bevelBox(Mat4.multiply(m, Mat4.translation(0f, 3.55f, 0.25f)), Vec3(1.1f, 0.3f, 0.6f), rgb(0xFF4A9BC4), 0.05f, Part.DRESS_TRIM)
         for (side in listOf(-1f, 1f)) {
             val p = Mat4.transformPoint(m, Vec3(side * 2.2f, 0f, 1.0f))
             lamp(ground(p.x, p.z), 2.6f)
@@ -1220,7 +1223,8 @@ object VillageModels {
         paint(rgb(0xFFE3C99A)) {
             tube((0..44).map { j -> val ang = gap + 0.35f + j / 44f * (2f * PI.toFloat() - 0.7f); Vec3(c.x + cos(ang) * (r - 0.25f), deckY + 1.12f - 0.14f * abs(sin(j * PI.toFloat() / 2.75f)), c.z + sin(ang) * (r - 0.25f)) }, { 0.07f }, 4, Part.PAINTED, cap = false)
         }
-        pennant(Vec3(c.x - r * 0.62f, deckY, c.z), 6.2f, 2.8f, 1f, rgb(0xFF3FA9F5))
+        // The blue pennant is the player's: it takes the colours of their skin (see IslandDress).
+        pennant(Vec3(c.x - r * 0.62f, deckY, c.z), 6.2f, 2.8f, 1f, rgb(0xFF3FA9F5), Part.DRESS_FLAG)
         pennant(Vec3(c.x + r * 0.62f, deckY, c.z), 6.2f, 2.8f, -1f, rgb(0xFFFF5A4A))
         for ((i, at2) in buoys.withIndex()) {
             paint(if (i % 2 == 0) rgb(0xFFE53935) else rgb(0xFFFFFBF2)) { sphere(at2, 0.45f, Part.PAINTED, 6, 10) }
@@ -1241,4 +1245,166 @@ object VillageModels {
             paint(dark) { tube(listOf(Vec3(ja.x + side, -2f, zz), Vec3(ja.x + side, ja.y + 0.3f, zz)), { 0.17f }, 7, Part.PAINTED, cap = true) }
         }
     }
+
+    // ---- The skin the player wears, on the island (see IslandDress) -------------------------------
+
+    /** Ambient occlusion towards the ground, as baked into the town. */
+    private fun MeshBuilder.bakeGround(from: Int) = bakeColors(from) { p, n, part, c ->
+        if (part == Part.GLASS || part == Part.BULB || part == Part.CLOTH || part == Part.DRESS_FLAG) return@bakeColors
+        val ao = 0.7f + 0.3f * smooth(0f, 2.4f, p.y - max(height(p.x, p.z), 0f))
+        val under = if (n.y < -0.3f) 0.85f else 1f
+        for (k in 0..2) c[k] *= ao * under
+    }
+
+    /**
+     * A string of little flags from [a] to [b], sagging by [sag]: the flags alternate between the
+     * skin's flag and trim colours (tinted in the shader) and flutter.
+     */
+    private fun MeshBuilder.flagString(a: Vec3, b: Vec3, sag: Float) {
+        val len = sqrt((b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y) + (b.z - a.z) * (b.z - a.z))
+        val n = max(4, (len / 0.75f).toInt())
+        fun at(t: Float) = Vec3(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t - sag * sin(t * PI.toFloat()), a.z + (b.z - a.z) * t)
+        paint(rgb(0xFF4E3B30)) { tube((0..n).map { at(it / n.toFloat()) }, { 0.03f }, 3, Part.PAINTED, cap = false) }
+        val side = Vec3(-(b.z - a.z), 0f, b.x - a.x).normalized()
+        for (i in 0 until n) {
+            val p = at((i + 0.15f) / n)
+            val q = at((i + 0.85f) / n)
+            val tip = at((i + 0.5f) / n) + Vec3(0f, -0.6f, 0f)
+            val part = if (i % 2 == 0) Part.DRESS_FLAG else Part.DRESS_TRIM
+            val col = if (i % 2 == 0) rgb(0xFF3FA9F5) else rgb(0xFFFFFBF2)
+            val i0 = vertex(p, side, 0f, 0f, part, col)
+            val i1 = vertex(q, side, 0f, 1f, part, col)
+            val i2 = vertex(tip, side, 1f, 0.5f, part, col)
+            triangle(i0, i1, i2)
+        }
+    }
+
+    /**
+     * Bunting for the island's party when the player wears a premium look: across the square,
+     * along the pier, between the arena's pennants and down from the lighthouse's gallery.
+     */
+    private fun bunting(): MeshData {
+        val b = MeshBuilder()
+        val fShop = floorOf(Building.SHOP)
+        val fRope = floorOf(Building.ROPE)
+        val shop = VillageLayout.spots.getValue(Building.SHOP).center
+        val rope = VillageLayout.spots.getValue(Building.ROPE).center
+        // Across the square, from the market's front corner to the workshop's.
+        b.flagString(Vec3(shop.x + 5.2f, fShop + 4.2f, shop.z + 3.4f), Vec3(rope.x - 6.1f, fRope + 3.7f, rope.z + 3.2f), 1.1f)
+        b.flagString(Vec3(shop.x + 5.2f, fShop + 4.2f, shop.z + 3.4f), Vec3(VillageLayout.square.x + 1f, fShop + 3.4f, VillageLayout.square.z + 5.5f), 0.6f)
+        // Along the pier, on three tall poles.
+        val a = VillageLayout.pierFrom
+        val e = VillageLayout.pierTo
+        val poles = listOf(a.z + 1.2f, (a.z + e.z) / 2f, e.z - 0.6f).map { z -> Vec3(a.x - 1.55f, a.y + 3.4f, z) }
+        for (p in poles) b.pole(Vec3(p.x, a.y + 0.3f, p.z), p + Vec3(0f, 0.2f, 0f), 0.07f, rgb(0xFF5E4330), 5)
+        for (i in 0 until poles.size - 1) b.flagString(poles[i], poles[i + 1], 0.7f)
+        // Between the arena's pennants.
+        val arena = VillageLayout.spots.getValue(Building.DUEL).center
+        b.flagString(Vec3(arena.x - ARENA_R * 0.62f, 0.9f + 5.8f, arena.z), Vec3(arena.x + ARENA_R * 0.62f, 0.9f + 5.8f, arena.z), 1.2f)
+        // Down from the lighthouse's gallery to either side of its steps.
+        val c = lighthouseAt
+        val gy = lighthouseLamp.y - 1.7f
+        for (side in listOf(-1f, 1f)) {
+            val foot = ground(c.x + side * 4.2f, c.z + 4.6f)
+            b.pole(foot, foot + Vec3(0f, 2.6f, 0f), 0.07f, rgb(0xFF5E4330), 5)
+            b.flagString(Vec3(c.x + side * 0.9f, gy + 1.2f, c.z + 2.45f), foot + Vec3(0f, 2.6f, 0f), 1.4f)
+        }
+        b.bakeGround(0)
+        return b.build()
+    }
+
+    /**
+     * What a legendary set raises on the island, its hardest look: a monument in the square and a
+     * crown for the lighthouse. "leviathan": a leviathan's skeleton with cyan runes; "prism": a
+     * cluster of rainbow crystals; "crown": a golden fish on a tall plinth with royal banners.
+     * They glow a little at night. Small enough to leave the paths and the places clear.
+     */
+    private fun monument(set: String): MeshData {
+        val b = MeshBuilder()
+        val sq = VillageLayout.square
+        val g = height(sq.x, sq.z)
+        val at = Vec3(sq.x, g, sq.z)
+        // Lathe profiles give absolute heights: turned round this.
+        val axis = Vec3(sq.x, 0f, sq.z)
+        val stone = rgb(0xFFD8CFBF)
+        val c = lighthouseAt
+        val gy = lighthouseLamp.y - 1.7f
+        when (set) {
+            "leviathan" -> {
+                val bone = rgb(0xFFEDE6D2)
+                val cyan = rgb(0xFF59E3F2)
+                b.paint(stone) { lathe(listOf(2.6f to g + 0.35f, 2.75f to g - 0.4f), 16, Part.PAINTED, axis) }
+                b.disc(Vec3(at.x, g + 0.35f, at.z), 2.6f, shade(stone, 1.05f), 16)
+                val spine = (0..10).map { i -> val x = -2.3f + 4.4f * i / 10f; Vec3(at.x + x, g + 1.25f + 0.25f * sin(i / 10f * PI.toFloat()), at.z) }
+                b.paint(bone) { tube(spine, { u -> 0.16f - 0.06f * u }, 6, Part.PAINTED) }
+                // The skull and its jaw.
+                b.paint(bone) {
+                    sphere(Vec3(at.x + 2.45f, g + 1.15f, at.z), 0.55f, Part.PAINTED, 6, 10, Vec3(1.3f, 0.75f, 0.9f))
+                    tube(listOf(Vec3(at.x + 1.9f, g + 0.75f, at.z), Vec3(at.x + 2.9f, g + 0.62f, at.z)), { 0.12f }, 5, Part.PAINTED)
+                }
+                b.paint(rgb(0xFF1B2A30)) { sphere(Vec3(at.x + 2.7f, g + 1.3f, at.z + 0.5f), 0.12f, Part.PAINTED, 3, 6) }
+                // Ribs arching over the spine.
+                for (i in 0 until 6) {
+                    val x = at.x - 1.7f + 0.65f * i
+                    val k = 1f - 0.12f * abs(i - 2.5f)
+                    val rib = (0..8).map { j ->
+                        val a = PI.toFloat() * j / 8f
+                        Vec3(x, g + 0.4f + (1.1f + 0.9f * k) * sin(a), at.z + (1.3f * k) * cos(a))
+                    }
+                    b.paint(bone) { tube(rib, { 0.08f }, 5, Part.PAINTED, cap = true) }
+                }
+                // Runes round the plinth, and a cyan ring on the lighthouse's gallery.
+                for (k in 0 until 10) {
+                    val a = k / 10f * 2f * PI.toFloat()
+                    b.paint(cyan) { box(Vec3(at.x + cos(a) * 2.72f, g + 0.05f, at.z + sin(a) * 2.72f), Vec3(0.22f, 0.28f, 0.22f), Part.BULB) }
+                }
+                b.paint(cyan) { tube(circle(Vec3(c.x, gy + 1.3f, c.z), 2.62f, 36).let { it + it.first() }, { 0.06f }, 4, Part.BULB, cap = false) }
+            }
+            "prism" -> {
+                b.paint(stone) { lathe(listOf(1.9f to g + 0.45f, 2.05f to g - 0.4f), 16, Part.PAINTED, axis) }
+                b.disc(Vec3(at.x, g + 0.45f, at.z), 1.9f, shade(stone, 1.05f), 16)
+                val colors = listOf(0xFFFF6B6B, 0xFFFFB347, 0xFFFFE66D, 0xFF7BE495, 0xFF5BC0EB, 0xFF9B7BFF, 0xFFFF8AD8)
+                for ((k, col) in colors.withIndex()) {
+                    val tall = if (k == 0) 3.6f else 1.4f + 0.35f * (k % 3)
+                    val r = if (k == 0) 0.45f else 0.26f
+                    val a = k / 6f * 2f * PI.toFloat()
+                    val off = if (k == 0) Vec3.ZERO else Vec3(cos(a) * 0.75f, 0f, sin(a) * 0.75f)
+                    val crystal = MeshBuilder().apply { lathe(listOf(0.01f to tall, r to tall * 0.72f, r to 0.15f, 0.01f to 0f), 6, Part.BULB) }.build()
+                    b.paint(rgb(col)) { append(crystal, Mat4.trs(Vec3(at.x + off.x, g + 0.4f, at.z + off.z), rotX = off.z * 0.35f, rotZ = -off.x * 0.35f)) }
+                }
+                // A prism over the lighthouse's weathervane.
+                val prism = MeshBuilder().apply { lathe(listOf(0.01f to 1.2f, 0.32f to 0.6f, 0.01f to 0f), 6, Part.BULB) }.build()
+                b.paint(rgb(0xFFBFF3FF)) { append(prism, Mat4.translation(c.x, gy + 5.6f, c.z)) }
+            }
+            else -> {
+                // "crown".
+                val gold = rgb(0xFFF2C14E)
+                val purple = rgb(0xFF6A3FA0)
+                b.box(Vec3(at.x, g + 0.7f, at.z), Vec3(2.2f, 1.6f, 2.2f), stone, 0.12f)
+                b.box(Vec3(at.x, g + 1.6f, at.z), Vec3(2.5f, 0.25f, 2.5f), shade(stone, 1.05f), 0.08f)
+                for ((dx, dz) in listOf(0f to 1.12f, 0f to -1.12f, 1.12f to 0f, -1.12f to 0f)) {
+                    b.box(Vec3(at.x + dx, g + 1.0f, at.z + dz), Vec3(if (dx == 0f) 1.0f else 0.06f, 1.0f, if (dz == 0f) 1.0f else 0.06f), purple, 0.02f)
+                    b.box(Vec3(at.x + dx * 1.02f, g + 0.52f, at.z + dz * 1.02f), Vec3(if (dx == 0f) 0.3f else 0.07f, 0.12f, if (dz == 0f) 0.3f else 0.07f), gold, 0.02f)
+                }
+                val fish = listOf(
+                    -1.0f to 0f, -0.7f to 0.34f, 0f to 0.5f, 0.7f to 0.3f, 1.0f to 0.04f, 1.45f to 0.32f, 1.45f to -0.32f, 1.0f to -0.04f,
+                    0.7f to -0.3f, 0f to -0.48f, -0.7f to -0.32f,
+                )
+                b.paint(gold) { append(MeshBuilder().apply { extrude(fish, 0.3f, Part.PAINTED) }.build(), Mat4.trs(Vec3(at.x, g + 2.75f, at.z), rotZ = 0.35f, scale = Vec3(1.3f, 1.3f, 1.3f))) }
+                b.pole(Vec3(at.x, g + 1.7f, at.z), Vec3(at.x, g + 2.3f, at.z), 0.1f, gold, 6)
+                // A crown round the top of the lighthouse's dome.
+                val ring = circle(Vec3(c.x, gy + 3.45f, c.z), 0.72f, 16)
+                b.paint(gold) { tube(ring + ring.first(), { 0.09f }, 5, Part.PAINTED, cap = false) }
+                for (k in 0 until 8) {
+                    val a = k / 8f * 2f * PI.toFloat()
+                    val p = Vec3(c.x + cos(a) * 0.72f, gy + 3.45f, c.z + sin(a) * 0.72f)
+                    b.paint(gold) { lathe(listOf(0.01f to 0.55f, 0.13f to 0f), 5, Part.PAINTED, p) }
+                    b.paint(if (k % 2 == 0) rgb(0xFFE53958) else rgb(0xFF4FC3F7)) { sphere(p + Vec3(0f, 0.62f, 0f), 0.09f, Part.BULB, 3, 5) }
+                }
+            }
+        }
+        b.bakeGround(0)
+        return b.build()
+    }
+
 }

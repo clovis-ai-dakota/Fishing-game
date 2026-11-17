@@ -56,6 +56,9 @@ import com.deepline.fishing.ui.tour.TourTarget
 import com.deepline.fishing.ui.tour.tourTarget
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import com.deepline.fishing.core.Decor
@@ -169,7 +172,13 @@ fun AquariumScreen(vm: GameViewModel) {
  * otherwise the 2D [AquariumTank]. Fills [modifier]'s size, whatever its shape.
  */
 @Composable
-fun AquariumView(p: PlayerProgress, modifier: Modifier = Modifier) {
+fun AquariumView(
+    p: PlayerProgress,
+    modifier: Modifier = Modifier,
+    camera: com.deepline.fishing.ui.render3d.AquariumScene.Camera? = null,
+    // About the card's own width on most phones: drawn at full sharpness, not stretched.
+    maxRenderWidth: Int = 1080,
+) {
     val context = LocalContext.current
     val supported = remember { com.deepline.fishing.ui.render3d.gl.Render3d.isSupported(context) } && !com.deepline.fishing.ui.render3d.gl.OffscreenGl.failed
     val fish = Showcase.tankFish(p)
@@ -183,7 +192,7 @@ fun AquariumView(p: PlayerProgress, modifier: Modifier = Modifier) {
     looks[0] = Triple(fish, Showcase.shownDecor(p), Showcase.hasBigTank(p))
     val source = remember {
         val scene = com.deepline.fishing.ui.render3d.AquariumScene()
-        com.deepline.fishing.ui.render3d.gl.FrameSource { w, h, t -> looks[0]!!.let { (f, d, big) -> scene.build(w, h, t, f, d, big) } }
+        com.deepline.fishing.ui.render3d.gl.FrameSource { w, h, t -> looks[0]!!.let { (f, d, big) -> scene.build(w, h, t, f, d, big, camera) } }
     }
     androidx.compose.foundation.layout.Box(modifier.semantics { contentDescription = description }) {
         com.deepline.fishing.ui.render3d.gl.LivePreview(
@@ -191,14 +200,15 @@ fun AquariumView(p: PlayerProgress, modifier: Modifier = Modifier) {
             transparent = false,
             modifier = Modifier.matchParentSize(),
             key = "aquarium",
-            maxRenderWidth = 720,
+            maxRenderWidth = maxRenderWidth,
         )
     }
 }
 
 /**
  * The aquarium full screen: the phone turns sideways and the system bars hide while it shows, and
- * both come back when it closes (back, or the button in the corner).
+ * both come back when it closes (back, or the button in the corner). Pinch to zoom in on a fish,
+ * drag to look around the tank, double-tap to see all of it again.
  */
 @Composable
 fun AquariumFullScreen(vm: GameViewModel) {
@@ -214,8 +224,23 @@ fun AquariumFullScreen(vm: GameViewModel) {
             activity?.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         }
     }
+    val camera = remember { com.deepline.fishing.ui.render3d.AquariumScene.Camera() }
     androidx.compose.foundation.layout.Box(Modifier.fillMaxSize().background(Color.Black).testTag("aquarium_full")) {
-        AquariumView(vm.progress, Modifier.fillMaxSize())
+        AquariumView(
+            vm.progress,
+            Modifier
+                .fillMaxSize()
+                .pointerInput(Unit) {
+                    detectTransformGestures { _, pan, zoom, _ ->
+                        camera.zoomBy(zoom)
+                        camera.drag(pan.x, pan.y)
+                    }
+                }
+                .pointerInput(Unit) { detectTapGestures(onDoubleTap = { camera.reset() }) },
+            camera = camera,
+            // Sideways the view is the phone's full width: drawn sharp, not stretched from a small image.
+            maxRenderWidth = 1800,
+        )
         com.deepline.fishing.ui.kit.RoundIconButton(
             com.deepline.fishing.ui.kit.KitIcons.Close,
             stringResource(R.string.common_back),

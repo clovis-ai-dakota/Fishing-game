@@ -16,21 +16,69 @@ import kotlin.math.tan
  * Looks only, like the 2D tank (`AquariumTank`), which is the fallback.
  */
 class AquariumScene {
+    /**
+     * Where the player looks in the full-screen tank (pinch to zoom, drag to look around); null:
+     * the whole tank. Written by the gestures on the main thread, read and clamped by [build] on the
+     * render thread.
+     */
+    class Camera {
+        @Volatile var zoom = 1f
+        /** The view's centre, in metres from the middle of the tank's back wall. */
+        @Volatile var panX = 0f
+        @Volatile var panY = 0f
+        /** Metres of back wall per screen pixel at the last frame: how far a finger moves the view. */
+        @Volatile var metersPerPx = 0f
+
+        fun zoomBy(factor: Float) {
+            zoom = (zoom * factor).coerceIn(1f, MAX_ZOOM)
+        }
+
+        /** A finger moved by ([dxPx], [dyPx]): the tank follows it. */
+        fun drag(dxPx: Float, dyPx: Float) {
+            panX -= dxPx * metersPerPx
+            panY += dyPx * metersPerPx
+        }
+
+        fun reset() {
+            zoom = 1f
+            panX = 0f
+            panY = 0f
+        }
+
+        companion object {
+            const val MAX_ZOOM = 3.5f
+        }
+    }
+
     /** The tank: [width] by [HEIGHT] by [DEPTH] metres, the sand at y = 0. */
     private fun width(big: Boolean) = if (big) 12f else 8f
 
-    fun build(widthPx: Int, heightPx: Int, t: Float, fish: List<FishSpecies>, decor: List<Decor>, big: Boolean): Frame {
+    fun build(widthPx: Int, heightPx: Int, t: Float, fish: List<FishSpecies>, decor: List<Decor>, big: Boolean, camera: Camera? = null): Frame {
         val tw = width(big)
         val aspect = widthPx / heightPx.toFloat()
         // A long lens: the front of the tank hardly bigger than its back, like looking through glass.
-        val fov = 18f * PI.toFloat() / 180f
-        val halfTan = tan(fov / 2f)
+        val baseFov = 18f * PI.toFloat() / 180f
+        val baseHalfTan = tan(baseFov / 2f)
         // Framed so the back wall fills the view (the water reaches every edge, the frame's front
         // bars just inside or past them): the closest distance at which the back wall covers it.
-        val toBack = kotlin.math.min(tw * 0.5f / (halfTan * aspect), HEIGHT * 0.5f / halfTan) * 0.98f
+        val toBack = kotlin.math.min(tw * 0.5f / (baseHalfTan * aspect), HEIGHT * 0.5f / baseHalfTan) * 0.98f
         val distance = toBack - DEPTH / 2f
-        val center = Vec3(0f, HEIGHT / 2f, 0f)
-        val eye = Vec3(0f, HEIGHT * 0.5f, distance)
+        // Zooming narrows the lens (the tank keeps its shape); looking around slides the camera
+        // along the glass, never past the back wall's edges.
+        val zoom = camera?.zoom ?: 1f
+        val halfTan = baseHalfTan / zoom
+        val fov = 2f * kotlin.math.atan(halfTan)
+        val seenHalfH = toBack * halfTan
+        val seenHalfW = seenHalfH * aspect
+        val panX = (camera?.panX ?: 0f).coerceIn(-max(0f, tw / 2f - seenHalfW), max(0f, tw / 2f - seenHalfW))
+        val panY = (camera?.panY ?: 0f).coerceIn(-max(0f, HEIGHT / 2f - seenHalfH), max(0f, HEIGHT / 2f - seenHalfH))
+        if (camera != null) {
+            camera.panX = panX
+            camera.panY = panY
+            camera.metersPerPx = 2f * seenHalfH / heightPx.coerceAtLeast(1)
+        }
+        val center = Vec3(panX, HEIGHT / 2f + panY, 0f)
+        val eye = Vec3(panX, HEIGHT * 0.5f + panY, distance)
         val view = Mat4.lookAt(eye, center, Vec3.UP)
         val proj = Mat4.perspective(fov, aspect, 0.3f, distance + DEPTH * 3f)
         val globals = mapOf(
@@ -186,6 +234,92 @@ internal object AquariumModels {
         return b.build()
     }
 
+    /**
+     * The sunken ship: a round wooden hull lofted from bow to stern (weathered darker and greener
+     * towards the keel), its deck with planks missing, a stern cabin with dark windows, a broken
+     * mast with its fallen yard, railing posts, a hole in its side and an anchor in the sand.
+     * Built about 3 m long, bow towards +x; the caller tilts it as it settled.
+     */
+    private fun wreck(): MeshData {
+        val b = MeshBuilder()
+        val wood = rgba(0xFF7A5A3C)
+        val darkWood = rgba(0xFF4E3826)
+        val plank = rgba(0xFF8C6A48)
+        val iron = rgba(0xFF3C4448)
+        // The hull: deep and round, a pointed bow rising at the front, a broad stern.
+        val hull = listOf(
+            LoftStation(-1.35f, 0.62f, 0.06f, 0.42f, 0.40f),
+            LoftStation(-1.15f, 0.6f, 0.07f, 0.55f, 0.52f),
+            LoftStation(-0.6f, 0.58f, 0.07f, 0.6f, 0.6f),
+            LoftStation(0.1f, 0.58f, 0.07f, 0.6f, 0.6f),
+            LoftStation(0.7f, 0.62f, 0.07f, 0.5f, 0.48f),
+            LoftStation(1.15f, 0.7f, 0.06f, 0.34f, 0.3f),
+            LoftStation(1.45f, 0.8f, 0.04f, 0.16f, 0.12f),
+            LoftStation(1.62f, 0.9f, 0.02f, 0.03f, 0.02f),
+        )
+        val hullFrom = b.vertexCount
+        b.loft(hull, 18, Part.PAINTED)
+        b.recolor(hullFrom, wood)
+        // Weathered: darker towards the keel, a little green where weed grows, planks in bands.
+        b.bakeColors(hullFrom) { p, _, _, c ->
+            val low = ((0.62f - p.y) / 0.6f).coerceIn(0f, 1f)
+            val band = if (((p.y * 9f) % 1f + 1f) % 1f < 0.5f) 1f else 0.9f
+            val k = (1f - 0.35f * low) * band
+            c[0] *= k * (1f - 0.12f * low); c[1] *= k; c[2] *= k * (1f - 0.1f * low)
+        }
+        // A wale along each side at the deck line, and the keel.
+        for (side in listOf(-1f, 1f)) {
+            val path = (0..10).map { i ->
+                val x = -1.3f + 2.85f * i / 10f
+                val st = hullAt(hull, x)
+                Vec3(x, st.centerY + st.top * 0.3f, side * (st.halfWidth + 0.02f))
+            }
+            b.paint(darkWood) { tube(path, { 0.045f }, 6, Part.PAINTED) }
+        }
+        b.paint(darkWood) { tube((0..10).map { i -> val x = -1.3f + 2.9f * i / 10f; val st = hullAt(hull, x); Vec3(x, st.centerY - st.bottom + 0.02f, 0f) }, { 0.05f }, 6, Part.PAINTED) }
+        // The deck: planks side by side, two of them gone.
+        for (k in 0 until 7) {
+            if (k == 2 || k == 5) continue
+            val z = -0.42f + 0.14f * k
+            b.cube(Vec3(-0.05f, 0.67f, z), Vec3(2.2f - 0.25f * kotlin.math.abs(k - 3), 0.04f, 0.12f), if (k % 2 == 0) plank else wood)
+        }
+        // Railing posts along both sides, a few broken short.
+        for (side in listOf(-1f, 1f)) for (i in 0 until 7) {
+            val x = -1.15f + 0.38f * i
+            val st = hullAt(hull, x)
+            val h = if ((i + (if (side > 0) 1 else 0)) % 3 == 0) 0.08f else 0.22f
+            b.cube(Vec3(x, st.centerY + st.top + h / 2f, side * (st.halfWidth - 0.04f)), Vec3(0.05f, h, 0.05f), darkWood)
+        }
+        // The stern cabin, its roof slipping, two dark windows and a door.
+        b.cube(Vec3(-0.95f, 0.92f, 0f), Vec3(0.6f, 0.46f, 0.8f), plank)
+        b.paint(darkWood) { append(MeshBuilder().apply { box(Vec3.ZERO, Vec3(0.72f, 0.06f, 0.92f), Part.PAINTED) }.build(), Mat4.trs(Vec3(-0.93f, 1.18f, 0.02f), rotX = 0.12f, rotZ = -0.08f)) }
+        for (z in listOf(-0.22f, 0.22f)) b.cube(Vec3(-0.64f, 0.98f, z), Vec3(0.03f, 0.14f, 0.16f), rgba(0xFF10181C))
+        b.cube(Vec3(-0.95f, 0.9f, 0.41f), Vec3(0.2f, 0.3f, 0.02f), rgba(0xFF1B1410))
+        // The broken mast, leaning, and its yard fallen across the deck.
+        b.paint(darkWood) { tube(listOf(Vec3(0.25f, 0.65f, 0f), Vec3(0.42f, 1.5f, 0.06f), Vec3(0.5f, 1.85f, 0.1f)), { u -> 0.075f - 0.025f * u }, 8, Part.PAINTED) }
+        b.paint(darkWood) { tube(listOf(Vec3(0.1f, 0.74f, -0.55f), Vec3(0.75f, 0.9f, 0.5f)), { 0.04f }, 6, Part.PAINTED) }
+        // A hole in its side, showing the dark inside.
+        b.paint(rgba(0xFF120D0A)) { sphere(Vec3(0.35f, 0.42f, 0.56f), 0.2f, Part.PAINTED, 6, 10, scale = Vec3(1.3f, 0.9f, 0.25f)) }
+        // The anchor, lying in the sand by the bow on its rope.
+        b.paint(iron) {
+            tube(listOf(Vec3(1.95f, 0.12f, 0.25f), Vec3(1.95f, 0.75f, 0.25f)), { 0.035f }, 6, Part.PAINTED)
+            tube((0..8).map { i -> val a = PI.toFloat() * (0.15f + 0.7f * i / 8f); Vec3(1.95f + 0.28f * cos(a), 0.4f - 0.28f * sin(a), 0.25f) }, { 0.035f }, 6, Part.PAINTED)
+            tube((0..10).map { i -> val a = 2f * PI.toFloat() * i / 10f; Vec3(1.95f + 0.08f * cos(a), 0.83f + 0.08f * sin(a), 0.25f) }, { 0.02f }, 5, Part.PAINTED, cap = false)
+        }
+        b.paint(rgba(0xFF8D7B5A)) { tube(listOf(Vec3(1.55f, 0.85f, 0.05f), Vec3(1.8f, 0.85f, 0.2f), Vec3(1.95f, 0.88f, 0.25f)), { 0.02f }, 5, Part.PAINTED) }
+        return b.build()
+    }
+
+    /** The hull's cross-section at [x], interpolated between [stations]. */
+    private fun hullAt(stations: List<LoftStation>, x: Float): LoftStation {
+        val i = stations.indexOfLast { it.x <= x }.coerceIn(0, stations.size - 2)
+        val a = stations[i]
+        val c = stations[i + 1]
+        val u = ((x - a.x) / (c.x - a.x)).coerceIn(0f, 1f)
+        fun lerp(p: Float, q: Float) = p + (q - p) * u
+        return LoftStation(x, lerp(a.centerY, c.centerY), lerp(a.top, c.top), lerp(a.bottom, c.bottom), lerp(a.halfWidth, c.halfWidth))
+    }
+
     private fun decor(d: Decor): MeshData {
         val b = MeshBuilder()
         when (d) {
@@ -234,15 +368,7 @@ internal object AquariumModels {
                 }
                 b.paint(rgba(0xFF37474F)) { tube((0..16).map { j -> val x = -3.8f + 7.6f * j / 16f; Vec3(x, AquariumScene.HEIGHT - 0.15f - 0.18f * sin(j / 16f * PI.toFloat()), -1.2f) }, { 0.02f }, 4, Part.PAINTED, cap = false) }
             }
-            Decor.SUNKEN_SHIP -> {
-                val wood = rgba(0xFF5D4632)
-                val hull = listOf(-1.4f to 0.6f, -1.0f to 0f, 1.0f to 0f, 1.5f to 0.7f)
-                b.paint(wood) { append(MeshBuilder().apply { extrude(hull, 0.8f, Part.PAINTED) }.build(), Mat4.trs(Vec3(0f, 0.1f, 0f), rotZ = 0.18f)) }
-                b.cube(Vec3(0.1f, 0.62f, 0f), Vec3(2.2f, 0.06f, 0.7f), rgba(0xFF7B5E45))
-                // The broken mast, leaning.
-                b.paint(rgba(0xFF4E3B2A)) { tube(listOf(Vec3(0.2f, 0.6f, 0f), Vec3(0.6f, 1.9f, 0.1f)), { 0.06f }, 6, Part.PAINTED) }
-                b.cube(Vec3(-0.6f, 0.85f, 0.41f), Vec3(0.18f, 0.18f, 0.04f), rgba(0xFF2F3E46))
-            }
+            Decor.SUNKEN_SHIP -> b.append(wreck(), Mat4.trs(Vec3(-0.1f, -0.08f, 0f), rotZ = 0.1f, rotX = 0.16f, scale = Vec3(0.85f, 0.85f, 0.85f)))
             Decor.PLANTS, Decor.CORAL_GARDEN -> b.cube(Vec3.ZERO, Vec3(0.01f, 0.01f, 0.01f), rgba(0xFF000000))
         }
         return b.build()

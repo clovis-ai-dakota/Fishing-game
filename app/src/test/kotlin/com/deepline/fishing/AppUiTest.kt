@@ -169,6 +169,7 @@ class AppUiTest {
     fun onlineLobby() {
         launch()
         compose.openBuilding("battle")
+        compose.onNodeWithTag("battle_opponent_picker").performScrollTo().performClick()
         compose.onNodeWithTag("opponent_online").performScrollTo().performClick()
         compose.click("Go online")
         compose.onNodeWithText("Create room").assertExists()

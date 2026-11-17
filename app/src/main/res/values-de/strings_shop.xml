@@ -116,6 +116,13 @@
     <string name="shop_tackle_desc_battles">%1$s Wirkt auch in Duellen.</string>
     <string name="shop_tackle_desc_solo">%1$s Nur für Solo-Würfe.</string>
     <string name="shop_tackle_single">Nur eins</string>
+    <!-- Under "Just one": how many more can be bought one at a time today. %1$d: left, %2$d: the daily limit. -->
+    <string name="shop_tackle_singles_left">Heute noch %1$d/%2$d</string>
+    <!-- Behind a tackle's (i): the daily limit on single pieces. %1$d: the limit. -->
+    <plurals name="shop_tackle_singles_info">
+        <item quantity="one">Einzeln: bis zu %1$d von jedem pro Tag, nur mit Punkten. Pakete haben keine Grenze.</item>
+        <item quantity="other">Einzeln: bis zu %1$d von jedem pro Tag, nur mit Punkten. Pakete haben keine Grenze.</item>
+    </plurals>
 
     <!-- Seite „Stil“. -->
     <string name="shop_style_boats_title">Fertige Boote</string>

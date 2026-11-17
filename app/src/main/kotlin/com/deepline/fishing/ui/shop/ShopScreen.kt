@@ -431,9 +431,9 @@ private fun LazyGridScope.tacklePage(vm: GameViewModel, actions: ShopActions) {
 private fun TackleCard(vm: GameViewModel, t: Tackle, actions: ShopActions, modifier: Modifier) {
     val p = vm.progress
     val single = Progression.tacklePrice(p, t)
-    val packs = ShopCatalog.inSection(ShopSection.TACKLE).filter { item ->
-        item.grants.any { it is Grant.TacklePack && it.tackle == t }
-    }
+    val left = Progression.singlesLeft(p, t)
+    // One pack on offer at a time: the cheapest not bought yet, then the next bigger one.
+    val pack = ShopCatalog.offeredPack(p, t)
     Card(Modifier.fillMaxWidth().then(modifier)) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -449,21 +449,31 @@ private fun TackleCard(vm: GameViewModel, t: Tackle, actions: ShopActions, modif
                 )
                 com.deepline.fishing.ui.kit.InfoButton(
                     t.label(),
-                    stringResource(if (t.usableInBattles) R.string.shop_tackle_desc_battles else R.string.shop_tackle_desc_solo, t.description()),
+                    stringResource(if (t.usableInBattles) R.string.shop_tackle_desc_battles else R.string.shop_tackle_desc_solo, t.description()) +
+                        "\n\n" + pluralStringResource(R.plurals.shop_tackle_singles_info, GameConfig.TACKLE_SINGLES_PER_DAY, GameConfig.TACKLE_SINGLES_PER_DAY),
                 )
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.shop_tackle_single), style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
+                Column(Modifier.weight(1f)) {
+                    Text(stringResource(R.string.shop_tackle_single), style = MaterialTheme.typography.titleSmall)
+                    // How many more can be bought one at a time today.
+                    Text(
+                        stringResource(R.string.shop_tackle_singles_left, left, GameConfig.TACKLE_SINGLES_PER_DAY),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.testTag("singles_left_${t.name.lowercase()}"),
+                    )
+                }
                 val price = stringResource(R.string.common_points, formatPoints(single))
                 GameButton(
                     onClick = { vm.buyTackle(t) },
                     modifier = Modifier.testTag("buy_one_${t.name.lowercase()}").semantics { contentDescription = price },
                     role = ActionRole.POINTS,
                     size = ButtonSize.SMALL,
-                    enabled = p.pointsBalance >= single,
+                    enabled = p.pointsBalance >= single && left > 0,
                 ) { CoinPrice(formatPoints(single)) }
             }
-            for (pack in packs) {
+            if (pack != null) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Column(Modifier.weight(1f)) {
                         // The badge goes under a long name ("Tonneau de Lanternes") instead of being squeezed out.
@@ -476,7 +486,7 @@ private fun TackleCard(vm: GameViewModel, t: Tackle, actions: ShopActions, modif
                         }
                         Text(ShopText.contents(pack, p).asString(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
-                    val tagged = if (pack == ShopCatalog.inSection(ShopSection.TACKLE).first()) Modifier.tourTarget(TourTarget.SHOP_PRICES) else Modifier
+                    val tagged = if (t == Tackle.entries.first()) Modifier.tourTarget(TourTarget.SHOP_PRICES) else Modifier
                     Box(Modifier.weight(1.3f)) { PriceButtons(pack, actions, modifier = tagged) }
                 }
             }

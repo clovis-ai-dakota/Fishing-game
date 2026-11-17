@@ -96,7 +96,7 @@
     <string name="tour_shop_style_body">La página Estilo tiene barcos prediseñados, pinturas, emblemas y estampados de vela (que se previsualizan en tu propio barco), además de nuevos anzuelos, sedales y estelas. Como todos los aspectos, solo cambian la apariencia, nunca el juego.</string>
 
     <string name="tour_aquarium_title">Tu acuario</string>
-    <string name="tour_aquarium_body">Los peces que has capturado nadan en tu acuario, el pabellón de cristal del pueblo: elige quién nada en él y compra allí mismo decoración o una pecera más grande. La pantalla completa gira el teléfono en horizontal para verlos.</string>
+    <string name="tour_aquarium_body">Los peces que has capturado nadan en tu acuario, el pabellón de cristal del pueblo: elige quién nada en él y compra allí mismo decoración o una pecera más grande. La pantalla completa gira el teléfono en horizontal para verlos. Allí, pellizca para acercarte a un pez, arrastra para mirar alrededor y toca dos veces para volver a ver toda la pecera.</string>
 
     <string name="tour_season_title">Temporadas y eventos de fin de semana</string>
     <!-- %1$s: how long a season lasts (e.g. "6 semanas"). -->
@@ -191,4 +191,11 @@
 
     <string name="tour_replay_title">¡Eso es todo, buena pesca!</string>
     <string name="tour_replay_body">Puedes volver a ver esta guía cuando quieras desde Ajustes.</string>
+
+    <!-- The island in the colours of the player's skin (see IslandDress). Never name a secret or a legendary set here. -->
+    <string name="tour_island_look_title">Tu estilo en la isla</string>
+    <string name="tour_island_look_body">Lo que llevas se ve en la isla: tu barco y tu equipo dan color a su banderín, sus toldos y sus tejados. Cuanto más raro es tu estilo, mayor es la fiesta.</string>
+    <!-- The Tackle page offers one pack at a time. %1$d: single pieces per day. -->
+    <string name="tour_tackle_offers_title">Un lote cada vez</string>
+    <string name="tour_tackle_offers_body">Cada aparejo ofrece primero su lote más pequeño y, cuando lo compras, el siguiente más grande. Por unidad se compra con puntos, hasta %1$d de cada uno al día.</string>
 </resources>

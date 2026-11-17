@@ -273,7 +273,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         if (session != null || tour != null) return
         when (target) {
             com.deepline.fishing.daily.ReminderTarget.DAILY -> openDaily()
-            com.deepline.fishing.daily.ReminderTarget.MIGRATION -> screen = Screen.VILLAGE
+            com.deepline.fishing.daily.ReminderTarget.MIGRATION -> openDaily()
             com.deepline.fishing.daily.ReminderTarget.EVENT -> openShop(ShopPage.PASSES)
         }
     }
@@ -490,7 +490,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             val owned = item.kind == ItemKind.PERMANENT && ShopCatalog.owns(progress, item.id)
             if (!owned) {
                 val contents = ShopText.contents(item, progress)
-                update(ShopCatalog.grant(progress, item, ShopClock.now()))
+                update(ShopCatalog.bought(progress, item, ShopClock.now()))
                 shopMessage = UiText.res(R.string.shop_message_thanks, item.nameText(), contents)
                 feel.cue(com.deepline.fishing.feel.Cue.PURCHASE)
             }

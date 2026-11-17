@@ -32,6 +32,28 @@ class TackleTest {
     }
 
     @Test
+    fun singlePiecesAreLimitedPerLocalDay() {
+        val day = 20_000L
+        var p = PlayerProgress(pointsBalance = 10_000_000)
+        repeat(GameConfig.TACKLE_SINGLES_PER_DAY) { p = Progression.buyTackle(p, Tackle.LANTERN, day)!! }
+        assertEquals(0, Progression.singlesLeft(p, Tackle.LANTERN, day))
+        assertNull(Progression.buyTackle(p, Tackle.LANTERN, day), "no more single Lanterns today")
+        // Each kind has its own count, and a new day starts over.
+        assertEquals(GameConfig.TACKLE_SINGLES_PER_DAY, Progression.singlesLeft(p, Tackle.DETECTOR, day))
+        assertEquals(GameConfig.TACKLE_SINGLES_PER_DAY, Progression.singlesLeft(p, Tackle.LANTERN, day + 1))
+        // A clock set back never gives more.
+        assertEquals(0, Progression.singlesLeft(p, Tackle.LANTERN, day - 1))
+        assertNull(Progression.buyTackle(p, Tackle.LANTERN, day - 1))
+        // Saved and loaded.
+        val back = ProgressCodec.decode(ProgressCodec.encode(p))
+        assertEquals(p.singlesDay, back.singlesDay)
+        assertEquals(p.singlesBought, back.singlesBought)
+        assertNull(Progression.buyTackle(back, Tackle.LANTERN, day))
+        p = Progression.buyTackle(p, Tackle.LANTERN, day + 1)!!
+        assertEquals(GameConfig.TACKLE_SINGLES_PER_DAY - 1, Progression.singlesLeft(p, Tackle.LANTERN, day + 1))
+    }
+
+    @Test
     fun aLuckyCharmGivesOneMoreBump() {
         val rocks = (0 until 6).map { i -> Obstacle(i, ObstacleKind.ROCK, center, 60f + i * 12f, 1f) }
         val s = CastSession(RopeSpecs(200f, 6f, 8f), false, World(emptyList(), rocks))

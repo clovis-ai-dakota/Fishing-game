@@ -195,7 +195,9 @@ class OnlineUiTest {
         scenario = ActivityScenario.launch(MainActivity::class.java)
 
         compose.openBuilding("battle")
+        compose.onNodeWithTag("battle_mode_picker").performClick()
         compose.click("Heavy Haul")
+        compose.onNodeWithTag("battle_opponent_picker").performScrollTo().performClick()
         compose.onNodeWithTag("opponent_online").performScrollTo().performClick()
         compose.click("Go online")
         compose.click("Create room")
