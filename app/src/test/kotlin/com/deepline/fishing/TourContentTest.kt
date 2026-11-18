@@ -207,9 +207,11 @@ class TourContentTest {
         // Version 14: the island wears the player's skin, one tackle pack at a time.
         val v14 = Tour.steps.filter { it.sinceVersion == 14 }.map { it.id }
         assertTrue(v14.containsAll(listOf("island_look", "tackle_offers")))
-        // Version 15: the aquarium opens full screen with a double tap, and its decor moves.
+        // Version 15: the aquarium opens full screen with a double tap, and its decor moves;
+        // version 16: its fish live together (the step moved to 16 with its new text).
         val aquarium = Tour.steps.single { it.id == "aquarium" }
-        assertEquals(15, aquarium.sinceVersion)
+        assertEquals(16, aquarium.sinceVersion)
+        assertTrue("school" in aquarium.body.shown)
         assertTrue("double-tap" in aquarium.body.shown.lowercase())
         val village = Tour.steps.single { it.id == "village" }
         assertEquals(Screen.VILLAGE, village.screen)

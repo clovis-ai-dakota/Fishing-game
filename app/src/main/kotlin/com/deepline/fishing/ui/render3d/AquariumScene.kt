@@ -31,6 +31,8 @@ class AquariumScene {
      */
     class Camera {
         @Volatile var zoom = 1f
+        /** Whether the view was set yet: it opens filling the screen, down at the sand. */
+        @Volatile internal var framed = false
         /** The view's centre, in metres from the middle of the tank's back wall. */
         @Volatile var panX = 0f
         @Volatile var panY = 0f
@@ -64,7 +66,7 @@ class AquariumScene {
             panY += dyPx * metersPerPx
         }
 
-        /** A double tap: close up on the sand under the finger, or the whole tank again. */
+        /** A double tap: the whole tank on its stand, or back to filling the screen where the finger is. */
         fun toggleZoom(xPx: Float, yPx: Float) {
             val v = view ?: return
             if (zoom > 1.2f) {
@@ -163,6 +165,8 @@ class AquariumScene {
     /** The tank: [width] by [HEIGHT] by [DEPTH] metres, the sand at y = 0. */
     private fun width(big: Boolean) = if (big) 12f else 8f
     private var lastT = -1f
+    /** The fish living together (see [AquariumSchool]): kept from frame to frame. */
+    val school = AquariumSchool()
 
     fun build(widthPx: Int, heightPx: Int, t: Float, fish: List<FishSpecies>, pieces: List<Piece>, big: Boolean, camera: Camera? = null): Frame {
         val tw = width(big)
@@ -182,6 +186,12 @@ class AquariumScene {
         // along the glass, never past the tank's edges once it fills the view.
         val coverZoom = toBack / cover
         val maxZoom = coverZoom * 2.5f
+        // Full screen opens filling the screen (some of the tank off the sides), down at the sand.
+        if (camera != null && !camera.framed) {
+            camera.framed = true
+            camera.zoom = coverZoom
+            camera.panY = -HEIGHT
+        }
         val zoom = (camera?.zoom ?: 1f).coerceIn(1f, maxZoom)
         val halfTan = baseHalfTan / zoom
         val fov = 2f * kotlin.math.atan(halfTan)
@@ -195,12 +205,12 @@ class AquariumScene {
         val panY = (camera?.panY ?: 0f).coerceIn(-roomY - if (roomY > 0f) FLOOR_ROOM else 0f, roomY)
         val center = Vec3(panX, HEIGHT / 2f + panY, 0f)
         val eye = Vec3(panX, HEIGHT * 0.5f + panY, distance)
+        val dt = if (lastT < 0f) 0f else (t - lastT).coerceIn(0f, 0.1f)
         if (camera != null) {
             camera.zoom = zoom
             camera.panX = panX
             camera.panY = panY
             camera.remember(eye, halfTan, aspect, widthPx, heightPx, tw, coverZoom, maxZoom)
-            val dt = if (lastT < 0f) 0f else (t - lastT).coerceIn(0f, 0.1f)
             camera.sink(dt)
         }
         lastT = t
@@ -238,20 +248,15 @@ class AquariumScene {
             }
             items += decorItems(d, at, t, i, tw)
         }
-        // The fish: each swims lengths at its own depth and pace, turning at the ends.
-        for ((i, s) in fish.withIndex()) {
-            val lane = 0.9f + (HEIGHT - 1.6f) * ((i * 0.37f + 0.15f) % 1f)
-            val speed = 0.22f + 0.05f * (i % 4)
-            val phase = t * speed + i * 1.7f
-            val reach = tw / 2f - 0.9f
-            val x = reach * sin(phase)
-            val goingRight = cos(phase)
-            // Turn smoothly through facing the viewer as it slows at the glass.
-            val yaw = SceneBuilder.FACING_LEFT + (SceneBuilder.FACING_RIGHT - SceneBuilder.FACING_LEFT) * (0.5f + 0.5f * goingRight.coerceIn(-1f, 1f))
-            val z = -0.7f + 1.4f * ((i * 0.53f) % 1f)
-            val len = (0.55f + 0.18f * ln(1f + s.bodyLengthM)).coerceIn(0.5f, 1.1f)
-            val bob = 0.12f * sin(t * 0.9f + i)
-            items += SceneBuilder.fishItem(s, Vec3(x, lane + bob, z), yaw, 0f, t * 6f + i, 1f, false, i.toFloat(), len = len)
+        // The fish, living together: schools, chases, meetings, nibbling at the decor.
+        val tops = pieces.filter { it.decor != Decor.LANTERN_LIGHTS }.map { p ->
+            val x = camera?.xOf(p, tw) ?: xOf(p.spot, tw)
+            Vec3(x, sandAt(x, zOf(p.decor)) + AquariumModels.bounds(p.decor).second.y, zOf(p.decor))
+        }
+        school.sync(fish, tw, tops)
+        school.step(dt)
+        for ((i, f) in school.swimmers.withIndex()) {
+            items += SceneBuilder.fishItem(f.species, Vec3(f.x, f.y, f.z), f.yaw, f.pitch, f.phase, 1f, false, i.toFloat(), len = f.len)
         }
         // Bubbles rising from the diver's helmet (or from the sand), drawn last, see-through.
         val sprites = SpriteBatch()

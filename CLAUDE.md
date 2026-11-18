@@ -149,7 +149,9 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     stand, zoom and look around (`AquariumScene.Camera`), and decor the player drags (let go in
     the water, it sinks). Each piece has its own default spot (`Showcase.decorSpot`, saved in
     `decorSpots`), so a new piece never moves the others; keep every piece inside the small tank
-    (`AquariumSceneTest`).
+    (`AquariumSceneTest`). Full screen opens filling the screen (double tap: the whole tank). Its
+    fish live together (`AquariumSchool`: boids-style schools, chases that scatter them,
+    meetings, nibbling at the decor, following a big fish), render-only and never saved.
   - The village is an island with only the six places that open a menu (research:
     `docs/research/village-visuals.md`): no decor building. Its light is baked once into the
     vertex colours, as mobile games do: cast shadows from `VillageModels.SUN` (soft, several

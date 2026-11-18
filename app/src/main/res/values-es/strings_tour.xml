@@ -96,7 +96,7 @@
     <string name="tour_shop_style_body">La página Estilo tiene barcos prediseñados, pinturas, emblemas y estampados de vela (que se previsualizan en tu propio barco), además de nuevos anzuelos, sedales y estelas. Como todos los aspectos, solo cambian la apariencia, nunca el juego.</string>
 
     <string name="tour_aquarium_title">Tu acuario</string>
-    <string name="tour_aquarium_body">Los peces que has capturado nadan en tu acuario, el pabellón de cristal del pueblo: elige quién nada en él y compra allí mismo decoración o una pecera más grande. Toca dos veces la pecera para verla a pantalla completa: pellizca para acercarte, arrastra el agua para mirar alrededor y arrastra un adorno para moverlo (al soltarlo, se hunde hasta la arena).</string>
+    <string name="tour_aquarium_body">Los peces que has capturado nadan en tu acuario, el pabellón de cristal del pueblo: elige quién nada en él y compra allí mismo decoración o una pecera más grande. Toca dos veces la pecera para verla a pantalla completa: pellizca para acercarte, arrastra el agua para mirar alrededor y arrastra un adorno para moverlo (al soltarlo, se hunde hasta la arena). Tus peces conviven: los pequeños nadan en banco, los grandes los persiguen y dos que se cruzan se paran frente a frente.</string>
 
     <string name="tour_season_title">Temporadas y eventos de fin de semana</string>
     <!-- %1$s: how long a season lasts (e.g. "6 semanas"). -->
