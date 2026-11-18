@@ -32,6 +32,21 @@ class AquariumSchoolTest {
             }
         }
         for (m in AquariumSchool.Mood.entries) assertTrue("never seen: $m (saw $seen)", m in seen)
+        // Double-tapped, a fish reacts: the five reactions in turn, each one ending.
+        val tapped = school.swimmers.first()
+        val reactions = HashSet<AquariumSchool.Reaction>()
+        repeat(5) {
+            school.react(tapped)
+            reactions += tapped.reaction!!
+            var guard = 0
+            while (tapped.reaction != null && guard++ < 200) {
+                school.step(1f / 30f)
+                assertTrue(listOf(tapped.roll, tapped.puff, tapped.loop, tapped.x, tapped.y).all { it.isFinite() })
+                assertTrue(tapped.puff in 1f..1.6f)
+            }
+            assertTrue("a reaction never ends", tapped.reaction == null)
+        }
+        assertTrue(reactions == AquariumSchool.Reaction.entries.toSet())
         // A fish taken out of the tank leaves the school; the others keep swimming where they are.
         val before = school.swimmers.drop(1).map { it.x }
         school.sync(fish.drop(1), 8f, decor)

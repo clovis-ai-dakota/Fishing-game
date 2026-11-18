@@ -316,6 +316,8 @@
     <string name="shop_aquarium_fullscreen">Full screen</string>
     <!-- Heading over the species the player caught (chips to put them in the tank). -->
     <string name="shop_aquarium_catches">Your catches</string>
+    <!-- A folded section of the aquarium page: what's shown out of what's there (decor shown / owned, fish in the tank / room, decor owned / for sale). %1$d, %2$d: the counts. -->
+    <string name="shop_aquarium_fold_count">%1$d / %2$d</string>
     <plurals name="shop_aquarium_cd_tank">
         <!-- Screen reader description of the tank. %d: fish swimming in it. -->
         <item quantity="one">Aquarium with %d fish</item>

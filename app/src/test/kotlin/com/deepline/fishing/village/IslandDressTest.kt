@@ -36,18 +36,23 @@ class IslandDressTest {
         val season = IslandDress.of(wearing(PremiumSkins.byId(Seasons.boats.first())!!.design))
         assertEquals(3, season.level)
         assertTrue(season.bunting)
-        // Shop gear on the line: level 2 in its colours.
-        assertEquals(2, IslandDress.of(PlayerProgress(equippedSkins = mapOf(CosmeticSlot.LINE to Cosmetic.NEON_LINE))).level)
-        // A legendary piece beats everything, and brings its set's monument.
+        // Only the boat counts: gear on the hook or the line doesn't dress the island.
+        assertEquals(0, IslandDress.of(PlayerProgress(equippedSkins = mapOf(CosmeticSlot.LINE to Cosmetic.NEON_LINE))).level)
+        assertEquals(0, IslandDress.of(PlayerProgress(equippedSkins = mapOf(CosmeticSlot.HOOK to Cosmetic.CROWN_HOOK))).level)
+        // A legendary boat brings its set's monument, and takes over a design worn under it.
         val royal = IslandDress.of(
-            wearing(PremiumSkins.byId(Seasons.boats.first())!!.design).copy(equippedSkins = mapOf(CosmeticSlot.HOOK to Cosmetic.CROWN_HOOK)),
+            wearing(PremiumSkins.byId(Seasons.boats.first())!!.design).copy(equippedSkins = mapOf(CosmeticSlot.BOAT to Cosmetic.ROYAL_BOAT)),
         )
         assertEquals(4, royal.level)
         assertEquals("crown", royal.legend)
-        // Every legendary set has a monument, and every shop piece colours the island.
-        for (c in Cosmetic.entries) {
-            val d = IslandDress.of(PlayerProgress(equippedSkins = mapOf(c.slot to c)))
-            assertEquals(c.name, if (c.fromShop) 2 else 4, d.level)
+        // Changing boats changes the island.
+        val set = mapOf(CosmeticSlot.HOOK to Cosmetic.LEVIATHAN_BONE_HOOK, CosmeticSlot.LINE to Cosmetic.GIANTS_BRAID_LINE)
+        assertEquals("leviathan", IslandDress.of(PlayerProgress(equippedSkins = set + (CosmeticSlot.BOAT to Cosmetic.GIANT_SLAYER_PENNANT))).legend)
+        assertEquals(0, IslandDress.of(PlayerProgress(equippedSkins = set)).level)
+        assertEquals(3, IslandDress.of(wearing(PremiumSkins.byId(Seasons.boats.first())!!.design).copy(equippedSkins = set)).level)
+        // Every legendary boat has a monument.
+        for (c in Cosmetic.entries.filter { it.slot == CosmeticSlot.BOAT }) {
+            assertEquals(c.name, 4, IslandDress.of(PlayerProgress(equippedSkins = mapOf(c.slot to c))).level)
         }
     }
 }

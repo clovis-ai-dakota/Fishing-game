@@ -1,5 +1,10 @@
 package com.deepline.fishing.ui.shop
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+
 import com.deepline.fishing.ui.i18n.label
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
@@ -92,23 +97,31 @@ fun AquariumScreen(vm: GameViewModel) {
     val actions = ShopActions(vm, LocalContext.current.findActivity(), onPoints = { confirm = it })
     val forSale = ShopCatalog.inSection(ShopSection.AQUARIUM)
     SubScreen(title = stringResource(R.string.shop_aquarium_title), onBack = vm::onBack) {
-        LazyVerticalGrid(
-            // Two columns on a phone: species and decor names are read in full (two lines at most).
-            columns = GridCells.Adaptive(minSize = 150.dp),
+        // The tank takes half the screen; the lists fold away under it (one open at a time).
+        var open by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf<String?>(null) }
+        fun toggle(key: String) { open = if (open == key) null else key }
+        val tankHeight = (androidx.compose.ui.platform.LocalConfiguration.current.screenHeightDp * 0.5f).coerceAtLeast(300f).dp
+        val owned = Decor.entries.filter { Showcase.ownsDecor(p, it) }
+        val decorForSale = forSale.filter { (it.grants.single() as? Grant.Unlock)?.key?.startsWith("decor:") == true }
+        val bigTank = forSale.filter { (it.grants.single() as? Grant.Unlock)?.key == "aquarium:big" }
+        androidx.compose.foundation.lazy.LazyColumn(
             contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 24.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.testTag("aquarium_list"),
         ) {
-            item(span = { GridItemSpan(maxLineSpan) }) {
+            item(key = "tank") {
                 // The live tank (3D where available): a double tap opens it full screen (screen
                 // readers get it as the tank's action).
                 val fullScreen = stringResource(R.string.shop_aquarium_fullscreen)
+                // Framed like the full screen (most of the tank, on its stand), without its gestures.
+                val cardView = remember { com.deepline.fishing.ui.render3d.AquariumScene.Camera(widthShare = 0.62f) }
                 AquariumView(
                     p,
+                    camera = cardView,
+                    modifier =
                     Modifier
                         .fillMaxWidth()
-                        .height(260.dp)
+                        .height(tankHeight)
                         .tourTarget(TourTarget.AQUARIUM_TANK)
                         .clip(RoundedCornerShape(16.dp))
                         .pointerInput(Unit) { detectTapGestures(onDoubleTap = { vm.openAquariumFull() }) }
@@ -116,58 +129,81 @@ fun AquariumScreen(vm: GameViewModel) {
                         .testTag("aquarium_tank"),
                 )
             }
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                Text(
-                    stringResource(
+            item(key = "decor") {
+                com.deepline.fishing.ui.kit.FoldingSection(
+                    title = stringResource(R.string.shop_aquarium_decor),
+                    icon = com.deepline.fishing.ui.kit.KitIcons.Tank,
+                    choice = stringResource(R.string.shop_aquarium_fold_count, owned.count { it.name !in p.hiddenDecor }, owned.size),
+                    expanded = open == "decor",
+                    onToggle = { toggle("decor") },
+                    modifier = Modifier.testTag("aquarium_decor_picker"),
+                ) {
+                    androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        for (d in owned) {
+                            FilterChip(
+                                selected = d.name !in p.hiddenDecor,
+                                onClick = { vm.toggleDecor(d) },
+                                label = { Text(d.label(), maxLines = 2, overflow = TextOverflow.Ellipsis) },
+                                modifier = Modifier.testTag("decor_${d.name.lowercase()}"),
+                            )
+                        }
+                    }
+                }
+            }
+            item(key = "catches") {
+                com.deepline.fishing.ui.kit.FoldingSection(
+                    title = stringResource(R.string.shop_aquarium_catches),
+                    icon = com.deepline.fishing.ui.GameIcons.Fish,
+                    choice = stringResource(R.string.shop_aquarium_fold_count, inTank.size, Showcase.tankSize(p)),
+                    expanded = open == "catches",
+                    onToggle = { toggle("catches") },
+                    modifier = Modifier.testTag("aquarium_catches_picker"),
+                    info = stringResource(
                         if (caught.isEmpty()) R.string.shop_aquarium_count_empty else R.string.shop_aquarium_count,
                         inTank.size,
                         Showcase.tankSize(p),
                     ),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                ) {
+                    androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        for (s in caught) {
+                            FilterChip(
+                                selected = s.id in inTank,
+                                onClick = { vm.toggleTankFish(s.id) },
+                                label = { Text(s.label(), maxLines = 2, overflow = TextOverflow.Ellipsis) },
+                                modifier = Modifier.testTag("tank_${s.id}"),
+                            )
+                        }
+                    }
+                }
             }
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                Text(
-                    stringResource(R.string.shop_aquarium_decor),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 4.dp),
-                )
-            }
-            items(Decor.entries.filter { Showcase.ownsDecor(p, it) }, key = { "d_" + it.name }) { d ->
-                FilterChip(
-                    selected = d.name !in p.hiddenDecor,
-                    onClick = { vm.toggleDecor(d) },
-                    label = { Text(d.label(), maxLines = 2, overflow = TextOverflow.Ellipsis) },
-                )
-            }
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                Text(stringResource(R.string.shop_aquarium_catches), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-            }
-            items(caught, key = { it.id }) { s ->
-                FilterChip(
-                    selected = s.id in inTank,
-                    onClick = { vm.toggleTankFish(s.id) },
-                    label = { Text(s.label(), maxLines = 2, overflow = TextOverflow.Ellipsis) },
-                    modifier = Modifier.testTag("tank_${s.id}"),
-                )
-            }
-            // What's for sale: the bigger tank, then each piece of decor in a tank of its own.
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                com.deepline.fishing.ui.kit.SectionTitle(
-                    stringResource(R.string.shop_aquarium_for_sale),
-                    stringResource(R.string.shop_aquarium_page_note),
-                    Modifier.fillMaxWidth().padding(top = 8.dp),
-                )
-            }
-            for (item in forSale.filter { (it.grants.single() as? Grant.Unlock)?.key == "aquarium:big" }) {
-                item(key = item.id, span = { GridItemSpan(maxLineSpan) }) { ItemCard(vm, item, actions) }
-            }
-            items(forSale.filter { (it.grants.single() as? Grant.Unlock)?.key?.startsWith("decor:") == true }, key = { it.id }) { item ->
-                val decor = Decor.entries.first { it.unlockKey == (item.grants.single() as Grant.Unlock).key }
-                Tile(item.label(), item.badgeText()?.asString(), preview = { AquariumTank(p, height = 120.dp, extraDecor = decor) }) {
-                    if (ShopCatalog.owns(p, item.id)) OwnedRow() else PriceButtons(item, actions)
+            item(key = "for_sale") {
+                // What's for sale: the bigger tank, then each piece of decor in a tank of its own.
+                val all = bigTank + decorForSale
+                com.deepline.fishing.ui.kit.FoldingSection(
+                    title = stringResource(R.string.shop_aquarium_for_sale),
+                    icon = com.deepline.fishing.ui.GameIcons.Shop,
+                    choice = stringResource(R.string.shop_aquarium_fold_count, all.count { ShopCatalog.owns(p, it.id) }, all.size),
+                    expanded = open == "for_sale",
+                    onToggle = { toggle("for_sale") },
+                    modifier = Modifier.testTag("aquarium_shop_picker"),
+                    info = stringResource(R.string.shop_aquarium_page_note),
+                ) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        for (item in bigTank) ItemCard(vm, item, actions)
+                        for (pair in decorForSale.chunked(2)) {
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                for (item in pair) {
+                                    val decor = Decor.entries.first { it.unlockKey == (item.grants.single() as Grant.Unlock).key }
+                                    Box(Modifier.weight(1f)) {
+                                        Tile(item.label(), item.badgeText()?.asString(), preview = { AquariumTank(p, height = 120.dp, extraDecor = decor) }) {
+                                            if (ShopCatalog.owns(p, item.id)) OwnedRow() else PriceButtons(item, actions)
+                                        }
+                                    }
+                                }
+                                if (pair.size == 1) Spacer(Modifier.weight(1f))
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -217,10 +253,10 @@ fun AquariumView(
 internal fun piecesOf(p: PlayerProgress) = Showcase.shownDecor(p).map { com.deepline.fishing.ui.render3d.AquariumScene.Piece(it, Showcase.decorSpot(p, it)) }
 
 /**
- * The aquarium full screen, upright: the system bars hide while it shows. The whole tank stands on
- * its cabinet; pinch to zoom, drag the water to look around, double-tap to zoom in or out. Drag a
- * piece of decor to move it: let go in the water and it sinks to the sand; it stays where it was
- * put (saved), and new pieces never move it.
+ * The aquarium full screen, upright: the system bars hide while it shows. Drag to look around,
+ * pinch to zoom; double-tap a fish and it reacts (five ways), double-tap the water to zoom in or
+ * back out. Press and hold a piece of decor to pick it up, then drag it: let go in the water and
+ * it sinks to the sand; it stays where it was put (saved), and new pieces never move it.
  */
 @Composable
 fun AquariumFullScreen(vm: GameViewModel) {
@@ -243,8 +279,25 @@ fun AquariumFullScreen(vm: GameViewModel) {
                     awaitEachGesture {
                         val down = awaitFirstDown(requireUnconsumed = false)
                         val hit = camera.pick(down.position.x, down.position.y, pieces.value)
+                        // A piece of decor moves after a press held still for the system's long-press
+                        // time (400 ms unless the player changed it in the accessibility settings):
+                        // a plain drag, even starting on the decor, looks around the tank.
+                        var held = false
                         if (hit != null) {
-                            // Moving a piece of decor: it follows the finger until it's let go.
+                            val outcome = withTimeoutOrNull(viewConfiguration.longPressTimeoutMillis) {
+                                while (true) {
+                                    val event = awaitPointerEvent()
+                                    val finger = event.changes.firstOrNull { it.id == down.id }
+                                    if (finger == null || !finger.pressed) return@withTimeoutOrNull false
+                                    if (event.changes.count { it.pressed } > 1) return@withTimeoutOrNull false
+                                    if ((finger.position - down.position).getDistance() > viewConfiguration.touchSlop) return@withTimeoutOrNull false
+                                }
+                                @Suppress("UNREACHABLE_CODE") false
+                            }
+                            held = outcome == null
+                        }
+                        if (held && hit != null) {
+                            // Lifted: it follows the finger until it's let go, then sinks.
                             camera.grab(hit, down.position.x, down.position.y, pieces.value)
                             while (true) {
                                 val event = awaitPointerEvent()
@@ -270,7 +323,8 @@ fun AquariumFullScreen(vm: GameViewModel) {
                         }
                     }
                 }
-                .pointerInput(Unit) { detectTapGestures(onDoubleTap = { camera.toggleZoom(it.x, it.y) }) },
+                // A double tap: on a fish it reacts, on the water the view zooms in or back out.
+                .pointerInput(Unit) { detectTapGestures(onDoubleTap = { camera.doubleTap(it.x, it.y) }) },
             camera = camera,
             // Full screen: drawn at the phone's own width, not stretched from a small image.
             maxRenderWidth = 1080,

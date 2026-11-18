@@ -109,6 +109,7 @@ private class RenderThread(
     @Volatile private var paused = false
     private var vsyncs = 0
     private val start = System.nanoTime()
+    private val queried = IntArray(2)
 
     fun begin() {
         thread.start()
@@ -157,8 +158,15 @@ private class RenderThread(
             } catch (_: Exception) {
                 // Released while the view goes away: end() is on its way.
             }
-            b.submit(source.frame(w, h, t))
-            b.onSurfaceChanged(null, w, h)
+            // A new size only applies from the next buffer: the one drawn into now was taken at
+            // the last swap and keeps its own size. Draw at the size it really has, or a change of
+            // resolution shows one frame squeezed into a corner (a flicker while dragging the map).
+            EGL14.eglQuerySurface(display, surface, EGL14.EGL_WIDTH, queried, 0)
+            EGL14.eglQuerySurface(display, surface, EGL14.EGL_HEIGHT, queried, 1)
+            val fw = if (queried[0] > 0) queried[0] else w
+            val fh = if (queried[1] > 0) queried[1] else h
+            b.submit(source.frame(fw, fh, t))
+            b.onSurfaceChanged(null, fw, fh)
             b.onDrawFrame(null)
             EGL14.eglSwapBuffers(display, surface)
             if (b.hasFailed) stopWithError("Preview draw failed")

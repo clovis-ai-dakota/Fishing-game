@@ -254,6 +254,8 @@
     <string name="shop_aquarium_for_sale">Satılık dekorlar</string>
     <string name="shop_aquarium_fullscreen">Tam ekran</string>
     <string name="shop_aquarium_catches">Avların</string>
+    <!-- A folded section of the aquarium page: what's shown out of what's there (decor shown / owned, fish in the tank / room, decor owned / for sale). %1$d, %2$d: the counts. -->
+    <string name="shop_aquarium_fold_count">%1$d / %2$d</string>
     <plurals name="shop_aquarium_cd_tank">
         <item quantity="one">%d balıklı akvaryum</item>
         <item quantity="other">%d balıklı akvaryum</item>

@@ -89,7 +89,7 @@
     <string name="tour_shop_style_body">Stil sayfasında hazır tekneler, boyalar, amblemler ve yelken desenleri (kendi teknende önizlenir), ayrıca yeni iğneler, misinalar ve izler var. Her görünüm gibi bunlar da yalnızca görüntüyü değiştirir, oyunu asla.</string>
 
     <string name="tour_aquarium_title">Akvaryumun</string>
-    <string name="tour_aquarium_body">Yakaladığın balıklar akvaryumunda, köydeki cam köşkte yüzer: orada kimlerin yüzeceğini seç, dekoru ya da daha büyük bir tankı hemen orada satın al. Tam ekran için tanka iki kez dokun: yakınlaşmak için iki parmakla büyüt, etrafa bakmak için suyu sürükle, bir dekoru taşımak için onu sürükle (bırakınca kuma batar). Balıkların birlikte yaşar: küçükler sürü hâlinde yüzer, büyükler onları kovalar, karşılaşan iki balık burun buruna durur.</string>
+    <string name="tour_aquarium_body">Yakaladığın balıklar akvaryumunda, köydeki cam köşkte yüzer: orada kimlerin yüzeceğini seç, dekoru da orada satın al. Tam ekran için tanka iki kez dokun: etrafa bakmak için sürükle, yakınlaşmak için iki parmakla büyüt, bir dekoru taşımak için basılı tut, tepkisini görmek için bir balığa iki kez dokun. Küçükler sürü hâlinde yüzer, büyükler onları kovalar, karşılaşan iki balık burun buruna durur.</string>
 
     <string name="tour_season_title">Sezonlar ve hafta sonu etkinlikleri</string>
     <!-- %1$s: how long a season lasts (e.g. "6 hafta"). -->
@@ -185,7 +185,7 @@
 
     <!-- The island in the colours of the player's skin (see IslandDress). Never name a secret or a legendary set here. -->
     <string name="tour_island_look_title">Adadaki tarzın</string>
-    <string name="tour_island_look_body">Giydiklerin adada görünür: teknen ve takımın flamayı, tenteleri ve çatıları boyar. Tarzın ne kadar nadirse kutlama o kadar büyük olur.</string>
+    <string name="tour_island_look_body">Teknen adada görünür: flamayı, tenteleri ve çatıları boyar. Teknen ne kadar nadirse kutlama o kadar büyük olur.</string>
     <!-- The Tackle page offers one pack at a time. %1$d: single pieces per day. -->
     <string name="tour_tackle_offers_title">Her seferinde bir paket</string>
     <string name="tour_tackle_offers_body">Her takım önce en küçük paketini sunar, onu satın alınca bir sonraki büyüğünü. Tek tek ise puanla alınır, her birinden günde en fazla %1$d tane.</string>

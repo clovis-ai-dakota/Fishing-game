@@ -55,9 +55,10 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
   - **Atmosphere**: `Atmosphere.NIGHTMARE` unlocks when a cast reaches
     `DepthZone.ABYSS.minDepth` (`Progression.applyCast`). It only changes the mood: the player
     must see exactly as much as in FAMILY.
-  - **The island wears it too** (`ui/village/IslandDress`): what the player wears colours the
-    village, more the harder it was to get (0 classic, 1 own design: the arena's pennant, 2 shop
-    look: awnings and tiles, 3 premium: roofs, lighthouse and bunting, 4 legendary: the set's
+  - **The island wears it too** (`ui/village/IslandDress`): the boat the player wears (only the
+    boat: changing boats changes the island) colours the village, more the harder it was to get
+    (0 classic, 1 own design: the arena's pennant, 2 shop boat: awnings and tiles, 3 premium:
+    roofs, lighthouse and bunting, 4 legendary: the set's
     colours, a monument in the square and a crown for the lighthouse). Parts are marked
     `Part.DRESS_ROOF/FLAG/TRIM` and tinted in the shader (`uDress*`, off by default). Looks only,
     nothing that opens a menu; never name a secret or a set in its tour step.
@@ -153,12 +154,15 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     sea its own (`uMaterial` 6). Still parts are merged into a few big meshes (a triangle budget
     is tested in `VillageSceneTest`); the 2D map and the 2D tank stay the fallbacks. The
     aquarium opens full screen with a double tap on the tank, upright: the whole tank on its
-    stand, zoom and look around (`AquariumScene.Camera`), and decor the player drags (let go in
-    the water, it sinks). Each piece has its own default spot (`Showcase.decorSpot`, saved in
+    stand, zoom and look around with a plain drag (`AquariumScene.Camera`), decor picked up with a
+    long press (the system's long-press time) then dragged (let go in the water, it sinks). Each piece has its own default spot (`Showcase.decorSpot`, saved in
     `decorSpots`), so a new piece never moves the others; keep every piece inside the small tank
-    (`AquariumSceneTest`). Full screen opens filling the screen (double tap: the whole tank). Its
-    fish live together (`AquariumSchool`: boids-style schools, chases that scatter them,
-    meetings, nibbling at the decor, following a big fish), render-only and never saved.
+    (`AquariumSceneTest`). Full screen opens on most of the tank (a wider lens), double tap on the
+    water for a close-up. Its fish live together (`AquariumSchool`: boids-style schools, chases
+    that scatter them, meetings, nibbling at the decor, following a big fish) and react to a
+    double tap (dart, roll, puff up, loop, bubbles, in turn), render-only and never saved. The
+    aquarium page folds its lists (`kit/FoldingSection`, like the Battle setup) under a tank half
+    the screen high.
   - The village is an island with only the six places that open a menu (research:
     `docs/research/village-visuals.md`): no decor building. Its light is baked once into the
     vertex colours, as mobile games do: cast shadows from `VillageModels.SUN` (soft, several

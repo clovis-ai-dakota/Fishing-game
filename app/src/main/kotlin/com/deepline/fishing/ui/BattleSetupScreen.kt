@@ -105,56 +105,6 @@ private val BattleMode.icon: ImageVector
     }
 
 
-/**
- * A choice that folds away: closed, one row with the section's name, what's picked (pictogram and
- * name) and a chevron; tapped, the options open under it, and picking one closes it again.
- */
-@Composable
-private fun ChoiceSection(
-    title: String,
-    icon: ImageVector,
-    choice: String,
-    expanded: Boolean,
-    onToggle: () -> Unit,
-    modifier: Modifier = Modifier,
-    info: String? = null,
-    trailing: @Composable () -> Unit = {},
-    options: @Composable () -> Unit,
-) {
-    val scheme = MaterialTheme.colorScheme
-    val calm = com.deepline.fishing.ui.kit.LocalCalmMotion.current
-    Column(
-        modifier.then(if (calm) Modifier else Modifier.animateContentSize(tween(CHOICE_MOTION_MS))),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Card(
-            onClick = onToggle,
-            modifier = Modifier.fillMaxWidth().semantics { stateDescription = choice },
-            colors = CardDefaults.cardColors(containerColor = scheme.surface),
-        ) {
-            Row(Modifier.padding(start = 14.dp, end = 4.dp, top = 6.dp, bottom = 6.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Icon(icon, contentDescription = null, tint = scheme.primary, modifier = Modifier.size(26.dp))
-                Column(Modifier.weight(1f).padding(vertical = 4.dp)) {
-                    Text(title, style = MaterialTheme.typography.labelMedium, color = scheme.onSurfaceVariant, maxLines = 1)
-                    Text(choice, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, maxLines = 2)
-                }
-                trailing()
-                if (info != null) InfoButton(title, info)
-                Icon(
-                    GameIcons.ChevronRight,
-                    contentDescription = null,
-                    tint = scheme.onSurfaceVariant,
-                    modifier = Modifier.size(22.dp).rotate(if (expanded) -90f else 90f),
-                )
-                Spacer(Modifier.width(6.dp))
-            }
-        }
-        if (expanded) options()
-    }
-}
-
-/** How long a choice takes to open or close (a small change: under NN/g's 300 ms). */
-private const val CHOICE_MOTION_MS = 200
 
 /**
  * A choice among a few: a pictogram and a short name, lit when chosen. [info] is what the tile
@@ -229,7 +179,7 @@ fun BattleSetupScreen(vm: GameViewModel) {
             fun toggle(key: String) { open = if (open == key) null else key }
 
             val modeInfo = mode.rules()
-            ChoiceSection(
+            com.deepline.fishing.ui.kit.FoldingSection(
                 title = stringResource(R.string.battle_setup_mode),
                 icon = mode.icon,
                 choice = mode.label(),
@@ -249,7 +199,7 @@ fun BattleSetupScreen(vm: GameViewModel) {
             }
 
             val rivalPicked = BotDifficulty.entries.firstOrNull { it.name == opponentKey }
-            ChoiceSection(
+            com.deepline.fishing.ui.kit.FoldingSection(
                 title = stringResource(R.string.battle_setup_opponent),
                 icon = when (opponentKey) {
                     FRIEND -> KitIcons.Phone
@@ -296,7 +246,7 @@ fun BattleSetupScreen(vm: GameViewModel) {
                 val payout = GameConfig.wagerPayout(rival)
                 val multiplier = formatDecimal(payout.toDouble(), 2)
                 val staked = stake > 0 && p.pointsBalance >= stake
-                ChoiceSection(
+                com.deepline.fishing.ui.kit.FoldingSection(
                     title = stringResource(R.string.battle_setup_wager_title),
                     icon = GameIcons.Coin,
                     choice = if (staked) compactPoints(stake) else stringResource(R.string.battle_setup_wager_none),

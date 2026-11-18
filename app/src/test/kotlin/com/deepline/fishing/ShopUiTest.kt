@@ -293,11 +293,16 @@ class AquariumUiTest : BoatUiTestBase() {
         compose.shot("70_aquarium")
         assertEquals(com.deepline.fishing.core.Showcase.TANK_SIZE, com.deepline.fishing.core.Showcase.tankFish(vm.progress).size)
         val first = com.deepline.fishing.core.Showcase.tankFish(vm.progress).first()
+        // The lists fold away under the tank: open the catches first.
+        compose.onNodeWithTag("aquarium_list").performScrollToNode(hasTestTag("aquarium_catches_picker"))
+        compose.onNodeWithTag("aquarium_catches_picker").performClick()
         compose.onNodeWithTag("aquarium_list").performScrollToNode(hasTestTag("tank_${first.id}"))
         compose.onNodeWithTag("tank_${first.id}").performClick()
         assertFalse(first in com.deepline.fishing.core.Showcase.tankFish(vm.progress))
 
-        // Decor for sale, at the bottom of the aquarium: euros or points, like everything in the Shop.
+        // Decor for sale, in its own folded list: euros or points, like everything in the Shop.
+        compose.onNodeWithTag("aquarium_list").performScrollToNode(hasTestTag("aquarium_shop_picker"))
+        compose.onNodeWithTag("aquarium_shop_picker").performClick()
         compose.onNodeWithTag("aquarium_list").performScrollToNode(hasTestTag("buy_eur_decor_sunken_ship"))
         compose.shot("71_aquarium_for_sale")
         vm.buyWithMoney(ShopCatalog.byId("decor_sunken_ship")!!, null)

@@ -697,7 +697,14 @@ object VillageModels {
     /** The leaves of the island's models in one texture, lit like the town (ambient occlusion baked in). */
     private fun leaves(texture: String): MeshData {
         val b = MeshBuilder()
-        for (p in nature) for (piece in ModelAssets.model(p.model).leaves) if (piece.texture == texture) b.append(piece.mesh, p.at)
+        for ((i, p) in nature.withIndex()) for (piece in ModelAssets.model(p.model).leaves) if (piece.texture == texture) {
+            val from = b.vertexCount
+            b.append(piece.mesh, p.at)
+            // Each tree its own shade of the island's green (a little lighter or deeper, warmer or cooler).
+            val k = 0.9f + 0.2f * hash01(i, 1, 79)
+            val warm = 0.06f * (hash01(i, 2, 79) - 0.5f)
+            b.bakeColors(from) { _, _, _, c -> c[0] *= k * (1f + warm); c[1] *= k; c[2] *= k * (1f - warm) }
+        }
         b.bakeColors { q, n, _, c ->
             val ground = max(height(q.x, q.z), 0f)
             val ao = 0.72f + 0.28f * smooth(0f, 3f, q.y - ground)

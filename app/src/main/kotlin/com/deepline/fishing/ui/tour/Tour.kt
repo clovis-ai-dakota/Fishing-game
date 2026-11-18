@@ -97,8 +97,9 @@ object Tour {
      *     pieces limited per day), zoom and look around in the full-screen aquarium.
      * 15: the aquarium full screen upright, opened with a double tap; decor the player moves.
      * 16: the aquarium's fish live together (schools, chases, meetings); full screen fills the screen.
+     * 17: the island follows the boat worn; decor moved with a long press; fish react to a double tap.
      */
-    const val VERSION = 16
+    const val VERSION = 17
 
     private val bumps = GameConfig.DESCENT_TOUCH_LIMIT
     private val calendarDays get() = UiText.plural(R.plurals.common_days, com.deepline.fishing.core.DailyRewards.calendar.size)
@@ -125,7 +126,7 @@ object Tour {
             body = text(R.string.tour_island_look_body),
             screen = Screen.VILLAGE,
             target = TourTarget.VILLAGE_MAP,
-            sinceVersion = 14,
+            sinceVersion = 17,
         ),
         TourStep(
             id = "look",
@@ -314,7 +315,7 @@ object Tour {
             body = text(R.string.tour_aquarium_body),
             screen = Screen.AQUARIUM,
             target = TourTarget.AQUARIUM_TANK,
-            sinceVersion = 16,
+            sinceVersion = 17,
         ),
         TourStep(
             id = "season",

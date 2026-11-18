@@ -82,7 +82,7 @@
     <string name="tour_shop_style_body">La page Style propose des bateaux tout faits, des peintures, des emblèmes et des imprimés de voile (en aperçu sur votre propre bateau), ainsi que de nouveaux hameçons, lignes et traînées. Comme toutes les apparences, ils ne changent que le look, jamais le jeu.</string>
 
     <string name="tour_aquarium_title">Votre aquarium</string>
-    <string name="tour_aquarium_body">Les poissons que vous avez pêchés nagent dans votre aquarium, le pavillon de verre du village : choisissez qui y nage, et achetez sur place du décor ou un bac plus grand. Touchez deux fois l\'aquarium pour le voir en plein écran : pincez pour zoomer, faites glisser l\'eau pour regarder autour, et faites glisser un décor pour le déplacer (lâché, il coule jusqu\'au sable). Vos poissons vivent ensemble : les petits nagent en banc, les gros les prennent en chasse, et deux qui se croisent s\'arrêtent nez à nez.</string>
+    <string name="tour_aquarium_body">Les poissons que vous avez pêchés nagent dans votre aquarium, le pavillon de verre du village : choisissez qui y nage et achetez du décor sur place. Touchez deux fois l\'aquarium pour le plein écran : faites glisser pour regarder autour, pincez pour zoomer, maintenez un décor pour le déplacer, et touchez deux fois un poisson pour le voir réagir. Les petits nagent en banc, les gros les prennent en chasse, et deux qui se croisent s\'arrêtent nez à nez.</string>
 
     <string name="tour_season_title">Saisons et événements du week-end</string>
     <!-- %1$s: how long a season lasts (e.g. "6 semaines"). -->
@@ -168,7 +168,7 @@
 
     <!-- The island in the colours of the player's skin (see IslandDress). Never name a secret or a legendary set here. -->
     <string name="tour_island_look_title">Votre style sur l\'île</string>
-    <string name="tour_island_look_body">Ce que vous portez se voit sur l\'île : votre bateau et votre équipement colorent son fanion, ses auvents et ses toits. Plus votre style est rare, plus la fête est grande.</string>
+    <string name="tour_island_look_body">Votre bateau se voit sur l\'île : il colore le fanion, les auvents et les toits. Plus votre bateau est rare, plus la fête est grande.</string>
     <!-- The Tackle page offers one pack at a time. %1$d: single pieces per day. -->
     <string name="tour_tackle_offers_title">Un lot à la fois</string>
     <string name="tour_tackle_offers_body">Chaque matériel propose d\'abord son plus petit lot, puis le suivant, plus grand, une fois celui-ci acheté. À l\'unité, il s\'achète en points, jusqu\'à %1$d de chaque par jour.</string>

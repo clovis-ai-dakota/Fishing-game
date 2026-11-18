@@ -96,7 +96,7 @@
     <string name="tour_shop_style_body">La página Estilo tiene barcos prediseñados, pinturas, emblemas y estampados de vela (que se previsualizan en tu propio barco), además de nuevos anzuelos, sedales y estelas. Como todos los aspectos, solo cambian la apariencia, nunca el juego.</string>
 
     <string name="tour_aquarium_title">Tu acuario</string>
-    <string name="tour_aquarium_body">Los peces que has capturado nadan en tu acuario, el pabellón de cristal del pueblo: elige quién nada en él y compra allí mismo decoración o una pecera más grande. Toca dos veces la pecera para verla a pantalla completa: pellizca para acercarte, arrastra el agua para mirar alrededor y arrastra un adorno para moverlo (al soltarlo, se hunde hasta la arena). Tus peces conviven: los pequeños nadan en banco, los grandes los persiguen y dos que se cruzan se paran frente a frente.</string>
+    <string name="tour_aquarium_body">Los peces que has capturado nadan en tu acuario, el pabellón de cristal del pueblo: elige quién nada en él y compra decoración allí mismo. Toca dos veces la pecera para verla a pantalla completa: arrastra para mirar alrededor, pellizca para acercarte, mantén pulsado un adorno para moverlo y toca dos veces un pez para verlo reaccionar. Los pequeños nadan en banco, los grandes los persiguen y dos que se cruzan se paran frente a frente.</string>
 
     <string name="tour_season_title">Temporadas y eventos de fin de semana</string>
     <!-- %1$s: how long a season lasts (e.g. "6 semanas"). -->
@@ -194,7 +194,7 @@
 
     <!-- The island in the colours of the player's skin (see IslandDress). Never name a secret or a legendary set here. -->
     <string name="tour_island_look_title">Tu estilo en la isla</string>
-    <string name="tour_island_look_body">Lo que llevas se ve en la isla: tu barco y tu equipo dan color a su banderín, sus toldos y sus tejados. Cuanto más raro es tu estilo, mayor es la fiesta.</string>
+    <string name="tour_island_look_body">Tu barco se ve en la isla: da color al banderín, a los toldos y a los tejados. Cuanto más raro es tu barco, mayor es la fiesta.</string>
     <!-- The Tackle page offers one pack at a time. %1$d: single pieces per day. -->
     <string name="tour_tackle_offers_title">Un lote cada vez</string>
     <string name="tour_tackle_offers_body">Cada aparejo ofrece primero su lote más pequeño y, cuando lo compras, el siguiente más grande. Por unidad se compra con puntos, hasta %1$d de cada uno al día.</string>

@@ -92,7 +92,7 @@ object ModelCredits {
                 "CommonTree_3", "Bush_Common", "Flower_3_Group", "Rock_Medium_1", "Rock_Medium_2", "Pebble_Round_1", "Pebble_Round_2",
                 "Pebble_Square_1", "Pebble_Square_2", "Plant_1", "Plant_7", "Grass_Common_Short",
             ),
-            listOf("Flowers.png", "Leaves.png", "Leaves_Bush.png", "Leaves_NormalTree_C.png"),
+            listOf("Flowers.png", "Leaves.png", "Leaves_Bush.png", "Leaves_Tree.png"),
         ),
     )
 }

@@ -803,8 +803,9 @@ class SceneBuilder {
             silhouette: Float = 0f,
             len: Float = species.bodyLengthM,
             atmosphere: Atmosphere = Atmosphere.FAMILY,
+            roll: Float = 0f,
         ): DrawItem {
-            val m = Mat4.trs(at, rotY = yaw, rotZ = rotZ, scale = Vec3(len, len, len))
+            val m = Mat4.trs(at, rotY = yaw, rotZ = rotZ, rotX = roll, scale = Vec3(len, len, len))
             val look = FishLooks.of(species, atmosphere)
             // Ink lines: a dark shade of the fish's own colours (anime style), not plain black.
             val ink = rgb(ColorScript.mix(look.body, 0xFF0A0E1A, 0.78f))

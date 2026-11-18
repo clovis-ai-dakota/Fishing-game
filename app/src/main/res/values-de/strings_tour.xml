@@ -79,7 +79,7 @@
     <string name="tour_shop_style_body">Auf der Seite „Stil“ gibt es fertige Boote, Lackierungen, Embleme und Segeldrucke (als Vorschau an deinem eigenen Boot) sowie neue Haken, Schnüre und Spuren. Wie alle Skins ändern sie nur das Aussehen, nie das Spiel.</string>
 
     <string name="tour_aquarium_title">Dein Aquarium</string>
-    <string name="tour_aquarium_body">Die Fische, die du gefangen hast, schwimmen in deinem Aquarium, dem Glaspavillon im Dorf: Wähle aus, wer dort schwimmt, und kaufe direkt dort Deko oder ein größeres Becken. Tippe doppelt auf das Becken für das Vollbild: Zoome mit zwei Fingern, ziehe das Wasser, um dich umzusehen, und ziehe ein Dekostück, um es zu verschieben (losgelassen sinkt es auf den Sand). Deine Fische leben zusammen: Die kleinen schwimmen im Schwarm, die großen jagen ihnen nach, und zwei, die sich begegnen, halten Nase an Nase inne.</string>
+    <string name="tour_aquarium_body">Die Fische, die du gefangen hast, schwimmen in deinem Aquarium, dem Glaspavillon im Dorf: Wähle aus, wer dort schwimmt, und kaufe direkt dort Deko. Tippe doppelt auf das Becken für das Vollbild: Ziehe, um dich umzusehen, zoome mit zwei Fingern, halte ein Dekostück gedrückt, um es zu verschieben, und tippe doppelt auf einen Fisch, um ihn reagieren zu sehen. Die kleinen schwimmen im Schwarm, die großen jagen ihnen nach, und zwei, die sich begegnen, halten Nase an Nase inne.</string>
 
     <string name="tour_season_title">Saisons und Wochenend-Events</string>
     <string name="tour_season_body">Jede Saison dauert %1$s. Jeder Solo-Wurf bringt Saison-XP und schaltet Belohnungsstufen frei: Zubehör und Punkte für alle und mit dem Saisonpass noch mehr (ein Saisonboot, ein Abzeichen). Jedes Wochenende gibt es außerdem ein Angelziel mit eigener Belohnung. Nichts davon verändert Duelle.</string>
@@ -159,7 +159,7 @@
 
     <!-- The island in the colours of the player's skin (see IslandDress). Never name a secret or a legendary set here. -->
     <string name="tour_island_look_title">Dein Look auf der Insel</string>
-    <string name="tour_island_look_body">Was du trägst, sieht man auf der Insel: Dein Boot und deine Ausrüstung färben ihren Wimpel, ihre Markisen und Dächer. Je seltener dein Look, desto größer das Fest.</string>
+    <string name="tour_island_look_body">Dein Boot sieht man auf der Insel: Es färbt den Wimpel, die Markisen und die Dächer. Je seltener dein Boot, desto größer das Fest.</string>
     <!-- The Tackle page offers one pack at a time. %1$d: single pieces per day. -->
     <string name="tour_tackle_offers_title">Ein Paket nach dem anderen</string>
     <string name="tour_tackle_offers_body">Jede Ausrüstung bietet zuerst ihr kleinstes Paket an und nach dem Kauf das nächstgrößere. Einzeln kaufst du sie mit Punkten, bis zu %1$d von jeder pro Tag.</string>

@@ -109,7 +109,7 @@
     <string name="tour_shop_style_body">The Style page has premade boats, paints, emblems and sail prints (previewed on your own boat), and new hooks, lines and trails. Like every skin, they only change the look, never the game.</string>
 
     <string name="tour_aquarium_title">Your aquarium</string>
-    <string name="tour_aquarium_body">The fish you\'ve caught swim in your aquarium, the glass pavilion in the village: pick who swims there, and buy decor or a bigger tank right there. Double-tap the tank to see it full screen: pinch to zoom, drag the water to look around, and drag a piece of decor to move it (let go and it sinks to the sand). Your fish live together: small ones school, big ones give chase, and two that meet stop nose to nose.</string>
+    <string name="tour_aquarium_body">The fish you\'ve caught swim in your aquarium, the glass pavilion in the village: pick who swims there and buy decor right there. Double-tap the tank for full screen: drag to look around, pinch to zoom, press and hold a piece of decor to move it, and double-tap a fish to see it react. Small fish school, big ones give chase, and two that meet stop nose to nose.</string>
 
     <string name="tour_season_title">Seasons and weekend events</string>
     <!-- %1$s: how long a season lasts (e.g. "6 weeks"). -->
@@ -210,7 +210,7 @@
 
     <!-- The island in the colours of the player's skin (see IslandDress). Never name a secret or a legendary set here. -->
     <string name="tour_island_look_title">Your look on the island</string>
-    <string name="tour_island_look_body">What you wear shows on the island: your boat and gear colour its pennant, awnings and roofs. The rarer your look, the bigger the celebration.</string>
+    <string name="tour_island_look_body">Your boat shows on the island: it colours the pennant, the awnings and the roofs. The rarer your boat, the bigger the celebration.</string>
     <!-- The Tackle page offers one pack at a time. %1$d: single pieces per day. -->
     <string name="tour_tackle_offers_title">One pack at a time</string>
     <string name="tour_tackle_offers_body">Each piece of tackle offers its smallest pack first, then the next bigger one once you\'ve bought it. Single pieces are bought with points, up to %1$d of each a day.</string>

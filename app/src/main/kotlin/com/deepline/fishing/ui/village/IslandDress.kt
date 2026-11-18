@@ -13,17 +13,17 @@ import com.deepline.fishing.core.Secrets
 import com.deepline.fishing.core.ShopCatalog
 
 /**
- * The island in the colours of what the player wears, more so the harder it was to get. Looks
+ * The island in the colours of the boat the player wears, more so the harder it was to get. Looks
  * only, like every skin: nothing on the island opens anything new or hides anything.
  *
  * [level]:
  * - 0 the classic look: the island as it is.
  * - 1 a boat of their own design (free options): the arena's pennant in its flag colour.
- * - 2 a shop look (a premade boat up to €1.99, shop paints or emblems, a shop hook, line or
- *   trail): also the market's awning and the pavilion's tiles.
+ * - 2 a shop boat (a premade boat up to €1.99, shop paints or emblems): also the market's awning
+ *   and the pavilion's tiles.
  * - 3 a premium look (a set, a season pass boat, €4.99 and up, the Club's Aurora): also the roofs
  *   and the lighthouse, and bunting all over the island.
- * - 4 a legendary set (a legendary secret): all of that in the set's colours, its monument in
+ * - 4 a legendary boat (a legendary secret): all of that in the set's colours, its monument in
  *   the square and a crown for the lighthouse ([legend], the monument's key).
  *
  * Colours are ARGB; null leaves that part as built.
@@ -44,7 +44,7 @@ data class IslandDress(
         /**
          * The legendary sets, by the secret that unlocks them: their monument's key ([legend]:
          * a leviathan's skeleton, rainbow crystals, a golden crowned fish) and colours (roof,
-         * flag, trim). Then the shop gear's colours (flag, trim).
+         * flag, trim).
          */
         private val LEGENDS = mapOf(
             Secrets.DAVID_AND_GOLIATH to ("leviathan" to Triple(0xFF2F6F7EL, 0xFF59E3F2L, 0xFF1FA2B8L)),
@@ -54,40 +54,25 @@ data class IslandDress(
 
         /** Every legendary monument's key. */
         val legends: List<String> get() = LEGENDS.values.map { it.first }
-        private val GEAR = mapOf(
-            Cosmetic.CORAL_HOOK to (0xFFFF7F7FL to 0xFFFFF0E6L),
-            Cosmetic.OCEAN_LINE to (0xFF2EC4D6L to 0xFF1565C0L),
-            Cosmetic.HEART_TRAIL to (0xFFFF6F9FL to 0xFFFFE0EAL),
-            Cosmetic.NEON_HOOK to (0xFFFF3FD2L to 0xFF2BE3FFL),
-            Cosmetic.NEON_LINE to (0xFFFF4FB0L to 0xFF2BE3FFL),
-            Cosmetic.STAR_TRAIL to (0xFF2BE3FFL to 0xFFB04FFFL),
-            Cosmetic.OBSIDIAN_HOOK to (0xFF5B3A8CL to 0xFF2A2238L),
-            Cosmetic.SILVER_LINE to (0xFFC9D3DCL to 0xFF6E7F8DL),
-            Cosmetic.PETAL_TRAIL to (0xFFFFA8C8L to 0xFFFFF4F8L),
-            Cosmetic.FOUNDER_TITLE to (0xFFF2C14EL to 0xFF1F3A68L),
-        )
 
-        /** What [p] wears, on the island. */
+        /**
+         * The boat [p] wears, on the island: its own design, a premade boat, or a boat skin. Only
+         * the boat: changing boats changes the island (the hook, line and trail don't).
+         */
         fun of(p: PlayerProgress): IslandDress {
-            val options = ArrayList<IslandDress>()
-            // The boat first: it wins a tie.
-            val boatCosmetic = p.equippedSkins[CosmeticSlot.BOAT]
-            if (p.customBoatEquipped && boatCosmetic == null) options += ofDesign(p.boatDesign)
-            for (slot in listOf(CosmeticSlot.BOAT, CosmeticSlot.HOOK, CosmeticSlot.LINE, CosmeticSlot.TRAIL, CosmeticSlot.TITLE)) {
-                val c = p.equippedSkins[slot] ?: continue
-                ofCosmetic(c)?.let { options += it }
+            val boat = p.equippedSkins[CosmeticSlot.BOAT]
+            return when {
+                boat != null -> ofCosmetic(boat) ?: CLASSIC
+                p.customBoatEquipped -> ofDesign(p.boatDesign)
+                else -> CLASSIC
             }
-            return options.maxByOrNull { it.level }?.takeIf { it.level > 0 } ?: CLASSIC
         }
 
         private fun ofCosmetic(c: Cosmetic): IslandDress? {
-            if (!c.fromShop) {
-                val (legend, colors) = LEGENDS[c.unlockedBy] ?: return null
-                val (roof, flag, trim) = colors
-                return IslandDress(4, roof, flag, trim, legend)
-            }
-            val (flag, trim) = GEAR[c] ?: return null
-            return IslandDress(2, flag = flag, trim = trim)
+            // Boat skins are the legendary sets' boats.
+            val (legend, colors) = LEGENDS[c.unlockedBy] ?: return null
+            val (roof, flag, trim) = colors
+            return IslandDress(4, roof, flag, trim, legend)
         }
 
         /** A boat design worn: a shop boat by its price, otherwise by the options it uses. */

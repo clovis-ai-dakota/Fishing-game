@@ -29,7 +29,13 @@ class AquariumScene {
      * and it sinks to the sand). The gestures write it on the main thread; [build] reads it, clamps
      * it and leaves what the gestures need (the last frame's projection) on the render thread.
      */
-    class Camera {
+    class Camera(
+        /**
+         * How the view opens: on this share of the tank's width (a card), or else on the tank and
+         * its stand from top to bottom (full screen).
+         */
+        val widthShare: Float? = null,
+    ) {
         @Volatile var zoom = 1f
         /** Whether the view was set yet: it opens filling the screen, down at the sand. */
         @Volatile internal var framed = false
@@ -38,7 +44,14 @@ class AquariumScene {
         @Volatile var panY = 0f
 
         /** The last frame's view, for turning a finger into a point in the tank. */
-        private class View(val eye: Vec3, val halfTan: Float, val aspect: Float, val w: Float, val h: Float, val tankWidth: Float, val coverZoom: Float, val maxZoom: Float)
+        private class View(val eye: Vec3, val halfTan: Float, val aspect: Float, val w: Float, val h: Float, val tankWidth: Float, val coverZoom: Float, val maxZoom: Float, val homeZoom: Float)
+
+        /** A double tap waiting for the next frame: on a fish it reacts, on the water the view zooms. */
+        @Volatile internal var doubleTapAt: FloatArray? = null
+
+        fun doubleTap(xPx: Float, yPx: Float) {
+            doubleTapAt = floatArrayOf(xPx, yPx)
+        }
         @Volatile private var view: View? = null
 
         /** The piece under the finger and where it is now (world metres; y above the sand). */
@@ -66,18 +79,18 @@ class AquariumScene {
             panY += dyPx * metersPerPx
         }
 
-        /** A double tap: the whole tank on its stand, or back to filling the screen where the finger is. */
+        /** A double tap on the water: a close-up where the finger is, or back to the usual view. */
         fun toggleZoom(xPx: Float, yPx: Float) {
             val v = view ?: return
-            if (zoom > 1.2f) {
-                zoom = 1f
+            if (zoom > v.homeZoom * 1.3f) {
+                zoom = v.homeZoom
                 panX = 0f
-                panY = 0f
+                panY = if (widthShare != null) -HEIGHT else HOME_CENTER_Y - HEIGHT / 2f
             } else {
                 val at = unproject(xPx, yPx, 0f) ?: return
-                zoom = v.coverZoom
+                zoom = v.coverZoom * 1.7f
                 panX = at.x
-                panY = -HEIGHT
+                panY = at.y - HEIGHT / 2f
             }
         }
 
@@ -110,7 +123,8 @@ class AquariumScene {
             val p = pieces.firstOrNull { it.decor == d } ?: return
             val at = unproject(xPx, yPx, zOf(d)) ?: return
             heldX = xOf(p, v.tankWidth)
-            heldY = heightOf(d)
+            // Picked up: it lifts a little off the sand, so the player sees it's in hand.
+            heldY = heightOf(d) + LIFT
             grabDx = heldX - at.x
             grabDy = heldY + sandAt(heldX, zOf(d)) - at.y
             sinking.remove(d)
@@ -144,8 +158,8 @@ class AquariumScene {
 
         internal fun heightOf(d: Decor): Float = if (held == d) heldY else sinking[d]?.get(0) ?: 0f
 
-        internal fun remember(eye: Vec3, halfTan: Float, aspect: Float, w: Int, h: Int, tw: Float, coverZoom: Float, maxZoom: Float) {
-            view = View(eye, halfTan, aspect, w.toFloat(), h.toFloat(), tw, coverZoom, maxZoom)
+        internal fun remember(eye: Vec3, halfTan: Float, aspect: Float, w: Int, h: Int, tw: Float, coverZoom: Float, maxZoom: Float, homeZoom: Float) {
+            view = View(eye, halfTan, aspect, w.toFloat(), h.toFloat(), tw, coverZoom, maxZoom, homeZoom)
         }
 
         /** Sinking pieces fall through the water ([dt] seconds), slowed by it, and settle on the sand. */
@@ -171,8 +185,9 @@ class AquariumScene {
     fun build(widthPx: Int, heightPx: Int, t: Float, fish: List<FishSpecies>, pieces: List<Piece>, big: Boolean, camera: Camera? = null): Frame {
         val tw = width(big)
         val aspect = widthPx / heightPx.toFloat()
-        // A long lens: the front of the tank hardly bigger than its back, like looking through glass.
-        val baseFov = 18f * PI.toFloat() / 180f
+        // A long lens: the front of the tank hardly bigger than its back, like looking through glass;
+        // a little wider full screen, nearer the glass, for more depth.
+        val baseFov = (if (camera != null) 26f else 18f) * PI.toFloat() / 180f
         val baseHalfTan = tan(baseFov / 2f)
         // How far the back wall must be to fill the view across, or up and down.
         val fitWidth = tw * 0.5f / (baseHalfTan * aspect)
@@ -186,11 +201,15 @@ class AquariumScene {
         // along the glass, never past the tank's edges once it fills the view.
         val coverZoom = toBack / cover
         val maxZoom = coverZoom * 2.5f
-        // Full screen opens filling the screen (some of the tank off the sides), down at the sand.
+        // Full screen opens on about 60% of the tank's width, all of its height on the stand (a
+        // balance between the whole tank and a close-up, like the island's view), down at the sand.
+        val share = camera?.widthShare
+        val homeZoom = (if (share != null) toBack / fitWidth / share else toBack * baseHalfTan / (HOME_VIEW_HEIGHT / 2f)).coerceIn(1f, coverZoom)
         if (camera != null && !camera.framed) {
             camera.framed = true
-            camera.zoom = coverZoom
-            camera.panY = -HEIGHT
+            camera.zoom = homeZoom
+            // A card looks down at the sand; full screen centres the tank on its stand.
+            camera.panY = if (share != null) -HEIGHT else HOME_CENTER_Y - HEIGHT / 2f
         }
         val zoom = (camera?.zoom ?: 1f).coerceIn(1f, maxZoom)
         val halfTan = baseHalfTan / zoom
@@ -202,7 +221,10 @@ class AquariumScene {
         // A little lower than the back wall's foot too, once zoomed in: the sand in front of the
         // decor is nearer the lens and shows below it.
         val roomY = max(0f, HEIGHT / 2f - seenHalfH)
-        val panY = (camera?.panY ?: 0f).coerceIn(-roomY - if (roomY > 0f) FLOOR_ROOM else 0f, roomY)
+        // Seeing more than the tank's height, the view can go down to the stand under it (the lid
+        // stays at the top), rather than leave the room's dark above.
+        val standRoom = max(0f, seenHalfH - HEIGHT / 2f) * 0.9f
+        val panY = (camera?.panY ?: 0f).coerceIn(-roomY - if (roomY > 0f) FLOOR_ROOM else standRoom, roomY)
         val center = Vec3(panX, HEIGHT / 2f + panY, 0f)
         val eye = Vec3(panX, HEIGHT * 0.5f + panY, distance)
         val dt = if (lastT < 0f) 0f else (t - lastT).coerceIn(0f, 0.1f)
@@ -210,7 +232,7 @@ class AquariumScene {
             camera.zoom = zoom
             camera.panX = panX
             camera.panY = panY
-            camera.remember(eye, halfTan, aspect, widthPx, heightPx, tw, coverZoom, maxZoom)
+            camera.remember(eye, halfTan, aspect, widthPx, heightPx, tw, coverZoom, maxZoom, homeZoom)
             camera.sink(dt)
         }
         lastT = t
@@ -255,8 +277,19 @@ class AquariumScene {
         }
         school.sync(fish, tw, tops)
         school.step(dt)
+        // A double tap: the fish under the finger reacts; on the water, the view zooms.
+        camera?.doubleTapAt?.let { (x, y) ->
+            camera.doubleTapAt = null
+            val hit = school.fishAt { f ->
+                val at = camera.unproject(x, y, f.z) ?: return@fishAt false
+                val dx = at.x - f.x
+                val dy = at.y - f.y
+                dx * dx + dy * dy < (f.len * 0.6f + 0.2f).let { it * it }
+            }
+            if (hit != null) school.react(hit) else camera.toggleZoom(x, y)
+        }
         for ((i, f) in school.swimmers.withIndex()) {
-            items += SceneBuilder.fishItem(f.species, Vec3(f.x, f.y, f.z), f.yaw, f.pitch, f.phase, 1f, false, i.toFloat(), len = f.len)
+            items += SceneBuilder.fishItem(f.species, Vec3(f.x, f.y, f.z), f.yaw, f.pitch + f.loop, f.phase, 1f, false, i.toFloat(), len = f.len * f.puff, roll = f.roll)
         }
         // Bubbles rising from the diver's helmet (or from the sand), drawn last, see-through.
         val sprites = SpriteBatch()
@@ -268,6 +301,14 @@ class AquariumScene {
             val x = from + 0.25f * sin(p * 9f + k) + if (k % 2 == 0) 0f else 0.15f
             val y = fromY + p * (HEIGHT - fromY - 0.2f)
             sprites.quad(Vec3(x, y, zOf(Decor.BUBBLER) + 0.3f), 0.08f + 0.06f * (k % 3), floatArrayOf(0.9f, 0.97f, 1f, 0.75f * (1f - p * 0.6f)), SceneBuilder.SHAPE_RING)
+        }
+        // A fish blowing bubbles at the glass.
+        for (f in school.swimmers) if (f.reaction == AquariumSchool.Reaction.BUBBLES) {
+            val mouth = Vec3(f.x, f.y + 0.05f, f.z + f.len * 0.5f)
+            for (k in 0 until 6) {
+                val p = (f.reactionT * 2.2f + k / 6f) % 1f
+                sprites.quad(mouth + Vec3(0.08f * sin(p * 11f + k), p * 1.4f, 0.1f), 0.05f + 0.05f * (k % 2), floatArrayOf(0.9f, 0.97f, 1f, 0.85f * (1f - p)), SceneBuilder.SHAPE_RING)
+            }
         }
         // Light falling through the water.
         for (k in 0 until 4) {
@@ -316,6 +357,11 @@ class AquariumScene {
         /** A piece let go in the water sinks: pulled down this much (m/s²), never faster than this (m/s). */
         private const val SINK_GRAVITY = 6f
         private const val SINK_SPEED = 3f
+        /** Full screen opens on this much height (m, at the back glass), centred at this height: the tank and its stand. */
+        private const val HOME_VIEW_HEIGHT = 6.8f
+        private const val HOME_CENTER_Y = 1.6f
+        /** How far a piece lifts when it's picked up (m). */
+        private const val LIFT = 0.18f
 
         /** The sand's height at ([x], [z]): gentle ripples, rising a little towards the back glass. */
         fun sandAt(x: Float, z: Float): Float = 0.12f + 0.08f * sin(x * 1.3f) * cos(z * 1.7f) + 0.1f * (0.5f - z / DEPTH)

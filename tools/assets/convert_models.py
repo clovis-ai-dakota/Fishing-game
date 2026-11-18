@@ -44,7 +44,11 @@ LEAF_TEXTURE_SIZE = 256
 # which is what cut-out leaves cost on a phone's GPU.
 THIN_LEAVES = {"CommonTree_3": (2, 1.3), "Bush_Common": (2, 1.25)}
 # Cut-out textures recoloured for the island: the bush's leaves come autumn red, the game's are green.
-RECOLOR = {"Leaves_TwistedTree_C.png": ((0x56, 0xA8, 0x4C), "Leaves_Bush.png")}
+# The tree's olive leaves take the island's own greens (its lawns and bushes) too.
+RECOLOR = {
+    "Leaves_TwistedTree_C.png": ((0x56, 0xA8, 0x4C), "Leaves_Bush.png"),
+    "Leaves_NormalTree_C.png": ((0x5C, 0xB2, 0x4E), "Leaves_Tree.png"),
+}
 
 
 def recolor(im, rgb):
