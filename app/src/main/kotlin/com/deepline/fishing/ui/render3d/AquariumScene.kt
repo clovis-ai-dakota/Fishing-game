@@ -97,7 +97,7 @@ class AquariumScene {
                 val z = zOf(p.decor)
                 val at = unproject(xPx, yPx, z) ?: return@firstOrNull false
                 val x = xOf(p, v.tankWidth)
-                val y = heightOf(p.decor)
+                val y = heightOf(p.decor) + sandAt(x, z)
                 at.x in (x + lo.x - 0.15f)..(x + hi.x + 0.15f) && at.y in (y + lo.y - 0.15f)..(y + hi.y + 0.15f)
             }?.decor
         }
@@ -110,7 +110,7 @@ class AquariumScene {
             heldX = xOf(p, v.tankWidth)
             heldY = heightOf(d)
             grabDx = heldX - at.x
-            grabDy = heldY - at.y
+            grabDy = heldY + sandAt(heldX, zOf(d)) - at.y
             sinking.remove(d)
             held = d
         }
@@ -123,7 +123,7 @@ class AquariumScene {
             val (lo, hi) = AquariumModels.bounds(d)
             val half = v.tankWidth / 2f
             heldX = (at.x + grabDx).coerceIn(-half - lo.x + 0.1f, half - hi.x - 0.1f)
-            heldY = (at.y + grabDy).coerceIn(0f, HEIGHT - hi.y - 0.1f)
+            heldY = (at.y + grabDy - sandAt(heldX, zOf(d))).coerceIn(0f, HEIGHT - hi.y - 0.4f)
         }
 
         /** Lets go: the piece sinks from where it is; returns it and its new spot along the tank. */
@@ -229,7 +229,13 @@ class AquariumScene {
         // The decor, each where the player put it (or its own spot), sinking if let go in the water.
         for ((i, p) in pieces.withIndex()) {
             val d = p.decor
-            val at = if (d == Decor.LANTERN_LIGHTS) Vec3(0f, 0f, zOf(d)) else Vec3(camera?.xOf(p, tw) ?: xOf(p.spot, tw), camera?.heightOf(d) ?: 0f, zOf(d))
+            val at = if (d == Decor.LANTERN_LIGHTS) {
+                Vec3(0f, 0f, zOf(d))
+            } else {
+                // Standing on the sand, sunk into it a little.
+                val x = camera?.xOf(p, tw) ?: xOf(p.spot, tw)
+                Vec3(x, sandAt(x, zOf(d)) - 0.04f + (camera?.heightOf(d) ?: 0f), zOf(d))
+            }
             items += decorItems(d, at, t, i, tw)
         }
         // The fish: each swims lengths at its own depth and pace, turning at the ends.
@@ -302,6 +308,9 @@ class AquariumScene {
         /** A piece let go in the water sinks: pulled down this much (m/s²), never faster than this (m/s). */
         private const val SINK_GRAVITY = 6f
         private const val SINK_SPEED = 3f
+
+        /** The sand's height at ([x], [z]): gentle ripples, rising a little towards the back glass. */
+        fun sandAt(x: Float, z: Float): Float = 0.12f + 0.08f * sin(x * 1.3f) * cos(z * 1.7f) + 0.1f * (0.5f - z / DEPTH)
 
         /** Where a piece at [spot] (0..1) stands along a tank [tw] wide. */
         fun xOf(spot: Float, tw: Float) = -tw / 2f + MARGIN + (tw - 2f * MARGIN) * spot
@@ -382,7 +391,7 @@ internal object AquariumModels {
         for (j in 0..rows) for (k in 0..cols) {
             val x = -tw / 2f + tw * k / cols
             val z = -d / 2f + d * j / rows
-            val y = 0.12f + 0.08f * sin(x * 1.3f) * cos(z * 1.7f) + 0.1f * (1f - j / rows.toFloat())
+            val y = AquariumScene.sandAt(x, z)
             val shade = 0.9f + 0.1f * hash01(k, j, 21)
             b.vertex(Vec3(x, y, z), Vec3.UP, 0f, 0f, Part.PAINTED, floatArrayOf(sand[0] * shade, sand[1] * shade, sand[2] * shade, 1f))
         }
