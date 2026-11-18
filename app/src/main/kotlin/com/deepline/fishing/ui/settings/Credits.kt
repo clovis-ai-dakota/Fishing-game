@@ -17,7 +17,7 @@ import com.deepline.fishing.GameViewModel
 import com.deepline.fishing.R
 import com.deepline.fishing.audio.AudioCredits
 
-/** Credits and licences: where every sound and music track comes from (see [AudioCredits]). */
+/** Credits and licences: where every sound, music track and 3D model comes from (see [AudioCredits], `ModelCredits`). */
 @Suppress("UNUSED_PARAMETER")
 @Composable
 fun CreditsSection(vm: GameViewModel) {
@@ -41,6 +41,19 @@ fun CreditsSection(vm: GameViewModel) {
                     fontWeight = FontWeight.SemiBold,
                 )
                 Text(stringResource(R.string.settings_credits_by, credit.author, credit.licence), style = MaterialTheme.typography.bodySmall)
+                Text(credit.url, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+            }
+        }
+        // The island's and the aquarium's CC0 models (see ModelCredits).
+        for (credit in com.deepline.fishing.ui.render3d.ModelCredits.all) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .clickable { runCatching { uri.openUri(credit.url) } },
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                Text(stringResource(R.string.settings_credits_models, credit.pack), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.settings_credits_by, credit.author, com.deepline.fishing.ui.render3d.ModelCredits.LICENCE), style = MaterialTheme.typography.bodySmall)
                 Text(credit.url, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
             }
         }

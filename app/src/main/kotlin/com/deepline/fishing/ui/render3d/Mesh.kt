@@ -86,6 +86,8 @@ object Part {
     const val DRESS_FLAG = 65f
     /** Still trims: the market's awning stripes, the pavilion's tiles. */
     const val DRESS_TRIM = 66f
+    /** Leaves, petals and grass of the CC0 models: a cut-out texture ([Program.LEAF]); they sway. */
+    const val LEAF = 67f
     const val KELP = 40f
     const val DECOR_ROCK = 41f
     const val CORAL = 42f

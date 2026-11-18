@@ -25,6 +25,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // The CC0 models (trees, rocks, props) are read from the app's assets.
+        val assetFiles = applicationContext.assets
+        com.deepline.fishing.ui.render3d.ModelAssets.open = { path -> runCatching { assetFiles.open(path) }.getOrNull() }
         com.deepline.fishing.ui.i18n.AppLanguages.handOverToSystem(this)
         // Analytics and crash reports: Firebase if configured, collecting only after consent.
         com.deepline.fishing.analytics.Telemetry.start(this)

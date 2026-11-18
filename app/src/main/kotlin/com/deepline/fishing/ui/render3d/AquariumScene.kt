@@ -285,6 +285,9 @@ class AquariumScene {
         val glow = f(0.7f + 0.3f * sin(t * 2f + i))
         val m = if (d == Decor.LANTERN_LIGHTS) Mat4.trs(at, scale = Vec3(tw / 8f, 1f, 1f)) else Mat4.trs(at)
         items += DrawItem(Program.TOON, "aquarium:${d.name}", uniforms = model(m) + mapOf("uMaterial" to f(5f), "uGlow" to glow), cullBack = d != Decor.PLANTS)
+        for (tex in AquariumModels.leafTextures(d)) {
+            items += DrawItem(Program.LEAF, "aquarium:leaves:${d.name}:$tex", uniforms = model(m) + mapOf("uMaterial" to f(5f)), cullBack = false, texture = tex)
+        }
         // Living parts on top of the painted ones: kelp that sways, corals in the reef's colours.
         when (d) {
             Decor.PLANTS -> for ((k, off) in listOf(Vec3(-0.45f, 0f, -0.1f), Vec3(0.05f, 0f, -0.25f), Vec3(0.5f, 0f, 0.05f)).withIndex()) {
@@ -339,7 +342,12 @@ internal object AquariumModels {
                 "aquarium:tank:big" -> tank(12f)
                 "aquarium:stand" -> stand(8f)
                 "aquarium:stand:big" -> stand(12f)
-                else -> decor(Decor.valueOf(key.substringAfter("aquarium:")))
+                else -> if (key.startsWith("aquarium:leaves:")) {
+                    val (d, tex) = key.removePrefix("aquarium:leaves:").split(':', limit = 2)
+                    leaves(Decor.valueOf(d), tex)
+                } else {
+                    decor(Decor.valueOf(key.substringAfter("aquarium:")))
+                }
             }
         }
     }
@@ -512,41 +520,51 @@ internal object AquariumModels {
         tube((0..6).map { j -> val u = j / 6f; foot + Vec3(lean.x * u * u, tall * u, lean.z * u * u) }, { u -> r * (1f - 0.85f * u) }, 5, Part.PAINTED)
     }
 
+    /** A CC0 model in a piece of decor (see [ModelAssets]). */
+    private class Placed(val model: String, val at: FloatArray)
+
+    /** The CC0 models a piece of decor is made of, around its foot. */
+    private fun placed(d: Decor): List<Placed> {
+        fun p(model: String, x: Float, z: Float, s: Float, turn: Float, y: Float = 0f) =
+            Placed(model, Mat4.trs(Vec3(x, y, z), rotY = turn, scale = Vec3(s, s, s)))
+        return when (d) {
+            Decor.PLANTS -> listOf(
+                p("Plant_1", -0.5f, 0.2f, 1.0f, 0.4f), p("Plant_1", 0.45f, -0.3f, 0.8f, 2.2f),
+                p("Plant_7", 0.1f, 0.35f, 1.3f, 1.0f), p("Plant_7", -0.7f, -0.25f, 1.1f, 3.4f),
+                p("Grass_Common_Short", -0.2f, -0.35f, 0.75f, 0.2f), p("Grass_Common_Short", 0.7f, 0.25f, 0.6f, 1.9f),
+                p("Grass_Common_Short", -0.85f, 0.35f, 0.55f, 4.1f),
+            )
+            Decor.PEBBLES -> (0 until 16).map { k ->
+                val model = listOf("Pebble_Round_1", "Pebble_Round_2", "Pebble_Square_1", "Pebble_Square_2")[k % 4]
+                p(model, -0.75f + 1.5f * hash01(k, 2, 31), -0.4f + 0.8f * hash01(k, 3, 31), 0.45f + 0.45f * hash01(k, 1, 31), k * 1.3f)
+            }
+            Decor.CORAL_GARDEN -> listOf(p("Rock_Medium_2", 0.05f, -0.05f, 0.32f, 0.6f, -0.05f))
+            else -> emptyList()
+        }
+    }
+
+    /** The cut-out textures a piece of decor's leaves use: one `aquarium:leaves:<decor>:<texture>` draw each. */
+    fun leafTextures(d: Decor): List<String> = placed(d).flatMap { p -> ModelAssets.model(p.model).leaves.mapNotNull { it.texture } }.distinct()
+
+    private fun leaves(d: Decor, texture: String): MeshData {
+        val b = MeshBuilder()
+        for (p in placed(d)) for (piece in ModelAssets.model(p.model).leaves) if (piece.texture == texture) b.append(piece.mesh, p.at)
+        return b.build()
+    }
+
     private fun decor(d: Decor): MeshData {
         val b = MeshBuilder()
+        for (p in placed(d)) for (m in ModelAssets.model(p.model).painted) b.append(m, p.at)
         when (d) {
             Decor.PLANTS -> {
-                // A mossy stone, tufts of grass, a broad-leaved sword plant and two moss balls (the
-                // swaying kelp is drawn on top).
+                // A mossy stone and two moss balls; the CC0 plants and grass ([placed]) and the
+                // swaying kelp are drawn with it.
                 b.rockAt(Vec3(0.05f, 0.08f, -0.05f), Vec3(0.42f, 0.3f, 0.34f), 2, rgba(0xFF7D8A80))
-                b.rockAt(Vec3(-0.35f, 0.04f, 0.2f), Vec3(0.24f, 0.16f, 0.2f), 5, rgba(0xFF6F7C74), 0.8f)
-                val greens = listOf(rgba(0xFF3E9B4F), rgba(0xFF5DBB5A), rgba(0xFF2F7F45), rgba(0xFF7FCB5E))
-                for ((t, foot) in listOf(Vec3(-0.6f, 0.05f, 0.25f), Vec3(0.55f, 0.05f, 0.3f), Vec3(0.3f, 0.05f, -0.35f)).withIndex()) {
-                    for (k in 0 until 8) {
-                        val a = k / 8f * 2f * PI.toFloat() + t
-                        val lean = Vec3(cos(a) * 0.25f, 0f, sin(a) * 0.18f)
-                        b.blade(foot + Vec3(cos(a) * 0.05f, 0f, sin(a) * 0.05f), lean, 0.45f + 0.25f * hash01(k, t, 41), 0.03f, greens[(k + t) % greens.size])
-                    }
-                }
-                // The sword plant: long leaves fanning out from one crown.
-                val crown = Vec3(-0.15f, 0.12f, -0.25f)
-                for (k in 0 until 7) {
-                    val a = k / 7f * 2f * PI.toFloat()
-                    val leaf = MeshBuilder().apply { sphere(Vec3(0f, 0.45f, 0f), 1f, Part.PAINTED, 6, 8, Vec3(0.07f, 0.45f, 0.17f)) }.build()
-                    b.paint(greens[k % 3]) { append(leaf, Mat4.trs(crown, rotY = a, rotX = 0.35f + 0.1f * (k % 2))) }
-                }
                 b.paint(rgba(0xFF2E6B3A)) { sphere(Vec3(0.62f, 0.14f, -0.05f), 0.15f, Part.PAINTED, 6, 8) }
                 b.paint(rgba(0xFF356F3F)) { sphere(Vec3(0.8f, 0.11f, 0.15f), 0.11f, Part.PAINTED, 5, 7) }
             }
             Decor.PEBBLES -> {
-                // Smooth river pebbles of every colour, two scallop shells, a starfish and a conch.
-                val colors = listOf(0xFF9E9E9E, 0xFFBCAAA4, 0xFF8D99A6, 0xFFD7CCC8, 0xFFB5835A, 0xFFF2EEE8, 0xFF6D7B85)
-                for (k in 0 until 24) {
-                    val r = 0.06f + 0.07f * hash01(k, 1, 31)
-                    val x = -0.75f + 1.5f * hash01(k, 2, 31)
-                    val z = -0.4f + 0.8f * hash01(k, 3, 31)
-                    b.paint(rgba(colors[k % colors.size])) { sphere(Vec3(x, r * 0.45f, z), 1f, Part.PAINTED, 5, 8, Vec3(r, r * 0.55f, r * 0.8f)) }
-                }
+                // River pebbles (the CC0 ones, [placed]), two scallop shells, a starfish and a conch.
                 for ((k, at) in listOf(Vec3(-0.35f, 0.04f, 0.32f), Vec3(0.5f, 0.04f, -0.2f)).withIndex()) {
                     val turn = 0.6f + 1.9f * k
                     b.paint(rgba(0xFFF6D6C2)) { append(MeshBuilder().apply { sphere(Vec3.ZERO, 1f, Part.PAINTED, 5, 10, Vec3(0.2f, 0.06f, 0.18f)) }.build(), Mat4.trs(at, rotY = turn)) }

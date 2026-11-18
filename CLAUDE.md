@@ -136,11 +136,18 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     `drawBoatAndRod` (graphite blank, cork grip, reel, guides); classic colours are in `BoatLook`.
     Change both renderers together. The hull's near side sits in front of the play plane, so a
     translucent `waterSkirt` and the hull's depth fade keep it reading as under water.
+  - **CC0 models** (Kenney, Quaternius: research in `docs/research/open-assets.md`) are converted
+    once by `tools/assets/convert_models.py` into `assets/models/*.dlm` (`ModelAssets`): painted
+    parts (colours sampled per vertex) merge into the scenes' meshes, cut-out leaves keep a small
+    texture (`assets/models/tex`) and are drawn by `Program.LEAF` (the toon shader with `LEAF`
+    defined: it alone may discard, so the other draws keep early depth tests). Every file is
+    credited in `assets/models/CREDITS.md` and `ModelCredits` (Settings > Credits); `ModelAssetsTest`
+    checks credits and the size budget. CC0 only. The WebGL preview skips leaf draws (no textures).
   - Lighting follows the usual stylised recipe: a cel ramp with cool shadows, a stepped specular,
     rim light, hemispheric ambient and analytic AO in the material functions (no textures).
   - The village (`ui/village/`: `VillageModels`, `VillageScene`) and the aquarium
-    (`render3d/AquariumScene`) are scenes of their own, hosted by `LivePreview` (render width and
-    pace as parameters: the village runs at 60 fps while moved, 20 at rest). Their architecture
+    (`render3d/AquariumScene`) are scenes of their own, hosted by `LivePreview` (render width, pace and dynamic resolution as parameters: the village
+    runs at 60 fps and 80% resolution while moved, 20 fps and full resolution at rest). Their architecture
     uses the painted material (`uMaterial` 5: colour per vertex via `MeshBuilder.recolor`, parts
     `GLASS` and `BULB` that light up with `uGlow` at night, fluttering `CLOTH`) and the village's
     sea its own (`uMaterial` 6). Still parts are merged into a few big meshes (a triangle budget

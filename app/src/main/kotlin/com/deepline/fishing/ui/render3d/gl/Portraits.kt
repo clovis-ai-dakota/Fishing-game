@@ -144,13 +144,14 @@ internal fun LivePreview(
     onPainted: ((Boolean) -> Unit)? = null,
     maxRenderWidth: Int = 480,
     pace: (() -> Int)? = null,
+    resolution: (() -> Float)? = null,
 ) {
     val painted = androidx.compose.runtime.rememberUpdatedState(onPainted)
     val lifecycle = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
     val viewRef = remember(key) { arrayOfNulls<GlTextureView>(1) }
     androidx.compose.runtime.key(key) {
         androidx.compose.ui.viewinterop.AndroidView(
-            factory = { ctx -> GlTextureView(ctx, source, transparent, maxRenderWidth = maxRenderWidth, pace = pace).also { viewRef[0] = it; it.onPainted = { on -> painted.value?.invoke(on) } } },
+            factory = { ctx -> GlTextureView(ctx, source, transparent, maxRenderWidth = maxRenderWidth, pace = pace, resolution = resolution).also { viewRef[0] = it; it.onPainted = { on -> painted.value?.invoke(on) } } },
             modifier = modifier,
         )
     }

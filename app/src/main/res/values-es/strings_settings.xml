@@ -60,6 +60,8 @@
     <!-- %1$s: the original English title of a track or sound pack. -->
     <string name="settings_credits_music">Música: %1$s</string>
     <string name="settings_credits_sounds">Sonidos: %1$s</string>
+    <!-- A 3D model pack in Settings > Credits. %1$s: the pack's name (not translated). -->
+    <string name="settings_credits_models">Modelos 3D: %1$s</string>
     <!-- %1$s: the author's name; %2$s: the licence's name. -->
     <string name="settings_credits_by">Autor: %1$s. Licencia: %2$s.</string>
 </resources>

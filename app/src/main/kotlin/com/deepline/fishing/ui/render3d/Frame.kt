@@ -21,8 +21,14 @@ class Frame(
 enum class Blend { OPAQUE, ALPHA, ADD }
 
 /** The shader programs, each a vertex + fragment pair in `assets/shaders`. */
-enum class Program(val vertex: String, val fragment: String) {
+enum class Program(val vertex: String, val fragment: String, val defines: String = "") {
     TOON("toon.vert", "toon.frag"),
+    /**
+     * The toon shader for cut-out leaves (the CC0 models' leaves, petals and grass): it samples
+     * [DrawItem.texture] and drops the clear pixels. A program of its own, so the discard never
+     * slows down the other draws (a shader that can discard loses early depth tests on phones).
+     */
+    LEAF("toon.vert", "toon.frag", "LEAF"),
     OUTLINE("outline.vert", "outline.frag"),
     BACKGROUND("screen.vert", "background.frag"),
     DARKNESS("screen.vert", "darkness.frag"),
@@ -42,6 +48,8 @@ class DrawItem(
     val cullBack: Boolean = true,
     val depthTest: Boolean = true,
     val depthWrite: Boolean = true,
+    /** A texture under `assets/models/tex` (for [Program.LEAF]), bound to `uTex`. */
+    val texture: String? = null,
 )
 
 /** Builds the cached meshes by key ("fish:silver_sprat", "rock:3", "boat:ROYAL_BOAT"...). */

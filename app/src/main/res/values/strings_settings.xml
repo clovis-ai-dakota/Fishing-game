@@ -70,6 +70,8 @@
     <!-- %1$s: the title of a music track or sound pack (its original English title). -->
     <string name="settings_credits_music">Music: %1$s</string>
     <string name="settings_credits_sounds">Sounds: %1$s</string>
+    <!-- A 3D model pack in Settings > Credits. %1$s: the pack's name (not translated). -->
+    <string name="settings_credits_models">3D models: %1$s</string>
     <!-- %1$s: the author's name; %2$s: the licence's name (e.g. CC0 1.0). -->
     <string name="settings_credits_by">By %1$s. Licence: %2$s.</string>
 </resources>

@@ -119,6 +119,9 @@ function drawFrame(frame) {
   gl.depthMask(true);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   for (const item of frame.items) {
+    // The leaf shader samples a texture (GlBackend's Program.LEAF, a define on toon.frag): the
+    // preview has no textures, so it leaves the cut-out leaves out.
+    if (item.program === 'LEAF') continue;
     const mesh = vao(item.mesh);
     const passes = [];
     if (item.outline > 0) passes.push('OUTLINE');

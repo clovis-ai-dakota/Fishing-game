@@ -15,6 +15,12 @@ vec3 deform(vec3 p, float part, vec2 uv) {
     } else if (uMaterial > 4.5 && uMaterial < 5.5) {
         // The village's flags flutter, more towards their tip (u along the cloth).
         if (isPart(part, 63.0) || isPart(part, 65.0)) p.z += sin(uTime * 4.0 + uv.x * 5.0 + p.x * 0.7) * 0.22 * uv.x;
+        // Leaves sway in the breeze (or the water), more the higher they are.
+        if (isPart(part, 67.0)) {
+            float k = 0.035 * clamp(p.y * 0.25, 0.2, 1.0);
+            p.x += sin(uTime * 1.7 + p.x * 0.9 + p.z * 0.6) * k;
+            p.z += cos(uTime * 1.3 + p.x * 0.7) * k;
+        }
     } else if (uMaterial < 1.5) {
         // The hook doesn't move.
     } else if (uMaterial < 2.5) {

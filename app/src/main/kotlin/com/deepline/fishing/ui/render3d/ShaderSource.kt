@@ -16,4 +16,13 @@ object ShaderSource {
         }
         return expand(name)
     }
+
+    /** [source] with `#define NAME 1` for each of [defines] (space separated), right after its `#version` line. */
+    fun define(source: String, defines: String): String {
+        if (defines.isBlank()) return source
+        val lines = source.lines().toMutableList()
+        val at = lines.indexOfFirst { it.trimStart().startsWith("#version") } + 1
+        lines.addAll(at, defines.split(' ').filter { it.isNotBlank() }.map { "#define $it 1" })
+        return lines.joinToString("\n")
+    }
 }

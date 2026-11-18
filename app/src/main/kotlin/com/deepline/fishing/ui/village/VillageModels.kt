@@ -3,6 +3,7 @@ package com.deepline.fishing.ui.village
 import com.deepline.fishing.Building
 import com.deepline.fishing.ui.render3d.Mat4
 import com.deepline.fishing.ui.render3d.MeshBuilder
+import com.deepline.fishing.ui.render3d.ModelAssets
 import com.deepline.fishing.ui.render3d.MeshData
 import com.deepline.fishing.ui.render3d.Part
 import com.deepline.fishing.ui.render3d.PropModels
@@ -44,7 +45,8 @@ object VillageModels {
                 "village:glass" -> glass()
                 "village:beam" -> beam()
                 "village:dress:bunting" -> bunting()
-                else -> if (key.startsWith("village:dress:")) monument(key.removePrefix("village:dress:")) else error("Unknown village mesh $key")
+                else -> if (key.startsWith("village:leaves:")) leaves(key.removePrefix("village:leaves:"))
+                else if (key.startsWith("village:dress:")) monument(key.removePrefix("village:dress:")) else error("Unknown village mesh $key")
             }
         }
     }
@@ -394,6 +396,9 @@ object VillageModels {
         val boat = VillageLayout.boatAt
         d = min(d, distanceToSegment(x, z, Vec3(boat.x, 0f, boat.z - 2.2f), Vec3(boat.x, 0f, boat.z + 2.4f)) - 1.0f)
         for (r in seaRocks) d = min(d, sqrt((x - r.x) * (x - r.x) + (z - r.z) * (z - r.z)) - r.y)
+        val row = rowboatAt
+        d = min(d, sqrt((x - row.x) * (x - row.x) + (z - row.z) * (z - row.z)) - 1.4f)
+        for (bu in pierBuoys) d = min(d, sqrt((x - bu.x) * (x - bu.x) + (z - bu.z) * (z - bu.z)) - 0.4f)
         return max(d, 0f)
     }
 
@@ -584,8 +589,9 @@ object VillageModels {
     // ---- Trees -----------------------------------------------------------------------------------
 
     private class Tree(val at: Vec3, val scale: Float, val palm: Boolean, val variant: Int) {
-        val crownY get() = if (palm) 5.2f * scale else 3.3f * scale
-        val crownR get() = if (palm) 1.8f * scale else 2.0f * scale
+        // The CC0 models' crowns (see [nature]): a palm's fronds, a broad-leaved tree's canopy.
+        val crownY get() = if (palm) 5.0f * scale else 5.4f * scale
+        val crownR get() = if (palm) 1.9f * scale else 1.45f * scale
     }
 
     /** A few palms along the beach and round trees inland, never on a path or a building. */
@@ -614,61 +620,6 @@ object VillageModels {
         out
     }
 
-    private fun MeshBuilder.palm(t: Tree) {
-        val s = t.scale
-        val lean = Vec3(0.5f + 0.4f * hash01(t.variant, 4, 3), 0f, 0.3f - 0.6f * hash01(t.variant, 5, 3)).normalized()
-        val trunk = (0..6).map { k ->
-            val u = k / 6f
-            t.at + Vec3(0f, -0.4f + u * 5.4f * s, 0f) + lean * (u * u * 1.4f * s)
-        }
-        paint(rgb(0xFFA07B52)) { tube(trunk, { u -> (0.3f - 0.12f * u) * s }, 7, Part.PAINTED, cap = false) }
-        // Rings on the trunk.
-        for (k in 1..5) {
-            val c = trunk[k]
-            loop(circle(c, (0.3f - 0.12f * k / 6f) * s + 0.02f, 8), 0.05f * s, rgb(0xFF7E5E3E), 3)
-        }
-        val top = trunk.last()
-        val greens = listOf(rgb(0xFF4FA84C), rgb(0xFF66BF57), rgb(0xFF3F9447))
-        for (k in 0 until 8) {
-            val a = k / 8f * 2f * PI.toFloat() + t.variant
-            val dir = Vec3(cos(a), 0f, sin(a))
-            val side = Vec3(-dir.z, 0f, dir.x)
-            val col = greens[(k + t.variant) % 3]
-            val segs = 6
-            var prevL = -1
-            var prevR = -1
-            for (i in 0..segs) {
-                val u = i / segs.toFloat()
-                val reach = u * 3.1f * s
-                val p = top + dir * reach + Vec3(0f, (0.5f * u - 1.9f * u * u) * s, 0f)
-                val wHalf = (0.55f * sin(u * PI.toFloat()) + 0.05f) * s
-                val n = Vec3(0f, 1f, 0f)
-                val l = vertex(p + side * wHalf + Vec3(0f, -0.12f * s * u, 0f), n, 0f, u, Part.PAINTED, col)
-                val r = vertex(p - side * wHalf + Vec3(0f, -0.12f * s * u, 0f), n, 1f, u, Part.PAINTED, col)
-                if (prevL >= 0) quad(prevL, l, r, prevR)
-                prevL = l
-                prevR = r
-            }
-        }
-        paint(rgb(0xFF6B4A2E)) {
-            for (k in 0 until 3) sphere(top + Vec3(0.25f * cos(k * 2.1f), -0.3f, 0.25f * sin(k * 2.1f)) * s, 0.2f * s, Part.PAINTED, 4, 6)
-        }
-    }
-
-    private fun MeshBuilder.roundTree(t: Tree) {
-        val s = t.scale
-        pole(t.at + Vec3(0f, -0.5f, 0f), t.at + Vec3(0f, 2.2f * s, 0f), 0.26f * s, rgb(0xFF85603F), 7)
-        val greens = listOf(rgb(0xFF6DB85A), rgb(0xFF5AA94E), rgb(0xFF7FC463))
-        val c = t.at + Vec3(0f, t.crownY, 0f)
-        paint(greens[t.variant % 3]) {
-            // Lumps of leaves, coarse enough to stay cheap (the cel shading hides the facets).
-            sphere(c, 1.75f * s, Part.PAINTED, 6, 9)
-            sphere(c + Vec3(1.1f * s, -0.45f * s, 0.35f * s), 1.2f * s, Part.PAINTED, 5, 7)
-            sphere(c + Vec3(-1.0f * s, -0.35f * s, -0.3f * s), 1.15f * s, Part.PAINTED, 5, 7)
-            sphere(c + Vec3(0.2f * s, 0.95f * s, -0.2f * s), 1.0f * s, Part.PAINTED, 5, 7)
-        }
-    }
-
     /** Rocks along the coast, half in the water (each with its foam collar): (x, z) and size in y. */
     private val seaRocks: List<Vec3> by lazy {
         listOf(-2.15f, -1.75f, -1.25f, -0.35f, 0.2f, 2.45f, 3.0f).mapIndexed { k, a ->
@@ -686,6 +637,76 @@ object VillageModels {
         }
     }
 
+    /** A CC0 model placed on the island (see [ModelAssets], `assets/models/CREDITS.md`). */
+    private class Placed(val model: String, val at: FloatArray)
+
+    /** The leaf textures the island's models use: one `village:leaves:<texture>` draw each. */
+    val leafTextures: List<String> by lazy { nature.flatMap { p -> ModelAssets.model(p.model).leaves.mapNotNull { it.texture } }.distinct().sorted() }
+
+    /**
+     * What grows and lies around the places, from the CC0 packs: palms on the beach (Kenney),
+     * broad-leaved trees, bushes and flowers inland (Quaternius), grass tufts, rocks in the surf
+     * and on the sand, a rowboat by the jetty, flagged buoys off the pier, a barrel and a crate
+     * on it. Never on a path or a building (the trees keep the spots of [trees]).
+     */
+    private val nature: List<Placed> by lazy {
+        val out = ArrayList<Placed>()
+        fun place(model: String, at: Vec3, scale: Float, turn: Float) { out += Placed(model, Mat4.trs(at, rotY = turn, scale = Vec3(scale, scale, scale))) }
+        for (t in trees) {
+            if (t.palm) {
+                // The bent palm leans out to sea.
+                val ox = t.at.x - VillageLayout.ISLAND_X
+                val oz = t.at.z - VillageLayout.ISLAND_Z
+                val bent = t.variant % 2 == 0
+                place(if (bent) "palm-detailed-bend" else "palm-detailed-straight", t.at + Vec3(0f, -0.15f, 0f), 1.2f * t.scale, if (bent) atan2(oz, -ox) else t.variant * 1.3f)
+            } else {
+                place("CommonTree_3", t.at + Vec3(0f, -0.1f, 0f), 0.8f * t.scale, t.variant * 2.1f)
+            }
+        }
+        // Bushes by the plinths, a few in flower.
+        for ((k, p) in listOf(-17.2f to -14.6f, -4.6f to -14.4f, 4.7f to -13.6f, 17.6f to -13.4f, -15.6f to -1.2f, -3.2f to -31.5f, 0.6f to -33.5f).withIndex()) {
+            val (x, z) = p
+            place(if (k % 3 == 1) "Flower_3_Group" else "Bush_Common", ground(x, z) + Vec3(0f, -0.1f, 0f), if (k % 3 == 1) 0.8f else 1.05f + 0.2f * hash01(k, 1, 71), k * 1.7f)
+        }
+        // Tufts of grass on the lawns.
+        for (k in 0 until 40) {
+            val x = VillageLayout.ISLAND_X - 20f + 40f * hash01(k, 1, 73)
+            val z = VillageLayout.ISLAND_Z - 18f + 34f * hash01(k, 2, 73)
+            if (VillageLayout.shoreDistance(x, z) < 4f || pathDistance(x, z) < 1.4f || VillageLayout.spots.values.any { outside(x, z, it) < 1.5f }) continue
+            if (trees.any { sqrt((it.at.x - x) * (it.at.x - x) + (it.at.z - z) * (it.at.z - z)) < 1.5f }) continue
+            place("grass-plant", ground(x, z), 1.1f + 0.5f * hash01(k, 3, 73), k * 0.9f)
+        }
+        // Rocks in the surf, and two on the sand.
+        for ((k, r) in seaRocks.withIndex()) place(if (k % 2 == 0) "Rock_Medium_1" else "Rock_Medium_2", Vec3(r.x, -0.6f, r.z), (0.55f + 0.35f * r.y) * 0.9f, k * 1.9f)
+        for ((k, a) in listOf(1.2f, -1.0f).withIndex()) {
+            val rr = VillageLayout.islandRadius(a) - 1.3f
+            place("rocks-sand-a", ground(VillageLayout.ISLAND_X + cos(a) * rr, VillageLayout.ISLAND_Z + sin(a) * rr), 0.45f, k * 2.4f)
+        }
+        // By the jetty, a rowboat; off the pier's end, two flagged buoys; on the pier, a barrel and a crate.
+        place("boat-row-small", rowboatAt, 1.2f, 0.35f)
+        for (bu in pierBuoys) place("buoy-flag", bu, 0.8f, 0.6f)
+        val p0 = VillageLayout.pierFrom
+        place("barrel", Vec3(p0.x + 0.95f, p0.y, p0.z + 4.5f), 0.6f, 0.4f)
+        place("crate", Vec3(p0.x - 0.95f, p0.y, p0.z + 7.5f), 0.75f, 0.2f)
+        out
+    }
+
+    private val rowboatAt: Vec3 get() = Vec3(VillageLayout.jettyFrom.x + 2.4f, 0.02f, VillageLayout.jettyFrom.z + 6.5f)
+    private val pierBuoys: List<Vec3> get() = listOf(-4.2f, 4.4f).map { dx -> Vec3(VillageLayout.pierTo.x + dx, -0.05f, VillageLayout.pierTo.z + 2.5f) }
+
+    /** The leaves of the island's models in one texture, lit like the town (ambient occlusion baked in). */
+    private fun leaves(texture: String): MeshData {
+        val b = MeshBuilder()
+        for (p in nature) for (piece in ModelAssets.model(p.model).leaves) if (piece.texture == texture) b.append(piece.mesh, p.at)
+        b.bakeColors { q, n, _, c ->
+            val ground = max(height(q.x, q.z), 0f)
+            val ao = 0.72f + 0.28f * smooth(0f, 3f, q.y - ground)
+            val under = if (n.y < -0.3f) 0.85f else 1f
+            for (k in 0..2) c[k] *= ao * under
+        }
+        return b.build()
+    }
+
     // ---- The town: the six places and what grows around them --------------------------------------
 
     private const val AQ_R = 5f
@@ -699,18 +720,9 @@ object VillageModels {
         b.aquariumPavilion()
         b.pier()
         b.arena()
-        for (t in trees) if (t.palm) b.palm(t) else b.roundTree(t)
-        for ((k, r) in seaRocks.withIndex()) b.rockAt(Vec3(r.x, -0.5f, r.z), 1.2f + r.y * 0.6f, k + 2)
-        // Bushes by the buildings' plinths.
-        for ((k, p) in listOf(-17.2f to -14.6f, -4.6f to -14.4f, 4.7f to -13.6f, 17.6f to -13.4f, -15.6f to -1.2f, -3.2f to -31.5f, 0.6f to -33.5f).withIndex()) {
-            val (x, z) = p
-            val y = height(x, z)
-            b.paint(listOf(rgb(0xFF5FAE52), rgb(0xFF79BF5C), rgb(0xFF4F9C4D))[k % 3]) {
-                sphere(Vec3(x, y + 0.35f, z), 0.75f, Part.PAINTED, 5, 8)
-                sphere(Vec3(x + 0.6f, y + 0.2f, z + 0.2f), 0.55f, Part.PAINTED, 5, 8)
-            }
-            if (k % 2 == 0) b.paint(rgb(0xFFFF8FA3)) { sphere(Vec3(x - 0.2f, y + 1.0f, z + 0.45f), 0.12f, Part.PAINTED, 3, 5) }
-        }
+        // Trees, bushes, flowers, rocks and props: the CC0 models' painted parts (their leaves are
+        // `village:leaves:*`, drawn with the leaf shader).
+        for (p in nature) for (m in ModelAssets.model(p.model).painted) b.append(m, p.at)
         // The light baked into the colours: ambient occlusion towards the ground (and the water),
         // so everything sits on the island instead of floating over it.
         b.bakeColors { p, n, part, c ->

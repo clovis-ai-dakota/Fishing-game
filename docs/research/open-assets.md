@@ -2,7 +2,10 @@
 
 What free, open resources could raise the island's and the aquarium's look, and how they would
 fit the game's own renderer (meshes in code, colour per vertex, no textures; a Fairphone 4 is the
-reference phone). Nothing here is used yet: the downloads need the developer's go-ahead.
+reference phone). **Done** (2026-11-18): the Kenney Pirate and Watercraft kits and the Quaternius
+Stylized Nature MegaKit (Standard) are in the game: palms, broad-leaved trees, bushes, flowers,
+grass, rocks, a rowboat, buoys, a barrel and a crate on the island; plants, grass and pebbles in
+the aquarium (see `assets/models/CREDITS.md`).
 
 ## 1. 3D models under CC0 (public domain, no credit required)
 

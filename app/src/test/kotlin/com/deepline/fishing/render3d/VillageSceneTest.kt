@@ -38,6 +38,9 @@ class VillageSceneTest {
             Meshes.get(key).also { assertSound(key, it) }.triangleCount
         }
         triangles += dress[0] + dress.drop(1).max()
+        // The leaves of the CC0 trees, bushes and flowers.
+        for (tex in VillageModels.leafTextures) triangles += Meshes.get("village:leaves:$tex").also { assertSound(tex, it) }.triangleCount
+        println("village triangles: $triangles")
         // A mid-range phone's GPU is the limit (docs/ui-design.md): keep the whole village small.
         assertTrue("The village has $triangles triangles", triangles < 150_000)
     }

@@ -55,5 +55,7 @@
     <string name="settings_credits_body">Todos os sons e músicas são obras livres dedicadas ao domínio público (CC0) e compartilhadas no OpenGameArt.org. Obrigado aos seus autores.</string>
     <string name="settings_credits_music">Música: %1$s</string>
     <string name="settings_credits_sounds">Sons: %1$s</string>
+    <!-- A 3D model pack in Settings > Credits. %1$s: the pack's name (not translated). -->
+    <string name="settings_credits_models">Modelos 3D: %1$s</string>
     <string name="settings_credits_by">Por %1$s. Licença: %2$s.</string>
 </resources>

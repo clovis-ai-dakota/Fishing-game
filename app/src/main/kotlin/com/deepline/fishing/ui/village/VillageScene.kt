@@ -74,6 +74,8 @@ class VillageScene {
             "uDressTrim" to dressColor(d.trim, 1f),
         )
         items += DrawItem(Program.TOON, "village:town", uniforms = dressed, cullBack = false)
+        // The trees', bushes' and flowers' leaves: cut-out textures, one draw each.
+        for (tex in VillageModels.leafTextures) items += DrawItem(Program.LEAF, "village:leaves:$tex", uniforms = painted, cullBack = false, texture = tex)
         if (d.bunting) items += DrawItem(Program.TOON, "village:dress:bunting", uniforms = dressed, cullBack = false)
         d.legend?.let { items += DrawItem(Program.TOON, "village:dress:$it", uniforms = dressed) }
         // Your boat moored along the pier, bow out to sea, in your skins.

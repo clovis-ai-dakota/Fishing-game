@@ -55,5 +55,7 @@
     <string name="settings_credits_body">Tüm sesler ve müzikler kamu malı olarak bağışlanmış (CC0) ve OpenGameArt.org\'da paylaşılmış özgür eserlerdir. Yaratıcılarına teşekkür ederiz.</string>
     <string name="settings_credits_music">Müzik: %1$s</string>
     <string name="settings_credits_sounds">Sesler: %1$s</string>
+    <!-- A 3D model pack in Settings > Credits. %1$s: the pack's name (not translated). -->
+    <string name="settings_credits_models">3D modeller: %1$s</string>
     <string name="settings_credits_by">Yapan: %1$s. Lisans: %2$s.</string>
 </resources>

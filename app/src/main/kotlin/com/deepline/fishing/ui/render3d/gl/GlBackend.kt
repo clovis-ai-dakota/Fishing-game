@@ -52,6 +52,7 @@ class GlBackend(
         programs.clear()
         meshes.clear()
         dynamic.clear()
+        textures.clear()
         try {
             for (p in Program.entries) programs[p] = GlProgram.build(p, assets)
         } catch (e: Exception) {
@@ -116,10 +117,34 @@ class GlBackend(
         if (err != GLES30.GL_NO_ERROR) fail("GL error $err")
     }
 
+    /** Cut-out textures on the GPU, by file name (see [DrawItem.texture]). */
+    private val textures = HashMap<String, Int>()
+
+    private fun texture(name: String): Int = textures.getOrPut(name) {
+        val options = android.graphics.BitmapFactory.Options().apply { inPremultiplied = false }
+        val bitmap = assets.open("models/tex/$name").use { android.graphics.BitmapFactory.decodeStream(it, null, options) } ?: error("Texture $name")
+        val ids = IntArray(1)
+        GLES30.glGenTextures(1, ids, 0)
+        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, ids[0])
+        android.opengl.GLUtils.texImage2D(GLES30.GL_TEXTURE_2D, 0, bitmap, 0)
+        bitmap.recycle()
+        GLES30.glGenerateMipmap(GLES30.GL_TEXTURE_2D)
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_LINEAR_MIPMAP_LINEAR)
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_LINEAR)
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S, GLES30.GL_REPEAT)
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T, GLES30.GL_REPEAT)
+        ids[0]
+    }
+
     private fun drawPass(p: GlProgram, item: DrawItem, mesh: GlMesh, frame: Frame, outline: Boolean, outlineScale: Float) {
         if (currentProgram != p.id) {
             GLES30.glUseProgram(p.id)
             currentProgram = p.id
+        }
+        if (!outline && item.texture != null) {
+            GLES30.glActiveTexture(GLES30.GL_TEXTURE0)
+            GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, texture(item.texture))
+            p.setSampler("uTex", 0)
         }
         // Frame-wide uniforms once per program per frame; per-item ones (or their defaults) for
         // every draw. GlProgram.set skips values the program already holds.
@@ -201,6 +226,11 @@ private class GlProgram(val id: Int) {
     private val held = HashMap<Int, FloatArray>()
     var frameStamp = -1
 
+    fun setSampler(name: String, unit: Int) {
+        val loc = locations.getOrPut(name) { GLES30.glGetUniformLocation(id, name) }
+        if (loc >= 0) GLES30.glUniform1i(loc, unit)
+    }
+
     fun set(name: String, v: FloatArray) {
         val loc = locations.getOrPut(name) { GLES30.glGetUniformLocation(id, name) }
         if (loc < 0) return
@@ -220,8 +250,8 @@ private class GlProgram(val id: Int) {
     companion object {
         fun build(p: Program, assets: AssetManager): GlProgram {
             fun read(name: String) = assets.open("shaders/$name").bufferedReader().use { it.readText() }
-            val vs = compile(GLES30.GL_VERTEX_SHADER, ShaderSource.resolve(p.vertex, ::read), p.vertex)
-            val fs = compile(GLES30.GL_FRAGMENT_SHADER, ShaderSource.resolve(p.fragment, ::read), p.fragment)
+            val vs = compile(GLES30.GL_VERTEX_SHADER, ShaderSource.define(ShaderSource.resolve(p.vertex, ::read), p.defines), p.vertex)
+            val fs = compile(GLES30.GL_FRAGMENT_SHADER, ShaderSource.define(ShaderSource.resolve(p.fragment, ::read), p.defines), p.fragment)
             val id = GLES30.glCreateProgram()
             GLES30.glAttachShader(id, vs)
             GLES30.glAttachShader(id, fs)

@@ -25,6 +25,9 @@ uniform float uGlow;      // the village's lights: 0 by day, 1 at night
 uniform vec4 uDressRoof;  // the village in the player's skin: rgb a colour, a how much (0: off)
 uniform vec4 uDressFlag;
 uniform vec4 uDressTrim;
+#ifdef LEAF
+uniform sampler2D uTex;   // the cut-out leaves' texture (Program.LEAF)
+#endif
 
 in vec3 vWorld;
 in vec3 vNormal;
@@ -493,6 +496,12 @@ vec3 dressed(vec3 c, vec4 d) {
 
 Surface paintedSurface() {
     vec3 c = vColor.rgb;
+#ifdef LEAF
+    // Leaves, petals and grass: the texture's colour, its clear pixels dropped.
+    vec4 tx = texture(uTex, vUv);
+    if (tx.a < 0.5) discard;
+    c *= tx.rgb;
+#endif
     if (isPart(vPart, 64.0)) c = dressed(c, uDressRoof);
     else if (isPart(vPart, 65.0)) c = dressed(c, uDressFlag);
     else if (isPart(vPart, 66.0)) c = dressed(c, uDressTrim);
@@ -599,11 +608,14 @@ void main() {
     // Ambient light from the sky above and the water below (hemispheric).
     vec3 col = lit * uLightColor + s.albedo * uAmbient * 0.3 * mix(0.7, 1.3, n.y * 0.5 + 0.5);
 
-    // Hard-edged highlight and rim light, the anime way.
+    // Hard-edged highlight and rim light, the anime way (not on leaves: they're many and small,
+    // and the GPU has enough to do with their cut-outs).
+    float fres = 1.0 - max(dot(n, v), 0.0);
+#ifndef LEAF
     vec3 hv = normalize(l + v);
     col += s.spec * smoothstep(0.972, 0.985, dot(n, hv)) * uLightColor * 0.7;
-    float fres = 1.0 - max(dot(n, v), 0.0);
     col += s.rim * smoothstep(0.62, 0.7, fres) * s.rimColor * 0.45 * (0.4 + 0.6 * uLightColor.x);
+#endif
 
     // Sparkling fish: a gold rim and glints sweeping over the body. Touched obstacles: a red rim.
     if (uFlags.x > 0.5) {

@@ -32,6 +32,11 @@ class GlTextureView(
     private val everyNthVsync: Int = 2,
     /** When set, how many vsyncs per frame right now (1 while the player moves the view, 2 at rest). */
     private val pace: (() -> Int)? = null,
+    /**
+     * When set, the share of the render size to draw at right now (dynamic resolution: a little
+     * less while the view moves, where nobody sees the difference, full at rest).
+     */
+    private val resolution: (() -> Float)? = null,
 ) : TextureView(context), TextureView.SurfaceTextureListener {
     private var renderer: RenderThread? = null
     private var painted = false
@@ -51,7 +56,7 @@ class GlTextureView(
     override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
         val (rw, rh) = renderSize(width, height)
         surface.setDefaultBufferSize(rw, rh)
-        renderer = RenderThread(context.applicationContext, surface, rw, rh, source, transparent, everyNthVsync, pace).also { it.begin() }
+        renderer = RenderThread(context.applicationContext, surface, rw, rh, source, transparent, everyNthVsync, pace, resolution).also { it.begin() }
     }
 
     override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
@@ -92,6 +97,7 @@ private class RenderThread(
     private val transparent: Boolean,
     private val everyNthVsync: Int,
     private val pace: (() -> Int)?,
+    private val resolution: (() -> Float)?,
 ) : Choreographer.FrameCallback {
     private val thread = HandlerThread("DeepLine3D-preview")
     private lateinit var handler: Handler
@@ -139,8 +145,9 @@ private class RenderThread(
         val b = backend ?: return
         try {
             val t = (System.nanoTime() - start) / 1_000_000_000f
-            val w = width
-            val h = height
+            val k = resolution?.invoke()?.coerceIn(0.4f, 1f) ?: 1f
+            val w = (width * k).toInt().coerceAtLeast(16)
+            val h = (height * k).toInt().coerceAtLeast(16)
             // TextureView puts the buffer back to the view's full size, without telling its
             // listener, whenever it rebuilds its layer (after the app was stopped: the phone
             // locked, Home pressed). Ask for the reduced size again before every frame, or the

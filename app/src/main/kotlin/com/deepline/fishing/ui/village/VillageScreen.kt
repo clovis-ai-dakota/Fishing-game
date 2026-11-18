@@ -125,6 +125,9 @@ fun VillageScreen(vm: GameViewModel) {
             // 60 fps under the finger; at rest only the sea, the gulls and the fish move, slowly
             // enough for 20 fps, which keeps the full-screen scene's GPU load near the Fish menu's.
             pace = { if (System.nanoTime() - lastMove[0] < 900_000_000L) 1 else 3 },
+            // Dynamic resolution: a little less while the map moves (the trees' leaves cost their
+            // share), full sharpness as soon as it rests.
+            resolution = { if (System.nanoTime() - lastMove[0] < 250_000_000L) 0.8f else 1f },
             modifier = Modifier
                 .fillMaxSize()
                 .tourTarget(TourTarget.VILLAGE_MAP)
@@ -175,6 +178,7 @@ private fun VillageMap(
     moved: () -> Int,
     onPainted: (Boolean) -> Unit,
     pace: () -> Int,
+    resolution: () -> Float,
     modifier: Modifier,
 ) {
     val palette = LocalMenuPalette.current
@@ -200,6 +204,7 @@ private fun VillageMap(
                 // cost their share.
                 maxRenderWidth = 560,
                 pace = pace,
+                resolution = resolution,
             )
         }
         return
