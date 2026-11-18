@@ -46,7 +46,8 @@ object VillageModels {
                 "village:beam" -> beam()
                 "village:dress:bunting" -> bunting()
                 else -> if (key.startsWith("village:leaves:")) leaves(key.removePrefix("village:leaves:"))
-                else if (key.startsWith("village:dress:")) monument(key.removePrefix("village:dress:")) else error("Unknown village mesh $key")
+                else if (key.startsWith("village:dress:")) monument(key.removePrefix("village:dress:"))
+                else if (key.startsWith("village:theme:")) VillageThemes.build(com.deepline.fishing.core.MenuTheme.valueOf(key.removePrefix("village:theme:"))) else error("Unknown village mesh $key")
             }
         }
     }
@@ -89,7 +90,7 @@ object VillageModels {
     }
 
     /** How far ([x], [z]) is outside [s]'s footprint (0 inside). */
-    private fun outside(x: Float, z: Float, s: VillageLayout.Spot): Float {
+    internal fun outside(x: Float, z: Float, s: VillageLayout.Spot): Float {
         val dx = max(abs(x - s.center.x) - s.half.x, 0f)
         val dz = max(abs(z - s.center.z) - s.half.z, 0f)
         return sqrt(dx * dx + dz * dz)
@@ -131,7 +132,7 @@ object VillageModels {
     }
 
     /** The paths, from the square to each place's door (from, to, width). */
-    private val paths: List<Triple<Vec3, Vec3, Float>> by lazy {
+    internal val paths: List<Triple<Vec3, Vec3, Float>> by lazy {
         val sq = VillageLayout.square
         listOf(
             Triple(sq, Vec3(lighthouseAt.x, 0f, lighthouseAt.z + 3.2f), 2.2f),
@@ -143,7 +144,7 @@ object VillageModels {
         )
     }
 
-    private fun pathDistance(x: Float, z: Float): Float {
+    internal fun pathDistance(x: Float, z: Float): Float {
         val sq = VillageLayout.square
         val plaza = sqrt((x - sq.x) * (x - sq.x) + (z - sq.z) * (z - sq.z)) - 4.2f
         return min(plaza, paths.minOf { (a, e, w) -> distanceToSegment(x, z, a, e) - w / 2f })
@@ -442,11 +443,11 @@ object VillageModels {
 
     // ---- Painting helpers ------------------------------------------------------------------------
 
-    private fun rgb(argb: Long) = floatArrayOf(((argb shr 16) and 0xFF) / 255f, ((argb shr 8) and 0xFF) / 255f, (argb and 0xFF) / 255f, 1f)
+    internal fun rgb(argb: Long) = floatArrayOf(((argb shr 16) and 0xFF) / 255f, ((argb shr 8) and 0xFF) / 255f, (argb and 0xFF) / 255f, 1f)
 
     private fun mix(a: FloatArray, b: FloatArray, t: Float) = FloatArray(4) { a[it] + (b[it] - a[it]) * t.coerceIn(0f, 1f) }
 
-    private fun shade(c: FloatArray, k: Float) = floatArrayOf(c[0] * k, c[1] * k, c[2] * k, c[3])
+    internal fun shade(c: FloatArray, k: Float) = floatArrayOf(c[0] * k, c[1] * k, c[2] * k, c[3])
 
     /** [c] a little lighter or darker by [k] (-1..1) from a hash: planks and stones that aren't all alike. */
     private fun vary(c: FloatArray, i: Int, salt: Int, k: Float = 0.08f) = shade(c, 1f + k * (hash01(i, salt, 23) * 2f - 1f))
@@ -543,7 +544,7 @@ object VillageModels {
     }
 
     /** The ground under ([x], [z]). */
-    private fun ground(x: Float, z: Float) = Vec3(x, height(x, z), z)
+    internal fun ground(x: Float, z: Float) = Vec3(x, height(x, z), z)
 
     private fun MeshBuilder.rockAt(at: Vec3, size: Float, variant: Int, color: FloatArray = rgb(0xFFA9A196)) {
         paint(vary(color, variant, 5, 0.1f)) { append(PropModels.rock(variant), Mat4.trs(at, rotY = variant * 1.3f, scale = Vec3(size, size * 0.72f, size))) }
@@ -566,7 +567,7 @@ object VillageModels {
         if (fill != null) boxR(at + Vec3(0f, s + 0.06f, 0f), Vec3(s * 0.86f, 0.14f, s * 0.86f), fill, rotY = turn, bevel = 0.05f)
     }
 
-    private fun MeshBuilder.lamp(at: Vec3, height: Float = 3.2f) {
+    internal fun MeshBuilder.lamp(at: Vec3, height: Float = 3.2f) {
         val iron = rgb(0xFF37474F)
         box(at + Vec3(0f, 0.12f, 0f), Vec3(0.5f, 0.24f, 0.5f), iron, 0.06f)
         pole(at, at + Vec3(0f, height, 0f), 0.08f, iron, 6)
@@ -599,6 +600,7 @@ object VillageModels {
         fun free(x: Float, z: Float): Boolean =
             pathDistance(x, z) > 1.6f &&
                 VillageLayout.spots.values.none { outside(x, z, it) < 2.4f } &&
+                sqrt((x - legendAt.x) * (x - legendAt.x) + (z - legendAt.z) * (z - legendAt.z)) > 4.2f &&
                 sqrt((x - lighthouseAt.x).let { it * it } + (z - lighthouseAt.z).let { it * it }) > 7f
         val out = ArrayList<Tree>()
         // Palms on the beach (angle around the island, inland distance).
@@ -729,7 +731,12 @@ object VillageModels {
         b.arena()
         // Trees, bushes, flowers, rocks and props: the CC0 models' painted parts (their leaves are
         // `village:leaves:*`, drawn with the leaf shader).
-        for (p in nature) for (m in ModelAssets.model(p.model).painted) b.append(m, p.at)
+        for (p in nature) for (m in ModelAssets.model(p.model).painted) {
+            val from = b.vertexCount
+            b.append(m, p.at)
+            // The rowboat by the jetty is painted like the player's boat (see IslandDress).
+            if (p.model == "boat-row-small") b.repart(from, Part.DRESS_HULL)
+        }
         // The light baked into the colours: ambient occlusion towards the ground (and the water),
         // so everything sits on the island instead of floating over it.
         b.bakeColors { p, n, part, c ->
@@ -1214,7 +1221,7 @@ object VillageModels {
     // ---- The skin the player wears, on the island (see IslandDress) -------------------------------
 
     /** Ambient occlusion towards the ground, as baked into the town. */
-    private fun MeshBuilder.bakeGround(from: Int) = bakeColors(from) { p, n, part, c ->
+    internal fun MeshBuilder.bakeGround(from: Int) = bakeColors(from) { p, n, part, c ->
         if (part == Part.GLASS || part == Part.BULB || part == Part.CLOTH || part == Part.DRESS_FLAG) return@bakeColors
         val ao = 0.7f + 0.3f * smooth(0f, 2.4f, p.y - max(height(p.x, p.z), 0f))
         val under = if (n.y < -0.3f) 0.85f else 1f
@@ -1283,9 +1290,15 @@ object VillageModels {
      * cluster of rainbow crystals; "crown": a golden fish on a tall plinth with royal banners.
      * They glow a little at night. Small enough to leave the paths and the places clear.
      */
+    /**
+     * Where a legendary boat's monument stands: in the lighthouse's grounds, to the east of its
+     * knoll (the square's centre is the menu theme's, see [VillageThemes]).
+     */
+    val legendAt: Vec3 get() = Vec3(5.2f, 0f, -30.5f)
+
     private fun monument(set: String): MeshData {
         val b = MeshBuilder()
-        val sq = VillageLayout.square
+        val sq = legendAt
         val g = height(sq.x, sq.z)
         val at = Vec3(sq.x, g, sq.z)
         // Lathe profiles give absolute heights: turned round this.
@@ -1297,7 +1310,7 @@ object VillageModels {
             "leviathan" -> {
                 val bone = rgb(0xFFEDE6D2)
                 val cyan = rgb(0xFF59E3F2)
-                b.paint(stone) { lathe(listOf(2.6f to g + 0.35f, 2.75f to g - 0.4f), 16, Part.PAINTED, axis) }
+                b.paint(stone) { lathe(listOf(2.6f to g + 0.35f, 2.75f to g - 1.2f), 16, Part.PAINTED, axis) }
                 b.disc(Vec3(at.x, g + 0.35f, at.z), 2.6f, shade(stone, 1.05f), 16)
                 val spine = (0..10).map { i -> val x = -2.3f + 4.4f * i / 10f; Vec3(at.x + x, g + 1.25f + 0.25f * sin(i / 10f * PI.toFloat()), at.z) }
                 b.paint(bone) { tube(spine, { u -> 0.16f - 0.06f * u }, 6, Part.PAINTED) }
@@ -1325,7 +1338,7 @@ object VillageModels {
                 b.paint(cyan) { tube(circle(Vec3(c.x, gy + 1.3f, c.z), 2.62f, 36).let { it + it.first() }, { 0.06f }, 4, Part.BULB, cap = false) }
             }
             "prism" -> {
-                b.paint(stone) { lathe(listOf(1.9f to g + 0.45f, 2.05f to g - 0.4f), 16, Part.PAINTED, axis) }
+                b.paint(stone) { lathe(listOf(1.9f to g + 0.45f, 2.05f to g - 1.2f), 16, Part.PAINTED, axis) }
                 b.disc(Vec3(at.x, g + 0.45f, at.z), 1.9f, shade(stone, 1.05f), 16)
                 val colors = listOf(0xFFFF6B6B, 0xFFFFB347, 0xFFFFE66D, 0xFF7BE495, 0xFF5BC0EB, 0xFF9B7BFF, 0xFFFF8AD8)
                 for ((k, col) in colors.withIndex()) {
@@ -1344,7 +1357,7 @@ object VillageModels {
                 // "crown".
                 val gold = rgb(0xFFF2C14E)
                 val purple = rgb(0xFF6A3FA0)
-                b.box(Vec3(at.x, g + 0.7f, at.z), Vec3(2.2f, 1.6f, 2.2f), stone, 0.12f)
+                b.box(Vec3(at.x, g + 0.3f, at.z), Vec3(2.2f, 2.4f, 2.2f), stone, 0.12f)
                 b.box(Vec3(at.x, g + 1.6f, at.z), Vec3(2.5f, 0.25f, 2.5f), shade(stone, 1.05f), 0.08f)
                 for ((dx, dz) in listOf(0f to 1.12f, 0f to -1.12f, 1.12f to 0f, -1.12f to 0f)) {
                     b.box(Vec3(at.x + dx, g + 1.0f, at.z + dz), Vec3(if (dx == 0f) 1.0f else 0.06f, 1.0f, if (dz == 0f) 1.0f else 0.06f), purple, 0.02f)

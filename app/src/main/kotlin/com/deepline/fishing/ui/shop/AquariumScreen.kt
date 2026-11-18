@@ -249,6 +249,9 @@ fun AquariumView(
     }
 }
 
+/** What a press on the full-screen aquarium turned out to be. */
+private enum class Press { TAP, MOVE, HOLD }
+
 /** The decor shown in the tank, each where the player put it. */
 internal fun piecesOf(p: PlayerProgress) = Showcase.shownDecor(p).map { com.deepline.fishing.ui.render3d.AquariumScene.Piece(it, Showcase.decorSpot(p, it)) }
 
@@ -276,55 +279,75 @@ fun AquariumFullScreen(vm: GameViewModel) {
             Modifier
                 .fillMaxSize()
                 .pointerInput(Unit) {
+                    // One detector for every gesture, so none cancels another: a tap is a press
+                    // released quickly without moving past the touch slop, and two taps close in
+                    // time and place are a double tap (however many follow); anything that moves
+                    // further looks around (a pinch zooms); a press held still picks decor up.
+                    var lastTapUp = 0L
+                    var lastTapAt = androidx.compose.ui.geometry.Offset.Zero
                     awaitEachGesture {
                         val down = awaitFirstDown(requireUnconsumed = false)
+                        val slop = viewConfiguration.touchSlop
                         val hit = camera.pick(down.position.x, down.position.y, pieces.value)
-                        // A piece of decor moves after a press held still for the system's long-press
-                        // time (400 ms unless the player changed it in the accessibility settings):
-                        // a plain drag, even starting on the decor, looks around the tank.
-                        var held = false
-                        if (hit != null) {
-                            val outcome = withTimeoutOrNull(viewConfiguration.longPressTimeoutMillis) {
-                                while (true) {
-                                    val event = awaitPointerEvent()
-                                    val finger = event.changes.firstOrNull { it.id == down.id }
-                                    if (finger == null || !finger.pressed) return@withTimeoutOrNull false
-                                    if (event.changes.count { it.pressed } > 1) return@withTimeoutOrNull false
-                                    if ((finger.position - down.position).getDistance() > viewConfiguration.touchSlop) return@withTimeoutOrNull false
-                                }
-                                @Suppress("UNREACHABLE_CODE") false
-                            }
-                            held = outcome == null
-                        }
-                        if (held && hit != null) {
-                            // Lifted: it follows the finger until it's let go, then sinks.
-                            camera.grab(hit, down.position.x, down.position.y, pieces.value)
+                        var outcome = Press.TAP
+                        var upTime = down.uptimeMillis
+                        // Still and down: a tap if released soon, a hold (on decor) if kept long enough.
+                        val still = withTimeoutOrNull(if (hit != null) viewConfiguration.longPressTimeoutMillis else Long.MAX_VALUE / 2) {
                             while (true) {
                                 val event = awaitPointerEvent()
                                 val finger = event.changes.firstOrNull { it.id == down.id }
-                                if (finger == null || !finger.pressed || event.changes.count { it.pressed } > 1) break
-                                if (finger.positionChanged()) {
-                                    camera.move(finger.position.x, finger.position.y)
-                                    finger.consume()
+                                if (finger == null || !finger.pressed) {
+                                    upTime = finger?.uptimeMillis ?: upTime
+                                    return@withTimeoutOrNull Press.TAP
+                                }
+                                if (event.changes.count { it.pressed } > 1 || (finger.position - down.position).getDistance() > slop) {
+                                    return@withTimeoutOrNull Press.MOVE
                                 }
                             }
-                            camera.release()?.let { (d, spot) -> vm.placeDecor(d, spot) }
-                        } else {
-                            // The water: look around and zoom.
-                            while (true) {
-                                val event = awaitPointerEvent()
-                                if (event.changes.none { it.pressed }) break
-                                val zoom = event.calculateZoom()
-                                val pan = event.calculatePan()
-                                if (zoom != 1f) camera.zoomBy(zoom)
-                                if (pan != androidx.compose.ui.geometry.Offset.Zero) camera.drag(pan.x, pan.y)
-                                event.changes.forEach { if (it.positionChanged()) it.consume() }
+                            @Suppress("UNREACHABLE_CODE") Press.TAP
+                        }
+                        outcome = still ?: Press.HOLD
+                        when (outcome) {
+                            Press.TAP -> {
+                                val near = (down.position - lastTapAt).getDistance() < slop * 4f
+                                if (upTime - lastTapUp < viewConfiguration.doubleTapTimeoutMillis + 100 && near) {
+                                    camera.doubleTap(down.position.x, down.position.y)
+                                    lastTapUp = 0L
+                                } else {
+                                    lastTapUp = upTime
+                                    lastTapAt = down.position
+                                }
+                            }
+                            Press.HOLD -> if (hit != null) {
+                                // Lifted: it follows the finger until it's let go, then sinks.
+                                camera.grab(hit, down.position.x, down.position.y, pieces.value)
+                                while (true) {
+                                    val event = awaitPointerEvent()
+                                    val finger = event.changes.firstOrNull { it.id == down.id }
+                                    if (finger == null || !finger.pressed || event.changes.count { it.pressed } > 1) break
+                                    if (finger.positionChanged()) {
+                                        camera.move(finger.position.x, finger.position.y)
+                                        finger.consume()
+                                    }
+                                }
+                                camera.release()?.let { (d, spot) -> vm.placeDecor(d, spot) }
+                            }
+                            Press.MOVE -> {
+                                lastTapUp = 0L
+                                // The water: look around and zoom, from where the finger is now.
+                                while (true) {
+                                    val event = awaitPointerEvent()
+                                    if (event.changes.none { it.pressed }) break
+                                    val zoom = event.calculateZoom()
+                                    val pan = event.calculatePan()
+                                    if (zoom != 1f) camera.zoomBy(zoom)
+                                    if (pan != androidx.compose.ui.geometry.Offset.Zero) camera.drag(pan.x, pan.y)
+                                    event.changes.forEach { if (it.positionChanged()) it.consume() }
+                                }
                             }
                         }
                     }
-                }
-                // A double tap: on a fish it reacts, on the water the view zooms in or back out.
-                .pointerInput(Unit) { detectTapGestures(onDoubleTap = { camera.doubleTap(it.x, it.y) }) },
+                },
             camera = camera,
             // Full screen: drawn at the phone's own width, not stretched from a small image.
             maxRenderWidth = 1080,

@@ -13,6 +13,7 @@ import com.deepline.fishing.ui.village.VillageCamera
 import com.deepline.fishing.ui.village.VillageLayout
 import com.deepline.fishing.ui.village.VillageModels
 import com.deepline.fishing.ui.village.VillageScene
+import com.deepline.fishing.ui.village.VillageThemes
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -38,11 +39,33 @@ class VillageSceneTest {
             Meshes.get(key).also { assertSound(key, it) }.triangleCount
         }
         triangles += dress[0] + dress.drop(1).max()
+        // The richest theme's dress.
+        triangles += com.deepline.fishing.core.MenuTheme.entries.maxOf { Meshes.get(VillageThemes.key(it)).triangleCount }
         // The leaves of the CC0 trees, bushes and flowers.
         for (tex in VillageModels.leafTextures) triangles += Meshes.get("village:leaves:$tex").also { assertSound(tex, it) }.triangleCount
         println("village triangles: $triangles")
         // A mid-range phone's GPU is the limit (docs/ui-design.md): keep the whole village small.
         assertTrue("The village has $triangles triangles", triangles < 150_000)
+    }
+
+    @Test
+    fun everyThemeDressesTheSquareAndDearerThemesChangeMore() {
+        val tris = com.deepline.fishing.core.MenuTheme.entries.associateWith { t ->
+            Meshes.get(VillageThemes.key(t)).also { assertSound(t.name, it) }.triangleCount
+        }
+        println("theme triangles: $tris")
+        // Every theme has its own centrepiece (no two alike), and each tier brings more than the one below.
+        assertTrue(tris.values.toSet().size == tris.size)
+        val byTier = tris.entries.groupBy({ it.key.tier }, { it.value })
+        for (tier in 1..byTier.keys.max()) {
+            assertTrue("tier $tier: ${byTier[tier]} vs ${byTier[tier - 1]}", byTier.getValue(tier).average() > byTier.getValue(tier - 1).average())
+        }
+        // A frame builds with each theme on the island.
+        val camera = VillageCamera().apply { fit(1080f, 2156f, floatArrayOf(220f, 394f, 42f, 95f)) }
+        for (t in com.deepline.fishing.core.MenuTheme.entries) {
+            val frame = VillageScene().build(720, 1437, 2f, camera, VillageScene.Looks(MenuPalettes.of(t, false), Skins.CLASSIC, emptyList(), theme = t))
+            assertTrue(VillageThemes.key(t) in frame.items.mapNotNull { it.meshKey })
+        }
     }
 
     @Test
@@ -180,5 +203,35 @@ class AquariumSceneTest {
         assertTrue(camera.heightOf(com.deepline.fishing.core.Decor.SUNKEN_SHIP) == 0f)
         // Nothing to pick in empty water.
         assertTrue(camera.pick(5f, 5f, all) == null)
+    }
+
+    @Test
+    fun aDoubleTapAnywhereOnAFishMakesItReactEveryTime() {
+        val scene = com.deepline.fishing.ui.render3d.AquariumScene()
+        val camera = com.deepline.fishing.ui.render3d.AquariumScene.Camera()
+        val w = 1080
+        val h = 2340
+        val fish = FishCatalog.all.take(1)
+        var t = 0f
+        scene.build(w, h, t, fish, emptyList(), false, camera)
+        val f = scene.school.swimmers.single()
+        repeat(5) { n ->
+            // In view, swimming: the tail end of the body, then the head, then the middle...
+            f.x = camera.panX + 0.3f * n - 0.6f
+            f.y = 2.4f
+            val along = listOf(-0.42f, 0.42f, 0f, -0.3f, 0.3f)[n] * f.len * kotlin.math.cos(f.yaw)
+            val target = Vec3(f.x + along, f.y, f.z)
+            var px = -1f
+            var py = -1f
+            loop@ for (y in 0 until h step 6) for (x in 0 until w step 6) {
+                val p = camera.unproject(x.toFloat(), y.toFloat(), f.z)!!
+                if (kotlin.math.abs(p.x - target.x) < 0.03f && kotlin.math.abs(p.y - target.y) < 0.03f) { px = x.toFloat(); py = y.toFloat(); break@loop }
+            }
+            assertTrue("fish on screen", px >= 0f)
+            camera.doubleTap(px, py)
+            t += 1f / 60f
+            scene.build(w, h, t, fish, emptyList(), false, camera)
+            assertTrue("tap ${n + 1} wasn't taken", f.reaction != null)
+        }
     }
 }

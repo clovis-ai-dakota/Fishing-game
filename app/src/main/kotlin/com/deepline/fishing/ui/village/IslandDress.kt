@@ -18,13 +18,15 @@ import com.deepline.fishing.core.ShopCatalog
  *
  * [level]:
  * - 0 the classic look: the island as it is.
- * - 1 a boat of their own design (free options): the arena's pennant in its flag colour.
- * - 2 a shop boat (a premade boat up to €1.99, shop paints or emblems): also the market's awning
- *   and the pavilion's tiles.
- * - 3 a premium look (a set, a season pass boat, €4.99 and up, the Club's Aurora): also the roofs
- *   and the lighthouse, and bunting all over the island.
+ * - 1 a boat of their own design (free options): its colours on the arena's pennant, the bunting,
+ *   the market's awning, the pavilion's tiles and the rowboat by the jetty.
+ * - 2 a shop boat (a premade boat up to €1.99, shop paints or emblems): the roofs take some of it.
+ * - 3 a premium boat (a set, a season pass boat, €4.99 and up, the Club's Aurora): the roofs and
+ *   the lighthouse fully.
  * - 4 a legendary boat (a legendary secret): all of that in the set's colours, its monument in
- *   the square and a crown for the lighthouse ([legend], the monument's key).
+ *   the lighthouse's grounds and a crown for the lighthouse ([legend], the monument's key).
+ *
+ * The menu theme dresses the island too, with objects rather than colours (see [VillageThemes]).
  *
  * Colours are ARGB; null leaves that part as built.
  */
@@ -34,9 +36,19 @@ data class IslandDress(
     val flag: Long? = null,
     val trim: Long? = null,
     val legend: String? = null,
+    /** The rowboat by the jetty, painted like the player's boat. */
+    val hull: Long? = null,
 ) {
-    /** Whether the island gets its bunting. */
-    val bunting: Boolean get() = level >= 3
+    /** Whether the island gets its bunting (any boat of the player's own, or better). */
+    val bunting: Boolean get() = level >= 1
+
+    /** How much the roofs take the boat's colour (none for a boat of free options). */
+    val roofAmount: Float get() = when {
+        level >= 4 -> 1f
+        level >= 3 -> 0.85f
+        level >= 2 -> 0.55f
+        else -> 0f
+    }
 
     companion object {
         val CLASSIC = IslandDress(0)
@@ -72,7 +84,7 @@ data class IslandDress(
             // Boat skins are the legendary sets' boats.
             val (legend, colors) = LEGENDS[c.unlockedBy] ?: return null
             val (roof, flag, trim) = colors
-            return IslandDress(4, roof, flag, trim, legend)
+            return IslandDress(4, roof, flag, trim, legend, hull = roof)
         }
 
         /** A boat design worn: a shop boat by its price, otherwise by the options it uses. */
@@ -93,9 +105,10 @@ data class IslandDress(
             if (level == 0) return CLASSIC
             return IslandDress(
                 level,
-                roof = d.hullColor().takeIf { level >= 3 },
+                roof = d.hullColor().takeIf { level >= 2 },
                 flag = d.flagColor(),
-                trim = d.trimColor().takeIf { level >= 2 },
+                trim = d.trimColor(),
+                hull = d.hullColor(),
             )
         }
     }

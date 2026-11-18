@@ -32,7 +32,14 @@ class VillageScene {
     private val lighthouseLamp = VillageModels.lighthouseLamp
 
     /** What the scene shows besides the village itself (read on the render thread). */
-    class Looks(val palette: MenuPalette, val skins: Skins, val tankFish: List<FishSpecies>, val dress: IslandDress = IslandDress.CLASSIC)
+    class Looks(
+        val palette: MenuPalette,
+        val skins: Skins,
+        val tankFish: List<FishSpecies>,
+        val dress: IslandDress = IslandDress.CLASSIC,
+        /** The menu theme: the square's centrepiece and, the dearer the theme, more (see [VillageThemes]). */
+        val theme: com.deepline.fishing.core.MenuTheme = com.deepline.fishing.core.MenuTheme.LAGOON,
+    )
 
     fun build(widthPx: Int, heightPx: Int, t: Float, camera: VillageCamera, looks: Looks): Frame {
         val w = widthPx.toFloat()
@@ -69,15 +76,17 @@ class VillageScene {
         // The town in the colours of the skin the player wears (see IslandDress).
         val d = looks.dress
         val dressed = painted + mapOf(
-            "uDressRoof" to dressColor(d.roof, if (d.level >= 4) 1f else 0.85f),
+            "uDressRoof" to dressColor(d.roof, d.roofAmount),
             "uDressFlag" to dressColor(d.flag, 1f),
             "uDressTrim" to dressColor(d.trim, 1f),
+            "uDressHull" to dressColor(d.hull, 1f),
         )
         items += DrawItem(Program.TOON, "village:town", uniforms = dressed, cullBack = false)
         // The trees', bushes' and flowers' leaves: cut-out textures, one draw each.
         for (tex in VillageModels.leafTextures) items += DrawItem(Program.LEAF, "village:leaves:$tex", uniforms = painted, cullBack = false, texture = tex)
         if (d.bunting) items += DrawItem(Program.TOON, "village:dress:bunting", uniforms = dressed, cullBack = false)
         d.legend?.let { items += DrawItem(Program.TOON, "village:dress:$it", uniforms = dressed) }
+        items += DrawItem(Program.TOON, VillageThemes.key(looks.theme), uniforms = painted, cullBack = false)
         // Your boat moored along the pier, bow out to sea, in your skins.
         items += boats.boatItems(looks.skins.boat, VillageLayout.boatAt, t, looks.skins.customBoat, rotY = PI.toFloat() / 2f)
         // The aquarium's fish swimming circles under the dome.

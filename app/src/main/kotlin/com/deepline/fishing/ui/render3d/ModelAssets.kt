@@ -83,7 +83,7 @@ object ModelCredits {
     val all = listOf(
         Credit(
             "Pirate Kit", "Kenney", "https://kenney.nl/assets/pirate-kit",
-            listOf("palm-detailed-bend", "palm-detailed-straight", "barrel", "crate", "boat-row-small", "rocks-sand-a", "grass-plant"),
+            listOf("palm-detailed-bend", "palm-detailed-straight", "barrel", "crate", "boat-row-small", "rocks-sand-a", "grass-plant", "chest"),
         ),
         Credit("Watercraft Kit", "Kenney", "https://kenney.nl/assets/watercraft-kit", listOf("buoy-flag")),
         Credit(

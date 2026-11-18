@@ -187,7 +187,7 @@ private fun VillageMap(
     if (supported) {
         // What the render thread draws: the latest palette, skins and tank, read every frame.
         val looks = remember { arrayOfNulls<VillageScene.Looks>(1) }
-        looks[0] = VillageScene.Looks(palette, vm.skins, com.deepline.fishing.core.Showcase.tankFish(vm.progress), IslandDress.of(vm.progress))
+        looks[0] = VillageScene.Looks(palette, vm.skins, com.deepline.fishing.core.Showcase.tankFish(vm.progress), IslandDress.of(vm.progress), vm.menuTheme)
         val source = remember {
             val scene = VillageScene()
             com.deepline.fishing.ui.render3d.gl.FrameSource { w, h, t -> scene.build(w, h, t, camera, looks[0]!!) }

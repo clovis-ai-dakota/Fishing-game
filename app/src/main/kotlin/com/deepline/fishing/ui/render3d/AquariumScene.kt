@@ -280,12 +280,17 @@ class AquariumScene {
         // A double tap: the fish under the finger reacts; on the water, the view zooms.
         camera?.doubleTapAt?.let { (x, y) ->
             camera.doubleTapAt = null
-            val hit = school.fishAt { f ->
-                val at = camera.unproject(x, y, f.z) ?: return@fishAt false
-                val dx = at.x - f.x
+            // Anywhere on the body counts, head to tail (with a finger's width to spare): the
+            // nearest fish to the finger, measured along its body as seen on the screen.
+            val hit = school.swimmers.mapNotNull { f ->
+                val at = camera.unproject(x, y, f.z) ?: return@mapNotNull null
+                val half = 0.5f * f.len * f.puff * kotlin.math.abs(kotlin.math.cos(f.yaw))
+                val along = (at.x - f.x).coerceIn(-half, half)
+                val dx = at.x - (f.x + along)
                 val dy = at.y - f.y
-                dx * dx + dy * dy < (f.len * 0.6f + 0.2f).let { it * it }
-            }
+                val d = kotlin.math.sqrt(dx * dx + dy * dy)
+                if (d < 0.25f * f.len * f.puff + TAP_REACH) f to d else null
+            }.minByOrNull { it.second }?.first
             if (hit != null) school.react(hit) else camera.toggleZoom(x, y)
         }
         for ((i, f) in school.swimmers.withIndex()) {
@@ -360,6 +365,8 @@ class AquariumScene {
         /** Full screen opens on this much height (m, at the back glass), centred at this height: the tank and its stand. */
         private const val HOME_VIEW_HEIGHT = 6.8f
         private const val HOME_CENTER_Y = 1.6f
+        /** How far from a fish's body (m) a double tap still reaches it: about a fingertip. */
+        private const val TAP_REACH = 0.35f
         /** How far a piece lifts when it's picked up (m). */
         private const val LIFT = 0.18f
 

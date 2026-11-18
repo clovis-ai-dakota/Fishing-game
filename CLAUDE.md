@@ -60,8 +60,13 @@ Modules: `core` (pure-Kotlin rules, battles, bot, online protocol), `server` (Kt
     (0 classic, 1 own design: the arena's pennant, 2 shop boat: awnings and tiles, 3 premium:
     roofs, lighthouse and bunting, 4 legendary: the set's
     colours, a monument in the square and a crown for the lighthouse). Parts are marked
-    `Part.DRESS_ROOF/FLAG/TRIM` and tinted in the shader (`uDress*`, off by default). Looks only,
-    nothing that opens a menu; never name a secret or a set in its tour step.
+    `Part.DRESS_ROOF/FLAG/TRIM/HULL` and tinted in the shader (`uDress*`, off by default). Looks
+    only, nothing that opens a menu; never name a secret or a set in its tour step. The boat gives
+    the colours (any design of the player's own: pennant, bunting, awnings, the rowboat), the
+    **menu theme gives the objects** (`VillageThemes`): the square's centrepiece is the theme's
+    (Lagoon's fountain), and the dearer the tier the more it adds (tier 2 round the square, tier
+    3 all over the island, tier 4 living lights); `VillageSceneTest` checks each tier adds more.
+    A legendary boat's monument stands in the lighthouse's grounds (`VillageModels.legendAt`).
   - The 2D boat (classic, skins and designs) is drawn by `drawBoat` in `BoatArt.kt`; every
     `HullPattern`, `SailStyle`, `FlagStyle` and `Emblem` must also be drawn in 3D.
 - **Menu design** (rules and kit: `docs/ui-design.md`; components in `ui/kit/`):

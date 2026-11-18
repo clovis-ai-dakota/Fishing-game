@@ -88,6 +88,8 @@ object Part {
     const val DRESS_TRIM = 66f
     /** Leaves, petals and grass of the CC0 models: a cut-out texture ([Program.LEAF]); they sway. */
     const val LEAF = 67f
+    /** The rowboat by the jetty: painted like the player's own boat (uDressHull). */
+    const val DRESS_HULL = 68f
     const val KELP = 40f
     const val DECOR_ROCK = 41f
     const val CORAL = 42f
@@ -169,6 +171,11 @@ class MeshBuilder {
      * Paints vertices [from] until the end with [color] (r, g, b, a): the painted material reads
      * it (see [Part.PAINTED]). Shapes are built with the usual calls, then painted.
      */
+    /** Marks vertices [from] until the end as part [partId] (a model's piece the shader treats apart). */
+    fun repart(from: Int, partId: Float) {
+        for (i in from until vCount) part[i] = partId
+    }
+
     fun recolor(from: Int, color: FloatArray) {
         hasColors = true
         for (i in from until vCount) {

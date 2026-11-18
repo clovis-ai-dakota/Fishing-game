@@ -23,11 +23,13 @@ class IslandDressTest {
         assertEquals(IslandDress.CLASSIC, IslandDress.of(PlayerProgress()))
         // The default design, worn: nothing to show.
         assertEquals(0, IslandDress.of(wearing(BoatDesign.DEFAULT)).level)
-        // A design of free options: the pennant only.
         val own = IslandDress.of(wearing(BoatDesign.DEFAULT.copy(flag = BoatPalette.indexOf("Lagoon"))))
         assertEquals(1, own.level)
+        // A design of its own: its colours on the pennant, the bunting, the awning and the rowboat; not the roofs.
         assertEquals(BoatPalette.color(BoatPalette.indexOf("Lagoon")), own.flag)
-        assertNull(own.trim)
+        assertEquals(BoatDesign.DEFAULT.trimColor(), own.trim)
+        assertEquals(BoatDesign.DEFAULT.hullColor(), own.hull)
+        assertTrue(own.bunting)
         assertNull(own.roof)
         // A shop paint: the awning too.
         assertEquals(2, IslandDress.of(wearing(BoatDesign.DEFAULT.copy(pattern = HullPattern.FLAMES))).level)

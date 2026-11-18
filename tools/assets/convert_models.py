@@ -29,7 +29,7 @@ TEX_OUT = os.path.join(OUT, "tex")
 # (pack folder, OBJ folder inside it, texture folder inside it, model names)
 PACKS = [
     ("kenney-pirate-kit", "extracted/Models/OBJ format", "extracted/Models/OBJ format/Textures", [
-        "palm-detailed-bend", "palm-detailed-straight", "barrel", "crate", "boat-row-small", "rocks-sand-a", "grass-plant",
+        "palm-detailed-bend", "palm-detailed-straight", "barrel", "crate", "boat-row-small", "rocks-sand-a", "grass-plant", "chest",
     ]),
     ("kenney-watercraft-kit", "extracted/Models/OBJ format", "extracted/Models/OBJ format/Textures", [
         "buoy-flag",

@@ -210,7 +210,7 @@
 
     <!-- The island in the colours of the player's skin (see IslandDress). Never name a secret or a legendary set here. -->
     <string name="tour_island_look_title">Your look on the island</string>
-    <string name="tour_island_look_body">Your boat shows on the island: it colours the pennant, the awnings and the roofs. The rarer your boat, the bigger the celebration.</string>
+    <string name="tour_island_look_body">Your boat and your theme show on the island: the boat colours the pennant, the bunting, the awnings and the roofs; each theme has its own centrepiece in the square, and the rarer the theme, the more it changes the island.</string>
     <!-- The Tackle page offers one pack at a time. %1$d: single pieces per day. -->
     <string name="tour_tackle_offers_title">One pack at a time</string>
     <string name="tour_tackle_offers_body">Each piece of tackle offers its smallest pack first, then the next bigger one once you\'ve bought it. Single pieces are bought with points, up to %1$d of each a day.</string>

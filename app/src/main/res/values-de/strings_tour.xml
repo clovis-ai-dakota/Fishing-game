@@ -159,7 +159,7 @@
 
     <!-- The island in the colours of the player's skin (see IslandDress). Never name a secret or a legendary set here. -->
     <string name="tour_island_look_title">Dein Look auf der Insel</string>
-    <string name="tour_island_look_body">Dein Boot sieht man auf der Insel: Es färbt den Wimpel, die Markisen und die Dächer. Je seltener dein Boot, desto größer das Fest.</string>
+    <string name="tour_island_look_body">Dein Boot und dein Thema sieht man auf der Insel: Das Boot färbt den Wimpel, die Wimpelketten, die Markisen und die Dächer; jedes Thema hat sein eigenes Denkmal in der Mitte des Platzes, und je seltener das Thema, desto mehr verändert es die Insel.</string>
     <!-- The Tackle page offers one pack at a time. %1$d: single pieces per day. -->
     <string name="tour_tackle_offers_title">Ein Paket nach dem anderen</string>
     <string name="tour_tackle_offers_body">Jede Ausrüstung bietet zuerst ihr kleinstes Paket an und nach dem Kauf das nächstgrößere. Einzeln kaufst du sie mit Punkten, bis zu %1$d von jeder pro Tag.</string>

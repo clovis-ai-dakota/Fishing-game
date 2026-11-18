@@ -25,6 +25,7 @@ uniform float uGlow;      // the village's lights: 0 by day, 1 at night
 uniform vec4 uDressRoof;  // the village in the player's skin: rgb a colour, a how much (0: off)
 uniform vec4 uDressFlag;
 uniform vec4 uDressTrim;
+uniform vec4 uDressHull;
 #ifdef LEAF
 uniform sampler2D uTex;   // the cut-out leaves' texture (Program.LEAF)
 #endif
@@ -505,6 +506,7 @@ Surface paintedSurface() {
     if (isPart(vPart, 64.0)) c = dressed(c, uDressRoof);
     else if (isPart(vPart, 65.0)) c = dressed(c, uDressFlag);
     else if (isPart(vPart, 66.0)) c = dressed(c, uDressTrim);
+    else if (isPart(vPart, 68.0)) c = dressed(c, uDressHull);
     if (isPart(vPart, 61.0)) {
         // Glass: the sky by day (brighter at the top), warm lamplight at night.
         vec3 day = mix(vec3(0.42, 0.62, 0.78), vec3(0.85, 0.95, 1.0), clamp(vUv.y, 0.0, 1.0));

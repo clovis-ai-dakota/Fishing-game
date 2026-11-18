@@ -216,6 +216,7 @@ class GlBackend(
             "uDressRoof" to floatArrayOf(0f, 0f, 0f, 0f),
             "uDressFlag" to floatArrayOf(0f, 0f, 0f, 0f),
             "uDressTrim" to floatArrayOf(0f, 0f, 0f, 0f),
+            "uDressHull" to floatArrayOf(0f, 0f, 0f, 0f),
         )
     }
 }

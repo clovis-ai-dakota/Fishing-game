@@ -185,7 +185,7 @@
 
     <!-- The island in the colours of the player's skin (see IslandDress). Never name a secret or a legendary set here. -->
     <string name="tour_island_look_title">Adadaki tarzın</string>
-    <string name="tour_island_look_body">Teknen adada görünür: flamayı, tenteleri ve çatıları boyar. Teknen ne kadar nadirse kutlama o kadar büyük olur.</string>
+    <string name="tour_island_look_body">Teknen ve temaların adada görünür: tekne flamayı, bayrak dizilerini, tenteleri ve çatıları boyar; her temanın meydanın ortasında kendi anıtı vardır ve tema ne kadar nadirse adayı o kadar çok değiştirir.</string>
     <!-- The Tackle page offers one pack at a time. %1$d: single pieces per day. -->
     <string name="tour_tackle_offers_title">Her seferinde bir paket</string>
     <string name="tour_tackle_offers_body">Her takım önce en küçük paketini sunar, onu satın alınca bir sonraki büyüğünü. Tek tek ise puanla alınır, her birinden günde en fazla %1$d tane.</string>

@@ -194,7 +194,7 @@
 
     <!-- The island in the colours of the player's skin (see IslandDress). Never name a secret or a legendary set here. -->
     <string name="tour_island_look_title">Tu estilo en la isla</string>
-    <string name="tour_island_look_body">Tu barco se ve en la isla: da color al banderín, a los toldos y a los tejados. Cuanto más raro es tu barco, mayor es la fiesta.</string>
+    <string name="tour_island_look_body">Tu barco y tu tema se ven en la isla: el barco da color al banderín, a las guirnaldas, a los toldos y a los tejados; cada tema tiene su propio monumento en el centro de la plaza y, cuanto más raro es el tema, más cambia la isla.</string>
     <!-- The Tackle page offers one pack at a time. %1$d: single pieces per day. -->
     <string name="tour_tackle_offers_title">Un lote cada vez</string>
     <string name="tour_tackle_offers_body">Cada aparejo ofrece primero su lote más pequeño y, cuando lo compras, el siguiente más grande. Por unidad se compra con puntos, hasta %1$d de cada uno al día.</string>
