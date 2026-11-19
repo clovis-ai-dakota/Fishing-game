@@ -79,7 +79,7 @@ fun DrawScope.drawVillageMap(camera: VillageCamera, p: MenuPalette, t: Float) {
         poly(listOf(Vec3(a.x + nx, 0.8f, a.z + nz), Vec3(b.x + nx, 0.8f, b.z + nz), Vec3(b.x - nx, 0.8f, b.z - nz), Vec3(a.x - nx, 0.8f, a.z - nz)))?.let { drawPath(it, road) }
     }
     val sq = VillageLayout.square
-    poly((0 until 24).map { k -> val a = k / 24f * 2f * PI.toFloat(); Vec3(sq.x + cos(a) * 4.2f, 0.8f, sq.z + sin(a) * 4.2f) })?.let { drawPath(it, road) }
+    poly((0 until 24).map { k -> val a = k / 24f * 2f * PI.toFloat(); Vec3(sq.x + cos(a) * VillageLayout.SQUARE_R, 0.8f, sq.z + sin(a) * VillageLayout.SQUARE_R) })?.let { drawPath(it, road) }
     street(sq, Vec3(dex.x, 0f, dex.z + 3.2f), 2.2f)
     street(sq, Vec3(-11f, 0f, -13.6f), 2.4f)
     street(sq, Vec3(11f, 0f, -12.6f), 2.4f)

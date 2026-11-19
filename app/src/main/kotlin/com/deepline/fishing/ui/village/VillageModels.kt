@@ -146,7 +146,7 @@ object VillageModels {
 
     internal fun pathDistance(x: Float, z: Float): Float {
         val sq = VillageLayout.square
-        val plaza = sqrt((x - sq.x) * (x - sq.x) + (z - sq.z) * (z - sq.z)) - 4.2f
+        val plaza = sqrt((x - sq.x) * (x - sq.x) + (z - sq.z) * (z - sq.z)) - VillageLayout.SQUARE_R
         return min(plaza, paths.minOf { (a, e, w) -> distanceToSegment(x, z, a, e) - w / 2f })
     }
 
@@ -261,6 +261,11 @@ object VillageModels {
         // The boat at the pier (its usual size: the skins keep the same hull).
         val boat = VillageLayout.boatAt
         out += BoxOcc(Vec3(boat.x - 1.1f, 0f, boat.z - 2.6f), Vec3(boat.x + 1.1f, 2.2f, boat.z + 2.6f))
+        // The theme's centrepiece in the square, as big as a building: a soft shadow its rough size
+        // (the ground is shared by every theme).
+        val sq = VillageLayout.square
+        val sg = height(sq.x, sq.z)
+        out += CylOcc(sq.x, sq.z, 2.8f, sg, sg + 3.2f)
         for (t in trees) {
             out += SphereOcc(Vec3(t.at.x, t.at.y + t.crownY, t.at.z), t.crownR)
             out += CylOcc(t.at.x, t.at.z, 0.25f * t.scale, t.at.y - 0.5f, t.at.y + t.crownY)
@@ -666,7 +671,7 @@ object VillageModels {
             }
         }
         // Bushes by the plinths, a few in flower.
-        for ((k, p) in listOf(-17.2f to -14.6f, -4.6f to -14.4f, 4.7f to -13.6f, 17.6f to -13.4f, -15.6f to -1.2f, -3.2f to -31.5f, 0.6f to -33.5f).withIndex()) {
+        for ((k, p) in listOf(-17.2f to -14.6f, -4.4f to -16.8f, 3.4f to -16.6f, 17.6f to -13.4f, -15.6f to -1.2f, -3.2f to -31.5f, 0.6f to -33.5f).withIndex()) {
             val (x, z) = p
             place(if (k % 3 == 1) "Flower_3_Group" else "Bush_Common", ground(x, z) + Vec3(0f, -0.1f, 0f), if (k % 3 == 1) 0.8f else 1.05f + 0.2f * hash01(k, 1, 71), k * 1.7f)
         }
@@ -1252,17 +1257,12 @@ object VillageModels {
     }
 
     /**
-     * Bunting for the island's party when the player wears a premium look: across the square,
-     * along the pier, between the arena's pennants and down from the lighthouse's gallery.
+     * Bunting for the island's party when the player wears a boat of their own: along the pier,
+     * between the arena's pennants and down from the lighthouse's gallery (the square is the
+     * theme's).
      */
     private fun bunting(): MeshData {
         val b = MeshBuilder()
-        val fShop = floorOf(Building.SHOP)
-        val fRope = floorOf(Building.ROPE)
-        val shop = VillageLayout.spots.getValue(Building.SHOP).center
-        val rope = VillageLayout.spots.getValue(Building.ROPE).center
-        // Across the square, from the market's front corner to the workshop's.
-        b.flagString(Vec3(shop.x + 5.2f, fShop + 4.2f, shop.z + 3.4f), Vec3(rope.x - 6.1f, fRope + 3.7f, rope.z + 3.2f), 1.1f)
         // Along the pier, on three tall poles.
         val a = VillageLayout.pierFrom
         val e = VillageLayout.pierTo

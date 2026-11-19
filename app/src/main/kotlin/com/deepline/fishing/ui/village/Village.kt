@@ -76,8 +76,12 @@ object VillageLayout {
         Building.DUEL to Spot(Vec3(-8f, 2.5f, 19f), Vec3(7f, 3f, 7f), Vec3(-8f, 9.5f, 19f)),
     )
 
-    /** The square in the middle of the island, where the paths meet. */
-    val square = Vec3(0f, 0f, -14f)
+    /**
+     * The square in the middle of the island, where the paths meet: wide enough ([SQUARE_R]) for
+     * the menu theme's centrepiece, as big as a building (see `VillageThemes`).
+     */
+    val square = Vec3(0.5f, 0f, -9.5f)
+    const val SQUARE_R = 6f
 
     /** The pier, from the beach out to sea (x, z of its two ends), and where the boat lies. */
     val pierFrom = Vec3(6f, 0.9f, 2.5f)
