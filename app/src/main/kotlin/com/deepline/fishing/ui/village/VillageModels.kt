@@ -132,17 +132,7 @@ object VillageModels {
     }
 
     /** The paths, from the square to each place's door (from, to, width). */
-    internal val paths: List<Triple<Vec3, Vec3, Float>> by lazy {
-        val sq = VillageLayout.square
-        listOf(
-            Triple(sq, Vec3(lighthouseAt.x, 0f, lighthouseAt.z + 3.2f), 2.2f),
-            Triple(sq, Vec3(-11f, 0f, -13.6f), 2.4f),
-            Triple(sq, Vec3(11f, 0f, -12.6f), 2.4f),
-            Triple(sq, Vec3(-6.2f, 0f, -1.4f), 2.2f),
-            Triple(sq, Vec3(VillageLayout.pierFrom.x, 0f, VillageLayout.pierFrom.z + 0.5f), 2.6f),
-            Triple(Vec3(-4f, 0f, -6.5f), Vec3(VillageLayout.jettyFrom.x, 0f, VillageLayout.jettyFrom.z + 0.5f), 2f),
-        )
-    }
+    internal val paths: List<Triple<Vec3, Vec3, Float>> get() = VillageLayout.paths
 
     internal fun pathDistance(x: Float, z: Float): Float {
         val sq = VillageLayout.square
@@ -617,8 +607,8 @@ object VillageModels {
         }
         // Round trees in small groups between the places.
         val inland = listOf(
-            -1.5f to -26f, 3f to -27.5f, 17f to -26f, 19.5f to -23f, -18f to -26f, -19.5f to -12f,
-            17.5f to -7f, 19f to -10.5f, 1.5f to -3.5f, -2f to -5f, -15f to -30f, 9f to -31f,
+            -4.6f to -25f, 4.6f to -25f, -11f to -25.5f, 11f to -25.5f, -17.5f to -27f, 17.5f to -27f,
+            -18f to -8f, 18f to -8f, -15.5f to -3f, 15.5f to -3f, -7.5f to -30f,
         )
         for ((k, p) in inland.withIndex()) {
             val (x, z) = p
@@ -671,7 +661,7 @@ object VillageModels {
             }
         }
         // Bushes by the plinths, a few in flower.
-        for ((k, p) in listOf(-17.2f to -14.6f, -4.4f to -16.8f, 3.4f to -16.6f, 17.6f to -13.4f, -15.6f to -1.2f, -3.2f to -31.5f, 0.6f to -33.5f).withIndex()) {
+        for ((k, p) in listOf(-20.2f to -13.6f, -6.8f to -21.6f, 6.6f to -21.6f, 21f to -13.6f, -6.6f to 1.6f, 6.4f to -6.4f, -3.6f to -31.6f, 3.2f to -31.4f).withIndex()) {
             val (x, z) = p
             place(if (k % 3 == 1) "Flower_3_Group" else "Bush_Common", ground(x, z) + Vec3(0f, -0.1f, 0f), if (k % 3 == 1) 0.8f else 1.05f + 0.2f * hash01(k, 1, 71), k * 1.7f)
         }
@@ -1055,7 +1045,7 @@ object VillageModels {
             lathe(listOf(0.02f to top + r * 0.95f + 1.4f, 0.14f to top + r * 0.95f + 0.7f), 6, Part.PAINTED, at)
         }
         // The arched entrance, facing the square (south-east).
-        val a = 0.75f
+        val a = 0.3f
         val ex = c.x + cos(a) * (r + 0.4f)
         val ez = c.z + sin(a) * (r + 0.4f)
         val turn = atan2(cos(a), sin(a))
@@ -1294,7 +1284,7 @@ object VillageModels {
      * Where a legendary boat's monument stands: in the lighthouse's grounds, to the east of its
      * knoll (the square's centre is the menu theme's, see [VillageThemes]).
      */
-    val legendAt: Vec3 get() = Vec3(5.2f, 0f, -30.5f)
+    val legendAt: Vec3 get() = Vec3(7.8f, 0f, -30.5f)
 
     private fun monument(set: String): MeshData {
         val b = MeshBuilder()

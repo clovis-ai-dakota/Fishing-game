@@ -18,10 +18,12 @@ import kotlin.math.tan
  * the bottom of the screen), y up, the sea's surface at y = 0. One source for the 3D scene, the 2D
  * map (the fallback, and what the UI tests see) and the tests.
  *
- * The village is a small island with only the six places that open a menu: the lighthouse (Dex)
- * on its rocks to the north, the market hall (Shop) and the rope workshop (Rope) either side of
- * the square, the glass pavilion (Aquarium) by the south-west beach, and out on the water the pier
- * with your boat (Fish) and the duelling platform (Battle). Laid out for a phone held upright.
+ * The village is a small island with only the six places that open a menu, round the square at
+ * its heart (where the menu theme's centrepiece stands) and balanced either side of its north-south
+ * axis: the lighthouse (Dex) on its rocks to the north, the market hall (Shop) to the west and
+ * the rope workshop (Rope) to the east, the glass pavilion (Aquarium) to the south, and out on
+ * the water, either side of it, the duelling platform (Battle) and the pier with your boat (Fish).
+ * Laid out for a phone held upright.
  */
 object VillageLayout {
     /** A building's place: its footprint's centre, its half sizes, and where its name plate floats. */
@@ -63,34 +65,47 @@ object VillageLayout {
     }
 
     val spots: Map<Building, Spot> = mapOf(
-        // The lighthouse on its rocks at the island's northern point: the tallest thing in sight.
-        Building.DEX to Spot(Vec3(-3f, 9f, -35f), Vec3(4f, 9f, 4f), Vec3(-3f, 21f, -35f)),
-        // The market hall and the rope workshop, either side of the square.
-        Building.SHOP to Spot(Vec3(-11f, 4f, -18f), Vec3(5.5f, 4f, 4f), Vec3(-11f, 10.5f, -18f)),
-        Building.ROPE to Spot(Vec3(11f, 3.5f, -17f), Vec3(6.5f, 3.5f, 4f), Vec3(11f, 9.5f, -17f)),
-        // The glass pavilion by the south-west beach.
-        Building.AQUARIUM to Spot(Vec3(-10f, 4f, -4.5f), Vec3(5.5f, 4f, 5.5f), Vec3(-10f, 10.5f, -4.5f)),
-        // The pier and your boat moored at its end.
-        Building.FISHING to Spot(Vec3(7f, 2.5f, 15f), Vec3(4.5f, 3.5f, 10f), Vec3(9f, 8.5f, 20f)),
-        // The round duelling platform out on the water.
-        Building.DUEL to Spot(Vec3(-8f, 2.5f, 19f), Vec3(7f, 3f, 7f), Vec3(-8f, 9.5f, 19f)),
+        // The lighthouse on its rocks at the island's northern point, on the square's axis.
+        Building.DEX to Spot(Vec3(0f, 9f, -35f), Vec3(4f, 9f, 4f), Vec3(0f, 21f, -35f)),
+        // The market hall and the rope workshop, either side of the square, as far from it.
+        Building.SHOP to Spot(Vec3(-13.2f, 4f, -17f), Vec3(5.5f, 4f, 4f), Vec3(-13.2f, 10.5f, -17f)),
+        Building.ROPE to Spot(Vec3(13.8f, 3.5f, -17f), Vec3(6.5f, 3.5f, 4f), Vec3(13.8f, 9.5f, -17f)),
+        // The glass pavilion to the south of the square, between the two landing stages.
+        Building.AQUARIUM to Spot(Vec3(0f, 4f, -2.2f), Vec3(5.5f, 4f, 5.5f), Vec3(0f, 10.5f, -2.2f)),
+        // The pier and your boat moored at its end, to the south-east.
+        Building.FISHING to Spot(Vec3(10.5f, 2.5f, 15f), Vec3(4.5f, 3.5f, 10f), Vec3(12.5f, 8.5f, 20f)),
+        // The round duelling platform out on the water, to the south-west, the pier's twin.
+        Building.DUEL to Spot(Vec3(-11.5f, 2.5f, 19f), Vec3(7f, 3f, 7f), Vec3(-11.5f, 9.5f, 19f)),
     )
 
     /**
-     * The square in the middle of the island, where the paths meet: wide enough ([SQUARE_R]) for
-     * the menu theme's centrepiece, as big as a building (see `VillageThemes`).
+     * The square at the island's heart, where the paths meet: wide enough ([SQUARE_R]) for the
+     * menu theme's centrepiece, as big as a building (see `VillageThemes`).
      */
-    val square = Vec3(0.5f, 0f, -9.5f)
+    val square = Vec3(0f, 0f, -16.5f)
     const val SQUARE_R = 6f
 
     /** The pier, from the beach out to sea (x, z of its two ends), and where the boat lies. */
-    val pierFrom = Vec3(6f, 0.9f, 2.5f)
-    val pierTo = Vec3(6f, 0.9f, 24f)
-    val boatAt = Vec3(9.2f, 0f, 20f)
+    val pierFrom = Vec3(9.5f, 0.9f, 3.2f)
+    val pierTo = Vec3(9.5f, 0.9f, 24f)
+    val boatAt = Vec3(12.7f, 0f, 20f)
 
     /** The duelling platform's jetty from the beach. */
-    val jettyFrom = Vec3(-8.5f, 0.9f, 2.5f)
-    val jettyTo = Vec3(-8.5f, 0.9f, 12.5f)
+    val jettyFrom = Vec3(-11.5f, 0.9f, 3.2f)
+    val jettyTo = Vec3(-11.5f, 0.9f, 12.5f)
+
+    /**
+     * The paths (from, to, width): from the square to the lighthouse's steps, the market's and the
+     * workshop's doors, and down either side of the pavilion to the pier and the jetty (the
+     * pavilion's door opens on the pier's path).
+     */
+    val paths: List<Triple<Vec3, Vec3, Float>> get() = listOf(
+        Triple(square, Vec3(0f, 0f, -31.8f), 2.2f),
+        Triple(square, Vec3(-13.2f, 0f, -12.4f), 2.4f),
+        Triple(square, Vec3(11.8f, 0f, -12.4f), 2.4f),
+        Triple(square, Vec3(pierFrom.x, 0f, pierFrom.z + 0.5f), 2.6f),
+        Triple(square, Vec3(jettyFrom.x, 0f, jettyFrom.z + 0.5f), 2.4f),
+    )
 }
 
 /**

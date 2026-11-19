@@ -80,12 +80,7 @@ fun DrawScope.drawVillageMap(camera: VillageCamera, p: MenuPalette, t: Float) {
     }
     val sq = VillageLayout.square
     poly((0 until 24).map { k -> val a = k / 24f * 2f * PI.toFloat(); Vec3(sq.x + cos(a) * VillageLayout.SQUARE_R, 0.8f, sq.z + sin(a) * VillageLayout.SQUARE_R) })?.let { drawPath(it, road) }
-    street(sq, Vec3(dex.x, 0f, dex.z + 3.2f), 2.2f)
-    street(sq, Vec3(-11f, 0f, -13.6f), 2.4f)
-    street(sq, Vec3(11f, 0f, -12.6f), 2.4f)
-    street(sq, Vec3(-6.2f, 0f, -1.4f), 2.2f)
-    street(sq, Vec3(VillageLayout.pierFrom.x, 0f, VillageLayout.pierFrom.z + 0.5f), 2.6f)
-    street(Vec3(-4f, 0f, -6.5f), Vec3(VillageLayout.jettyFrom.x, 0f, VillageLayout.jettyFrom.z + 0.5f), 2f)
+    for ((from, to, w) in VillageLayout.paths) street(from, to, w)
 
     // The pier and the duelling platform's jetty, out over the water.
     val wood = if (night) Color(0xFF5D4632) else Color(0xFFA77B4F)
